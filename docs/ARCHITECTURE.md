@@ -23,6 +23,14 @@ The platform ships as one HTML file (`knowledge-hub-integrated_BAP5.html`) so it
 
 Every module registers itself with `regMod(name, version, deps, description)`. The registry is shown on the Integrations page.
 
+## Data model
+
+`dl.js` builds chunks with unique `chunk_id` (`kind:record#ordinal`), canonical status codes (`STATUS`), ISO dates, content hash, token count, role based ACL and an embedding slot. `facts.js` extracts typed facts (set points with operator, value and unit, permissives, bill of material, nozzles, datasheet values, locations) and relations. `docs/DATA_MODEL.sql` is the matching server schema and the Integrations page exports the live data in that shape.
+
+## Assistant
+
+`intent.js` classifies each question (bypass, consequence, comparison, ranking, data issues, history, procedure, diagnosis, spares) and routes it to a deterministic handler. Handlers return sources and a confidence. Retrieval answers get a calibrated confidence that is capped when the sources are about other equipment or do not cover the question terms. `tests/eval_cases.json` holds the curated evaluation; the suite fails below 90 percent.
+
 ## Retrieval
 
 `DB.build()` converts each record into a chunk: `{id, k, title, sec, text, set, tags, ver, status, trust, sys}`. `DB.search(query, {set, kinds, k})`:

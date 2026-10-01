@@ -18,4 +18,8 @@ Edit `src/modules/*.js`, not the generated HTML. See `docs/ARCHITECTURE.md` and 
 
 Dashboard (plant P&ID overview), Equipment Sets (with Asset 360), Plot Plan, Maintenance (overview, work orders, timeline, predictive, plant replay), Interlock Library, AI Assistant, Knowledge Studio, Failure Memory, Report Center, Case 1 Coverage, Integrations, Documents, OPL Library, Data Quality. Press Ctrl+K for global search.
 
+## Backend and LLM
+
+The assistant is provider-ready: see `docs/AI_PROVIDER_CONTRACT.md` (request, response, streaming, citations), `docs/BACKEND_API.md` (endpoints and server rules), `docs/DATA_MODEL.sql` (PostgreSQL with pgvector) and `docs/PROMPT_TEMPLATE.md`. The Integrations page exports the live chunks, typed facts, relations, tool schemas and evaluation cases in that shape. `npm test` runs a curated evaluation of 54 questions and fails below 90 percent.
+
 All data is sample data provided for CALIBER purposes only.

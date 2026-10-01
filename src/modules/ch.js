@@ -14,7 +14,7 @@ function cCols(items,o={}){const H=o.h||150,W=o.w||560,L=30,B=30,T=10,n=items.le
  return s+`</svg>`}
 function cStackRows(rows,keys,o={}){ /* rows:[{l,js,vals:{key:n},}] keys:[{k,c,js:(row)=>}] horizontal stacked bars */
  const mx=Math.max(1,...rows.map(r=>sum(keys,k=>r.vals[k.k]||0)));return `<div class="chb">${rows.map(r=>`<div class="hbar" style="grid-template-columns:minmax(70px,120px) 1fr 38px"><span class="hl" ${r.js?`onclick="${r.js}" style="cursor:pointer"`:""}>${esc(r.l)}</span><span class="hb" style="display:flex;height:14px">${keys.map(k=>{const v=r.vals[k.k]||0;return v?`<i style="width:${v/mx*100}%;background:${k.c};cursor:pointer" title="${esc(r.l)} - ${k.k}: ${v}" ${k.js?`onclick="${k.js(r)}"`:""}></i>`:""}).join("")}</span><span class="hv">${sum(keys,k=>r.vals[k.k]||0)}</span></div>`).join("")}</div>`}
-const cLegend=(keys)=>`<div class="row muted" style="font-size:11.5px;gap:12px;flex-wrap:wrap">${keys.map(k=>`<span><span class="dot" style="background:${k.c}"></span>${k.k}</span>`).join("")}</div>`;
+const cLegend=(keys)=>`<div class="row muted" style="font-size:11px;gap:4px 10px;flex-wrap:wrap">${keys.map(k=>`<span><span class="dot" style="background:${k.c}"></span>${k.k}</span>`).join("")}</div>`;
 const cCard=(t,body,sub)=>`<div class="card"><div class="row between" style="margin-bottom:6px"><h3 style="margin:0">${t}</h3>${sub?`<span class="muted" style="font-size:11.5px">${sub}</span>`:""}</div>${body}</div>`;
 
 function cGroup(rows,series,o={}){ /* rows:[{l,js,vals:{k:n}}] series:[{k,c}] grouped horizontal bars */

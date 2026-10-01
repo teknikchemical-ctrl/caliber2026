@@ -31,7 +31,7 @@ for x,y in [('const vb=full?PP.vb:[0,0,880,830],o=[];','const vb=opt.vb||(full?P
  ('${full?"":`<div class="row" style="font-size:12px','${full||opt.mini?"":`<div class="row" style="font-size:12px')]:
     assert x in pp,x; pp=pp.replace(x,y)
 a=h.index('const gKey=(d,i)=>');b=h.index('const _r1=render;')
-mods=[w('dl.js'),w('ai.js'),w('gad.js'),w('ga.js'),pp,'const MH='+open(os.path.join(ROOT,'src','data','mh.json')).read()+';\n']
+mods=[w('dl.js'),w('ui.js'),w('facts.js'),w('ai.js'),w('intent.js'),w('gad.js'),w('ga.js'),pp,'const MH='+open(os.path.join(ROOT,'src','data','mh.json')).read()+';\nconst EVAL_CASES='+open(os.path.join(ROOT,'src','data','eval_cases.json')).read()+';\nconst SCHEMA_SQL='+json.dumps(open(os.path.join(ROOT,'src','data','schema.sql')).read())+';\nconst PROMPT_TEMPLATE='+json.dumps(open(os.path.join(ROOT,'src','data','prompt_template.md')).read())+';\n']
 for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pidx.js','pid2.js','pdm.js','ks.js','fm.js','rc.js','cov.js','int.js','il.js','dash.js']:
     try: mods.append(w(f))
     except FileNotFoundError: pass

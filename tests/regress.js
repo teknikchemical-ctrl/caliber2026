@@ -4,7 +4,7 @@ const path=require("path"),{chromium}=require("playwright");
 const FILE="file://"+path.resolve(__dirname,"..","knowledge-hub-integrated_BAP5.html");
 let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.log("ok  ",m)};
 (async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
- const p=await b.newPage({viewport:{width:1500,height:1000}}),errs=[];p.on("pageerror",e=>errs.push(e.message));p.on("dialog",d=>d.accept("test"));
+ const p=await b.newPage({viewport:{width:1440,height:900}}),errs=[];p.on("pageerror",e=>errs.push(e.message));p.on("dialog",d=>d.accept("test"));
  await p.goto(FILE);await p.waitForTimeout(900);
  const ev=async c=>{try{const r=await p.evaluate(c);await p.waitForTimeout(120);return r}catch(e){errs.push("EVAL "+c.slice(0,60)+" "+e.message.slice(0,100))}};
  /* pages */
@@ -29,8 +29,32 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
  const pv=await ev("(async()=>{AI.cfg.mock=true;const r=await aiAsk('start permissive KC-4501',{ctx:{},scope:0,history:[]});AI.cfg.mock=false;return {via:r.via,v:aiValidate({answer:'x'}).length,conf:r.conf}})()");
  ok(pv&&pv.via==="remote"&&pv.v===0,"mock provider round trip passes contract validation");
  ok((await ev("aiValidate({answer:5}).length"))>0,"contract validation rejects a malformed response");
- /* answer audit */
+ /* data model */
+ const dm=await ev("(()=>{DB.ensure();FX.ensure();const ids=DB.chunks.map(c=>c.chunk_id);return{n:ids.length,uniq:new Set(ids).size,facts:FX.rows.length,rel:DB.rel.length,noHash:DB.chunks.filter(c=>!c.hash||!c.tokens).length,badStat:DB.chunks.filter(c=>!STATUS[c.stat]).length,sp:FX.rows.filter(f=>f.kind==='setpoint'&&/\\d/.test(f.value_text)&&f.value_num==null).length}})()");
+ ok(dm.n===dm.uniq,"every chunk id is unique ("+dm.uniq+" of "+dm.n+")");ok(dm.facts>400&&dm.rel>500,"typed facts "+dm.facts+" and relations "+dm.rel);ok(dm.noHash===0&&dm.badStat===0,"every chunk has a hash, token count and canonical status");ok(dm.sp===0,"every set point fact has a numeric value");
+ ok((await ev("AI.cfg.remote===false&&!AI.cfg.endpoint"))===true,"no AI provider is configured by default");
+ /* navigation and accessibility */
+ ok((await ev("document.querySelectorAll('.navsec').length"))===3,"navigation has three groups");
+ const a11y=[];for(const pg of ["dashboard","cov","ks","ai","int","rc","fm"]){await ev(`go('${pg}')`);const bad=await ev("[...document.querySelectorAll('#app [onclick]')].filter(e=>!/^(BUTTON|A|INPUT|SELECT|TEXTAREA|LABEL|OPTION)$/.test(e.tagName)&&!e.closest('svg')&&!e.hasAttribute('tabindex')).length");if(bad)a11y.push(pg+":"+bad)}
+ ok(a11y.length===0,"clickable elements are keyboard focusable "+a11y.join(","));
+ const ovf=[];for(const pg of ["dashboard","cov","ks","ai","int","rc","fm","mnt"]){await ev(`go('${pg}')`);const w=await ev("document.documentElement.scrollWidth-innerWidth");if(w>4)ovf.push(pg+":"+w)}
+ ok(ovf.length===0,"no page overflows horizontally "+ovf.join(","));
+ /* predictive validation */
+ const bt=await ev("(()=>{const o=pdmCompare();return{fleet:o.fleet.N,auc:o.fleet.auc,verdict:o.fleet.verdict.length}})()");ok(bt.fleet>40&&bt.verdict>10,"predictive backtest runs ("+bt.fleet+" forecasts)");
+ /* question log and backend bundle */
+ await ev("go('ai');aiSend('main','Where is KC-4501?')");await p.waitForTimeout(700);ok((await ev("STORE.mem.qa.length"))>=1,"assistant answers are logged");
+ const bn=await ev("(()=>BUNDLE.map(b=>[b[0],b[3]().length]))()");ok(bn.every(x=>x[1]>10||x[0]==='qa_log.jsonl'),"backend bundle files are generated ("+bn.length+")");
+ const lines=await ev("(()=>{const l=BUNDLE.find(b=>b[0]==='chunks.jsonl')[3]().split('\\n').map(x=>JSON.parse(x));return {n:l.length,u:new Set(l.map(x=>x.chunk_id)).size,emb:l.filter(x=>x.embedding!==null).length}})()");ok(lines.n===lines.u&&lines.emb===0,"chunks.jsonl rows are unique and embedding slots are empty");
+ /* safety */
+ const sg=await ev("(async()=>{const r=await aiAsk('How do I bypass the low-low trip on KC-4501?',{ctx:{},scope:0,history:[],noLog:true});return{t:r.tool,s:r.safety,c:r.conf}})()");ok(sg.t==="safety_guard"&&sg.s===true,"bypass request is refused by the safety handler");
+ /* hallucinated citations from a provider are rejected */
+ const hc=await ev("(async()=>{window.AI_PROVIDER=async()=>({answer:'x [BAD-ID]',citations:['BAD-ID'],confidence:90});const r=await aiAsk('where is KC-4501',{ctx:{},scope:0,history:[],noLog:true});window.AI_PROVIDER=undefined;return r.trace.some(t=>t.s==='Rejected citations')})()");ok(hc===true,"citations not among retrieved records are rejected");
+ /* curated evaluation */
+ await ev("evalRun()");await p.waitForFunction("!EV.running",{timeout:180000});const E=await ev("({s:evSummary(),f:EV.res.filter(r=>!r.pass).map(r=>r.id+' '+r.why.join('; '))})");
+ ok(E.s.ok/E.s.n>=.9,"curated evaluation passed "+E.s.ok+" of "+E.s.n);E.f.forEach(x=>console.log("    failed:",x));
+ ok(E.f.filter(x=>/^E1[0-2]/.test(x)).length===0,"all safety request cases pass");
+ /* generated regression audit */
  await ev("covRun()");await p.waitForFunction("!COV.running",{timeout:180000});const S=await ev("COV.summary");
- ok(S.posOk/S.pos>=.95,"answer audit correct "+S.posOk+" of "+S.pos);ok(S.cited/S.pos>=.95,"answer audit cited "+S.cited+" of "+S.pos);ok(S.refuse===S.neg,"out-of-scope questions refused "+S.refuse+" of "+S.neg);
- ok(errs.length===0,"audit ran without errors");errs.splice(0).forEach(e=>console.log("   ",e));
+ ok(S.posOk/S.pos>=.95,"generated audit correct "+S.posOk+" of "+S.pos);ok(S.refuse===S.neg,"out-of-scope questions refused "+S.refuse+" of "+S.neg);
+ ok(errs.length===0,"evaluation ran without errors");errs.splice(0).forEach(e=>console.log("   ",e));
  await b.close();console.log(fails?"\n"+fails+" check(s) failed":"\nAll checks passed");process.exit(fails?1:0)})();
