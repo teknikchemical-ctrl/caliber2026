@@ -72,6 +72,17 @@
   @media(max-width:900px){aside{display:none}.g4,.split,.opl{grid-template-columns:1fr}main{padding:18px}}
 
   h4{font-size:13px} .tab{white-space:nowrap} .tabs{overflow:auto} .stat b .tag{font-size:14px}
+.otsbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);margin-bottom:8px;font-size:13px}
+.otsbar.alarm{border-color:var(--bad);background:#3a1417}.otsbar.done{border-color:var(--ok)}
+.pbarx{height:4px;background:var(--line);border-radius:2px;margin:-4px 0 8px}.pbarx i{display:block;height:100%;background:var(--acc);border-radius:2px;transition:.3s}
+.gasheet{background:#fbfbf8;border:1px solid #c9c9c0;border-radius:6px;padding:10px 12px;color:#111}
+.gasheet .ttl{font:700 14px Arial,sans-serif;color:#1f3864;text-align:center}.gasheet .sub2{font:11px Arial,sans-serif;text-align:center;color:#333;margin-bottom:4px}
+.gsvg text{fill:#111;font-family:Arial,sans-serif}.gsvg .dim{stroke:#1f3864;fill:none}.gsvg .dt{fill:#1f3864;font-size:9.5px;font-weight:600}
+.gsvg .b{fill:#fff;stroke:#111;stroke-width:1.4}.gsvg .eq{fill:#eceff3}.gsvg .gl{fill:none;stroke:#111;stroke-width:1.3}
+.gsvg .bl{fill:#fff1b8;stroke:#111;stroke-width:1.2}.gsvg .bn{font-size:10px;font-weight:700;text-anchor:middle}.gsvg .nzb{fill:#ffe29a}
+.gsvg .pdn.fok .b{fill:#b7f0c1!important;stroke:#1a7f37}.gsvg .pdn.fbad .b{fill:#ffc2bd!important;stroke:#cf222e}
+.tblk{display:grid;grid-template-columns:2fr 1.5fr 1.4fr;border:1px solid #111;font:10px Arial,sans-serif;margin-top:6px;color:#111}.tblk>div{padding:5px 7px;border-right:1px solid #111}.tblk .stamp{border-right:0;color:#555}
+.aim{max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin-top:8px}.aibox .msg{max-width:100%;font-size:13px;white-space:normal}
 .pbar{padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;font-size:12.5px;background:var(--panel2)}
 .sheet{background:#fbfbf8;border:1px solid #c9c9c0;border-radius:6px;overflow:auto;max-height:76vh}
 .sheet svg{display:block;font-family:Arial,Helvetica,sans-serif}.sheet text{fill:#111}
@@ -92,6 +103,7 @@
   <div class="brand">⚙️ Knowledge Hub<small>CALIBER 2026 · Case 1</small></div>
   <div class="nav active" data-page="dashboard">▦ Dashboard</div>
   <div class="nav" data-page="equipment">🏭 Equipment Sets</div>
+  <div class="nav" data-page="plot">📍 Plot Plan · OTS</div>
   <div class="nav" data-page="assistant">🤖 AI Assistant</div>
   <div class="nav" data-page="documents">📄 Documents</div>
   <div class="nav" data-page="opl">🧩 OPL Library</div>
@@ -218,27 +230,6 @@ const hasSeq=s=>/^SEQ/.test(s.ga.assoc_interlock_ref||"");
 const types=[...new Set(K.docs.map(d=>d.type))];
 
 
-/* Plot-plan map: positions from plot_plan_drawings (E/N metres); click a node to open its set */
-const POS={1:[124,132],2:[160,132],3:[196,132],4:[232,132],5:[124,204],6:[160,204],7:[196,204],8:[232,204]};
-const MODES={dt:["Breakdown downtime (h)",n=>sum(woOf(n),m=>m.dt)],cm:["Corrective work orders",n=>cnt(woOf(n),m=>m.type==="Corrective")],rv:["Instruments flagged REVIEW",n=>cnt(K.inst,i=>i.set===n&&i.flag)]};
-function mapSvg(sel){const mode=st.f.mm||"dt",f=MODES[mode][1],v=K.sets.map(s=>f(s.n)),sorted=[...v].sort((a,b)=>a-b),t1=sorted[2],t2=sorted[5];
-  const X=e=>(e-100)*3.6+50,Y=n=>(n-110)*3.6+30,col=x=>x>t2?"#f85149":x>t1?"#d29922":"#3fb950";
-  const ticks=[100,120,140,160,180,200,220,240,260].map(e=>`<line x1="${X(e)}" y1="22" x2="${X(e)}" y2="28" stroke="#8b98a5"/><text x="${X(e)}" y="16" fill="#8b98a5" font-size="10" text-anchor="middle">E${e}</text>`).join("");
-  const nodes=K.sets.map((s,i)=>{const[e,n]=POS[s.n],x=X(e),y=Y(n),on=sel===s.n,c=col(v[i]);
-    return `<g style="cursor:pointer" onclick="go('equipment',{set:${s.n},tab:'overview'})"><title>${s.tag} · ${s.name} · ${MODES[mode][0]}: ${Math.round(v[i])} · E${e}/N${n} approx</title>
-    <rect x="${x-60}" y="${y-28}" width="120" height="56" rx="10" fill="${on?"rgba(47,129,247,.25)":"#1f2630"}" stroke="${on?"#2f81f7":c}" stroke-width="${on?3:2}"/>
-    <text x="${x}" y="${y-10}" fill="#e6edf3" font-size="12" font-weight="700" text-anchor="middle">${s.tag}</text>
-    <text x="${x}" y="${y+4}" fill="#8b98a5" font-size="9.5" text-anchor="middle">${s.name.length>20?s.name.slice(0,19)+"…":s.name}</text>
-    <text x="${x}" y="${y+19}" fill="#8b98a5" font-size="9" text-anchor="middle">A${s.area} · ${s.pp.elevation_label}</text>
-    <circle cx="${x+52}" cy="${y-20}" r="4" fill="${c}"/></g>`}).join("");
-  return `<svg viewBox="0 0 700 560" style="width:100%;height:auto">${ticks}
-  <rect x="30" y="${Y(168)-14}" width="640" height="28" fill="rgba(163,113,247,.12)" stroke="#a371f7" stroke-dasharray="5 4"/><text x="350" y="${Y(168)+4}" fill="#a371f7" font-size="11" text-anchor="middle">MAIN PIPE RACK</text>
-  <rect x="30" y="${Y(238)}" width="640" height="22" fill="#161b22" stroke="#2b3440"/><text x="350" y="${Y(238)+15}" fill="#8b98a5" font-size="10" text-anchor="middle">ROAD (6 m)</text>
-  <rect x="30" y="30" width="640" height="${Y(238)-30}" fill="none" stroke="#2b3440" stroke-dasharray="2 3"/><text x="38" y="44" fill="#8b98a5" font-size="9">BATTERY LIMIT</text>
-  ${nodes}<line x1="50" y1="${Y(238)+44}" x2="122" y2="${Y(238)+44}" stroke="#8b98a5" stroke-width="2"/><text x="50" y="${Y(238)+58}" fill="#8b98a5" font-size="9">0 — 20 m</text>
-  <text x="640" y="${Y(238)+50}" fill="#8b98a5" font-size="11" text-anchor="end">▲ N</text></svg>
-  <div class="row" style="font-size:12px;color:var(--muted)"><span><span class="dot" style="background:#3fb950"></span>low</span><span><span class="dot" style="background:#d29922"></span>mid</span><span><span class="dot" style="background:#f85149"></span>high</span><span>· relative tiers across the 8 sets · positions approx ±1 m from plot plan sheets</span></div>`}
-const modeSel=()=>`<select onchange="st.f.mm=this.value;render()">${Object.entries(MODES).map(([k,[l]])=>`<option value="${k}" ${(st.f.mm||"dt")===k?"selected":""}>Colour by: ${l}</option>`).join("")}</select>`;
 
 /* Dashboard */
 function dashboard(){
@@ -268,7 +259,7 @@ function setList(){return `<h1>Equipment Knowledge Sets</h1><p class="sub">Each 
 <div class="row" style="margin-top:12px"><span class="tag">📄 ${docsOf(s.n).length} docs</span><span class="tag">🧩 7 OPL</span><span class="tag">🔧 ${woOf(s.n).length} WO</span><span class="tag">⚡ ${cnt(K.inst,i=>i.set===s.n)} instr.</span></div></div>`).join("")}</div>`}
 function setDetail(n){
   const s=S(n),w=woOf(n),tab=st.tab,ins=K.inst.filter(i=>i.set===n),rel=K.assets.filter(a=>a.set===n);
-  const tabs=[["overview","Overview"],["pid","P&ID"],["ga","Equipment drawing"],["docs","Documents ("+(docsOf(n).length)+")"],["ds","Equipment data sheet"],["seq","OTS · Interlock simulator"],["opl","OPL (7)"],["maint","Maintenance ("+w.length+")"],["rel","Related assets ("+rel.length+")"]];
+  const tabs=[["overview","Overview"],["pid","P&ID"],["ga","Equipment drawing"],["plot","Plot plan"],["docs","Documents ("+(docsOf(n).length)+")"],["ds","Equipment data sheet"],["seq","OTS · Interlock simulator"],["opl","OPL (7)"],["maint","Maintenance ("+w.length+")"],["rel","Related assets ("+rel.length+")"]];
   let b="";
   if(tab==="overview"){const g=s.ga,p=s.pp,pc=K.chunks.find(c=>c.doc===s.pid.doc&&c.sec==="Process Description");
    b=`<div class="grid" style="grid-template-columns:1fr 1fr"><div class="card"><h3>Process description <span class="tag">${s.pid.doc} · P&ID</span></h3><p style="line-height:1.6">${esc(pc?.text||s.pid.sys)}</p></div>
@@ -278,7 +269,7 @@ function setDetail(n){
    <div class="card rel" style="margin-top:14px"><div class="row between"><h3>Plot plan · location of ${s.tag} (highlighted)</h3>${modeSel()}</div><p class="muted" style="margin-bottom:8px">${s.pp.area_subtitle} · grid ${p.grid_ref} · click another node to jump to that set</p>${mapSvg(n)}</div>
    <h3 style="margin:16px 0 8px">Nozzle schedule</h3>${tbl(["Mark","Service","Size","Face","Connects to / from"],K.nz.filter(z=>z.document_id===g.document_id).map(z=>[z.nozzle_mark,z.service,z.size_rating,z.face,esc(z.connects_to_from)]))}
    <h3 style="margin:16px 0 8px">Bill of materials</h3>${tbl(["#","Part","Material","Qty","Notes"],K.bom.filter(z=>z.document_id===g.document_id).map(z=>[z.item_no,z.part_name,z.material,z.qty,esc(z.notes)]))}`}
-  if(tab==="ga")b=gaView(n);if(tab==="pid")b=pidView(n);
+  if(tab==="ga")b=gaView(n);if(tab==="plot")b=ppView(n);if(tab==="pid")b=pidView(n);
   if(tab==="docs"){const slot=(t,d)=>[t,d?d.name:'<span class="muted">Not in knowledge base</span>',d?tg(ds(d)):tg("Missing","bad")];
    b=`<h3 style="margin-bottom:8px">Document set coverage</h3>${tbl(["Category","Document","Status"],[slot("P&ID",DOC[s.pid.doc]),slot("Equipment Drawing (GA)",DOC[s.ga.document_id]),slot("Equipment Datasheet",DOC["DS-"+n]),slot("Plot Plan",DOC[s.pp.document_id]),slot("Interlock Logic (SEQ)",DOC["IL-"+n])])}<h3 style="margin:16px 0 8px">All documents</h3>${docTbl(docsOf(n))}`}
   if(tab==="ds")b=dsView(n);if(tab==="seq")b=ilView(n)+'<h3 style="margin:18px 0 8px">Instrument index (from P&amp;ID)</h3>'+`<p class="muted" style="margin-bottom:8px">Interlock ${esc(s.ga.assoc_interlock_ref)} · instruments and trip actions on ${s.pid.ref}. Rows marked REVIEW need confirmation.</p>`+tbl(["Tag","Type","Service","Setpoint / range","On trip / alarm","Flag"],ins.map(i=>[`<b>${esc(i.tag)}</b>`,i.type,i.var,esc(i.sp),esc(i.act),i.flag?tg("REVIEW"):""]));
@@ -354,7 +345,7 @@ function local(h,conf){if(!h.length)return{text:"I couldn't find this in the kno
 
 /* Render */
 function render(){const p=st.page;
-  app.innerHTML=p==="dashboard"?dashboard():p==="equipment"?(st.set?setDetail(st.set):setList()):p==="pid"?pidPage():p==="documents"?documents():p==="opl"?opl():p==="quality"?quality():assistant();
+  app.innerHTML=p==="dashboard"?dashboard():p==="equipment"?(st.set?setDetail(st.set):setList()):p==="pid"?pidPage():p==="plot"?plotPage():p==="documents"?documents():p==="opl"?opl():p==="quality"?quality():assistant();
   const m=$("#msgs");if(m)m.scrollTop=m.scrollHeight;if(p==="documents"&&st.hl){$("#"+st.hl)?.scrollIntoView({block:"center"});st.hl=null}if(p==="assistant")$("#q")?.focus()}
 /* ===== P&ID Viewer v2: sheets redrawn 1:1 from the P&ID pack, digital-twin overlay (flow, rotation, interlock trips) ===== */
 const P={set:1,sel:null,z:100,vals:true},LIVE={h:{},f:{}};
@@ -661,7 +652,6 @@ setInterval(()=>{if(isPid()){tick();pUpd()}},1500);
 const _r0=render;render=function(){_r0();if(isPid())pUpd()};
 
 /* ===== Equipment (GA) Drawing Viewer: parts drawn in-app, every part & nozzle selectable, tied to BOM + knowledge ===== */
-const G={n:1,sel:null};
 const B=s=>s.split(";").map(x=>{const[a,b,c]=x.split("~");return{name:a,mat:b,qty:c}});
 const Z=s=>s.split(";").map(x=>{const[m,sv,sz,r]=x.split("~");return{m,sv,sz,r}});
 const GA={
@@ -697,45 +687,266 @@ const GA={
  nz:Z(`N1~Inlet~8"-150# RF~Column overhead condensate;N2~Reflux out~6"-150# RF~To reflux pump;N3~Product out~4"-150# RF~To product;N4~Boot drain~2"-150# RF~Water draw-off;N5~PSV~3"-150# RF~To PSV-8901;M1~Manway~24" FLG~Access`),
  p:[["4","r",[300,310,50,50],320,400],["4","r",[560,310,50,50],0,0],["1","r",[220,160,460,150,70],450,185],["2","e",[222,235,24,75],185,235],["2","e",[678,235,24,75],0,0],["3","r",[480,310,60,60],510,400],["5","r",[330,128,50,32],405,105],["6","r",[600,285,60,20],630,262],["7","r",[252,190,12,90],250,330],["8","r",[700,170,20,130],765,235],["9","r",[560,135,24,25],625,130],["10","r",[400,200,60,30],0,0],["11","r",[330,158,50,4],305,148],["12","r",[250,312,14,14],235,350]],
  n:[["N1",290,160,"u"],["N2",640,310,"d"],["N3",420,310,"d"],["N4",510,370,"d"],["N5",572,135,"u"],["M1",355,128,"u"]]}};
+/* ===== Shared: in-context AI copilot (used by the equipment drawing and plot plan) ===== */
+const qa=s=>esc(s).replace(/"/g,"&quot;"),AIB={},OTS={ga:[0,0],ft:[0,0],rounds:[],drills:[]};
+function aiMsg(id,m,i){if(m.role==="u")return `<div class="msg u">${esc(m.text)}</div>`;
+ return `<div class="msg a">${m.text}${m.sources?.length?`<div class="src"><b>Sources</b>${m.sources.map((s,j)=>`<div onclick="aiOpen('${id}',${i},${j})"><b>${esc(s.k==="doc"?s.id:s.k==="wo"?s.title.split(" · ")[0]:s.title)}</b> <span class="tag">${esc(s.ver)}</span> ${tg(s.status)}</div>`).join("")}</div>`:""}</div>`}
+const aiMsgs=id=>AIB[id].h.length?AIB[id].h.map((m,i)=>aiMsg(id,m,i)).join(""):`<p class="muted" style="font-size:12.5px">Ask in plain language — answers are grounded in this set's P&amp;ID, GA drawing, plot plan, OPLs, instruments and work orders.</p>`;
+const aiChips=id=>(AIB[id].ctx.prompts||[]).map(p=>`<span class="chip" data-p="${qa(p)}" onclick="aiSend('${id}',this.dataset.p)">${esc(p)}</span>`).join("");
+function aiBox(id,ctx){const b=AIB[id]||(AIB[id]={h:[]});b.ctx=ctx;
+ return `<div class="card aibox" id="ai-${id}" style="margin-top:12px"><div class="row between"><h3>🤖 AI copilot</h3><span class="tag acc" id="ai-${id}-c" style="max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(ctx.label)}</span></div>
+ <div class="aim" id="ai-${id}-m">${aiMsgs(id)}</div><div class="chips" id="ai-${id}-p" style="margin-top:8px">${aiChips(id)}</div>
+ <div class="composer"><input id="ai-${id}-q" placeholder="${qa(ctx.ph||"Ask about this…")}" onkeydown="if(event.key==='Enter')aiSend('${id}')"><button onclick="aiSend('${id}')">Ask</button></div></div>`}
+function aiSetCtx(id,ctx){const b=AIB[id];if(!b)return;b.ctx=ctx;const c=$("#ai-"+id+"-c"),p=$("#ai-"+id+"-p");if(c)c.textContent=ctx.label;if(p)p.innerHTML=aiChips(id)}
+function aiPaint(id){const m=$("#ai-"+id+"-m");if(m){m.innerHTML=aiMsgs(id);m.scrollTop=m.scrollHeight}}
+function aiOpen(id,i,j){const s=AIB[id].h[i].sources[j];if(s.k==="doc")return go("documents",{doc:s.id,hl:s.cid});go("equipment",{set:s.set,tab:s.k==="wo"?"maint":"seq",wo:s.k==="wo"?s.id:null})}
+async function aiSend(id,q){const b=AIB[id],inp=$("#ai-"+id+"-q");q=(q||inp?.value||"").trim();if(!q||!b)return;if(inp)inp.value="";
+ b.h.push({role:"u",text:q},{role:"a",text:"<span class='muted'>Thinking…</span>"});aiPaint(id);const c=b.ctx;let a=null;
+ try{a=c.skill?c.skill(q):null}catch(e){console.error(e)}
+ if(!a){const h=retrieve(c.kw?q+" "+c.kw:q,c.set||0),conf=h.length?Math.min(95,Math.round(40+h[0].score*3)):0;
+  try{const r=await fetch(API+"/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,context:h.map(x=>({id:x.id,title:x.title,sec:x.sec,text:x.text,ver:x.ver,status:x.status}))})});if(!r.ok)throw 0;const j=await r.json();a={text:esc(j.answer).replace(/\n/g,"<br>"),sources:h}}catch(e){a=local(h,conf)}}
+ b.h[b.h.length-1]={role:"a",...a};aiPaint(id)}
+/* ===== Equipment (GA) drawing v2: GA sheet + operator-training modes (explore / walk-down quiz / fault finding) + AI copilot ===== */
+const G={n:1,sel:null,mode:"explore",cond:true,q:null,f:null,hv:{},hh:{},flash:null};
 const gKey=(d,i)=>d.mot&&i==="M"?"M":i;
 const gBom=(n,k)=>k==="M"?(GA[n].mot?{name:GA[n].mot,mat:"—",qty:"1"}:null):GA[n].bom[+k-1];
 function gShape(t,a,c){
  if(t==="r")return `<rect class="b ${c}" x="${a[0]}" y="${a[1]}" width="${a[2]}" height="${a[3]}" rx="${a[4]||3}"/>`;
  if(t==="c")return `<circle class="b ${c}" cx="${a[0]}" cy="${a[1]}" r="${a[2]}"/>`;
  if(t==="e")return `<ellipse class="b ${c}" cx="${a[0]}" cy="${a[1]}" rx="${a[2]}" ry="${a[3]}"/>`;
- if(t==="l")return `<line class="g" stroke-width="6" x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}"/>`;
+ if(t==="l")return `<line class="gl" stroke-width="6" x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}"/>`;
  if(t==="pl")return `<polygon class="b ${c}" points="${a.join(" ")}"/>`;
- return `<text class="lb" x="${a[0]}" y="${a[1]}" text-anchor="middle" style="fill:#8b98a5;letter-spacing:2px">${a[2]}</text>`}
+ return `<text x="${a[0]}" y="${a[1]}" text-anchor="middle" font-size="11" style="fill:#777;letter-spacing:2px">${a[2]}</text>`}
 const gAnc=(t,a)=>t==="r"?[a[0]+a[2]/2,a[1]+a[3]/2]:[a[0],a[1]];
-function gaSvg(n){const d=GA[n],s=S(n),lead=[],bal=[],body=[],nz=[],U={u:[-7,-16,14,16,0,-22,"middle"],d:[-7,0,14,16,0,28,"middle"],l:[-16,-7,16,14,-20,4,"end"],r:[0,-7,16,14,20,4,"start"]};
- d.p.forEach(([k,t,a,bx,by])=>{if(!k){body.push(`<g opacity=".5" style="pointer-events:none">${gShape(t,a,"")}</g>`);return}
+function gBox(d){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;const add=(x,y)=>{x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)};
+ d.p.forEach(([k,t,a])=>{if(t==="r"){add(a[0],a[1]);add(a[0]+a[2],a[1]+a[3])}else if(t==="c"){add(a[0]-a[2],a[1]-a[2]);add(a[0]+a[2],a[1]+a[2])}else if(t==="e"){add(a[0]-a[2],a[1]-a[3]);add(a[0]+a[2],a[1]+a[3])}else if(t==="l"){add(a[0],a[1]);add(a[2],a[3])}else if(t==="pl")for(let i=0;i<a.length;i+=2)add(a[i],a[i+1])});return[x0,y0,x1,y1]}
+/* ---- condition model (simulated; plug real data via window.LIVE_SOURCE) ---- */
+const GM=[[/bearing/i,"Bearing temperature","°C",62,85,95,1],[/mechanical seal|oil seal|packing|gland|gasket|rotary joint|o-ring/i,"Leak rate","ml/min",.4,5,20,1],[/motor/i,"Winding temperature","°C",78,110,130,1],[/shaft|impeller|coupling|rotor|crank|rod|crosshead|sprocket|fan|gearbox|piston|blade/i,"Vibration","mm/s",2.4,7.1,9,1],[/valve|cage|plug|seat|diaphragm|positioner|spring|actuator/i,"Travel deviation","%",.8,3,6,1],[/tube|bundle|catalyst|grid|thermowell|distributor|shell|head|body|casing|baseplate|support|frame|housing|sleeve|ring|trap|intercooler|pump/i,"Condition index","%",94,75,55,-1]];
+const gMon=(n,k)=>{const b=gBom(n,k);return b&&GM.find(m=>m[0].test(b.name))};
+const gFaulty=(n,k)=>!!G.f&&G.f.n===n&&G.f.targets.includes(k)&&G.f.ramp>0;
+function gVal(n,k){const m=gMon(n,k);if(!m)return null;const id=n+"|"+k,h=G.hh[id]||(G.hh[id]=[m[3]]);return{m,v:h[h.length-1],h}}
+function gTickVals(){const n=G.n;GA[n].bom.forEach((_,i)=>gStep(n,String(i+1)));if(GA[n].mot)gStep(n,"M");if(G.f)G.f.ramp=Math.min(14,G.f.ramp+1)}
+function gStep(n,k){const m=gMon(n,k);if(!m)return;const id=n+"|"+k,h=G.hh[id]||(G.hh[id]=[m[3]]);let v=h[h.length-1];
+ const tgt=gFaulty(n,k)?m[3]+(m[5]*1.15-m[3])*Math.min(1,G.f.ramp/12)*(m[6]):m[3];v=gFaulty(n,k)?tgt+(Math.random()-.5)*Math.abs(m[3])*.05:v+(tgt-v)*.25+(Math.random()-.5)*Math.abs(m[3])*.04;h.push(Math.max(0,v));if(h.length>30)h.shift()}
+const gState=(m,v)=>m[6]>0?(v>=m[5]?"trip":v>=m[4]?"warn":"ok"):(v<=m[5]?"trip":v<=m[4]?"warn":"ok"),GCOL={ok:"#c9efd1",warn:"#ffe3a3",trip:"#ffb3ad"};
+/* ---- scenarios built from the set's own OPL troubleshooting tables ---- */
+const GSTOP=new Set(["assy","with","type"]),GAL=[[/misalign|alignment|motor feet|coupling/,/coupling|^motor/i],[/foundation settlement/,/baseplate/i],[/flush|orifice|seal gland|seal face|seal cartridge/,/mechanical seal/i],[/chain|sprocket/,/sprocket/i],[/thermocouple|tc point/,/thermowell/i]];
+function gScore(name,txt){const nm=name.toLowerCase(),toks=nm.replace(/\(.*?\)/g,x=>" "+x.slice(1,-1)+" ").split(/[^a-z0-9]+/).filter(t=>t.length>=2&&!GSTOP.has(t));let s=toks.filter(t=>new RegExp("\\b"+t.replace(/s$/,"")+"s?\\b").test(txt)).length;if(txt.includes(nm.replace(/\s*\(.*\)/,"").replace(/s$/,"")))s+=2;GAL.forEach(([a,b])=>{if(a.test(txt)&&b.test(name))s+=3});return s}
+function gScen(n){const d=GA[n],seen=new Set(),out=[];K.opl.filter(o=>o.set===n).forEach(o=>o.ts.forEach(r=>{const key=r[0].slice(0,38);if(seen.has(key)||/^(scheduled|proof test|end-of-life)/i.test(r[0]))return;seen.add(key);const txt=(r[0]+" "+r[1]).toLowerCase(),sc=d.bom.map((b,i)=>({k:String(i+1),s:gScore(b.name,txt)}));
+  if(d.mot&&GAL[0][0].test(txt))sc.push({k:"M",s:3});const mx=Math.max(...sc.map(x=>x.s));if(mx<1)return;
+  out.push({sym:r[0].replace(/\.$/,""),cause:r[1].replace(/\.$/,""),fix:r[2].replace(/\.$/,""),opl:o,targets:sc.filter(x=>x.s===mx&&d.p.some(p=>p[0]===x.k)).map(x=>x.k)})}));return out.filter(s=>s.targets.length)}
+function gQuizItems(n){const d=GA[n],has=k=>d.p.some(p=>p[0]===k),it=[],seen=new Set();
+ d.bom.forEach((b,i)=>{const k=String(i+1);if(seen.has(b.name)||!has(k))return;seen.add(b.name);it.push({k,q:`Click the <b>${esc(b.name)}</b>`,a:b.name})});
+ if(d.mot&&has("M"))it.push({k:"M",q:"Click the <b>driver</b> (motor)",a:d.mot});
+ d.nz.forEach(z=>it.push({k:z.m,q:`Which nozzle is the <b>${esc(z.sv)}</b> (${esc(z.sz)})?`,a:z.m+" · "+z.sv}));
+ return it.sort(()=>Math.random()-.5).slice(0,10)}
+/* ---- drawing ---- */
+function gaSvg(n){const d=GA[n],s=S(n),lead=[],bal=[],body=[],nz=[],U={u:[-7,-16,14,16,0,-22,"middle"],d:[-7,0,14,16,0,28,"middle"],l:[-16,-7,16,14,-20,4,"end"],r:[0,-7,16,14,20,4,"start"]},gy=n===7?382:n===3?392:372,[x0,y0,x1,y1]=gBox(d);
+ d.p.forEach(([k,t,a,bx,by])=>{if(!k){body.push(`<g opacity=".45" style="pointer-events:none">${gShape(t,a,"")}</g>`);return}
   const b=gBom(n,k),on=`onclick="gSel('${k}')"`;
-  body.push(`<g class="pn ${G.sel===k?"sel":""}" data-k="${k}" ${on}><title>${esc(b.name)}</title>${gShape(t,a,"eq")}</g>`);
-  if(bx){const[ax,ay]=gAnc(t,a);lead.push(`<line class="g" stroke-width=".9" stroke-dasharray="3 2" x1="${bx}" y1="${by}" x2="${ax}" y2="${ay}"/>`);
-   bal.push(`<g class="pn ${G.sel===k?"sel":""}" data-k="${k}" ${on}><circle class="bl" cx="${bx}" cy="${by}" r="11"/><text class="bn" x="${bx}" y="${by+4}" text-anchor="middle">${k}</text></g>`)}});
+  body.push(`<g class="pdn gp ${G.sel===k?"sel":""}" data-k="${k}" ${on}><title>${esc(G.mode==="locate"?"?":b.name)}</title>${gShape(t,a,"eq")}</g>`);
+  if(bx){const[ax,ay]=gAnc(t,a);lead.push(`<line class="gl" stroke-width=".8" stroke-dasharray="3 2" x1="${bx}" y1="${by}" x2="${ax}" y2="${ay}"/>`);
+   bal.push(`<g class="pdn ${G.sel===k?"sel":""}" data-k="${k}" ${on}><circle class="bl" cx="${bx}" cy="${by}" r="11"/><text class="bn" x="${bx}" y="${by+4}">${k}</text></g>`)}});
  d.n.forEach(([m,x,y,r])=>{const u=U[r],z=d.nz.find(q=>q.m===m);
-  nz.push(`<g class="pn ${G.sel===m?"sel":""}" data-k="${m}" onclick="gSel('${m}')"><title>${m} · ${esc(z.sv)} ${esc(z.sz)}</title><rect class="b nzb" x="${x+u[0]}" y="${y+u[1]}" width="${u[2]}" height="${u[3]}"/><text class="it" style="fill:#d29922;font-size:10px;font-weight:700" x="${x+u[4]}" y="${y+u[5]}" text-anchor="${u[6]}">${m}</text></g>`)});
- return `<svg viewBox="0 0 900 440" style="width:100%;height:auto"><line x1="60" y1="${n===7?382:n===3?392:372}" x2="850" y2="${n===7?382:n===3?392:372}" stroke="#2b3440" stroke-dasharray="6 4"/><text x="62" y="430" fill="#8b98a5" font-size="9">GRADE EL +0.00 · schematic, not to scale</text><text x="838" y="430" fill="#8b98a5" font-size="9" text-anchor="end">${esc(s.ga.dwg_no)} · REV ${esc(s.ga.revision)}</text>${body.join("")}${lead.join("")}${bal.join("")}${nz.join("")}</svg>`}
+  nz.push(`<g class="pdn ${G.sel===m?"sel":""}" data-k="${m}" onclick="gSel('${m}')"><title>${m}${G.mode==="locate"?"":" · "+esc(z.sv)+" "+esc(z.sz)}</title><rect class="b nzb" x="${x+u[0]}" y="${y+u[1]}" width="${u[2]}" height="${u[3]}"/><text class="bn" style="fill:#7a4b00" x="${x+u[4]}" y="${y+u[5]}" text-anchor="${u[6]}">${m}</text></g>`)});
+ const gnd=Array.from({length:50},(_,i)=>`M${60+i*16} ${gy}l-7 8`).join(""),L=s.ga.overall_length_mm,H=s.ga.height_mm;
+ const dim=`<path class="dim" d="M${x0} ${gy+26}H${x1}M${x0} ${gy+20}v12M${x1} ${gy+20}v12"/><path class="dim" d="M${x0+1} ${gy+26}l8 -3v6zM${x1-1} ${gy+26}l-8 -3v6z" fill="#1f3864"/><text class="dt" x="${(x0+x1)/2}" y="${gy+40}" text-anchor="middle">OVERALL LENGTH ${L} mm</text>
+  <path class="dim" d="M${x0-26} ${y0}V${gy}M${x0-32} ${y0}h12M${x0-32} ${gy}h12"/><path d="M${x0-26} ${y0+1}l-3 8h6zM${x0-26} ${gy-1}l-3 -8h6z" fill="#1f3864"/><text class="dt" transform="translate(${x0-33} ${(y0+gy)/2}) rotate(-90)" text-anchor="middle">HEIGHT ${H} mm</text>`;
+ const ys=[y0,...d.p.filter(p=>p[4]).map(p=>p[4]-16),...d.n.map(q=>q[2]-30)],top=Math.max(0,Math.min(...ys)-14),bot=gy+72;
+ return `<svg id="gsvg" class="gsvg" viewBox="0 ${top} 900 ${bot-top}" style="width:100%;height:auto"><defs><pattern id="ht" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#222" stroke-width="1"/></pattern></defs>
+  <path d="M60 ${gy}H850" stroke="#111" stroke-width="1.4"/><path d="${gnd}" stroke="#111" stroke-width="1" fill="none"/><text x="852" y="${gy-4}" font-size="9" fill="#333">GRADE EL +0.00</text>${dim}
+  <text x="450" y="${gy+62}" text-anchor="middle" font-size="10" fill="#222">C/L ELEVATION ${s.ga.cl_elevation_mm??"—"} mm  |  DRY WEIGHT ${s.ga.dry_weight_kg?fmt(s.ga.dry_weight_kg)+" kg":"n/a"}</text>${body.join("")}${lead.join("")}${bal.join("")}${nz.join("")}</svg>`}
+/* ---- side panel ---- */
+function gSpark(h){if(h.length<2)return"";const mx=Math.max(...h),mn=Math.min(...h);return `<svg viewBox="0 0 200 40" style="width:100%;height:42px"><polyline fill="none" stroke="#2f81f7" stroke-width="1.5" points="${h.map((v,i)=>`${i*6.9},${38-(mx===mn?19:(v-mn)/(mx-mn)*34)}`).join(" ")}"/></svg>`}
 function gP(){const n=G.n,s=S(n),d=GA[n],k=G.sel;
- if(!k)return `<h3>Select a part</h3><p class="muted" style="line-height:1.6">Click any numbered part or nozzle (N1, N2 …) on the drawing, or a row in the tables below, to see its bill-of-materials entry and the OPLs and work orders that mention it.</p><div style="margin-top:12px">${kv([["Parts in BOM",d.bom.length+(d.mot?1:0)],["Nozzles",d.nz.length],["Overall L × H",s.ga.overall_length_mm+" × "+s.ga.height_mm+" mm"],["Dry weight",s.ga.dry_weight_kg?fmt(s.ga.dry_weight_kg)+" kg":"illegible on drawing"]])}</div>`;
+ if(!k)return `<h3>${G.mode==="explore"?"Select a part":G.mode==="locate"?"Walk-down quiz":"Fault finding"}</h3><p class="muted" style="line-height:1.6">${G.mode==="explore"?"Click any numbered part or nozzle (N1, N2 …) on the drawing, or a row in the tables below. Turn on <b>Live condition</b> to see simulated health on the monitored parts.":G.mode==="locate"?"Answer by clicking the part or nozzle on the drawing. Names are hidden on hover during the quiz.":"Click a part to <b>inspect</b> its readings, then mark the one you suspect."}</p><div style="margin-top:12px">${kv([["Parts in BOM",d.bom.length+(d.mot?1:0)],["Nozzles",d.nz.length],["Overall L × H",s.ga.overall_length_mm+" × "+s.ga.height_mm+" mm"],["Dry weight",s.ga.dry_weight_kg?fmt(s.ga.dry_weight_kg)+" kg":"illegible on drawing"]])}</div>`;
  const nzr=d.nz.find(q=>q.m===k),b=nzr?null:gBom(n,k),name=nzr?nzr.sv:b.name,kw=((name.toLowerCase().match(/[a-z]{4,}/g)||[""]).sort((a,c)=>c.length-a.length)[0]);
  const lk=K.nz.find(z=>z.document_id===s.ga.document_id&&z.nozzle_mark===k),has=(x,...f)=>kw&&f.map(y=>x[y]||"").join(" ").toLowerCase().includes(kw);
  const wo=K.mnt.filter(m=>m.set===n&&has(m,"failure","cause","parts","action")).slice(0,3),ol=K.opl.filter(o=>o.set===n&&has(o,"title","obj")).slice(0,3);
+ const steps=[...new Set(K.opl.filter(o=>o.set===n).flatMap(o=>o.steps.filter(x=>has({t:x[0]},"t")).map(x=>x[0])))].slice(0,3);
  const rows=nzr?[["Nozzle",k],["Service",nzr.sv],["Size / rating",esc(nzr.sz)],["Remarks",esc(nzr.r)],["Connects to / from",lk?esc(lk.connects_to_from.slice(0,170)):null]]:[["Item no.",k==="M"?"Driver":k],["Part",esc(b.name)],["Material / spec",esc(b.mat)],["Qty",b.qty],["Drawing",s.ga.dwg_no]];
- return `<span class="tag acc">${s.tag} · Set ${n}</span><h3 style="margin:8px 0">${nzr?k+" · "+esc(nzr.sv):(k==="M"?"":k+" · ")+esc(b.name)}</h3>${kv(rows)}
- <h3 style="margin:14px 0 6px">Related knowledge</h3>${ol.length||wo.length?ol.map(o=>`<div class="src"><div onclick="go('opl',{opl:'${o.no}'})">🧩 ${esc(o.tag)} · ${esc(o.title)}</div></div>`).join("")+wo.map(m=>`<div class="src"><div onclick="go('equipment',{set:${n},tab:'maint',wo:'${m.id}'})">🔧 ${esc(m.wo)} · ${esc(m.failure).slice(0,70)}</div></div>`).join(""):`<p class="muted">No OPL or work order mentions “${esc(kw||name)}” for this set.</p>`}
- <button class="ghost" style="width:100%;margin-top:12px" onclick="go('assistant',{scope:${n}})">Ask AI about ${esc(name)} →</button>`}
-function gSel(k){G.sel=G.sel===k?null:k;document.querySelectorAll("[data-k]").forEach(g=>g.classList.toggle("sel",g.dataset.k===G.sel));const p=$("#gp");if(p)p.innerHTML=gP()}
-function gaView(n){if(G.n!==n){G.n=n;G.sel=null}const s=S(n),d=GA[n],g=s.ga,r=s.revs;
- return `<div class="split" style="margin-bottom:14px"><div class="card"><div class="row between"><h3>General arrangement · ${esc(s.name)} <span class="tag">${g.dwg_no}</span></h3><span class="tag ok">Rev ${esc(g.revision)} · ${esc(r[r.length-1].desc.toLowerCase())}</span></div>${gaSvg(n)}
- <div class="row muted" style="font-size:12px"><span style="color:var(--acc)">⬭ part (click)</span><span>① BOM item no.</span><span style="color:var(--warn)">▯ N / M nozzle</span><span>C/L EL ${g.cl_elevation_mm??"—"} mm · dry ${g.dry_weight_kg?fmt(g.dry_weight_kg)+" kg":"n/a"} · L ${g.overall_length_mm} × H ${g.height_mm} mm</span></div></div>
- <div class="card" id="gp" style="align-self:start">${gP()}</div></div>
+ const V=nzr?null:gVal(n,k);let live="";
+ if(V&&G.mode!=="locate"&&(G.mode==="fault"||G.cond)){const st=gState(V.m,V.v),c=st==="ok"?"ok":st==="warn"?"warn":"bad";live=`<h3 style="margin:14px 0 6px">${G.mode==="fault"?"Inspection reading":"Live condition"}</h3><div class="row between"><b style="font-size:24px;color:var(--${c})">${V.v.toFixed(V.m[3]<5?1:0)} ${V.m[2]}</b>${tg(st==="ok"?"NORMAL":st==="warn"?"ALARM":"TRIP",c)}</div><div class="muted" style="font-size:12px">${V.m[1]} · alarm ${V.m[4]} · trip ${V.m[5]}</div>${gSpark(V.h)}<p class="muted" style="font-size:11px;margin-top:4px">Simulated · connect DCS/OPC via window.LIVE_SOURCE(tag)</p>`}
+ else if(G.mode==="fault"&&!nzr)live=`<h3 style="margin:14px 0 6px">Inspection reading</h3><p class="muted">Visual check: ${gFaulty(n,k)?"<b style='color:var(--bad)'>abnormal — wear / leakage evident</b>":"nothing abnormal observed"}.</p>`;
+ const act=G.mode==="fault"&&G.f&&G.f.stage==="await"?`<button style="width:100%;margin-top:10px;background:var(--bad)" onclick="gSuspect('${k}')">Mark ${esc(name)} as the faulty part</button>`:"";
+ return `<span class="tag acc">${s.tag} · Set ${n}</span><h3 style="margin:8px 0">${nzr?k+" · "+esc(nzr.sv):(k==="M"?"":k+" · ")+esc(b.name)}</h3>${kv(rows)}${live}${act}
+ <h3 style="margin:14px 0 6px">Related knowledge</h3>${steps.length?steps.map(t=>`<div class="src"><div onclick="go('equipment',{set:${n},tab:'opl'})">📋 OPL step · ${esc(t.slice(0,90))}</div></div>`).join(""):""}${ol.length||wo.length?ol.map(o=>`<div class="src"><div onclick="go('opl',{opl:'${o.no}'})">🧩 ${esc(o.tag)} · ${esc(o.title)}</div></div>`).join("")+wo.map(m=>`<div class="src"><div onclick="go('equipment',{set:${n},tab:'maint',wo:'${m.id}'})">🔧 ${esc(m.wo)} · ${esc(m.failure).slice(0,70)}</div></div>`).join(""):(steps.length?"":`<p class="muted">No OPL or work order mentions “${esc(kw||name)}” for this set.</p>`)}`}
+const gCtx=()=>{const n=G.n,s=S(n),k=G.sel,nzr=k&&GA[n].nz.find(q=>q.m===k),b=k&&!nzr&&gBom(n,k),nm=nzr?nzr.sv:b?b.name:null;
+ return{set:n,kw:nm?nm.replace(/[()]/g,""):"",label:nm?`${s.tag} · ${nm}`:`${s.tag} · whole machine`,ph:"Ask about "+(nm||s.name)+"…",
+  prompts:nm?[`What does the ${nm} do and how do I inspect it?`,`What failures have occurred on the ${nm}?`,`What safety precautions apply before working on the ${nm}?`]:[`How do I start up ${s.tag} safely?`,`What are the main failure modes of ${s.tag}?`,`Which interlocks protect ${s.tag}?`]}};
+/* ---- task bar (OTS) ---- */
+function gTask(){const n=G.n;
+ if(G.mode==="explore")return `<div class="otsbar"><b>Explore</b><span class="muted">Click parts/nozzles to read the BOM entry, related OPL steps and work orders.</span><label class="row" style="gap:6px;margin-left:auto"><input type="checkbox" ${G.cond?"checked":""} onchange="G.cond=this.checked;gTint();gRefresh()"> Live condition</label></div>`;
+ if(G.mode==="locate"){const q=G.q;if(!q)return `<div class="otsbar"><b>Walk-down quiz</b><span class="muted">10 questions generated from this machine's BOM and nozzle schedule.</span><button style="margin-left:auto" onclick="gStartQuiz()">Start</button></div>`;
+  if(q.i>=q.items.length){const miss=q.log.filter(x=>!x.ok);return `<div class="otsbar done"><b>Result: ${q.ok}/${q.items.length}</b><span>${miss.length?"Review: "+miss.map(x=>esc(x.a)).join(", "):"Perfect walk-down."}</span><span style="margin-left:auto" class="row">${miss.length?`<button class="ghost" onclick="gExplain()">Ask AI to explain</button>`:""}<button onclick="gStartQuiz()">Retry</button></span></div>`}
+  const it=q.items[q.i];return `<div class="otsbar"><span class="tag acc">Q${q.i+1}/${q.items.length}</span><span style="font-size:15px">${it.q}</span><span class="muted" style="margin-left:auto">Score ${q.ok} · ${q.msg||""}</span></div><div class="pbarx"><i style="width:${q.i/q.items.length*100}%"></i></div>`}
+ const f=G.f;if(!f)return `<div class="otsbar"><b>Fault finding</b><span class="muted">${gScen(n).length} scenarios from this set's OPL troubleshooting tables.</span><button style="margin-left:auto" onclick="gNextFault()">Start scenario</button></div>`;
+ if(f.stage==="await")return `<div class="otsbar alarm"><span class="tag bad">ALARM</span><span style="font-size:14.5px"><b>${esc(f.sc.sym)}</b></span><span class="muted" style="margin-left:auto">Attempts left ${f.tries} · inspect parts, then mark the suspect</span></div><div class="otsbar" style="margin-top:6px">${f.msg?`<span>${f.msg}</span>`:`<span class="muted">Hint: use the AI copilot, or open the OPL for this set.</span>`}<button class="ghost" style="margin-left:auto" onclick="gReveal()">Give up</button></div>`;
+ return `<div class="otsbar done"><span class="tag ${f.ok?"ok":"warn"}">${f.ok?"CORRECT":"REVEALED"}</span><span><b>Cause:</b> ${esc(f.sc.cause)}. <b>Action:</b> ${esc(f.sc.fix)}. <a style="color:var(--acc);cursor:pointer" onclick="go('opl',{opl:'${f.sc.opl.no}'})">${esc(f.sc.opl.no)}</a></span><span style="margin-left:auto" class="row"><button class="ghost" onclick="gExplain()">Ask AI why</button><button onclick="gNextFault()">Next scenario</button></span></div>`}
+/* ---- actions ---- */
+const gTint=()=>{document.querySelectorAll(".gp").forEach(g=>{const k=g.dataset.k,e=g.querySelector(".eq");if(!e)return;const v=G.mode==="explore"&&G.cond?gVal(G.n,k):null;e.style.fill=v?GCOL[gState(v.m,v.v)]:""})};
+function gRefresh(){const t=$("#gtask"),p=$("#gp");if(t)t.innerHTML=gTask();if(p)p.innerHTML=gP();document.querySelectorAll("[data-k]").forEach(g=>g.classList.toggle("sel",g.dataset.k===G.sel));aiSetCtx("ga",gCtx())}
+const gFlash=(k,c)=>{document.querySelectorAll(`.gp[data-k="${k}"], .pdn[data-k="${k}"]`).forEach(g=>{g.classList.add(c);setTimeout(()=>g.classList.remove(c),1200)})};
+function gSel(k){
+ if(G.mode==="locate"){const q=G.q;if(!q||q.i>=q.items.length||q.lock)return;const it=q.items[q.i],ok=k===it.k;OTS.ga[1]++;if(ok)OTS.ga[0]++;q.ok+=ok?1:0;q.log.push({a:it.a,ok});gFlash(k,ok?"fok":"fbad");if(!ok)gFlash(it.k,"fok");
+  const c=gBom(G.n,k),z=GA[G.n].nz.find(x=>x.m===k);q.msg=ok?"✔ correct":"✘ that was "+(z?k+" "+z.sv:c.name)+" — correct: "+it.a;q.lock=1;gRefresh();setTimeout(()=>{q.i++;q.lock=0;q.msg="";gRefresh()},ok?700:1800);return}
+ G.sel=G.sel===k?null:k;gRefresh()}
+function gStartQuiz(){G.q={items:gQuizItems(G.n),i:0,ok:0,log:[],msg:""};G.sel=null;gRefresh()}
+function gNextFault(){const l=gScen(G.n);if(!l.length){G.f=null;return}const prev=G.f?.sc;let sc;do{sc=l[Math.floor(Math.random()*l.length)]}while(l.length>1&&prev&&sc.sym===prev.sym);G.f={n:G.n,sc,targets:sc.targets,stage:"await",tries:3,ramp:9,msg:"",ok:false};G.sel=null;G.hh={};gTickVals();gRefresh()}
+function gSuspect(k){const f=G.f;if(!f||f.stage!=="await")return;OTS.ft[1]++;if(f.targets.includes(k)){f.ok=true;f.stage="done";OTS.ft[0]++;gFlash(k,"fok")}else{f.tries--;gFlash(k,"fbad");const b=gBom(G.n,k);f.msg=`<b style="color:var(--bad)">✘ ${esc(b?b.name:k)}</b> reads normal — keep looking.`;if(f.tries<=0){f.stage="done";f.targets.forEach(t=>gFlash(t,"fok"))}}gRefresh()}
+function gReveal(){const f=G.f;if(!f)return;f.stage="done";f.targets.forEach(t=>gFlash(t,"fok"));gRefresh()}
+function gExplain(){const n=G.n;let q;if(G.mode==="locate"){const miss=G.q.log.filter(x=>!x.ok).map(x=>x.a);q=`Explain the function of these parts of ${S(n).tag}: ${miss.join(", ")}`}else q=`Why does "${G.f.sc.sym}" happen on ${S(n).tag}? Cause: ${G.f.sc.cause}. How do I prevent it?`;aiSend("ga",q)}
+function gMode(m){G.mode=m;G.sel=null;render()}
+const gIsOn=()=>st.page==="equipment"&&st.set&&st.tab==="ga"&&$("#gsvg");
+setInterval(()=>{if(!gIsOn())return;gTickVals();if(G.mode==="explore"&&G.cond)gTint();if(G.sel&&(G.mode==="fault"||G.cond)){const p=$("#gp");if(p)p.innerHTML=gP()}},1500);
+function gaView(n){if(G.n!==n){G.n=n;G.sel=null;G.q=null;G.f=null;G.hh={}}const s=S(n),d=GA[n],g=s.ga,r=s.revs,M=[["explore","🔍 Explore"],["locate","🎯 Walk-down quiz"],["fault","🛠 Fault finding"]];
+ setTimeout(()=>{gTint()},0);
+ return `<div class="split" style="margin-bottom:14px;grid-template-columns:minmax(0,1fr) 330px"><div class="card" style="min-width:0"><div class="row between" style="margin-bottom:8px"><h3>Equipment drawing · ${esc(s.name)} <span class="tag">${g.dwg_no}</span></h3><span class="row" style="gap:4px">${M.map(([k,l])=>`<button class="${G.mode===k?"":"ghost"}" style="padding:5px 11px;font-size:12.5px" onclick="gMode('${k}')">${l}</button>`).join("")}</span></div>
+ <div id="gtask">${gTask()}</div>
+ <div class="gasheet"><div class="ttl">GENERAL ARRANGEMENT DRAWING - ${esc(s.name.toUpperCase())} (${esc(s.tag)})</div><div class="sub2">Area ${s.area} - ${esc(s.unit)} &nbsp;|&nbsp; Fluid: ${esc(s.fluid)}</div>${gaSvg(n)}
+  <div class="tblk"><div><b>TITLE:</b> GENERAL ARRANGEMENT DRAWING<br><span>${esc(s.name.toUpperCase())} · ${esc(s.tag)}</span></div><div><b>DWG No.</b> ${g.dwg_no}<br>Rev ${esc(g.revision)} · Sheet 1 of 1</div><div class="stamp">This is sample data provided for CALIBER purposes only</div></div></div>
+ <div class="row muted" style="font-size:12px;margin-top:8px"><span style="color:#b8860b">① BOM item no.</span><span style="color:#b8860b">▯ N / M nozzle</span><span>${G.mode==="explore"?"colour = simulated condition (green ok · amber alarm · red trip)":G.mode==="locate"?"names hidden — click to answer":"inspect parts, find the faulty one"}</span></div></div>
+ <div><div class="card" id="gp">${gP()}</div>${aiBox("ga",gCtx())}</div></div>
  <div class="grid" style="grid-template-columns:1fr 1fr"><div><h3 style="margin-bottom:8px">Bill of material</h3>${tbl(["#","Part","Material","Qty"],[...(d.mot?[["—",esc(d.mot),"—","1"]]:[]),...d.bom.map((b,i)=>[i+1,esc(b.name),esc(b.mat),b.qty])],i=>`gSel('${d.mot?(i===0?"M":i):i+1}')`)}</div>
  <div><h3 style="margin-bottom:8px">Nozzle / connection schedule</h3>${tbl(["Mark","Service","Size","Remarks"],d.nz.map(z=>[z.m,z.sv,esc(z.sz),esc(z.r)]),i=>`gSel('${d.nz[i].m}')`)}
- <h3 style="margin:14px 0 8px">Revision history</h3>${tbl(["Rev","Description","By","Date"],r.map(x=>[x.rev,x.desc,x.by,x.date]))}</div></div>
+ <h3 style="margin:14px 0 8px">Revision history</h3>${tbl(["Rev","Description","By","Date"],r.map(x=>[x.rev,x.desc,x.by,x.date]))}
+ <h3 style="margin:14px 0 8px">Your OTS record</h3>${kv([["Walk-down answers",OTS.ga[1]?`${OTS.ga[0]}/${OTS.ga[1]} correct`:"—"],["Fault-finding",OTS.ft[1]?`${OTS.ft[0]} found · ${OTS.ft[1]} attempts`:"—"]])}</div></div>
  <p class="muted" style="margin-top:10px;font-size:12px">Notes: 1 Material per WPN-MAT-001 · 2 Surface prep &amp; painting per WPN-PAINT-001 · 3 Dimensions in mm · 4 Weights estimated (dry/erection) · 5 Nozzle loads per vendor drawing · 6 Associated docs: ${s.pid.ref}, interlock ${esc(g.assoc_interlock_ref)}. Sample data for CALIBER only; schematic redraw — parts not individually dimensioned.</p>`}
-function gaPage(){return `<h1>Equipment Drawing Viewer</h1><p class="sub">General-arrangement drawings redrawn in-app from the GA pack · every part and nozzle is selectable and linked to the BOM, OPLs and work orders</p>
+function gaPage(){return `<h1>Equipment Drawing Viewer</h1><p class="sub">GA drawings redrawn in-app · explore, train and troubleshoot with the AI copilot</p>
  <div class="chips">${K.sets.map(x=>`<span class="chip" style="${x.n===G.n?"color:var(--acc);border-color:var(--acc)":""}" onclick="G.n=${x.n};G.sel=null;render()">${x.tag}</span>`).join("")}</div>${gaView(G.n)}`}
+/* ===== Plot plan v2: scaled site plan + field-operator round + emergency drill + spatial AI copilot ===== */
+const POS={1:[124,132],2:[160,132],3:[196,132],4:[232,132],5:[124,204],6:[160,204],7:[196,204],8:[232,204]};
+const MODES={dt:["Breakdown downtime (h)",n=>sum(woOf(n),m=>m.dt)],cm:["Corrective work orders",n=>cnt(woOf(n),m=>m.type==="Corrective")],rv:["Instruments flagged REVIEW",n=>cnt(K.inst,i=>i.set===n&&i.flag)]};
+const modeSel=()=>`<select onchange="st.f.mm=this.value;render()">${Object.entries(MODES).map(([k,[l]])=>`<option value="${k}" ${(st.f.mm||"dt")===k?"selected":""}>Colour by: ${l}</option>`).join("")}</select>`;
+const PS=4.6,PX=e=>(e-96)*PS+46,PY=n=>(n-96)*PS+34,AREAC=["#9ec5fe","#a5d6a7","#ffd59e","#f4a6a6","#cdb4f6","#9fe0d8","#f6e58d","#c3c9d6"];
+const HA=[150,186,222,238],VA=[110,142,178,214,250],CRP=[110,186],MUS={A:[110,252],B:[250,252]};
+const PP={sel:null,mode:"explore",L:{areas:1,heat:0,haz:0,esc:1,fire:0,walk:0},wind:315,op:[110,186],opn:[110,186],at:"Control room",anim:null,trail:[],clock:0,dist:0,round:null,drill:null,vb:[0,0,880,830],timer:null};
+const ppFP=n=>{const m=/([\d.]+)\s*x\s*([\d.]+)/.exec(S(n).pp.footprint_text);return[+m[1],+m[2]]};
+const ppAcc=n=>[POS[n][0],POS[n][1]<168?150:222];
+const ppHaz=n=>{const f=S(n).fluid;return /h2|hydrogen|ethylene/i.test(f)?[5,12]:/hexane/i.test(f)?[3,8]:null};
+/* ---- walkway graph + routing ---- */
+const kk=p=>p[0]+","+p[1];
+function ppGraph(){const pts=new Map(),add=p=>pts.set(kk(p),p);HA.forEach(h=>VA.forEach(v=>add([v,h])));K.sets.forEach(s=>add(ppAcc(s.n)));add(MUS.A);add(MUS.B);
+ const adj=new Map(),link=(a,b)=>{const d=Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1]);[[a,b],[b,a]].forEach(([x,y])=>{if(!adj.has(kk(x)))adj.set(kk(x),[]);adj.get(kk(x)).push([y,d])})};
+ HA.forEach(h=>{const l=[...pts.values()].filter(p=>p[1]===h).sort((a,b)=>a[0]-b[0]);for(let i=1;i<l.length;i++)link(l[i-1],l[i])});
+ VA.forEach(v=>{const l=[...pts.values()].filter(p=>p[0]===v).sort((a,b)=>a[1]-b[1]);for(let i=1;i<l.length;i++)link(l[i-1],l[i])});return{pts,adj}}
+const PG=ppGraph();
+function ppRoute(a,b){const dist=new Map([[kk(a),0]]),prev=new Map(),Q=new Set([kk(a)]);
+ while(Q.size){let u=null;Q.forEach(x=>{if(u===null||dist.get(x)<dist.get(u))u=x});Q.delete(u);if(u===kk(b))break;(PG.adj.get(u)||[]).forEach(([p,d])=>{const k=kk(p),nd=dist.get(u)+d;if(nd<(dist.get(k)??1e9)){dist.set(k,nd);prev.set(k,u);Q.add(k)}})}
+ const path=[];let c=kk(b);if(!dist.has(c))return[a,b];while(c){path.unshift(PG.pts.get(c));c=prev.get(c)}return path}
+const plen=p=>p.reduce((t,q,i)=>i?t+Math.hypot(q[0]-p[i-1][0],q[1]-p[i-1][1]):0,0);
+const ppPathTo=(from,fromN,n)=>{const acc=ppAcc(n),r=ppRoute(fromN,acc);return[...(kk(from)!==kk(fromN)?[from]:[]),...r,POS[n]]};
+const ppDescr=p=>{const seg=[];for(let i=1;i<p.length;i++){const dE=p[i][0]-p[i-1][0],dN=p[i][1]-p[i-1][1],d=Math.abs(dE)>Math.abs(dN)?(dE>0?"east":"west"):(dN>0?"south":"north"),L=Math.hypot(dE,dN);if(L<.5)continue;if(seg.length&&seg[seg.length-1][0]===d)seg[seg.length-1][1]+=L;else seg.push([d,L])}return seg.map(([d,L])=>`${d} ${Math.round(L)} m`).join(" → ")};
+const eu=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+/* ---- drawing ---- */
+function mapSvg(sel,opt={}){const mode=st.f.mm||"dt",f=MODES[mode][1],v=K.sets.map(s=>f(s.n)),srt=[...v].sort((a,b)=>a-b),t1=srt[2],t2=srt[5],heat=x=>x>t2?"#f85149":x>t1?"#d29922":"#3fb950",full=opt.full,L=full?PP.L:{areas:1,heat:0,haz:0,esc:0,fire:0,walk:0};
+ const vb=full?PP.vb:[0,0,880,830],o=[];
+ for(let e=100;e<=260;e+=20)o.push(`<line x1="${PX(e)}" y1="${PY(100)}" x2="${PX(e)}" y2="${PY(260)}" stroke="#d9d9d2" stroke-width=".8"/><text x="${PX(e)}" y="${PY(100)-6}" font-size="9" text-anchor="middle" fill="#555">E${e}</text>`);
+ for(let n=100;n<=260;n+=20)o.push(`<line x1="${PX(100)}" y1="${PY(n)}" x2="${PX(260)}" y2="${PY(n)}" stroke="#d9d9d2" stroke-width=".8"/><text x="${PX(100)-6}" y="${PY(n)+3}" font-size="9" text-anchor="end" fill="#555">N${n}</text>`);
+ o.push(`<rect x="${PX(100)}" y="${PY(102)}" width="${(260-100)*PS}" height="${(246-102)*PS}" fill="none" stroke="#333" stroke-dasharray="9 5" stroke-width="1.2"/><text x="${PX(100)+4}" y="${PY(102)+12}" font-size="9" fill="#333">BATTERY LIMIT</text>`,
+  `<rect x="${PX(100)}" y="${PY(164)}" width="${160*PS}" height="${8*PS}" fill="#f1e6c8" stroke="#c9a95a"/><text x="${PX(102)}" y="${PY(168)+3}" font-size="9" fill="#7a5d12" font-weight="700">MAIN PIPE RACK</text>`,
+  `<rect x="${PX(100)}" y="${PY(234)}" width="${160*PS}" height="${8*PS}" fill="#e4e4e0" stroke="#bdbdb5"/><line x1="${PX(100)}" y1="${PY(238)}" x2="${PX(260)}" y2="${PY(238)}" stroke="#fff" stroke-dasharray="10 8"/><text x="${PX(102)}" y="${PY(238)-8}" font-size="9" fill="#666">ROAD (8 m)</text>`);
+ if(L.walk)HA.concat([]).forEach(h=>o.push(`<line x1="${PX(100)}" y1="${PY(h)}" x2="${PX(260)}" y2="${PY(h)}" stroke="#2e9e55" stroke-dasharray="3 4" opacity=".7"/>`)),VA.forEach(e=>o.push(`<line x1="${PX(e)}" y1="${PY(150)}" x2="${PX(e)}" y2="${PY(e===110||e===250?252:238)}" stroke="#2e9e55" stroke-dasharray="3 4" opacity=".7"/>`));
+ K.sets.forEach(s=>{const[e,n]=POS[s.n],[w,l]=ppFP(s.n),W=Math.max(w*PS,14),Hh=Math.max(l*PS,14),rackN=n<168?164:172;o.push(`<line x1="${PX(e)}" y1="${PY(n)}" x2="${PX(e)}" y2="${PY(rackN)}" stroke="#8d6bd1" stroke-width="1.6" opacity=".8"/>`)});
+ if(L.haz)K.sets.forEach(s=>{const z=ppHaz(s.n);if(!z)return;const[e,n]=POS[s.n];o.push(`<circle cx="${PX(e)}" cy="${PY(n)}" r="${z[1]*PS}" fill="rgba(245,180,40,.13)" stroke="#d29922" stroke-dasharray="5 3"/><circle cx="${PX(e)}" cy="${PY(n)}" r="${z[0]*PS}" fill="rgba(235,70,60,.2)" stroke="#d1242f"/>`)});
+ if(L.fire){[120,150,180,210,240].forEach(e=>o.push(`<g><rect x="${PX(e)-5}" y="${PY(236)-5}" width="10" height="10" fill="#d1242f"/><text x="${PX(e)}" y="${PY(236)+3}" font-size="8" text-anchor="middle" fill="#fff" font-weight="700">H</text></g>`));
+  K.sets.forEach(s=>{if(!ppHaz(s.n))return;const[e,n]=POS[s.n];o.push(`<g><circle cx="${PX(e)-22}" cy="${PY(n)+(n<168?20:-20)}" r="5" fill="#fff" stroke="#d1242f"/><text x="${PX(e)-22}" y="${PY(n)+(n<168?20:-20)+3}" font-size="7" text-anchor="middle" fill="#d1242f" font-weight="700">FM</text></g>`)});o.push(`<text x="${PX(102)}" y="${PY(246)+3}" font-size="8" fill="#d1242f">H = hydrant · FM = fire monitor (illustrative)</text>`)}
+ /* control room, musters, gates, wind */
+ o.push(`<rect x="${PX(99)}" y="${PY(179)}" width="${8*PS}" height="${14*PS}" fill="#dfe6f3" stroke="#334"/><text x="${PX(103)}" y="${PY(186)+3}" font-size="8" text-anchor="middle" fill="#223" font-weight="700" transform="rotate(-90 ${PX(103)} ${PY(186)})">CONTROL ROOM</text>`);
+ if(L.esc){Object.entries(MUS).forEach(([k,[e,n]])=>{const up=PP.drill&&PP.drill.rec===k;o.push(`<g style="cursor:${full?"pointer":"default"}" ${full?`onclick="ppMuster('${k}')"`:""}><circle cx="${PX(e)}" cy="${PY(n)}" r="14" fill="${up?"#2ea043":"#c8f0d2"}" stroke="#1a7f37" stroke-width="2"/><text x="${PX(e)}" y="${PY(n)+4}" font-size="12" text-anchor="middle" font-weight="700" fill="#0f5323">${k}</text><text x="${PX(e)}" y="${PY(n)+27}" font-size="8.5" text-anchor="middle" fill="#0f5323" font-weight="700">MUSTER POINT ${k}</text></g>`)});
+  o.push(`<path d="M${PX(110)} ${PY(246)}v${6*PS}M${PX(250)} ${PY(246)}v${6*PS}" stroke="#1a7f37" stroke-width="2" stroke-dasharray="5 3"/><text x="${PX(112)}" y="${PY(246)+10}" font-size="8" fill="#0f5323">GATE 1</text><text x="${PX(252)}" y="${PY(246)+10}" font-size="8" fill="#0f5323">GATE 2</text>`)}
+ const wa=PP.wind,wx=PX(250),wy=PY(112);
+ o.push(`<g transform="translate(${wx} ${wy})"><circle r="17" fill="#fff" stroke="#555"/><g transform="rotate(${wa+180})"><path d="M0 -12L5 4L0 1L-5 4z" fill="#2f81f7"/></g><text y="29" font-size="8.5" text-anchor="middle" fill="#333">WIND from ${["N","NE","E","SE","S","SW","W","NW"][Math.round(wa/45)%8]}</text></g>`,
+  `<g transform="translate(${PX(256)} ${PY(104)})" style="display:none"></g><path d="M${PX(98)} ${PY(262)}h${20*PS}" stroke="#111" stroke-width="2"/><text x="${PX(98)}" y="${PY(262)+12}" font-size="9" fill="#111">0 — 20 m</text><g transform="translate(${PX(256)} ${PY(238)+36})"><path d="M0 14V-12M0 -12l-4 8M0 -12l4 8" stroke="#111" stroke-width="2" fill="none"/><text y="-16" font-size="10" text-anchor="middle" font-weight="700">N</text></g>`);
+ const nodes=K.sets.map((s,i)=>{const[e,n]=POS[s.n],[w,l]=ppFP(s.n),W=Math.max(w*PS,14),Hh=Math.max(l*PS,14),x=PX(e),y=PY(n),on=(opt.sel??PP.sel)===s.n,c=L.heat?heat(v[i]):AREAC[i],up=n<168,ly=up?y-Hh/2-30:y+Hh/2+12,act=full?`ppSelect(${s.n})`:`go('equipment',{set:${s.n},tab:'overview'})`;
+  return `<g style="cursor:pointer" onclick="if(!PP.moved)${act}"><title>${s.tag} · ${s.name} · ${MODES[mode][0]}: ${Math.round(v[i])} · E${e}/N${n}</title>
+   <line x1="${x}" y1="${up?ly+24:ly}" x2="${x}" y2="${up?y-Hh/2:y+Hh/2}" stroke="#555" stroke-width=".8"/>
+   <rect x="${x-W/2}" y="${y-Hh/2}" width="${W}" height="${Hh}" fill="${c}" stroke="${on?"#d1242f":"#25324a"}" stroke-width="${on?3:1.4}"/>
+   <rect x="${x-34}" y="${up?ly:ly}" width="68" height="24" fill="${on?"#fde8e6":"#fff"}" stroke="${on?"#d1242f":"#25324a"}" stroke-width="1"/>
+   <text x="${x}" y="${ly+10}" font-size="10" text-anchor="middle" font-weight="700" fill="#111">${s.tag}</text><text x="${x}" y="${ly+20}" font-size="7.5" text-anchor="middle" fill="#444">A${s.area} · ${s.pp.elevation_label}</text>
+   ${on&&full?`<text x="${x}" y="${ly-6}" font-size="8.5" text-anchor="middle" fill="#d1242f" font-weight="700">SELECTED</text>`:""}</g>`}).join("");
+ const dyn=full?`<g id="ppcloud"></g><polyline id="pptrail" fill="none" stroke="#2f81f7" stroke-width="2.4" stroke-dasharray="4 3" points=""/><g id="ppop" transform="translate(${PX(PP.op[0])} ${PY(PP.op[1])})"><circle r="9" fill="#2f81f7" stroke="#fff" stroke-width="2"/><circle cy="-2.5" r="2.6" fill="#fff"/><path d="M-4.5 5a4.5 4 0 0 1 9 0z" fill="#fff"/><text y="-14" font-size="8.5" text-anchor="middle" fill="#0a4db3" font-weight="700">OPERATOR</text></g>`:"";
+ return `<svg id="${full?"ppsvg":""}" viewBox="${vb.join(" ")}" style="width:100%;height:auto;background:#fbfbf8;border-radius:6px;${full?"cursor:grab;touch-action:none":""}" ${full?'onwheel="ppWheel(event)" onmousedown="ppDown(event)"':""}>${o.join("")}${nodes}${dyn}</svg>
+  ${full?"":`<div class="row" style="font-size:12px;color:var(--muted)"><span><span class="dot" style="background:#3fb950"></span>low</span><span><span class="dot" style="background:#d29922"></span>mid</span><span><span class="dot" style="background:#f85149"></span>high</span><span>· footprints to scale from the plot plan · <a style="color:var(--acc);cursor:pointer" onclick="go('plot')">open operator plot plan →</a></span></div>`}`}
+/* ---- pan / zoom ---- */
+function ppWheel(ev){ev.preventDefault();const s=$("#ppsvg"),r=s.getBoundingClientRect(),f=ev.deltaY<0?.85:1.18,[x,y,w,h]=PP.vb,mx=x+(ev.clientX-r.left)/r.width*w,my=y+(ev.clientY-r.top)/r.height*h,nw=Math.min(880,Math.max(160,w*f)),nh=nw*h/w;PP.vb=[mx-(mx-x)*nw/w,my-(my-y)*nh/h,nw,nh];s.setAttribute("viewBox",PP.vb.join(" "))}
+function ppZoom(f){const[x,y,w,h]=PP.vb,nw=f?Math.min(880,Math.max(160,w*f)):880,nh=nw*830/880;PP.vb=f?[x+(w-nw)/2,y+(h-nh)/2,nw,nh]:[0,0,880,830];$("#ppsvg")?.setAttribute("viewBox",PP.vb.join(" "))}
+function ppDown(ev){const s=$("#ppsvg"),r=s.getBoundingClientRect(),st0={x:ev.clientX,y:ev.clientY,vb:[...PP.vb]};PP.moved=false;
+ const mv=e=>{const dx=e.clientX-st0.x,dy=e.clientY-st0.y;if(Math.abs(dx)+Math.abs(dy)>4)PP.moved=true;PP.vb=[st0.vb[0]-dx*st0.vb[2]/r.width,st0.vb[1]-dy*st0.vb[3]/r.height,st0.vb[2],st0.vb[3]];s.setAttribute("viewBox",PP.vb.join(" "))},up=()=>{removeEventListener("mousemove",mv);removeEventListener("mouseup",up);setTimeout(()=>PP.moved=false,0)};addEventListener("mousemove",mv);addEventListener("mouseup",up)}
+/* ---- animation engine (sim time: 1 tick = 1 s; 25x real time) ---- */
+const cloudAt=t=>{const d=PP.drill,r=Math.min(40,5+.45*t),a=PP.wind*Math.PI/180,dx=-Math.sin(a),dy=Math.cos(a),dr=.9*t;return{c:[POS[d.leak][0]+dx*dr,POS[d.leak][1]+dy*dr],r,ang:Math.atan2(dy,dx)*180/Math.PI}};
+function ppOpDom(){const g=$("#ppop");if(g)g.setAttribute("transform",`translate(${PX(PP.op[0])} ${PY(PP.op[1])})`);const t=$("#pptrail");if(t)t.setAttribute("points",PP.trail.map(p=>PX(p[0])+","+PY(p[1])).join(" "));const c=$("#ppcloud");if(c){if(PP.drill&&PP.drill.stage!=="setup"){const k=cloudAt(PP.drill.t);c.innerHTML=`<g transform="translate(${PX(k.c[0])} ${PY(k.c[1])}) rotate(${k.ang})"><ellipse rx="${k.r*PS*1.25}" ry="${k.r*PS*.8}" fill="rgba(235,70,60,.28)" stroke="#d1242f" stroke-dasharray="6 4"/><text font-size="10" fill="#b4161b" text-anchor="middle" font-weight="700" transform="rotate(${-k.ang})">HEXANE VAPOUR</text></g>`}else c.innerHTML=""}}
+function ppRun(path,v,done){clearInterval(PP.timer);const cum=[0];for(let i=1;i<path.length;i++)cum.push(cum[i-1]+eu(path[i],path[i-1]));PP.anim={path,cum,v,s:0,L:cum[cum.length-1],done};PP.trail=[path[0]];PP.dist0=PP.dist;PP.timer=setInterval(ppTick,40);ppTick()}
+function ppTick(){const A=PP.anim,D=PP.drill;if(D&&D.stage==="run"){D.t++;const k=cloudAt(D.t);if(eu(PP.op,k.c)<k.r)D.exp++;if(D.t>150&&!A){D.stage="result";D.out="no-action";clearInterval(PP.timer);ppUpd();return}}
+ if(A){A.s=Math.min(A.L,A.s+A.v);let i=1;while(i<A.cum.length-1&&A.cum[i]<A.s)i++;const f=A.cum[i]-A.cum[i-1]?(A.s-A.cum[i-1])/(A.cum[i]-A.cum[i-1]):1,a=A.path[i-1],b=A.path[i];PP.op=[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];PP.trail=[...A.path.slice(0,i),PP.op];PP.dist=PP.dist0+A.s;PP.clock+=1;
+  if(A.s>=A.L){clearInterval(PP.timer);PP.timer=null;PP.anim=null;PP.op=A.path[A.path.length-1];ppOpDom();A.done&&A.done();ppUpd();return}}
+ ppOpDom();const c=$("#ppclock");if(c)c.textContent=ppClk()}
+const ppClk=()=>`${Math.floor(PP.clock/60)}m ${String(Math.round(PP.clock%60)).padStart(2,"0")}s · ${Math.round(PP.dist)} m`;
+function ppWalk(n,after){const path=ppPathTo(PP.op,PP.opn,n);PP.at="walking to "+S(n).tag;ppRun(path,1.4*1,()=>{PP.opn=ppAcc(n);PP.at=S(n).tag;after&&after()});ppUpd()}
+/* ---- side panel / task bar ---- */
+function ppSelect(n){PP.sel=PP.sel===n?null:n;ppUpd(true)}
+function ppInfo(n){const s=S(n),z=ppHaz(n),[e,nn]=POS[n],fp=ppFP(n),nb=K.sets.filter(x=>x.n!==n).map(x=>[x,eu(POS[x.n],POS[n])]).sort((a,b)=>a[1]-b[1]).slice(0,2),cr=ppRoute(CRP,ppAcc(n)),dcr=plen(cr)+eu(ppAcc(n),POS[n]),mA=plen(ppRoute(ppAcc(n),MUS.A)),mB=plen(ppRoute(ppAcc(n),MUS.B));
+ return `<span class="tag acc">${s.tag} · Set ${n}</span><h3 style="margin:8px 0">${esc(s.name)}</h3>${kv([["Area",s.area+" – "+esc(s.unit)],["Plant grid",`E${e} / N${nn} · ref ${s.pp.grid_ref}`],["Elevation",s.pp.elevation_label],["Footprint",esc(s.pp.footprint_text)],["Functional loc.",s.pp.functional_location],["Fluid",esc(s.fluid)],["Hazard zones",z?`Zone 1 ≈ ${z[0]} m · Zone 2 ≈ ${z[1]} m <span class="muted">(illustrative)</span>`:"none (non-flammable service)"],["Nearest",nb.map(([x,d])=>`${x.tag} ${Math.round(d)} m`).join(" · ")],["Walk from control room",`${Math.round(dcr)} m · ~${Math.round(dcr/1.4/60*10)/10} min`],["Nearest muster",mA<mB?`A · ${Math.round(mA)} m`:`B · ${Math.round(mB)} m`]])}
+ ${s.pp.notes?`<p class="muted" style="margin-top:8px;font-size:12px">${esc(s.pp.notes)}</p>`:""}
+ <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button onclick="ppWalk(${n})">🚶 Walk operator here</button><button class="ghost" onclick="go('equipment',{set:${n},tab:'overview'})">Open set</button><button class="ghost" onclick="pidGo(${n},-1)">P&amp;ID</button><button class="ghost" onclick="gaGo(${n},null)">Equipment drawing</button></div>`}
+function ppRoundHTML(){const R=PP.round;if(!R)return `<h3>Field operator round</h3><p class="muted" style="line-height:1.6">Walk the plant like a field operator: visit every unit in the shortest order from the control room, tick the local checks from each unit's OPL, and decide whether to report an abnormality. One unit has a developing problem.</p><button style="margin-top:10px" onclick="ppStartRound()">Start round</button>`;
+ const cur=R.stops[R.i];
+ if(R.stage==="done"){const sc=Object.values(R.chk).filter(Boolean).length;return `<h3>Round complete</h3>${kv([["Distance walked",Math.round(PP.dist)+" m"],["Sim time",ppClk().split(" · ")[0]],["Checks ticked",sc+" / "+R.total],["Abnormality",R.rep==="ok"?"✔ found &amp; reported ("+S(R.abn).tag+")":R.rep==="miss"?"✘ missed at "+S(R.abn).tag:"—"],["False alarms",R.fa]])}<div class="row" style="gap:6px;margin-top:10px"><button onclick="ppDebrief()">Ask AI to debrief</button><button class="ghost" onclick="ppStartRound()">Restart</button></div>`}
+ const s=S(cur),o=K.opl.find(x=>x.set===cur),steps=o?o.steps.slice(0,4):[],ts=K.opl.find(x=>x.set===cur)?.ts[0];
+ const list=R.stops.map((x,i)=>`<span class="tag ${i<R.i?"ok":i===R.i?"acc":""}">${i+1}. ${S(x).tag}</span>`).join(" ");
+ if(R.stage==="walk")return `<h3>Round · ${R.i+1}/${R.stops.length}</h3><div style="margin:6px 0 10px;line-height:2">${list}</div><p class="muted">Next: <b>${s.tag}</b> — ${esc(s.name)}</p><button onclick="ppRoundGo()">🚶 Walk to ${s.tag}</button>`;
+ if(R.stage==="moving")return `<h3>Round · ${R.i+1}/${R.stops.length}</h3><div style="margin:6px 0 10px;line-height:2">${list}</div><p class="muted">Walking to ${s.tag}…</p>`;
+ return `<h3>At ${s.tag} · local checks</h3><div style="margin:6px 0 10px;line-height:2">${list}</div>${steps.map((x,j)=>`<label class="row" style="gap:8px;align-items:flex-start;padding:5px 0;font-size:13px"><input type="checkbox" ${R.chk[cur+":"+j]?"checked":""} onchange="PP.round.chk['${cur}:${j}']=this.checked"> <span>${esc(x[0])}<br><span class="muted">Accept: ${esc(x[1])}</span></span></label>`).join("")}
+ <div class="${R.abn===cur?"otsbar alarm":"otsbar"}" style="margin-top:8px;flex-direction:column;align-items:flex-start;gap:4px">${R.abn===cur?`<b>⚠ Observation:</b> <span>${esc(ts?ts[0]:"abnormal reading")}</span>`:`<b>Readings</b> <span class="muted">all normal at this unit</span>`}</div>
+ ${R.decided[cur]?`<p class="muted" style="margin-top:6px">${R.decided[cur]}</p>`:`<div class="row" style="gap:6px;margin-top:8px"><button style="background:var(--bad)" onclick="ppDecide('rep')">Report to control room</button><button class="ghost" onclick="ppDecide('ok')">Nothing to report</button></div>`}
+ <button style="margin-top:8px;width:100%" ${R.decided[cur]?"":"disabled style='opacity:.5;margin-top:8px;width:100%'"} onclick="ppNext()">${R.i+1<R.stops.length?"Next unit →":"Finish round"}</button>`}
+function ppDrillHTML(){const D=PP.drill,flam=K.sets.filter(s=>ppHaz(s.n));
+ if(!D||D.stage==="setup")return `<h3>Emergency drill · vapour release</h3><p class="muted" style="line-height:1.6">A flange leaks on a flammable unit. The cloud grows and drifts with the wind. You are the nearest operator — choose the muster point and escape <b>before</b> the cloud reaches you.</p>
+  <div class="row" style="gap:8px;margin:10px 0"><span class="muted">Leak at</span><select onchange="PP.drill={leak:+this.value,stage:'setup'};ppUpd()">${flam.map(s=>`<option value="${s.n}" ${D&&D.leak===s.n?"selected":""}>${s.tag} · ${esc(s.name)}</option>`).join("")}</select></div>
+  <div class="row" style="gap:8px;margin-bottom:10px"><span class="muted">Wind from</span><select onchange="PP.wind=+this.value;ppUpd(true)">${[["N",0],["NE",45],["E",90],["SE",135],["S",180],["SW",225],["W",270],["NW",315]].map(([l,a])=>`<option value="${a}" ${PP.wind===a?"selected":""}>${l}</option>`).join("")}</select></div>
+  <button style="background:var(--bad)" onclick="ppStartDrill()">Start release</button>`;
+ if(D.stage==="run")return `<h3 style="color:var(--bad)">🚨 Gas release at ${S(D.leak).tag}</h3><p style="line-height:1.6">Cloud radius <b id="ppcr">${Math.round(Math.min(40,5+.45*D.t))} m</b> and drifting. Click <b>Muster point A or B</b> on the map (or below) — choose wisely.</p><div class="row" style="gap:6px"><button onclick="ppMuster('A')">Run to muster A</button><button onclick="ppMuster('B')">Run to muster B</button></div><p class="muted" style="margin-top:8px">Time in cloud: <b id="ppexp">${D.exp}</b> s</p>`;
+ const good=D.exp===0,wrong=D.pick&&D.pick!==D.rec;return `<h3>${D.out==="no-action"?"❌ No action taken":good?(wrong?"⚠ Safe this time — wrong muster":"✅ Safe escape"):D.exp<20?"⚠ Brief exposure":"❌ Significant exposure"}</h3>${kv([["Leak",S(D.leak).tag],["Wind","from "+["N","NE","E","SE","S","SW","W","NW"][Math.round(PP.wind/45)%8]],["Chosen",D.pick?"Muster "+D.pick:"—"],["Recommended","Muster "+D.rec+" (upwind / cross-wind of the release)"],["Time in cloud",D.exp+" s"],["Lesson",wrong?"Muster "+D.rec+" was upwind of the release — escaping downwind risks being overtaken by the cloud.":"Moved away from the release towards the upwind muster point."],["Route",D.route||"—"]])}<div class="row" style="gap:6px;margin-top:10px"><button onclick="ppDebriefDrill()">Ask AI to debrief</button><button class="ghost" onclick="PP.drill={leak:${D.leak},stage:'setup'};PP.trail=[];ppUpd(true)">Retry</button></div>`}
+function ppPanel(){return PP.mode==="round"?ppRoundHTML():PP.mode==="drill"?ppDrillHTML():(PP.sel?ppInfo(PP.sel):`<h3>Plot plan · operator environment</h3><p class="muted" style="line-height:1.6">Click a unit to see its location data, then send the operator there. Switch to <b>Field round</b> or <b>Emergency drill</b> to train. Layers add training overlays (hazard zones, muster points, fire protection) — these overlays are <b>illustrative</b>; unit positions and footprints come from the plot-plan sheets.</p>`)}
+function ppTaskBar(){return `<div class="otsbar"><span class="tag acc" id="ppat">📍 ${esc(PP.at)}</span><span class="muted">Sim clock <b id="ppclock" style="color:var(--text)">${ppClk()}</b></span><span class="muted" style="margin-left:auto">${PP.mode==="explore"?"Explore":PP.mode==="round"?"Field round":"Emergency drill"} · speed ×25</span></div>`}
+const ppCtx=()=>{const n=PP.sel,s=n&&S(n);return{set:n||0,kw:s?s.tag+" "+s.name:"plot plan",label:s?`${s.tag} · location`:"Plot plan · whole site",ph:s?"Ask about "+s.tag+"'s location…":"Ask about layout, routes, hazards…",skill:ppSkill,
+ prompts:s?[`What is nearest to ${s.tag}?`,`Route from the control room to ${s.tag}`,`Where is the nearest muster point from ${s.tag}?`,`What are the hazard zones around ${s.tag}?`]:["Which units are closest to the control room?","What is the distance between GA-1201A and KC-4501?","Which equipment handles flammable hydrocarbons?"]}};
+function ppUpd(full){const p=$("#ppp");if(p)p.innerHTML=ppPanel();const t=$("#pptask");if(t)t.innerHTML=ppTaskBar();if(full){const m=$("#ppmap");if(m)m.innerHTML=mapSvg(0,{full:true})}aiSetCtx("pp",ppCtx());
+ const a=$("#ppat");if(a)a.textContent="📍 "+PP.at;const cr=$("#ppcr");if(cr&&PP.drill)cr.textContent=Math.round(Math.min(40,5+.45*PP.drill.t))+" m";const ex=$("#ppexp");if(ex&&PP.drill)ex.textContent=PP.drill.exp}
+/* ---- round ---- */
+function ppStartRound(){clearInterval(PP.timer);PP.anim=null;PP.op=[...CRP];PP.opn=[...CRP];PP.at="Control room";PP.clock=0;PP.dist=0;PP.trail=[];let cur=CRP,left=K.sets.map(s=>s.n),stops=[];while(left.length){left.sort((a,b)=>plen(ppRoute(cur,ppAcc(a)))-plen(ppRoute(cur,ppAcc(b))));const x=left.shift();stops.push(x);cur=ppAcc(x)}
+ PP.round={stops,i:0,stage:"walk",chk:{},decided:{},abn:stops[1+Math.floor(Math.random()*(stops.length-1))],fa:0,rep:null,total:stops.reduce((t,x)=>t+Math.min(4,(K.opl.find(o=>o.set===x)?.steps||[]).length),0)};ppUpd(true)}
+function ppRoundGo(){const R=PP.round,n=R.stops[R.i];R.stage="moving";ppWalk(n,()=>{R.stage="at"});ppUpd()}
+function ppDecide(a){const R=PP.round,cur=R.stops[R.i];if(R.abn===cur){R.decided[cur]=a==="rep"?"✔ Good call — reported to the control room.":"✘ That reading was abnormal and was not reported.";R.rep=a==="rep"?"ok":"miss"}else{R.decided[cur]=a==="rep"?"⚠ False alarm — nothing was wrong here.":"✔ Correct — normal.";if(a==="rep")R.fa++}ppUpd()}
+function ppNext(){const R=PP.round;if(R.i+1<R.stops.length){R.i++;R.stage="walk"}else{R.stage="done";OTS.rounds.push({dist:Math.round(PP.dist)})}ppUpd()}
+function ppDebrief(){const R=PP.round;aiSend("pp",`Debrief my field operator round: I walked ${Math.round(PP.dist)} m through ${R.stops.map(x=>S(x).tag).join(", ")}. The developing problem was at ${S(R.abn).tag}; I ${R.rep==="ok"?"reported it":"missed it"}. What should I check first at ${S(R.abn).tag} and why does it matter?`)}
+/* ---- drill ---- */
+function ppStartDrill(){const D=PP.drill||{leak:K.sets.find(s=>ppHaz(s.n)).n};clearInterval(PP.timer);const a=ppAcc(D.leak),w=PP.wind*Math.PI/180,to=[-Math.sin(w),Math.cos(w)],sc=k=>(MUS[k][0]-POS[D.leak][0])*to[0]+(MUS[k][1]-POS[D.leak][1])*to[1];
+ PP.drill={leak:D.leak,stage:"run",t:0,exp:0,rec:sc("A")<sc("B")?"A":"B"};PP.op=[...a];PP.opn=[...a];PP.at="at "+S(D.leak).tag+" aisle";PP.clock=0;PP.dist=0;PP.trail=[];PP.anim=null;PP.L.haz=1;PP.L.esc=1;PP.timer=setInterval(ppTick,40);ppUpd(true)}
+function ppMuster(k){const D=PP.drill;if(!D||D.stage!=="run"||PP.anim){if(!D||D.stage==="setup")ppUpd();return}D.pick=k;const r=ppRoute(PP.opn,MUS[k]);D.route=ppDescr(r)+" ("+Math.round(plen(r))+" m)";PP.at="running to muster "+k;
+ ppRun(r,2.2,()=>{D.stage="result";D.out=D.exp?"exposed":"safe";OTS.drills.push({exp:D.exp,ok:k===D.rec});PP.at="muster "+k;clearInterval(PP.timer);ppUpd()});ppUpd()}
+function ppDebriefDrill(){const D=PP.drill;aiSend("pp",`Debrief my vapour-release drill at ${S(D.leak).tag}: wind from ${["N","NE","E","SE","S","SW","W","NW"][Math.round(PP.wind/45)%8]}, I went to muster ${D.pick||"none"}, spent ${D.exp} s in the cloud, route ${D.route||"none"}. What is the correct escape strategy for a hexane release and which isolation actions follow?`)}
+/* ---- spatial skills for the AI copilot ---- */
+function ppSkill(q){const l=q.toLowerCase(),m=K.sets.filter(s=>l.includes(s.tag.toLowerCase())||l.includes(s.name.toLowerCase())),a=m[0]||(PP.sel&&S(PP.sel)),b=m[1],src=[],ans=t=>({text:t+`<div class="muted" style="margin-top:6px;font-size:12px">Computed from plot-plan coordinates (E/N, m) · walkways and muster points are illustrative.</div>`,sources:src});
+ const near=s=>K.sets.filter(x=>x.n!==s.n).map(x=>[x,eu(POS[x.n],POS[s.n])]).sort((p,q)=>p[1]-q[1]);
+ if(/(distance|how far).*(between|from)|between .* and/.test(l)&&a&&b)return ans(`<b>${a.tag} ↔ ${b.tag}</b>: ${Math.round(eu(POS[a.n],POS[b.n]))} m straight-line, <b>${Math.round(plen(ppPathTo(ppAcc(a.n),ppAcc(a.n),b.n))+eu(ppAcc(a.n),POS[a.n]))} m</b> by walkway.`);
+ if(/(nearest|closest|adjacent|neighbou?r|next to|around)/.test(l)&&/muster|escape|assembly/.test(l)===false&&a&&!/control room/.test(l))return ans(`Closest to <b>${a.tag}</b> (${a.name}): ${near(a).slice(0,3).map(([x,d])=>`<b>${x.tag}</b> ${Math.round(d)} m (A${x.area}, ${x.pp.elevation_label})`).join("; ")}.`);
+ if(/(route|walk|get to|path|way to|from the control room)/.test(l)&&a){const r=ppPathTo(CRP,CRP,a.n);return ans(`Control room → <b>${a.tag}</b>: ${ppDescr(r)} — about <b>${Math.round(plen(r))} m</b> (~${Math.round(plen(r)/1.4)} s at walking pace).`)}
+ if(/(muster|evacu|escape|assembly)/.test(l)&&a){const ac=ppAcc(a.n),A=ppRoute(ac,MUS.A),B=ppRoute(ac,MUS.B);return ans(`From <b>${a.tag}</b>: Muster A ${Math.round(plen(A))} m (${ppDescr(A)}); Muster B ${Math.round(plen(B))} m (${ppDescr(B)}). Pick the one <b>upwind or cross-wind</b> of the release — use the Emergency drill to practise.`)}
+ if(/(hazard|zone|classif|flammable|explos)/.test(l)){if(a){const z=ppHaz(a.n);return ans(z?`<b>${a.tag}</b> handles <b>${esc(a.fluid)}</b>. Illustrative hazardous-area envelope: Zone 1 ≈ ${z[0]} m, Zone 2 ≈ ${z[1]} m. Check the actual area-classification drawing before work.`:`<b>${a.tag}</b> (${esc(a.fluid)}) is not a flammable-hydrocarbon service in this data set.`)}
+  return ans(`Flammable-hydrocarbon units: ${K.sets.filter(s=>ppHaz(s.n)).map(s=>`<b>${s.tag}</b> (${esc(s.fluid)})`).join(", ")}.`)}
+ if(/control room/.test(l)&&/(closest|nearest)/.test(l))return ans(`Closest to the control room: ${K.sets.map(s=>[s,plen(ppPathTo(CRP,CRP,s.n))]).sort((p,q)=>p[1]-q[1]).slice(0,3).map(([s,d])=>`<b>${s.tag}</b> ${Math.round(d)} m`).join(", ")}.`);
+ return null}
+/* ---- page ---- */
+function ppBody(){const M=[["explore","🔍 Explore"],["round","🚶 Field round"],["drill","🚨 Emergency drill"]],LY=[["areas","Areas"],["heat","Heat map"],["haz","Hazard zones"],["esc","Muster & gates"],["fire","Fire protection"],["walk","Walkways"]];
+ return `<div class="split" style="grid-template-columns:minmax(0,1fr) 340px"><div class="card" style="min-width:0"><div class="row between" style="margin-bottom:8px"><h3>Plot plan · LLDPE unit <span class="tag">${S(1).pp.dwg_no.replace("GA-1201A","XXXX")}</span></h3><span class="row" style="gap:4px">${M.map(([k,l])=>`<button class="${PP.mode===k?"":"ghost"}" style="padding:5px 11px;font-size:12.5px" onclick="PP.mode='${k}';PP.drill=PP.mode==='drill'?PP.drill:null;ppUpd();render()">${l}</button>`).join("")}</span></div>
+  <div id="pptask">${ppTaskBar()}</div>
+  <div class="chips" style="margin:8px 0 6px;align-items:center">${LY.map(([k,l])=>`<span class="chip" style="${PP.L[k]?"color:var(--acc);border-color:var(--acc)":""}" onclick="PP.L['${k}']=PP.L['${k}']?0:1;ppUpd(true);render()">${l}</span>`).join("")}<span style="margin-left:auto" class="row"><button class="ghost" style="padding:3px 10px" onclick="ppZoom(1.25)">−</button><button class="ghost" style="padding:3px 10px" onclick="ppZoom(0)">Fit</button><button class="ghost" style="padding:3px 10px" onclick="ppZoom(.8)">+</button>${PP.L.heat?modeSel():""}</span></div>
+  <div id="ppmap">${mapSvg(0,{full:true})}</div>
+  <div class="row muted" style="font-size:12px;margin-top:6px"><span>Footprints to scale (E × N metres) · drag to pan · scroll to zoom</span><span>Overlays: hazard zones, fire protection, muster points and walkways are illustrative training aids</span></div></div>
+  <div><div class="card" id="ppp">${ppPanel()}</div>${aiBox("pp",ppCtx())}</div></div>`}
+function plotPage(){return `<h1>Plot Plan · Operator Environment</h1><p class="sub">Site layout at grade from the plot-plan drawings · walk the plant, run drills, ask the AI copilot about locations, routes and hazards</p>${ppBody()}`}
+function ppView(n){PP.sel=n;return ppBody()}
 const _r1=render;render=function(){if(st.page==="pid"||st.page==="ga"){st={...st,tab:st.page,page:"equipment",set:st.set||(st.page==="pid"?P.set:G.n)}}_r1()};
 /* ===== Set-first navigation: Equipment set -> P&ID / Drawing / Docs / Interlock / OPL / Maintenance, all cross-linked ===== */
 const isPid=()=>st.page==="pid"||(st.page==="equipment"&&st.set&&st.tab==="pid");
@@ -756,7 +967,7 @@ function setHub(n){const s=S(n),w=woOf(n),ins=K.inst.filter(i=>i.set===n),tile=(
  return `<h3 style="margin-bottom:8px">Everything in this equipment set — click to open</h3><div class="grid g3" style="margin-bottom:14px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">
  ${tile("🗺️","P&amp;ID",s.pid.ref+"<br>"+D[n].n.length+" selectable items","st.tab='pid';render()")}
  ${tile("📐","Equipment drawing",s.ga.dwg_no+"<br>"+(GA[n].bom.length+(GA[n].mot?1:0))+" parts · "+GA[n].nz.length+" nozzles","st.tab='ga';render()")}
- ${tile("📍","Plot plan",s.pp.dwg_no+"<br>grid "+s.pp.grid_ref+" · "+s.pp.elevation_label,"go('documents',{doc:'"+s.pp.document_id+"'})")}
+ ${tile("📍","Plot plan",s.pp.dwg_no+"<br>grid "+s.pp.grid_ref+" · "+s.pp.elevation_label,"st.tab='plot';render()")}
  ${tile("📋","Datasheet","Rev 3 · Issued for operation<br>"+KDS(n).secs.reduce((a,x)=>a+x[1].length,0)+" specs","st.tab='ds';render()")}
  ${tile("⚡","Interlock",esc(KIL[n].logic)+"<br>"+ilSum(n),"st.tab='seq';render()")}
  ${tile("🧩","One-point lessons","7 OPLs","st.tab='opl';render()")}
