@@ -1,0 +1,11 @@
+{
+  "name": "asset-knowledge-platform",
+  "private": true,
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "python3 build.py && node tests/regress.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.45.0"
+  }
+}

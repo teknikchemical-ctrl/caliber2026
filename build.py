@@ -1,0 +1,117 @@
+"""Assemble knowledge-hub-integrated_BAP5.html from src/. Usage: python3 build.py"""
+import re,subprocess,json,sys,os,tempfile
+ROOT=os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0,os.path.join(ROOT,'tools'))
+from theme import *
+base=open(os.path.join(ROOT,'src','base.html')).read()
+w=lambda f:open(os.path.join(ROOT,'src','modules',f)).read()
+TMP=tempfile.mkdtemp()
+h=base
+def P(old,new,cnt=1):
+    global h
+    assert old in h,("PATCH MISSING",old[:80])
+    h=h.replace(old,new)
+# ---------- 1. AI assistant: remove original code, keep nav/buttons, rewire to ai.js ----------
+P('<div class="nav" data-page="assistant">🤖 AI Assistant</div>','<div class="nav" data-page="ai">AI Assistant</div>\n  <div class="nav" data-page="ks">Knowledge Studio</div>\n  <div class="nav" data-page="fm">Failure Memory</div>\n  <div class="nav" data-page="rc">Report Center</div>\n  <div class="nav" data-page="cov">Case 1 Coverage</div>\n  <div class="nav" data-page="int">Integrations</div>')
+i=h.index('  <div class="foot">');j=h.index('</div>',i)+6;h=h[:i]+'  <div class="foot"><span class="dot" id="aidot" style="background:var(--warn)"></span><span id="aistat">Local knowledge base</span></div>'+h[j:]
+i=h.index('/* AI Assistant: retrieval');j=h.index('/* Render */');h=h[:i]+h[j:]
+P('p==="quality"?quality():assistant();','p==="quality"?quality():p==="il"?ilPage():p==="ai"?aiPage():p==="ks"?ksPage():p==="fm"?fmPage():p==="rc"?rcPage():p==="cov"?covPage():p==="int"?intPage():dashboard();')
+P('if(p==="assistant")$("#q")?.focus()','if(p==="ai")$("#q")?.focus()')
+P('const m=$("#msgs");if(m)m.scrollTop=m.scrollHeight;','const m=$("#msgs");if(m)m.scrollTop=m.scrollHeight;')
+h=h.replace("go('assistant'","go('ai'")
+# ---------- 2. modules ----------
+a=h.index('/* Plot-plan map:');b=h.index('const modeSel=');b=h.index('\n',b)+1
+h=h[:a]+h[b:]
+h=h.replace('const G={n:1,sel:null};\n','')
+pp=w('pp.js')
+for x,y in [('const vb=full?PP.vb:[0,0,880,830],o=[];','const vb=opt.vb||(full?PP.vb:[0,0,880,830]),o=[];'),
+ ('c=L.heat?heat(v[i]):AREAC[i],','c=opt.fill?opt.fill(s.n):L.heat?heat(v[i]):AREAC[i],'),
+ (':`go(\'equipment\',{set:${s.n},tab:\'overview\'})`;',':(opt.click?opt.click(s.n):`go(\'equipment\',{set:${s.n},tab:\'overview\'})`);'),
+ ('<rect x="${x-W/2}" y="${y-Hh/2}" width="${W}" height="${Hh}" fill="${c}"','${opt.ring?opt.ring(s.n,x,y):""}<rect x="${x-W/2}" y="${y-Hh/2}" width="${W}" height="${Hh}" fill="${c}"'),
+ ('${full?"":`<div class="row" style="font-size:12px','${full||opt.mini?"":`<div class="row" style="font-size:12px')]:
+    assert x in pp,x; pp=pp.replace(x,y)
+a=h.index('const gKey=(d,i)=>');b=h.index('const _r1=render;')
+mods=[w('dl.js'),w('ai.js'),w('gad.js'),w('ga.js'),pp,'const MH='+open(os.path.join(ROOT,'src','data','mh.json')).read()+';\n']
+for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pidx.js','pid2.js','pdm.js','ks.js','fm.js','rc.js','cov.js','int.js','il.js','dash.js']:
+    try: mods.append(w(f))
+    except FileNotFoundError: pass
+h=h[:a]+''.join(mods)+h[b:]
+for t,r in [('["ga","Equipment drawing"],','["ga","Equipment drawing"],["plot","Plot plan"],'),('if(tab==="ga")b=gaView(n);','if(tab==="ga")b=gaView(n);if(tab==="plot")b=ppView(n);'),('if(tab==="maint")b=maint(n);','if(tab==="maint")b=mhView(n);')]:
+    P(t,r)
+P('"go(\'documents\',{doc:\'"+s.pp.document_id+"\'})"','"st.tab=\'plot\';render()"')
+P('<div class="nav" data-page="equipment">🏭 Equipment Sets</div>','<div class="nav" data-page="equipment">Equipment Sets</div>\n  <div class="nav" data-page="plot">Plot Plan</div>\n  <div class="nav" data-page="mnt">Maintenance</div>\n  <div class="nav" data-page="il">Interlock Library</div>')
+P('p==="pid"?pidPage():','p==="pid"?pidPage():p==="plot"?plotPage():p==="mnt"?mhPage():')
+i=h.index('.pbar{padding'); h=h[:i]+w('style2.css')+w('style3.css')+(w('style4.css') if True else '')+h[i:]
+
+# ---------- contextual exports ----------
+P('<button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button>','<div class="row" style="gap:8px"><button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button><button class="ghost" onclick="rcOpen(\'dossier\',{set:${n}})">Export dossier</button></div>')
+P('[["overview","Overview"],["pid","P&ID"],','[["overview","Overview"],["a360","Asset 360"],["pid","P&ID"],')
+P('if(tab==="overview"){','if(tab==="a360")b=a360View(n);else if(tab==="overview"){')
+# search box and role selector in sidebar
+P('<div class="nav active" data-page="dashboard">','<div class="gsb" onclick="gsOpen()">Search the knowledge base <kbd>Ctrl K</kbd></div>\n  <div class="nav active" data-page="dashboard">')
+# ---------- P&ID layout touch-ups ----------
+P('tx(496,76,"CATALYST REDUCTION|REACTOR|DC-3401A",13,"middle",1)','tx(496,56,"CATALYST REDUCTION|REACTOR|DC-3401A",13,"middle",1)')
+P('bx(356,292,60,26,"Interlock T1|2oo3 VOTING",7)','bx(356,316,60,26,"Interlock T1|2oo3 VOTING",7)')
+# ---------- P&ID page uses the v2 sheet ----------
+i=h.index('<div class="sheet"><svg id="psvg"');j=h.index('</svg></div>',i)+12
+h=h[:i]+'<div class="sheet">${pidSvgOnly(P.set,{w:P.z+"%",keepSel:true})}</div>'+h[j:]
+# ---------- interlock patches ----------
+P('window.ilX=n=>{IS[n]=','window.ilState=S0;window.ilX=n=>{IS[n]=')
+i=h.index('if(tab==="seq")b=ilView(n)+');j=h.index('\n',i)
+h=h[:i]+'if(tab==="seq")b=ilSetTab(n);'+h[j:]
+P('go(n.dataset.page,{set:null,doc:null,opl:null,wo:null})','go(n.dataset.page,{set:null,doc:null,opl:null,wo:null,il:null})')
+for old,new in [('<b>OPERATOR TRAINING SIMULATOR</b> &nbsp;·&nbsp; ${tg0} &nbsp;·&nbsp; ${il.logic}','<b>INTERLOCK FUNCTION TEST</b> &nbsp;|&nbsp; ${tg0} &nbsp;|&nbsp; ${il.logic}'),
+ ('<span class="lamp y" style="padding:3px 9px">SIMULATION MODE</span> <span class="muted">Not connected to live plant · Sample data</span>','<span class="lamp y" style="padding:3px 9px">TEST MODE</span> <span class="muted">Not connected to live plant. Sample data.</span>'),
+ ('<button class="ghost" onclick="st.tab=\'ds\';render()">📋 Equipment data sheet</button> <button class="ghost" onclick="go(\'ai\',{scope:${n}})">✨ Instructor AI</button> <button class="ghost" onclick="ilX(${n})">⟲ Reset simulator</button>','<button class="ghost" onclick="ilX(${n})">Reset test</button>'),
+ ('<h3>Training scenarios · Cause &amp; Effect Matrix</h3><p class="muted" style="margin:4px 0 8px">Select a scenario (cause) to load it into the simulator.','<h3>Test cases: Cause and Effect Matrix</h3><p class="muted" style="margin:4px 0 8px">Select a test case (cause) to load it into the function test.'),
+ ('<th>Scenario</th>','<th>Test case</th>'),('No events. Select a scenario and begin the exercise.','No events recorded. Select a test case to begin.'),('<h3>Sequence of Events (SOE)</h3>','<h3>Sequence of Events</h3>'),
+ ('Dynamic process mimic &amp; logic diagram','Process mimic and logic diagram'),('Live view of the selected scenario: flow stops','Live view of the selected test case: flow stops'),('<text y="6" text-anchor="middle" font-size="17" ${on?`class="bl2"`:""}>🔔</text>','<text y="5" text-anchor="middle" font-size="14" font-weight="700" ${on?`class="bl2"`:""}>ALM</text>'),
+ ('Operator response procedure','Operator response procedure'),('Follow in order — a latched trip','Follow in order. A latched trip'),
+ ('PROCESS MIMIC · ','PROCESS MIMIC | '),('LOGIC DIAGRAM · ${il.logic} · click an initiator to arm it','LOGIC DIAGRAM | ${il.logic} | select an initiator to arm it')]:
+    if old in h: h=h.replace(old,new)
+    else: print("WARN missing",old[:60])
+
+# ---------- 3. language ----------
+for old,new in [('<title>AI Manufacturing Knowledge Hub</title>','<title>Asset Knowledge Platform</title>'),('⚙️ Knowledge Hub<small>CALIBER 2026 · Case 1</small>','Asset Knowledge Platform<small>LLDPE Unit | Equipment Records</small>'),
+ ('["seq","OTS · Interlock simulator"]','["seq","Interlock Logic"]')]:
+    P(old,new)
+P('(!f.ds||d.set==f.ds)&&(!q||(d.name+d.id).toLowerCase().includes(q)));','(!f.ds||d.set==f.ds)&&(!f.dst||ds(d)===f.dst)&&(!q||(d.name+d.id).toLowerCase().includes(q)));')
+P('${filt("ds","",setOpts,"All sets")}</div>${docTbl(l)}','${filt("ds","",setOpts,"All sets")}${filt("dst","",[...new Set(K.docs.map(ds))],"All statuses")}</div>${docTbl(l)}')
+_i=h.rindex('</body>');h=h[:_i]+'<script>\n'+w('late.js')+'</script>\n'+h[_i:]
+
+# ---------- 3b. wording patches ----------
+EM="\u2014"
+for old,new in [
+ ('${k==="ds"?"⚡ Open OTS interlock simulator":"📋 Open equipment data sheet"}','${k==="ds"?"Open interlock logic":"Open equipment data sheet"}'),
+ 
+ ('Everything in this equipment set '+EM+' click to open','Equipment set records. Select a tile to open.'),
+ (' · click another node to jump to that set',' | select another unit to switch'),
+ ('Click any pump, vessel, valve or instrument on the sheet to see its datasheet context and live condition.','Select any pump, vessel, valve or instrument on the sheet to view its datasheet context and live condition.'),
+ ('Live twin: flow runs along the process lines and rotating equipment turns while healthy. Use <b>Simulate trip</b> on an initiating instrument and the interlock effects follow (valves move, drives stop, flow halts).','Digital twin view: product flow is animated along the process lines and rotating equipment turns while healthy. Use <b>Simulate trip</b> on an initiating instrument to display the resulting interlock actions (valves move, drives stop, flow halts).'),
+ ('Click a faceplate to drive that signal beyond its set point.','Select a transmitter faceplate to drive that signal beyond its set point.'),
+ ('Practise this lesson','Related scenarios'),('Practise this step in the simulator','Run this step in the scenario simulator'),
+ ('each with live training scenarios (','each with interactive scenarios ('),('Open a sheet to read it as issued, or run a scenario to practise it.','Open a sheet to review it as issued, or run a scenario to test the procedure.'),
+ ('Field &amp; panel actions '+EM+' choose what you would do','Field and panel actions: select the action to take'),('Field & panel actions '+EM+' choose what you would do','Field and panel actions: select the action to take'),
+ ('DUMMY training values','sample values'),(' (mixed!)',' (mixed)'),('"CLOSED!"','"CLOSED"'),('Weep at channel flange!','Weep at channel flange'),('"Knocking!"','"Knocking"'),
+ ('s==="tr"?"#ffb3ad":s==="al"?"#f0cf7a":"#d6dde5"','s==="tr"?"#a4161a":s==="al"?"#8a5a00":"#2f3b4a"'),
+ ('["CL elevation",g.cl_elevation_mm+" mm"]','["CL elevation",g.cl_elevation_mm==null?"n/a":g.cl_elevation_mm+" mm"]'),
+ ('${mapSvg(n)}','${mapSvg(n,{vb:[30,70,830,680]})}'),
+ ('click to filter','select to filter'),('click a bar to open','select a bar to open'),('click a column for history','select a column for history'),('click to open in Maintenance','select to open in Maintenance'),('click to open','select to open'),
+ ('Open interlock table','Open interlock logic'),('Simulated feed · connect DCS/OPC via window.LIVE_SOURCE(tag)','Simulated signal. Not connected to a live data source.'),('Simulated · connect DCS/OPC via window.LIVE_SOURCE(tag)','Simulated signal. Not connected to a live data source.'),
+ ('`Click the <b>','`Select the <b>'),('"Click the <b>','"Select the <b>'),
+ ]:
+    if old in h: h=h.replace(old,new)
+    else: print("WARN text patch missing:",old[:60])
+
+# ---------- 4. theme + cleanup ----------
+h=remap(h)
+h=h.replace(ROOT_OLD,ROOT_NEW)
+h=strip_emoji(h); h=dashes(h)
+open(os.path.join(ROOT,'knowledge-hub-integrated_BAP5.html'),'w').write(h)
+bad=0
+for k,m in enumerate(re.finditer(r'<script>(.*?)</script>',h,re.S)):
+    open(os.path.join(TMP,f'sc{k}.js'),'w').write(m.group(1))
+    r=subprocess.run(['node','--check',os.path.join(TMP,f'sc{k}.js')],capture_output=True,text=True)
+    if r.returncode: print(k,r.stderr[:800]);bad=1
+print('built',len(h),'em-dashes left:',h.count('—'))
+if bad:sys.exit(1)
