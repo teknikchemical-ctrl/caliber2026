@@ -2,7 +2,7 @@
 regMod("fx","1.0",["dl"],"Typed facts and relations");
 const FX={rows:[],built:-1,
  parse(t){t=String(t==null?"":t).trim();const sp=/^(sp|set(?: ?point)?)\s*[:=]?\s*/i.exec(t);if(sp){const r=FX.parse(t.slice(sp[0].length));return r.num!=null?{...r,op:r.op||"=",text:t}:r}const m=/^(<=|>=|<|>|=|~|max\.?|min\.?)?\s*(-?\d+(?:[.,]\d+)?)\s*([A-Za-z%\/°][A-Za-z0-9%\/°.\-]*)?/.exec(t);if(!m){const q=/(<=|>=|<|>)\s*(-?\d+(?:[.,]\d+)?)\s*([A-Za-z%\/°][\w%\/°.\-]*)?/.exec(t);if(q)return{op:q[1],num:+q[2].replace(",","."),unit:q[3]||"",text:t};return{op:"",num:null,unit:"",text:t}}return{op:(m[1]||"").replace(/\./g,"").replace("max","<=").replace("min",">="),num:+m[2].replace(",","."),unit:(m[3]||"").replace(/^deg$/i,"degC"),text:t}},
- ensure(){if(FX.built===DB.ver&&FX.rows.length)return FX.rows;const R=[],rel=[],add=(f)=>{f.fact_id="F"+String(R.length+1).padStart(5,"0");R.push(f)},ra=(ft,fi,r,tt,ti)=>rel.push({from_type:ft,from_id:String(fi),rel:r,to_type:tt,to_id:String(ti)});
+ ensure(){const key=DB.ver+"|"+ROLE.name;if(FX.key===key&&FX.rows.length)return FX.rows;const R=[],rel=[],add=(f)=>{f.fact_id="F"+String(R.length+1).padStart(5,"0");R.push(f)},ra=(ft,fi,r,tt,ti)=>rel.push({from_type:ft,from_id:String(fi),rel:r,to_type:tt,to_id:String(ti)});
   K.sets.forEach(s=>{const n=s.n,d=ilD(n),g=GA[n],loop=ilIsLoop(n);
    d.trig.forEach(t=>{const v=FX.parse(t.sp);add({set:n,tag:t.tag,asset:s.tag,kind:"setpoint",name:t.c,op:v.op,value_num:v.num,unit:v.unit,value_text:t.sp,vote:t.vote,logic:d.logic,actuates:t.fx.map((x,j)=>x?d.eff[j]:null).filter(Boolean),source:d.no,source_ref:t.id,status:"Issued for Operation"});ra("interlock",d.no,"has_trigger","instrument",t.tag);const i=K.inst.find(x=>x.tag===t.tag&&x.set===n);if(i)ra("instrument",i.id,"initiates","interlock",d.no)});
    d.perm.filter(p=>p[0]!=="=>").forEach(p=>{const v=FX.parse(p[1]);add({set:n,tag:p[2],asset:s.tag,kind:"permissive",name:p[1],op:v.op,value_num:v.num,unit:v.unit,value_text:p[1],vote:"",logic:d.logic,actuates:[],source:d.no,source_ref:"P"+p[0],status:"Issued for Operation"})});
@@ -14,7 +14,8 @@ const FX={rows:[],built:-1,
    ra("asset",s.tag,"has_interlock","interlock",d.no);K.docs.filter(x=>x.set===n).forEach(x=>ra("asset",s.tag,"has_document","document",x.id));K.inst.filter(x=>x.set===n).forEach(x=>ra("asset",s.tag,"has_instrument","instrument",x.id));K.opl.filter(x=>x.set===n).forEach(x=>ra("asset",s.tag,"has_lesson","opl",x.no));
    MH.filter(r=>r.n===n).forEach(r=>{ra("asset",s.tag,"has_work_order","work_order",r.wo);const k=mhParts(r)[0];if(k)ra("work_order",r.wo,"involves_component","component",s.tag+"/"+k)});
    UKB.items.filter(x=>x.set===n&&x.status!=="Rejected").forEach(x=>ra("asset",s.tag,"has_knowledge","knowledge_item",x.id))});
-  DB.rel=rel;FX.rows=R;FX.built=DB.ver;return R},
+  UKB.items.filter(x=>x.status!=="Rejected"&&x.status!=="Superseded"&&(ROLE.name!=="Operator"||x.status==="Approved")).forEach(x=>((x.meta&&x.meta.facts)||[]).forEach(f=>{if(f.set>0)add({...f,source:x.id,status:x.status})}));
+  DB.rel=rel;FX.rows=R;FX.key=key;return R},
  /* value of a named fact for an asset */
  get(set,kind,name){return FX.ensure().filter(f=>f.set===set&&f.kind===kind&&(!name||f.name.toLowerCase().includes(String(name).toLowerCase())||f.tag.toLowerCase()===String(name).toLowerCase()))},
  fmt(f){return f.op&&f.value_num!=null?`${f.op} ${f.value_num} ${f.unit}`.trim():f.value_text}};

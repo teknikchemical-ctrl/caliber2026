@@ -15,7 +15,7 @@ def P(old,new,cnt=1):
 P('<div class="nav" data-page="assistant">🤖 AI Assistant</div>','<div class="nav" data-page="ai">AI Assistant</div>\n  <div class="nav" data-page="ks">Knowledge Studio</div>\n  <div class="nav" data-page="fm">Failure Memory</div>\n  <div class="nav" data-page="rc">Report Center</div>\n  <div class="nav" data-page="cov">Case 1 Coverage</div>\n  <div class="nav" data-page="int">Integrations</div>')
 i=h.index('  <div class="foot">');j=h.index('</div>',i)+6;h=h[:i]+'  <div class="foot"><span class="dot" id="aidot" style="background:var(--warn)"></span><span id="aistat">Local knowledge base</span></div>'+h[j:]
 i=h.index('/* AI Assistant: retrieval');j=h.index('/* Render */');h=h[:i]+h[j:]
-P('p==="quality"?quality():assistant();','p==="quality"?quality():p==="il"?ilPage():p==="ai"?aiPage():p==="ks"?ksPage():p==="fm"?fmPage():p==="rc"?rcPage():p==="cov"?covPage():p==="int"?intPage():dashboard();')
+P('p==="quality"?quality():assistant();','p==="quality"?quality():p==="il"?ilPage():p==="ai"?aiPage():p==="ks"?ksPage():p==="fm"?fmPage():p==="rc"?rcPage():p==="cov"?covPage():p==="int"?intPage():p==="scn"?scnPage():dashboard();')
 P('if(p==="assistant")$("#q")?.focus()','if(p==="ai")$("#q")?.focus()')
 P('const m=$("#msgs");if(m)m.scrollTop=m.scrollHeight;','const m=$("#msgs");if(m)m.scrollTop=m.scrollHeight;')
 h=h.replace("go('assistant'","go('ai'")
@@ -32,21 +32,21 @@ for x,y in [('const vb=full?PP.vb:[0,0,880,830],o=[];','const vb=opt.vb||(full?P
     assert x in pp,x; pp=pp.replace(x,y)
 a=h.index('const gKey=(d,i)=>');b=h.index('const _r1=render;')
 mods=[w('dl.js'),w('ui.js'),w('facts.js'),w('ai.js'),w('intent.js'),w('gad.js'),w('ga.js'),pp,'const MH='+open(os.path.join(ROOT,'src','data','mh.json')).read()+';\nconst EVAL_CASES='+open(os.path.join(ROOT,'src','data','eval_cases.json')).read()+';\nconst SCHEMA_SQL='+json.dumps(open(os.path.join(ROOT,'src','data','schema.sql')).read())+';\nconst PROMPT_TEMPLATE='+json.dumps(open(os.path.join(ROOT,'src','data','prompt_template.md')).read())+';\n']
-for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pidx.js','pid2.js','pdm.js','ks.js','fm.js','rc.js','cov.js','int.js','il.js','dash.js']:
+for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pidx.js','pid2.js','pdm.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','dash.js']:
     try: mods.append(w(f))
     except FileNotFoundError: pass
 h=h[:a]+''.join(mods)+h[b:]
 for t,r in [('["ga","Equipment drawing"],','["ga","Equipment drawing"],["plot","Plot plan"],'),('if(tab==="ga")b=gaView(n);','if(tab==="ga")b=gaView(n);if(tab==="plot")b=ppView(n);'),('if(tab==="maint")b=maint(n);','if(tab==="maint")b=mhView(n);')]:
     P(t,r)
 P('"go(\'documents\',{doc:\'"+s.pp.document_id+"\'})"','"st.tab=\'plot\';render()"')
-P('<div class="nav" data-page="equipment">🏭 Equipment Sets</div>','<div class="nav" data-page="equipment">Equipment Sets</div>\n  <div class="nav" data-page="plot">Plot Plan</div>\n  <div class="nav" data-page="mnt">Maintenance</div>\n  <div class="nav" data-page="il">Interlock Library</div>')
+P('<div class="nav" data-page="equipment">🏭 Equipment Sets</div>','<div class="nav" data-page="equipment">Equipment Sets</div>\n  <div class="nav" data-page="plot">Plot Plan</div>\n  <div class="nav" data-page="mnt">Maintenance</div>\n  <div class="nav" data-page="scn">Scenarios</div>\n  <div class="nav" data-page="il">Interlock Library</div>')
 P('p==="pid"?pidPage():','p==="pid"?pidPage():p==="plot"?plotPage():p==="mnt"?mhPage():')
 i=h.index('.pbar{padding'); h=h[:i]+w('style2.css')+w('style3.css')+(w('style4.css') if True else '')+h[i:]
 
 # ---------- contextual exports ----------
 P('<button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button>','<div class="row" style="gap:8px"><button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button><button class="ghost" onclick="rcOpen(\'dossier\',{set:${n}})">Export dossier</button></div>')
-P('[["overview","Overview"],["pid","P&ID"],','[["overview","Overview"],["a360","Asset 360"],["pid","P&ID"],')
-P('if(tab==="overview"){','if(tab==="a360")b=a360View(n);else if(tab==="overview"){')
+P('[["overview","Overview"],["pid","P&ID"],','[["overview","Overview"],["a360","Asset 360"],["pid","P&ID"],["scn","Scenarios"],')
+P('if(tab==="overview"){','if(tab==="scn")b=scnUnitTab(n);else if(tab==="a360")b=a360View(n);else if(tab==="overview"){')
 # search box and role selector in sidebar
 P('<div class="nav active" data-page="dashboard">','<div class="gsb" onclick="gsOpen()">Search the knowledge base <kbd>Ctrl K</kbd></div>\n  <div class="nav active" data-page="dashboard">')
 # ---------- P&ID layout touch-ups ----------

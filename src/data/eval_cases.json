@@ -523,5 +523,57 @@
    "PSHH-8902"
   ],
   "min_conf": 55
+ },
+ {
+  "id": "E55",
+  "cat": "Chain reaction",
+  "q": "What happens to the rest of the plant if the cooling tower fan CT-7801 trips?",
+  "must": [
+   "KC-4501",
+   "FA-8901",
+   "cooling water"
+  ],
+  "tool": "cascade_analysis",
+  "min_conf": 70
+ },
+ {
+  "id": "E56",
+  "cat": "Chain reaction",
+  "q": "What trips if the nitrogen header is lost?",
+  "must": [
+   "FSLL-2302"
+  ],
+  "tool": "cascade_analysis"
+ },
+ {
+  "id": "E57",
+  "cat": "Chain reaction",
+  "q": "Chain reaction across the plant if the feed pump GA-1201A trips",
+  "must": [
+   "DC-3401A",
+   "EHT-3401"
+  ],
+  "tool": "cascade_analysis"
+ },
+ {
+  "id": "E58",
+  "cat": "Chain reaction",
+  "q": "Which downstream units are affected if the recycle compressor trips?",
+  "must": [
+   "DC-3401A"
+  ],
+  "tool": "cascade_analysis"
+ },
+ {
+  "id": "E59",
+  "cat": "Ingestion",
+  "q": "What is the range of TT-4510?",
+  "setup": "ROLE.name='Engineer';ROLE.user='Author';const a=UKB.add({type:'document',title:'Instrument list KC-4501 additions',text:'TT-4510 Temperature transmitter: Interstage gas temperature. Range 0-200 degC.',set:4,meta:{kind:'instruments',facts:[{set:4,tag:'TT-4510',asset:'KC-4501',kind:'instrument_range',name:'Interstage gas temperature',op:'',value_num:0,unit:'degC',value_text:'0-200 degC',vote:'',logic:'',actuates:[],source:'UK',source_ref:'x',status:'Draft'}]}});UKB.setStatus(a.id,'In review');ROLE.user='Reviewer';UKB.setStatus(a.id,'Approved')",
+  "must": [
+   "0-200 degC"
+  ],
+  "tool": "tag_facts",
+  "min_conf": 80,
+  "cleanup": "UKB.items=[];UKB.save()"
  }
 ]
