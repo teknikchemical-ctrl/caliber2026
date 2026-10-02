@@ -34,3 +34,9 @@ All data is sample data provided for CALIBER purposes only.
 ## Live deployment (Netlify)
 
 The page works as a plain file and as a Netlify site with a shared database and a server side AI. See `docs/DEPLOY_NETLIFY.md` for the 10 minute setup, the environment variables and the limits of open access. Tests: `npm test` (regression) and `node tests/live.js` (shared database between two users, AI adapters, rate limits and offline fallback).
+
+## Interface quality checks
+
+`node tests/layout.js [--strict]` opens every page, tab and key dialog at 1440, 1100 and 820 px and reports overlapping text, clipped text, content spilling out of its card, labels overlapping inside SVG figures and horizontal page overflow. Run it after any change to markup or styles (`npm run test:layout`).
+
+`src/modules/fx.js` holds two shared helpers. `svgFix` moves small labels inside any SVG figure away from labels they would overlap, and caches the offsets per figure so figures that repaint every animation frame are corrected without measuring again. The motion layer adds ripples around equipment in alarm or trip, a state-aware frame and readings flash in the OPL simulator, and count-up on KPI tiles. Motion is disabled for users who request reduced motion. When adding a CSS class, check that the name is not already used elsewhere (`grep -rn "\.name{" src`), because a duplicate name silently restyles the older component.
