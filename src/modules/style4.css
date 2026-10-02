@@ -242,3 +242,5 @@ aside{overflow-y:auto}
 .pd2bar{position:relative;height:18px;background:#eef2f7;border-radius:5px;overflow:hidden;min-width:90px}.pd2bar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;opacity:.85}.pd2bar b{position:relative;padding-left:6px;font-size:12px;line-height:18px}
 .pd2rng{position:relative;height:10px;background:#eef2f7;border-radius:5px;margin-bottom:3px}.pd2rng i{position:absolute;top:0;bottom:0;background:#9db8e0;border-radius:5px}.pd2rng u{position:absolute;top:-2px;bottom:-2px;width:3px;background:#0b5fd7;border-radius:2px;text-decoration:none}
 .pd2seg{display:flex;flex-wrap:wrap;height:auto}.pd2seg button{flex:0 1 auto}
+.rdyic{display:inline-block;width:20px;height:20px;border-radius:50%;text-align:center;line-height:20px;font-size:12px;font-weight:700;color:#fff}.rdyic.ok{background:#1a7f37}.rdyic.warn{background:#c77700}.rdyic.bad{background:#cf222e}.rdyic.muted{background:#5c6b7b}
+.rdyv{color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;font-size:15px;letter-spacing:.02em}
