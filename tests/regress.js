@@ -69,4 +69,16 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
  await ev("covRun()");await p.waitForFunction("!COV.running",{timeout:180000});const S=await ev("COV.summary");
  ok(S.posOk/S.pos>=.95,"generated audit correct "+S.posOk+" of "+S.pos);ok(S.refuse===S.neg,"out-of-scope questions refused "+S.refuse+" of "+S.neg);
  ok(errs.length===0,"evaluation ran without errors");errs.splice(0).forEach(e=>console.log("   ",e));
+ /* sign-in: open with ?login so the automatic sign-in is skipped */
+ {const q=await b.newPage({viewport:{width:1280,height:800}}),qe=[];q.on("pageerror",e=>qe.push(e.message));await q.goto(FILE+"?login=1");await q.waitForTimeout(900);
+  ok(await q.evaluate(()=>!!document.getElementById("loginbg")),"sign-in screen shows before login");
+  await q.fill("#lg_u","caliber");await q.fill("#lg_p","nope");await q.press("#lg_p","Enter");await q.waitForTimeout(150);
+  ok(await q.evaluate(()=>/Wrong/.test(document.getElementById("lg_e").textContent)&&!!document.getElementById("loginbg")),"wrong password is refused");
+  await q.fill("#lg_p","Caliber2026");await q.press("#lg_p","Enter");await q.waitForTimeout(700);
+  ok(await q.evaluate(()=>!document.getElementById("loginbg")&&ROLE.user==="Caliber"&&ROLE.name==="Manager"),"Caliber signs in as Manager");
+  await q.evaluate(()=>authLogout());await q.waitForTimeout(200);ok(await q.evaluate(()=>!!document.getElementById("loginbg")),"sign out returns to the sign-in screen");
+  await q.fill("#lg_u","Oscar");await q.fill("#lg_p","Oscar2026");await q.press("#lg_p","Enter");await q.waitForTimeout(700);
+  ok(await q.evaluate(()=>ROLE.name==="Operator"&&ROLE.user==="Oscar Timothy"&&document.body.classList.contains("role-locked")),"a document name signs in with its role");
+  const accs=await q.evaluate(()=>AUTH_USERS.length);ok(accs>=20,"accounts built from the document names ("+accs+")");
+  ok(qe.length===0,"sign-in produces no script errors");await q.close()}
  await b.close();console.log(fails?"\n"+fails+" check(s) failed":"\nAll checks passed");process.exit(fails?1:0)})();

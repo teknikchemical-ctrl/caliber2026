@@ -84,6 +84,14 @@ Deploy from GitHub, not by dragging a folder in. The shared database and the AI 
 Functions, which need the full build.
 
 
+SIGNING IN
+-----------------------------------------------------------------------------------------
+The site opens on a sign-in screen. Demo admin:  Caliber / Caliber2026. The other accounts are
+the people named in the work orders (username = first name, password = first name + 2026,
+for example Oscar / Oscar2026). "Demo accounts" on the sign-in screen lists all of them. This is
+a simple demo login, not real security.
+
+
 STEP 5. CHECK IT WORKS
 -----------------------------------------------------------------------------------------
 1. Open the site. At the bottom of the left menu you should see two green dots:

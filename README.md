@@ -10,6 +10,10 @@ Open `knowledge-hub-integrated_BAP5.html` in a browser. It works on its own, wit
 
 To share knowledge between people and switch on the AI, host it on Netlify. The steps are in `LAUNCH_NETLIFY_GEMINI.txt` and `docs/DEPLOY_NETLIFY.md`.
 
+## Sign-in
+
+A simple sign-in screen, for the demo and not for security: the account list is in the page. `Caliber` / `Caliber2026` is the demo admin (role Manager, can switch role under Settings). The other accounts are the people named in the work orders. The username is the first name and the password is the first name plus 2026, for example `Oscar` / `Oscar2026`. The role follows the employee number: 1xxx supervisors are Managers, 2xxx operators, 3xxx mechanical technicians are Engineers, 4xxx instrument technicians are Reliability, 5xxx electrical technicians are HSE. The sign-in screen lists them all (Demo accounts). Automated browsers skip the screen and sign in as Caliber; add `?login` to the address to see it.
+
 ## What is in it
 
 - Dashboard with all eight P&IDs laid out like the plot plan and joined by their process lines
