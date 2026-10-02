@@ -1,212 +1,176 @@
 ASSET KNOWLEDGE PLATFORM
-HOW TO LAUNCH ON NETLIFY WITH THE FREE GOOGLE GEMINI AI
+Putting it on Netlify with the free Google Gemini AI
 =========================================================================================
 
-What you get when you finish
+When you are done you will have a web address anyone can open. Knowledge items, approvals,
+imported work orders, feedback and the question log are shared between everybody who uses it,
+and the assistant uses Gemini to write its answers. The Gemini key stays on Netlify's server
+and is never sent to the browser.
+
+It costs nothing on the Netlify free plan and the Gemini free tier, with no credit card, as of
+when this was written. Check both sites' current terms. Set aside about 15 minutes.
+
+
+BEFORE YOU START
 -----------------------------------------------------------------------------------------
-* A public web address (for example https://your-site.netlify.app) that anyone can open.
-* A shared database: knowledge items, approvals, imported work orders, feedback, the audit
-  trail and the question log are the same for every visitor and update within about 15 seconds.
-* An AI assistant that reads the plant records, then writes the answer in plain language
-  with sources. The Gemini key stays on the server and is never sent to the browser.
-* Everything on free plans. No credit card is needed for Netlify or for the Gemini free tier
-  at the time of writing. Check both providers' current terms before relying on this.
-
-Time needed: about 15 minutes.
+- A GitHub account that can see  teknikchemical-ctrl/caliber2026
+- A free Netlify account (sign up with GitHub): https://app.netlify.com/signup
+- A Google account, for the Gemini key
+- The code lives on the branch  claude/great-tesla-l0uw33. You can deploy that branch as it
+  is, or merge pull request 1 into main first and deploy main.
 
 
-WHAT YOU NEED BEFORE YOU START
+STEP 1. GET THE GEMINI KEY
 -----------------------------------------------------------------------------------------
-1. A GitHub account that can see the repository  teknikchemical-ctrl/caliber2026
-2. A free Netlify account            https://app.netlify.com/signup   (sign up with GitHub)
-3. A Google account                  for the free Gemini key
-4. The code on a branch Netlify can deploy. The work is on the branch
-      claude/great-tesla-l0uw33
-   You can deploy that branch directly (step 3 below), or merge pull request 1 into the
-   main branch first and deploy main. Either works.
+1. Go to https://aistudio.google.com and sign in.
+2. Click "Get API key", then "Create API key". Make a new project if it asks. Any name will do.
+3. Copy the key. It starts with AIza.
+   Keep it to yourself. Don't paste it into the code, a chat or an email.
+
+The free tier has per-minute and per-day request limits, and Google may use free-tier prompts
+to improve its products. So don't put confidential plant data on a public site.
+
+The project is set up for the model gemini-2.5-flash. If AI Studio shows a different free
+model, use that name in step 3. If a name doesn't work, the app tries gemini-2.0-flash and
+gemini-1.5-flash next.
 
 
-STEP 1. GET A FREE GEMINI API KEY
+STEP 2. CREATE THE SITE ON NETLIFY
 -----------------------------------------------------------------------------------------
-1. Open https://aistudio.google.com and sign in with your Google account.
-2. Choose "Get API key" (left menu or top right).
-3. Choose "Create API key". If asked, create it in a new project. Name it, for example,
-   "knowledge-hub".
-4. Copy the key (a long text that starts with AIza...). Keep it private.
-   Do not paste it into the code, into the repository, into chat or into an email.
-5. Note on the free tier: it has request limits per minute and per day, and Google may use
-   free-tier prompts to improve its products. Do not put confidential plant data into a
-   public deployment. The current free model names and limits are shown in AI Studio.
-   The default model in this project is gemini-2.5-flash. If AI Studio lists a different
-   free model you prefer, you will enter its name in step 2.
-
-
-STEP 2. CREATE THE NETLIFY SITE
------------------------------------------------------------------------------------------
-1. Log in to https://app.netlify.com
-2. Choose "Add new site", then "Import an existing project".
-3. Choose "Deploy with GitHub" and allow Netlify to access your repositories when asked.
-   If the repository is not listed, choose "Configure the Netlify app on GitHub" and give
-   access to  teknikchemical-ctrl/caliber2026.
-4. Pick the repository  caliber2026.
-5. Branch to deploy: choose  claude/great-tesla-l0uw33  (or main, after merging).
-6. Build settings: leave them as they are. The file netlify.toml in the repository sets
+1. Log in at https://app.netlify.com
+2. Add new site > Import an existing project > Deploy with GitHub. Let Netlify see your
+   repositories. If caliber2026 isn't listed, use "Configure the Netlify app on GitHub" and
+   give it access to that repository.
+3. Pick  caliber2026  and choose the branch.
+4. Leave the build settings alone. netlify.toml already sets them:
       Build command      python3 build.py
       Publish directory  dist
       Functions          netlify/functions
-   If Netlify shows these fields empty or different, type those three values in.
-7. Do NOT click "Deploy" yet. First open "Add environment variables" (or "Show advanced")
-   and add the variables in step 3, then deploy. If you already deployed, add them later
-   and redeploy (see the note at the end of step 3).
+   If the fields come up empty, type those three values in.
+5. Don't press Deploy yet. Do step 3 first.
 
 
-STEP 3. ADD THE ENVIRONMENT VARIABLES (this connects the AI)
+STEP 3. ADD THE ENVIRONMENT VARIABLES
 -----------------------------------------------------------------------------------------
-In Netlify: Site configuration, Environment variables, Add a variable.
-Add these, one at a time:
+Site configuration > Environment variables > Add a variable. Add these:
 
-   Name            Value                              Required
-   --------------  ---------------------------------  ---------------------------------
-   AI_API_KEY      the key copied in step 1           YES
-   AI_PROVIDER     gemini                             recommended
-   AI_MODEL        gemini-2.5-flash                   recommended (use the model name
-                                                      shown in AI Studio if it differs)
-   AI_DAILY_MAX    600                                recommended. Total AI requests per
-                                                      day for the whole site. Keep it
-                                                      below the daily limit shown in
-                                                      AI Studio for your key.
-   AI_RATE_PER_MIN 12                                 optional. Requests per visitor per
-                                                      minute.
-   AI_RATE_PER_DAY 120                                optional. Requests per visitor per
-                                                      day.
+   AI_API_KEY      the key from step 1                       (required)
+   AI_PROVIDER     gemini
+   AI_MODEL        gemini-2.5-flash
+   AI_DAILY_MAX    600       total AI requests per day for the whole site. Keep it below the
+                             daily limit AI Studio shows for your key.
 
-Choose the scope "All scopes" (or at least "Functions" and "Builds") for AI_API_KEY.
-Tick "Contains secret values" for AI_API_KEY if Netlify offers it.
+Optional:
+   AI_RATE_PER_MIN  12       requests per visitor per minute
+   AI_RATE_PER_DAY  120      requests per visitor per day
 
-IMPORTANT: Netlify reads variables when a site is built. If you add or change a variable
-after the first deploy, go to Deploys, then "Trigger deploy", then "Deploy site" (or
-"Clear cache and deploy site") so the change takes effect.
+Mark AI_API_KEY as secret if Netlify offers the option.
+
+Netlify reads these when it builds. If you add or change one after the first deploy, go to
+Deploys > Trigger deploy > Clear cache and deploy site.
 
 
 STEP 4. DEPLOY
 -----------------------------------------------------------------------------------------
-1. Click "Deploy" (or "Trigger deploy"). The first build takes about 1 to 3 minutes.
-2. Open the Deploys tab and wait for "Published".
-3. Netlify gives the site a random address like  https://lively-sprite-123456.netlify.app
-   You can change it under Site configuration, Site details, "Change site name".
+Press Deploy. The first build takes one to three minutes. When Deploys says Published, the
+site is live at an address like  https://something-123456.netlify.app. You can rename it under
+Site configuration > Site details > Change site name.
 
-If the build fails with a message that python3 is missing, add one more variable:
-   PYTHON_VERSION   3.11
-and redeploy. As a fallback, the repository already contains the finished page in
-dist/index.html, so you can also clear the Build command field, keep the publish directory
-as dist, and redeploy.
+If the build stops because python3 isn't found, add  PYTHON_VERSION = 3.11  and redeploy. The
+finished page is also in the repository as dist/index.html, so another way out is to clear the
+Build command, keep the publish directory as dist, and redeploy.
 
-Use the Git-based deploy described here. Do not use the drag-and-drop deploy, because the
-shared database and the AI run as Netlify Functions and need the full site build.
+Deploy from GitHub, not by dragging a folder in. The shared database and the AI are Netlify
+Functions, which need the full build.
 
 
-STEP 5. CHECK THAT EVERYTHING IS CONNECTED
+STEP 5. CHECK IT WORKS
 -----------------------------------------------------------------------------------------
-1. Open your site address. The page loads.
-2. Look at the bottom of the left menu. You should see two green dots:
+1. Open the site. At the bottom of the left menu you should see two green dots:
       Shared database online
-      AI assistant live
-3. Open  https://YOUR-SITE.netlify.app/api/health  in the browser. You should see text like
-      {"ok":true, ... "store":"ok", "ai":{"configured":true, ... "available":true ...}}
-   The key itself is never shown.
-4. Click the gear icon next to the status and choose "Test the AI connection". It should
-   answer "Working" with the model name.
-5. Open "AI Assistant" and ask, for example:
-      What is the start permissive for the recycle gas compressor KC-4501?
-   The answer appears word by word, with numbered sources, a confidence level and a
-   "Numbers checked" label.
-6. Test sharing: open the site in a second browser (or a private window), add a lesson in
-   Knowledge Studio in the first, and wait about 15 seconds. It appears in the second.
+      AI connected
+2. Click the gear next to them. Press "Run diagnostics". Each line should say OK. It will
+   name the problem if one isn't, for example a key that isn't accepted or a model name that
+   doesn't exist for your key. "Test the AI connection" asks the model one short question.
+3. Open AI Assistant and ask:  What is the start permissive for the recycle gas compressor
+   KC-4501?  The answer should appear word by word, with numbered sources and a confidence
+   level.
+4. Open the site in a second browser or a private window. Add a lesson in Knowledge Studio
+   in the first one. It should show up in the second within about 15 seconds.
+
+You can also open  /api/health  on your site. It should show "store":"ok" and
+"configured":true under ai. The key is never shown there.
 
 
-IF SOMETHING DOES NOT WORK
+IF IT DOESN'T WORK
 -----------------------------------------------------------------------------------------
-Footer shows "Local only"
-   The page cannot reach the functions. Check that the deploy used the Git-based method and
-   that the Functions directory is netlify/functions. Check Deploys, Functions in Netlify
-   for build errors.
+Footer says "Local only"
+   The page can't reach the functions. Check you deployed from GitHub and that Deploys >
+   Functions lists ai, kb, embed, health and selftest.
 
-/api/health shows "store":"error ..."
-   Netlify Blobs (the shared storage) is not available for this deploy. Redeploy using the
-   Git-based method. Blobs is included with Netlify sites; no setup is needed.
+/api/health says "store":"error"
+   Netlify Blobs isn't available to this deploy. Redeploy from GitHub.
 
-Footer shows "Offline knowledge search (AI not configured on the server)"
-   AI_API_KEY is missing, or you added it after the last deploy. Add it and trigger a new
-   deploy.
+Footer says "Search only (no AI key on the server)"
+   AI_API_KEY is missing, or you added it after the last deploy. Add it and deploy again.
 
-Test shows "No answer: HTTP 502" or "AI provider error"
-   The key is wrong, the model name is not available for your key, or Google blocked the
-   request. Check the key in AI Studio and the AI_MODEL value, then redeploy.
+Test says "AI provider error" or HTTP 502
+   Wrong key, a model name your key can't use, or Google refused the request. Run diagnostics.
 
-Test shows "daily AI budget used up" or HTTP 429
-   The daily cap (AI_DAILY_MAX) or the per-visitor limit was reached. The assistant keeps
-   working from the records directly and returns to the AI on the next day or after you raise
-   the limit. If Google's own free quota is exhausted, the same happens until it resets.
+Test says "daily AI budget used up" or HTTP 429
+   You hit AI_DAILY_MAX or the visitor limit. The assistant keeps answering from the records
+   and switches back to the AI the next day or when you raise the limit. If Google's own free
+   quota runs out, the same thing happens until it resets.
 
-Answers are slower than expected
-   The free tier can be slow at busy times. The first request after a quiet period also
-   waits for the function to start.
+Answers are slow
+   The free tier is slower at busy times, and the first request after a quiet spell has to
+   wake the function up.
 
 
-OPTIONAL: RESTRICT WHO CAN CHANGE OR APPROVE (still free)
+LIMITING WHO CAN CHANGE THINGS (optional, still free)
 -----------------------------------------------------------------------------------------
-The site is open by default. If you want a light control, add these variables in Netlify
-(then redeploy):
-   EDIT_CODE      people need this code to save anything to the shared database
-   APPROVE_CODE   people need this code to approve knowledge items (give it to reviewers)
-   ADMIN_CODE     enables backup, restore and clean-up under Settings, Administration
-Everyone can still read and ask questions without a code. Visitors type the codes once in
-Settings, Access codes (stored only in their browser). These codes are a shared secret, not
-individual logins.
-
-Settings also has "Run diagnostics". Use it right after the first deploy: it tells you in
-plain words whether storage works, whether the key is accepted and whether the model name
-exists for your key.
+The site starts open. To add some control, set these in Netlify and redeploy:
+   EDIT_CODE      needed to save anything to the shared database
+   APPROVE_CODE   needed to approve knowledge items (give it to your reviewers)
+   ADMIN_CODE     turns on backup, restore and clean-up under Settings > Administration
+Anyone can still read and ask questions. People type the codes once under Settings > Access
+codes, and the browser remembers them. They are shared passwords, not personal logins.
 
 
-THINGS TO KNOW ABOUT AN OPEN, FREE SITE
+GOOD TO KNOW ABOUT A FREE, OPEN SITE
 -----------------------------------------------------------------------------------------
-* There is no login. Anyone who has the address can read and add knowledge and use the AI,
-  up to the limits you set. Share the address only with the people you intend.
-* The name shown in the audit trail is a label typed in Settings. It is not an identity.
-* The limits are approximate. They stop casual overuse, not a determined attacker. To close
-  the site later, use Netlify's site password protection (check which plan includes it) or
-  add an access check to netlify/functions/_lib.mjs.
-* Keep an eye on usage: Netlify, Team settings, Usage. Free plans have monthly limits for
-  builds, function calls and bandwidth. Check the current limits on the Netlify pricing page.
-* If the key is ever exposed, create a new key in AI Studio, delete the old one, update
-  AI_API_KEY in Netlify and redeploy.
-* The base plant data (P&IDs, OPLs, datasheets, interlocks, maintenance history) is part of
-  the page. The shared database stores what people add on top of it.
+- Anyone with the address can read, add and (without APPROVE_CODE) approve knowledge, and use
+  the AI up to your limits. Only share the address with the people you mean to.
+- The name in the audit trail is whatever someone typed in Settings.
+- The rate limits are approximate. They stop casual overuse, not a determined attacker. To
+  close the site later, use Netlify's password protection (check which plan has it) or add a
+  check in netlify/functions/_lib.mjs.
+- Watch Netlify's Usage page. Free plans cap builds, function calls and bandwidth each month.
+- If the key leaks, make a new one in AI Studio, delete the old one, update AI_API_KEY and
+  redeploy.
+- The P&IDs, OPLs, datasheets, interlocks and maintenance history are part of the page. The
+  shared database only holds what people add on top.
 
 
-UPDATING THE SITE LATER
+UPDATING
 -----------------------------------------------------------------------------------------
-Every push to the deployed branch builds and publishes a new version automatically.
-To rebuild the page yourself from the source files:
-      python3 build.py
-This writes knowledge-hub-integrated_BAP5.html and dist/index.html.
+Every push to the deployed branch rebuilds and publishes the site. To rebuild the page on
+your own computer:  python3 build.py  (writes knowledge-hub-integrated_BAP5.html and
+dist/index.html).
 
 
-TRYING IT ON YOUR OWN COMPUTER FIRST (optional)
+TRYING IT LOCALLY FIRST (optional)
 -----------------------------------------------------------------------------------------
-Requires Node.js 18 or later and Python 3.
+Needs Node.js 18 or newer and Python 3.
       npm install
       npm run build
       LOCAL_STORE_DIR=/tmp/akp AI_PROVIDER=mock node tools/devserver.mjs 8888
-Open http://localhost:8888  The mock provider gives deterministic test answers without a key.
-To test with Gemini locally, replace AI_PROVIDER=mock with
-      AI_PROVIDER=gemini AI_API_KEY=your_key_here
-Automated checks:  npm test   (page regression, then the two-user live test)
+Open http://localhost:8888. The mock provider gives canned answers, so no key is needed. To
+try Gemini locally, use  AI_PROVIDER=gemini AI_API_KEY=your_key  instead of AI_PROVIDER=mock.
+Tests:  npm test
 
 
-MORE DETAIL
+MORE
 -----------------------------------------------------------------------------------------
-docs/DEPLOY_NETLIFY.md       the same setup with the function reference
-docs/ARCHITECTURE.md         how the page, data layer and AI fit together
-docs/AI_PROVIDER_CONTRACT.md the request and response the AI function uses
+docs/DEPLOY_NETLIFY.md   same setup with the full variable list
+docs/ARCHITECTURE.md     how it is put together

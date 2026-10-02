@@ -5,13 +5,13 @@
    ===================================================================================================== */
 regMod("help","1.0",[],"Guided tour");
 const TOUR=[
- {page:"dashboard",sel:'.nav[data-page="dashboard"]',t:"Plant overview",x:"All eight P&IDs are placed as on the plot plan and linked by their process streams. Select a tile to see its state, open its P&ID, or simulate a trip and watch the effect travel through the plant."},
- {page:"equipment",sel:'.nav[data-page="equipment"]',t:"Equipment sets",x:"Each equipment set has its P&ID, general arrangement drawing, datasheet, interlock logic, OPLs and maintenance history in one place."},
- {page:"mnt",sel:'.nav[data-page="mnt"]',t:"Maintenance",x:"Work order history, timeline, predictive maintenance forecasts and plant replay. The forecasts show their data confidence."},
- {page:"scn",sel:'.nav[data-page="scn"]',t:"Scenarios",x:"Replay an OPL case or a work order on the P&ID, or trip a unit and follow the chain reaction through connected equipment. The assumptions register lists every rule used."},
- {page:"ai",sel:'.nav[data-page="ai"]',t:"AI Assistant",x:"Ask about procedures, interlocks, locations, spare parts or maintenance history. Answers cite their sources, show a confidence level and check every number against the records."},
- {page:"ks",sel:'.nav[data-page="ks"]',t:"Knowledge Studio",x:"Add documents, lessons and tacit knowledge with the ingestion wizard. New items go through review and approval before the assistant treats them as trusted."},
- {sel:".foot .gear[aria-label=Settings]",t:"Settings",x:"The gear opens Settings: shared database status, access codes, AI options, answer language and diagnostics."}];
+ {page:"dashboard",sel:'.nav[data-page="dashboard"]',t:"Plant overview",x:"All eight P&IDs are laid out as on the plot plan and linked by their process lines. Pick a tile to see its state or open its P&ID, or simulate a trip and watch it spread through the plant."},
+ {page:"equipment",sel:'.nav[data-page="equipment"]',t:"Equipment sets",x:"P&ID, GA drawing, datasheet, interlock logic, OPLs and maintenance history for each equipment set, in one place."},
+ {page:"mnt",sel:'.nav[data-page="mnt"]',t:"Maintenance",x:"Work order history, timeline, forecasts and plant replay. Each forecast shows how much data is behind it."},
+ {page:"scn",sel:'.nav[data-page="scn"]',t:"Scenarios",x:"Replay an OPL case or a work order on the P&ID, or trip a unit and follow the knock-on effects. The assumptions register lists every rule used."},
+ {page:"ai",sel:'.nav[data-page="ai"]',t:"AI Assistant",x:"Ask about procedures, interlocks, locations, spare parts or maintenance history. Each answer lists sources, a confidence level and a check of its numbers against the records."},
+ {page:"ks",sel:'.nav[data-page="ks"]',t:"Knowledge Studio",x:"Add documents, lessons and know-how with the wizard. New items need review and approval before the assistant treats them as trusted."},
+ {sel:".foot .gear[aria-label=Settings]",t:"Settings",x:"Settings: shared database status, access codes, AI options, answer language and diagnostics."}];
 const TOURS={i:-1};
 function tourStart(){try{setClose()}catch(e){}TOURS.i=0;tourShow()}
 function tourEnd(){TOURS.i=-1;document.getElementById("tourcard")?.remove();document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));try{localStorage.setItem("akp_tour_done","1")}catch(e){}}

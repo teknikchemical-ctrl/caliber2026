@@ -1,58 +1,48 @@
 # Architecture
 
-The platform ships as one HTML file (`knowledge-hub-integrated_BAP5.html`) so it can be opened without a server. It is assembled from modules by `build.py`. Edit the modules, not the generated file.
+One HTML file, assembled from the files in `src/` by `build.py`. Edit the sources, never the generated file. `build.py` also writes `dist/index.html` for Netlify.
 
-## Repository layout
+## Layout
 
-| Path | Purpose |
+| Path | Contents |
 |---|---|
-| `build.py` | Assembles the single file from `src/` and applies the light theme, wording and syntax checks |
-| `src/base.html` | Original application shell and the baseline data (documents, chunks, instruments, interlocks, OPL) |
-| `src/modules/*.js` | Feature modules, concatenated in the order listed in `build.py` |
+| `src/base.html` | The original shell, the baseline data (documents, instruments, interlocks, OPLs) and the OPL simulator |
+| `src/modules/*.js` | Feature modules, joined in the order listed in `build.py` |
 | `src/modules/style*.css` | Styles |
-| `src/data/mh.json` | Maintenance history (from `Maintenance History (All Equipment).xlsx`) |
-| `tools/theme.py` | Colour mapping, emoji and dash clean-up |
-| `tests/regress.js` | Headless regression suite (`npm test`) |
-| `docs/` | This file and the AI provider contract |
+| `src/data/` | Maintenance history, evaluation questions, SQL schema, prompt template |
+| `netlify/functions/` | The server side: `ai`, `kb`, `embed`, `health`, `selftest` |
+| `tools/` | Theme and wording clean-up, local dev server |
+| `tests/` | Static checks, regression, live test, layout audit |
+| `docs/` | These notes and the backend specs |
 
-## Layers
+## Page side
 
-1. **Data layer** (`dl.js`). Typed entity registry (`SCHEMA`), chunk builder over every source, BM25 index with synonyms and tag awareness, approval-aware trust weighting, user knowledge store (`UKB`) with a Draft, In review, Approved, Superseded, Rejected workflow, audit trail, answer feedback and persistence (`STORE`, IndexedDB with local storage fallback). Events: `BUS` (`kb:changed`, `audit`, `role`).
-2. **Services**. `ai.js` (retrieval call, tools, provider contract, confidence, number verification), `fm.js` (failure memory), `pdm.js` (predictive model), `rc.js` (reports and exports), `int.js` (connectors, graph, search), `cov.js` (coverage and answer audit).
-3. **Presentation**. Page modules (`ks.js`, `il.js`, `pid2.js`, `mh1-4.js`, `rp.js`, `ga.js`, `pp.js`, `dash.js`) and the original shell.
+**Data layer** (`dl.js`, `facts.js`). Every record becomes a chunk with a unique `chunk_id`, a status code, an ISO date, a hash, a token count, role access and a slot for an embedding. Facts such as set points, permissives, bill of material and nozzles are extracted separately. Search is BM25 with synonyms, equipment tags, approval-status weighting and role weighting. When embeddings are available, a record with no shared words can still be found by meaning.
 
-Every module registers itself with `regMod(name, version, deps, description)`. The registry is shown on the Integrations page.
+User knowledge goes through Draft, In review, Approved, Superseded, Rejected. Everything is saved in IndexedDB (localStorage as a fallback), and `sync.js` mirrors it to the server when there is one.
 
-## Data model
+**Assistant** (`ai.js`, `intent.js`). `intent.js` works out what is being asked (bypass request, consequence, comparison, ranking, history, procedure, chain reaction and so on). Counts, rankings, forecasts and similar are calculated in the browser, not by the model. With an AI connected, the calculated result and the retrieved records go to `/api/ai`, and the model writes the answer. The page then checks every number and citation against the records. A request to bypass a protection is always answered by the built-in rule, never by the model.
 
-`dl.js` builds chunks with unique `chunk_id` (`kind:record#ordinal`), canonical status codes (`STATUS`), ISO dates, content hash, token count, role based ACL and an embedding slot. `facts.js` extracts typed facts (set points with operator, value and unit, permissives, bill of material, nozzles, datasheet values, locations) and relations. `docs/DATA_MODEL.sql` is the matching server schema and the Integrations page exports the live data in that shape.
+**Views.** P&ID engine (`pid2.js`, `pidx.js`), drawings (`ga.js`), plot plan (`pp.js`), maintenance (`mh1-4.js`, `pdm.js`, `rp.js`), scenarios (`scn.js`, `scnui.js`), Knowledge Studio (`ks.js`, `wiz.js`), reports (`rc.js`), coverage (`cov.js`), integrations (`int.js`).
 
-## Assistant
+**Helpers** (`fx.js`, `help.js`, `ui.js`). Label de-collision for SVG figures, motion, the guided tour, shared UI patterns and accessibility fixes.
 
-`intent.js` classifies each question (bypass, consequence, comparison, ranking, data issues, history, procedure, diagnosis, spares) and routes it to a deterministic handler. Handlers return sources and a confidence. Retrieval answers get a calibrated confidence that is capped when the sources are about other equipment or do not cover the question terms. `tests/eval_cases.json` holds the curated evaluation; the suite fails below 90 percent.
+Modules register with `regMod(name, version, deps, description)`. The list is on the Integrations page.
 
-## Retrieval
+## Server side
 
-`DB.build()` converts each record into a chunk: `{id, k, title, sec, text, set, tags, ver, status, trust, sys}`. `DB.search(query, {set, kinds, k})`:
+All on Netlify Functions, storage in Netlify Blobs.
 
-- tokenises with light stemming, keeps equipment tags whole and as parts, expands with a synonym table at 0.55 weight;
-- scores with BM25 over title (x2), section (x1.5), text and tags (x2.5);
-- multiplies by status trust (approved 1.0, not stated 0.8, in review 0.7, draft 0.55, superseded 0.35), a kind prior, a boost for the detected equipment set and a role weighting;
-- returns each hit with `rel` (relative to the best), `cov` (share of query terms found) and the matched terms, which feed the confidence estimate and the "Why this answer" panel.
+- `ai.mjs` hides the key, applies the per-visitor and daily limits, builds the prompt and calls Gemini (or any OpenAI-compatible API). It tries the fallback models if the first one is not available to the key, and can hand tool calls back to the page.
+- `kb.mjs` stores knowledge items, imported work orders, feedback, the audit trail and the answer log. Last write wins unless the page sends the version it started from, in which case a newer server copy is reported as a conflict. Deleted items leave a marker so other browsers drop them. Optional codes protect edits, approvals and admin routes.
+- `embed.mjs` creates embeddings and caches them by content hash.
+- `health.mjs` and `selftest.mjs` report status and run the diagnostics shown in Settings.
 
-The index is rebuilt lazily after any change (`DB.dirty()`).
+The page polls the server every 15 seconds. Without a server it simply keeps working from browser storage.
 
-## Answer pipeline
+## Adding things
 
-question, `aiRoute` (tool routing for computed answers), `aiRetrieve`, provider or local composition, `aiConf` (match strength, independent sources, approval status, agreement), `aiVerify` (numbers in the answer must appear in a source), citations, feedback. See `AI_PROVIDER_CONTRACT.md` for the provider interface.
-
-## Extending
-
-- **New data source**: add a block to `DB.build()` that pushes chunks, add an entry to `SCHEMA`, and a connector description in `CONNS` (`int.js`).
-- **New tool for the assistant**: add to `AI.tools` with a JSON-schema `parameters` object and a `run` function that returns `{text, sources}`; add a route in `aiRoute` for the offline mode. Tools are published to a remote provider automatically.
-- **New report**: add a builder to `rc.js` and an entry in `RCK`.
-- **New page**: create a module, register it, add the nav item and route in `build.py`.
-
-## Limits of the single file build
-
-No network access and no server. EDMS, AIMS, CMMS and historian connectors are simulated. User knowledge is stored in the browser. PDF ingestion needs the PDF text layer and loads pdf.js once from a CDN. Scanned documents need OCR on the server side.
+- A data source: add a block to `DB.build()` that pushes chunks, an entry in `SCHEMA`, and a connector in `CONNS` (`int.js`).
+- An assistant tool: add it to `AI.tools` with a JSON-schema `parameters` object and a `run` function that returns `{text, sources}`, then add a route for it in `aiRoute`. Tools are sent to the provider automatically.
+- A report: add a builder to `rc.js` and an entry in `RCK`.
+- A page: write a module, register it, add the nav item and the route in `build.py`.

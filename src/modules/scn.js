@@ -12,12 +12,12 @@ function scnOplCases(set){const L=[];K.opl.filter(o=>o.set===set).forEach(o=>(o.
 function scnSplitAction(a){return String(a||"").split(/,\s+|;\s+|\s+and\s+|\.\s+/).map(s=>s.trim()).filter(s=>s.length>5).slice(0,6)}
 function scnPhase(n,label,text,tags,o={}){const trip=[],alarm=[],ilt=ilD(n).trig.map(t=>t.tag);tags.forEach(t=>{if(o.trip&&(ilt.includes(t)||D[n].eff[t]))trip.push(t);else alarm.push(t)});return{label,text,tags:[...new Set(tags)],trip:o.trip?trip:[],alarm:o.trip?alarm:(o.alarm?tags:[]),note:o.note||""}}
 function scnFromOplCase(c){const n=c.set,a=scnTagsOf(c.symptom),oplTags=scnTagsOf(c.tags),inSym=a.length?a:oplTags.slice(0,1),trip=/trip/i.test(c.symptom),parts=scnSplitAction(c.action),eq=S(n).tag;
- const cause=scnTagsOf(c.cause),causeTags=cause.length?cause:[eq],ph=[scnPhase(n,"Normal operation","The unit is running. Select Play to start the "+c.src+" scenario.",[]),
-  scnPhase(n,"Symptom",c.symptom,inSym,{trip,alarm:!trip,note:trip?"The trip is forced on the P&ID, so drives stop and valves move as in the interlock logic.":"The instrument alarms."}),
+ const cause=scnTagsOf(c.cause),causeTags=cause.length?cause:[eq],ph=[scnPhase(n,"Normal operation","Unit running normally. Press Play to start the "+c.src+" scenario.",[]),
+  scnPhase(n,"Symptom",c.symptom,inSym,{trip,alarm:!trip,note:trip?"The trip is applied on the P&ID: drives stop and valves move as the interlock logic says.":"The instrument alarms."}),
   scnPhase(n,"Cause",c.cause,causeTags,{alarm:true}),
   ...parts.map((p,i)=>scnPhase(n,"Action "+(i+1),p,scnTagsOf(p).length?scnTagsOf(p):[eq],{})),
   ...((c.steps||[]).slice(0,2).map((s,i)=>scnPhase(n,"Verify "+(i+1),s[0]+(s[1]?" (check: "+s[1]+")":""),scnTagsOf(s[0]).length?scnTagsOf(s[0]):[eq],{}))),
-  scnPhase(n,"Back to normal","Cause removed. The unit returns to normal operation.",[])];
+  scnPhase(n,"Back to normal","Cause cleared. Unit back to normal.",[])];
  return{set:n,kind:"OPL",title:c.title,sub:`${c.src} ${c.opl}`,phases:ph,links:{opl:c.opl,symptom:c.symptom}}}
 function scnFromWO(r){const n=r.n,tag=mhFailTag(r),eq=S(n).tag,bd=r.bd==="Yes",parts=scnSplitAction(r.act),ks=mhParts(r),comp=ks.length?mhPartName(n,ks[0]):"";
  const ph=[scnPhase(n,"Normal operation","The unit is running.",[]),scnPhase(n,"Reported "+dstr(r.t0),r.prob,[tag],{trip:bd,alarm:!bd,note:bd?"Breakdown: the initiating tag is forced to trip.":"Reported as a work request."}),

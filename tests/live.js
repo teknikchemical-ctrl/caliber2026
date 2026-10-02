@@ -70,7 +70,7 @@ const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+=d);rq.on("end
  const mk=async()=>{const c=await b.newContext({viewport:{width:1440,height:900}}),p=await c.newPage();p.on("pageerror",e=>errs.push(e.message));p.on("dialog",d=>d.accept("t"));await p.goto("http://localhost:8910/",{waitUntil:"commit"});await p.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await p.waitForTimeout(1800);return p};
  const A=await mk(),B=await mk();
  ok(await A.evaluate(()=>SYNC.state)==="online","user A connected to the shared database");
- ok(await A.evaluate(()=>AI.cfg.remote&&AI.conn.label)==="AI assistant live","assistant switched to the server AI automatically");
+ ok(await A.evaluate(()=>AI.cfg.remote&&AI.conn.label)==="AI connected","assistant switched to the server AI automatically");
  ok(await A.evaluate(()=>!document.body.innerText.includes("Provider endpoint")),"no AI connection fields on the page");
  await A.evaluate(()=>go("ai"));await A.waitForTimeout(300);ok(await A.evaluate(()=>!document.querySelector("#app").innerText.includes("Provider endpoint")&&!document.querySelector("#app").innerText.includes("Connection")),"assistant page has no connection card");
  await A.click(".foot .gear[aria-label=Settings]");await A.waitForTimeout(200);ok(await A.evaluate(()=>!!document.querySelector("#setbg")&&document.querySelector("#setbody").innerText.includes("Shared database")),"gear opens the Settings panel");

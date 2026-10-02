@@ -1,73 +1,59 @@
-# Deploying to Netlify (free, open access)
+# Hosting on Netlify
 
-The site is a static page (`dist/index.html`) plus three Netlify Functions in `netlify/functions`:
+The site is `dist/index.html` plus the functions in `netlify/functions`. Storage is Netlify Blobs, which every site has, so there is no database to set up. The step-by-step version for first-timers is `LAUNCH_NETLIFY_GEMINI.txt`.
 
-| Function | Route | Job |
-|---|---|---|
-| `ai` | `POST /api/ai` | Hides the AI key, applies limits, builds the prompt from the records the page retrieved, calls a free model provider and streams the answer back |
-| `kb` | `/api/kb/*` | Shared knowledge store in Netlify Blobs: knowledge items, imported work orders, feedback, audit trail, answer log |
-| `health` | `GET /api/health` | Reports whether the store and the AI are available (never returns the key) |
+## Setup
 
-## One time setup (about 10 minutes, no payment)
+1. In Netlify, add a new site from the GitHub repository and pick the branch. `netlify.toml` already has the build command (`python3 build.py`), the publish folder (`dist`) and the functions folder.
+2. Get a free key from Google AI Studio (Gemini). Groq or OpenRouter free models also work.
+3. Add the environment variables below, then deploy.
+4. Open the site. The sidebar footer should read "Shared database online" and "AI connected". In Settings, "Run diagnostics" checks storage, the key and the model name.
 
-1. Push this repository to GitHub (already done) and in Netlify choose **Add new site, Import an existing project**, pick the repository and branch. `netlify.toml` already sets the build command (`python3 build.py`), the publish folder (`dist`) and the functions folder.
-2. Create a free API key at a provider with a free tier, for example Google AI Studio (Gemini). Other options are Groq or OpenRouter (free models).
-3. In Netlify open **Site configuration, Environment variables** and add:
-
-| Variable | Value |
+| Variable | Use |
 |---|---|
-| `AI_API_KEY` | the key from step 2 |
-| `AI_PROVIDER` | `gemini` (default when a key is set) or `openai` for any OpenAI compatible API |
-| `AI_MODEL` | for example `gemini-2.5-flash`. Check the provider for the current free model names |
-| `AI_BASE_URL` | only for `openai`, for example `https://api.groq.com/openai/v1` |
-| `AI_MODELS` | optional comma separated list the user may pick from in Settings |
-| `AI_DAILY_MAX` | optional, total AI requests per day for the whole site (default 800). Keep it under the provider's free quota |
-| `AI_RATE_PER_MIN`, `AI_RATE_PER_DAY` | optional, per visitor limits (defaults 12 and 120) |
+| `AI_API_KEY` | The key |
+| `AI_PROVIDER` | `gemini` (the default once a key is set) or `openai` for an OpenAI-compatible API such as Groq |
+| `AI_MODEL` | For example `gemini-2.5-flash`. Check AI Studio for the free models available to your key |
+| `AI_BASE_URL` | Only for `openai`, for example `https://api.groq.com/openai/v1` |
+| `AI_MODELS` | Optional list of models users can choose from in Settings |
+| `AI_MODEL_FALLBACK` | Tried in order if `AI_MODEL` is not available to the key. Default `gemini-2.0-flash,gemini-1.5-flash` |
+| `AI_DAILY_MAX` | AI requests per day for the whole site. Default 800. Keep it under the provider's free quota |
+| `AI_RATE_PER_MIN`, `AI_RATE_PER_DAY` | Per-visitor limits. Defaults 12 and 120 |
+| `AI_EMBED_MODEL`, `AI_EMBED_DAILY` | Embedding model for search by meaning (default `gemini-embedding-001`) and how many new texts per day (default 4000) |
+| `EDIT_CODE` | If set, saving anything to the shared database needs this code |
+| `APPROVE_CODE` | If set, approving a knowledge item needs this code too |
+| `ADMIN_CODE` | Turns on backup, restore and clean-up in Settings. The admin routes are off without it |
 
-4. Trigger a deploy. Open the site. The sidebar footer shows **Shared database online** and **AI assistant live**. The gear opens Settings, where **Test the AI connection** confirms the key works.
-
-Netlify Blobs needs no setup. It is available to functions on every site.
-
-## Optional settings
-
-| Variable | Effect |
-|---|---|
-| `EDIT_CODE` | When set, every change to the shared database needs this code. Visitors enter it once in Settings, Access codes. Reading stays open. |
-| `APPROVE_CODE` | When set, approving a knowledge item needs this code in addition to the edit code. Use it so only reviewers can make knowledge trusted. |
-| `ADMIN_CODE` | Enables backup, restore and clean-up in Settings, Administration. The admin routes stay disabled while it is unset. |
-| `AI_MODEL_FALLBACK` | Models tried in order when `AI_MODEL` is not available to the key (default `gemini-2.0-flash,gemini-1.5-flash`). |
-| `AI_EMBED_MODEL`, `AI_EMBED_DAILY` | Embedding model for meaning-based search (default `gemini-embedding-001`) and the daily number of new texts allowed (default 4000). |
-
-Settings, Run diagnostics calls `/api/selftest` and reports in plain language whether storage, the key and the model work.
+Environment variables are read at build time. After changing one, trigger a new deploy.
 
 ## Functions
 
-| Route | Job |
+| Route | What it does |
 |---|---|
-| `POST /api/ai` | answer writer; may return tool calls that the page runs and sends back |
-| `POST /api/embed` | embeddings for meaning-based search, cached on the server by content hash |
-| `/api/kb/*` | shared knowledge store; `GET /api/kb/export` and `POST /api/kb/import` for backup (admin) |
-| `GET /api/health` | status, access flags and today's AI usage |
-| `GET /api/selftest` | diagnostics |
+| `POST /api/ai` | Writes the answer. May hand tool calls back to the page |
+| `POST /api/embed` | Embeddings for search by meaning, cached by content hash |
+| `/api/kb/*` | Shared knowledge store. `GET /api/kb/export` and `POST /api/kb/import` are the admin backup |
+| `GET /api/health` | Status, which codes are required, today's AI use |
+| `GET /api/selftest` | Diagnostics |
 
 ## How it behaves
 
-- Everyone who opens the URL uses the same shared knowledge. The page polls every 15 seconds, so a knowledge item, an approval, an imported work order or feedback from one person appears for the others within about 15 seconds. Deleting an item removes it everywhere.
-- The base plant data (P&IDs, OPLs, datasheets, interlocks, maintenance history) is part of the page. The shared store holds what people add on top.
-- The page retrieves the matching records and runs the computed tools (statistics, rankings, predictions, chain reactions) in the browser, then sends them to `/api/ai`. The model writes a natural language answer. The page checks the cited sources and every number against the records. Bypass requests are always answered by the built-in safety handler.
-- If the AI key is missing, the daily budget is used up, the provider fails or the visitor is rate limited, the assistant answers from the records directly and the footer says so.
-- Opened as a plain file, the page works as before from browser storage.
+- Everyone sees the same shared knowledge. The page checks for changes every 15 seconds, so an approval, an imported work order or a piece of feedback shows up for the others within about that time. Deleting an item removes it for everyone.
+- The plant data (P&IDs, OPLs, datasheets, interlocks, maintenance history) is part of the page. The shared store only holds what people add.
+- The page finds the matching records and works out any counts, rankings or forecasts itself, then sends both to `/api/ai`. The model writes the wording. The page checks the citations and every number before showing the answer. A request to bypass a protection never goes to the model.
+- If the key is missing, the daily limit is used up, the provider fails or the visitor hits a limit, the assistant answers straight from the records and the footer says so.
+- Opened as a plain file, the page keeps working from browser storage.
 
-## Open access and what it means
+## About open access
 
-There is no login. Anyone with the URL can read and add knowledge and use the AI up to the limits. Limits are approximate (no locking) and stop casual abuse, not a determined attacker. Anything added is visible to every visitor, and the free model providers may use prompts for their own purposes: do not put confidential plant data in a public deployment. The approval workflow and audit trail record who did what, but the name is a label typed in Settings, not an identity. To close the site later, enable Netlify password protection or add an access check in `netlify/functions/_lib.mjs`.
+Without access codes, anyone with the link can read, add and approve knowledge and use the AI up to the limits. The limits are approximate and only stop casual misuse. Free AI providers may use prompts for their own purposes, so keep confidential plant data out of a public site. The name in the audit trail is whatever the user typed in Settings. Set `EDIT_CODE` and `APPROVE_CODE` if you want some control, or use Netlify's site password protection.
 
-## Local trial
+## Trying it locally
 
 ```
 npm install
 npm run build
-LOCAL_STORE_DIR=/tmp/akp AI_PROVIDER=mock node tools/devserver.mjs 8888   # http://localhost:8888
-node tests/live.js                                                         # two browser users, adapters, limits, fallback
+LOCAL_STORE_DIR=/tmp/akp AI_PROVIDER=mock node tools/devserver.mjs 8888
 ```
-`AI_PROVIDER=mock` gives a deterministic offline AI for trials. The functions can also be run with `netlify dev` if you have the Netlify CLI.
+
+Then open http://localhost:8888. The mock provider gives canned answers, so no key is needed. `node tests/live.js` runs the full local check.

@@ -194,7 +194,7 @@ window.ilView=n=>{const s=S0(n),il=KB.IL[n],tg0=SETS[n-1].tag,t=il.trig[s.sel],[
  <div style="margin-top:8px"><button class="ghost" ${s.lat&&!s.ack?"":"disabled"} onclick="ilA(${n})">Acknowledge alarm</button> <button class="ghost" ${s.lat&&s.ack&&cleared&&ok?"":"disabled"} onclick="ilR(${n})">Reset trip</button></div>
  <h3 style="margin:14px 0 6px">Start permissive interlock</h3>${il.perm.map((p,j)=>`<div class="gate ${perm[j]?"ok":"no"}" onclick="ilP(${n},${j})"><span>${perm[j]?"✔":"✘"}</span><span style="flex:1">P${j+1} · ${esc(p[1])}</span>${chip(n,p[2])}</div>`).join("")}
  <div style="margin-top:8px"><span class="lamp ${ok&&!s.lat?"g":ok?"y":"r"}">${ok&&!s.lat?`START ${tg0} — PERMITTED`:s.lat?"START INHIBITED — TRIP LATCHED":"START INHIBITED — PERMISSIVE LOST"}</span></div></div></div>
- <div class="card" style="margin-top:12px"><h3>Sequence of Events (SOE)</h3><table class="cx soe"><tr><th style="width:90px">Time</th><th style="width:60px">Class</th><th>Event</th></tr>${s.log.length?s.log.map(l=>`<tr><td>${l[0]}</td><td class="c${l[1]}">${l[1]}</td><td class="l">${esc(l[2])}</td></tr>`).join(""):`<tr><td colspan="3" class="muted">No events. Select a scenario and begin the exercise.</td></tr>`}</table></div>
+ <div class="card" style="margin-top:12px"><h3>Sequence of Events (SOE)</h3><table class="cx soe"><tr><th style="width:90px">Time</th><th style="width:60px">Class</th><th>Event</th></tr>${s.log.length?s.log.map(l=>`<tr><td>${l[0]}</td><td class="c${l[1]}">${l[1]}</td><td class="l">${esc(l[2])}</td></tr>`).join(""):`<tr><td colspan="3" class="muted">No events yet. Pick a scenario and start it.</td></tr>`}</table></div>
  <p class="muted" style="margin-top:10px;font-size:12px">${esc(il.notes)}</p></div>`};
 window.ilSum=n=>{const il=KB.IL[n];return il.logic.startsWith("N/A")?"control loop":il.sil+" · "+il.trig.length+" trips"}})();
 </script>
@@ -254,7 +254,7 @@ function dashboard(){
    <h3 style="margin-top:16px">High-severity data issues (${hi.length})</h3>
    ${hi.slice(0,5).map(i=>`<div style="padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="go('quality')"><span class="tag bad">${esc(i.source)}</span> <span class="muted">${esc(i.issue).slice(0,90)}</span></div>`).join("")}
    <p class="back" style="margin:10px 0 0" onclick="go('quality')">View all ${K.issues.length} issues →</p></div></div>
-  <div class="card" style="margin-top:14px"><h3>Knowledge coverage per equipment set</h3><p class="muted" style="margin-bottom:6px">Click a row to open the set. Gaps are real: no datasheet exists in the knowledge base yet.</p>
+  <div class="card" style="margin-top:14px"><h3>Knowledge coverage per equipment set</h3><p class="muted" style="margin-bottom:6px">Click a row to open the set. A gap means that set has no datasheet in the knowledge base.</p>
   <table><tr><th>Set</th><th>Equipment</th><th>P&ID</th><th>GA</th><th>Datasheet</th><th>Plot plan</th><th>Interlock</th><th>OPL</th></tr>
   ${K.sets.map(s=>`<tr class="click" onclick="go('equipment',{set:${s.n},tab:'overview'})"><td>${s.n}</td><td><b>${s.tag}</b><br><span class="muted">${s.name}</span></td><td>${cell(1)}</td><td>${cell(1)}</td><td>${cell(1,"Rev 3")}</td><td>${cell(1)}</td><td>${cell(1,KIL[s.n].logic.startsWith("N/A")?"loop only":KIL[s.n].logic)}</td><td>${cnt(K.opl,o=>o.set===s.n)}</td></tr>`).join("")}</table></div>
   <div class="card" style="margin-top:14px"><h3>Breakdown downtime by equipment set (hours)</h3>
@@ -262,7 +262,7 @@ function dashboard(){
 }
 
 /* Equipment sets */
-function setList(){return `<h1>Equipment Knowledge Sets</h1><p class="sub">Each set = P&ID + GA drawing + datasheet + plot plan + interlock logic + OPLs + maintenance history, keyed on one hero equipment</p>
+function setList(){return `<h1>Equipment Knowledge Sets</h1><p class="sub">Each set = P&ID + GA drawing + datasheet + plot plan + interlock logic + OPLs + maintenance history, for one main equipment item</p>
 <div class="grid g3">${K.sets.map(s=>`<div class="card click" onclick="go('equipment',{set:${s.n},tab:'overview'})"><div class="row between"><span class="tag acc">SET ${s.n} · ${s.tag}</span>${tg(s.crit,"bad")}</div>
 <h3 style="margin-top:10px">${s.name}</h3><p class="muted">Area ${s.area} · ${s.unit}</p>
 <div class="row" style="margin-top:12px"><span class="tag">📄 ${docsOf(s.n).length} docs</span><span class="tag">🧩 7 OPL</span><span class="tag">🔧 ${woOf(s.n).length} WO</span><span class="tag">⚡ ${cnt(K.inst,i=>i.set===s.n)} instr.</span></div></div>`).join("")}</div>`}
@@ -348,7 +348,7 @@ async function ask(text){const q=(text||$("#q").value).trim();if(!q)return;st.ch
   const h=retrieve(q,st.scope),conf=h.length?Math.min(95,Math.round(40+h[0].score*3)):0;let a;
   try{const r=await fetch(API+"/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,context:h.map(c=>({id:c.id,title:c.title,sec:c.sec,text:c.text,ver:c.ver,status:c.status}))})});if(!r.ok)throw 0;const j=await r.json();a={text:esc(j.answer).replace(/\n/g,"<br>"),sources:h,conf};$("#apiDot").style.background="var(--ok)";$("#apiStatus").textContent="Connected · Gemini"}catch(e){a=local(h,conf)}
   st.chat[st.chat.length-1]={role:"a",...a};render()}
-function local(h,conf){if(!h.length)return{text:"I couldn't find this in the knowledge base. Try naming the equipment tag (e.g. KC-4501) or browse the Document Library.",sources:[]};
+function local(h,conf){if(!h.length)return{text:"Not found in the knowledge base. Name the equipment tag (e.g. KC-4501) or browse the Document Library.",sources:[]};
   const sets=[...new Set(h.map(c=>c.set).filter(Boolean))].map(S),open=h.some(c=>c.status==="Not stated"||c.status==="REVIEW");
   return{text:`<b>${sets.map(s=>s.tag+" "+s.name).join(", ")||"Site-wide"}</b><br><br>${h.map((c,i)=>`${i+1}. ${esc(c.text.slice(0,260))}${c.text.length>260?"…":""} <span class="muted">[${esc(c.id)}]</span>`).join("<br>")}${open?"<br><br>⚠ Some sources have no stated approval status or are flagged REVIEW — verify safety-critical values before acting.":""}`,sources:h,conf}}
 
@@ -627,7 +627,7 @@ D[8]=({vb:[1000,660],ref:"TJC-LLD-PID-8901",
  notes:["Note: 1. This is sample data provided for CALIBER purpose only","2. Refer to Datasheet TJC-LLD-GA-FA-8901","3. See SEQ-8901 logic diagram"],
  eff:{"LSHH-8901":["XV-8901"],"LSLL-8901":["GA-8920A"],"PSHH-8902":["PCV-8905"],"HS-8901":["XV-8901","GA-8920A"],"HS-5901":["GA-8920A","M-8901"]},oot:["PCV-8905"]});
 function pPanel(){const s=S(P.set),d=D[P.set],n=d.n[P.sel];
- if(!n)return `<h3>Select equipment</h3><p class="muted" style="line-height:1.6">Click any pump, vessel, valve or instrument on the sheet to see its datasheet context and live condition.</p><p class="muted" style="margin-top:10px">Live twin: flow runs along the process lines and rotating equipment turns while healthy. Use <b>Simulate trip</b> on an initiating instrument and the interlock effects follow (valves move, drives stop, flow halts).</p>`;
+ if(!n)return `<h3>Select equipment</h3><p class="muted" style="line-height:1.6">Click any pump, vessel, valve or instrument on the sheet to see its datasheet context and live condition.</p><p class="muted" style="margin-top:10px">Flow runs along the process lines and rotating equipment turns while healthy. Use <b>Simulate trip</b> on an initiating instrument and the interlock effects follow: valves move, drives stop, flow halts.</p>`;
  const t=n[0],ins=K.inst.find(i=>i.tag.split(/[\s\/()]+/).includes(t))||K.inst.find(i=>i.tag.includes(t)),as=K.assets.find(a=>a.tag===t),L=read(t);
  const rows=ins?[["Type",ins.type],["Variable",ins.var],["Setpoint",ins.sp],["On trip / action",ins.act],["Parent equipment",ins.eq],["Data status",ins.flag?tg("REVIEW"):"Listed"]]:as?[["Asset",as.id],["Type",as.type],["Description",esc((as.desc||"").slice(0,160))]]:[["Source","P&ID drawing "+s.pid.ref],["Note",n[1]==="m"?s.ga.motor_power+" motor (GA drawing)":"Not in instrument list"]];
  const eff=d.eff[t],cause=by(t);
@@ -643,11 +643,11 @@ function pUpd(){const d=D[P.set];
   if(g){g.classList.toggle("al",!!L&&L.s==="TRIP");g.classList.toggle("ef",!!L&&L.s==="EFFECT");if(SPIN.has(n[1]))g.classList.toggle("stop",!!L&&L.s!=="NORMAL")}});
  d.p.forEach((p,j)=>{const o=p[1]||{},el=$("#f"+j);if(!el)return;const dead=(o.g||[]).some(t=>isF(t)||isE(t)),need=o.o&&!o.o.some(t=>isF(t)||isE(t));el.classList.toggle("off",dead||!!need)});
  const act=Object.keys(LIVE.f).filter(k=>LIVE.f[k]&&k.startsWith(P.set+":")).map(k=>k.slice(k.indexOf(":")+1)),pb=$("#pb");
- if(pb)pb.innerHTML=act.length?`<span class="tag bad">TRIP ACTIVE</span> ${act.map(t=>`<b>${esc(t)}</b> → ${(d.eff[t]||[]).length?esc([...new Set(d.eff[t])].join(", ")):"alarm only"}`).join(" · ")} <button class="ghost" style="padding:3px 10px;margin-left:8px" onclick="pReset()">Reset all</button>`:`<span class="tag ok">NORMAL</span> <span class="muted">All items healthy · simulated live data</span>`;
+ if(pb)pb.innerHTML=act.length?`<span class="tag bad">TRIP ACTIVE</span> ${act.map(t=>`<b>${esc(t)}</b> → ${(d.eff[t]||[]).length?esc([...new Set(d.eff[t])].join(", ")):"alarm only"}`).join(" · ")} <button class="ghost" style="padding:3px 10px;margin-left:8px" onclick="pReset()">Reset all</button>`:`<span class="tag ok">NORMAL</span> <span class="muted">All items healthy · simulated data</span>`;
  const pp=$("#pp");if(pp)pp.innerHTML=pPanel()}
 const pSet=n=>{P.set=n;P.sel=null;render()},pSel=i=>{P.sel=i;document.querySelectorAll(".pdn").forEach(g=>g.classList.toggle("sel",g.id==="n"+i));$("#pp").innerHTML=pPanel()},pForce=t=>{LIVE.f[FK(t)]=!LIVE.f[FK(t)];tick();pUpd()},pReset=()=>{Object.keys(LIVE.f).forEach(k=>delete LIVE.f[k]);pUpd()},pZoom=z=>{P.z=z?Math.max(60,Math.min(260,P.z+z)):100;const e=$("#psvg");if(e)e.style.width=P.z+"%"},pVals=()=>{P.vals=!P.vals;pUpd()};
 function pidPage(){const s=S(P.set),d=D[P.set];tick();const[vw,vh]=d.vb;
- return `<h1>P&amp;ID Viewer</h1><p class="sub">Digital twin of the P&amp;ID pack · sheets redrawn from the drawings · every equipment, valve and instrument is selectable and live-ready</p>
+ return `<h1>P&amp;ID Viewer</h1><p class="sub">P&amp;ID sheets redrawn from the drawings. Every equipment item, valve and instrument can be selected and shows a simulated live value.</p>
  <div class="chips">${K.sets.map(x=>`<span class="chip" style="${x.n===P.set?"color:var(--acc);border-color:var(--acc)":""}" onclick="pSet(${x.n})">${x.tag}</span>`).join("")}</div>
  <div class="split" style="grid-template-columns:minmax(0,1fr) 310px"><div class="card" style="min-width:0"><div class="row between" style="margin-bottom:8px"><h3>${esc(s.pid.ref)} · ${esc(s.pid.title)}</h3><span class="row" style="gap:6px"><span class="tag warn">SIMULATED LIVE DATA</span><button class="ghost" style="padding:3px 10px" onclick="pZoom(-20)">−</button><button class="ghost" style="padding:3px 10px" onclick="pZoom(0)">Fit</button><button class="ghost" style="padding:3px 10px" onclick="pZoom(20)">+</button><button class="ghost" style="padding:3px 10px" onclick="pVals()">Values</button></span></div>
  <div id="pb" class="pbar"></div>
@@ -734,7 +734,7 @@ function gaView(n){if(G.n!==n){G.n=n;G.sel=null}const s=S(n),d=GA[n],g=s.ga,r=s.
  <div><h3 style="margin-bottom:8px">Nozzle / connection schedule</h3>${tbl(["Mark","Service","Size","Remarks"],d.nz.map(z=>[z.m,z.sv,esc(z.sz),esc(z.r)]),i=>`gSel('${d.nz[i].m}')`)}
  <h3 style="margin:14px 0 8px">Revision history</h3>${tbl(["Rev","Description","By","Date"],r.map(x=>[x.rev,x.desc,x.by,x.date]))}</div></div>
  <p class="muted" style="margin-top:10px;font-size:12px">Notes: 1 Material per WPN-MAT-001 · 2 Surface prep &amp; painting per WPN-PAINT-001 · 3 Dimensions in mm · 4 Weights estimated (dry/erection) · 5 Nozzle loads per vendor drawing · 6 Associated docs: ${s.pid.ref}, interlock ${esc(g.assoc_interlock_ref)}. Sample data for CALIBER only; schematic redraw — parts not individually dimensioned.</p>`}
-function gaPage(){return `<h1>Equipment Drawing Viewer</h1><p class="sub">General-arrangement drawings redrawn in-app from the GA pack · every part and nozzle is selectable and linked to the BOM, OPLs and work orders</p>
+function gaPage(){return `<h1>Equipment Drawing Viewer</h1><p class="sub">General arrangement drawings redrawn from the GA pack. Every part and nozzle links to the BOM, OPLs and work orders.</p>
  <div class="chips">${K.sets.map(x=>`<span class="chip" style="${x.n===G.n?"color:var(--acc);border-color:var(--acc)":""}" onclick="G.n=${x.n};G.sel=null;render()">${x.tag}</span>`).join("")}</div>${gaView(G.n)}`}
 const _r1=render;render=function(){if(st.page==="pid"||st.page==="ga"){st={...st,tab:st.page,page:"equipment",set:st.set||(st.page==="pid"?P.set:G.n)}}_r1()};
 /* ===== Set-first navigation: Equipment set -> P&ID / Drawing / Docs / Interlock / OPL / Maintenance, all cross-linked ===== */
@@ -753,7 +753,7 @@ const _gp=gP;gP=function(){const n=G.n,k=G.sel,h=_gp();if(!k)return h;const d=GA
  else{const m=mainIdx(n);if(m>=0)L.push([m,S(n).tag+" (parent equipment)"]);if(k===motKey(n)&&motIdx(n)>=0)L.push([motIdx(n),D[n].n[motIdx(n)][0]+" (driver)"])}
  return h+`<h3 style="margin:14px 0 6px">Linked in this equipment set</h3>${L.map(([i,l])=>lnk("🗺️ Show "+l+" on P&amp;ID",`pidGo(${n},${i})`)).join("")}${lnk("📄 Datasheet / document set","go('equipment',{set:"+n+",tab:'docs'})")}`};
 function setHub(n){const s=S(n),w=woOf(n),ins=K.inst.filter(i=>i.set===n),tile=(i,t,sub,on,bad)=>`<div class="card click" onclick="${on}" ${bad?'style="border-style:dashed"':""}><div style="font-size:22px">${i}</div><h3 style="margin-top:6px">${t}</h3><p class="muted">${sub}</p></div>`;
- return `<h3 style="margin-bottom:8px">Everything in this equipment set — click to open</h3><div class="grid g3" style="margin-bottom:14px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">
+ return `<h3 style="margin-bottom:8px">All records for this equipment set. Click to open.</h3><div class="grid g3" style="margin-bottom:14px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">
  ${tile("🗺️","P&amp;ID",s.pid.ref+"<br>"+D[n].n.length+" selectable items","st.tab='pid';render()")}
  ${tile("📐","Equipment drawing",s.ga.dwg_no+"<br>"+(GA[n].bom.length+(GA[n].mot?1:0))+" parts · "+GA[n].nz.length+" nozzles","st.tab='ga';render()")}
  ${tile("📍","Plot plan",s.pp.dwg_no+"<br>grid "+s.pp.grid_ref+" · "+s.pp.elevation_label,"go('documents',{doc:'"+s.pp.document_id+"'})")}
@@ -919,7 +919,7 @@ function sheet(o){
   pur=pur.replace(TAGX,t=>`<span class="otag" onclick="tagGo(${n},'${t}')">${t}</span>`);
   const hz=esc(o.safety[0]||"").replace(/is (.*?) handling (.*?) at/,(m,a,b)=>`is <b>${a}</b> handling <b>${b}</b> at`);
   const sc=SC[o.no]||[],tsLink=i=>{const j=sc.findIndex(x=>x.row===i);return j<0?"":`<span class="simgo" onclick="event.stopPropagation();oplSim('${o.no}',${j})" title="Run this case in the simulator">▶ simulate</span>`};
-  const stepLink=i=>{const j=sc.findIndex(x=>(x.a||[]).some(a=>[].concat(a[1]).includes(i+1)));return j<0?"":` onclick="oplSim('${o.no}',${j})" class="lk" title="Practise this step in the simulator"`};
+  const stepLink=i=>{const j=sc.findIndex(x=>(x.a||[]).some(a=>[].concat(a[1]).includes(i+1)));return j<0?"":` onclick="oplSim('${o.no}',${j})" class="lk" title="Run this step in the simulator"`};
   const ft=footOf(o);
   return `<div class="osh">
   <table class="oh"><tr><td class="stamp">This is sample data provided for<br>CALIBER purposes only</td><td class="ttl">ONE POINT LESSON (OPL)</td><td class="no">OPL No: <b>${o.no}</b><br>Sheet 1 of 1</td></tr></table>
@@ -1297,7 +1297,7 @@ const runOK=S=>S.P.run&&!S.trip;
 
 SC["OPL-GA-1201A-01"]=[
  {n:"Flush orifice RO-1201 plugging in service",k:"fault",row:0,tr:["DP","TS","LK"],
-  d:"GA-1201A is on line. Polymer fines are slowly building up in the Plan 11 flush orifice RO-1201. Watch PDI-1201 fall and the seal face run hotter until hexane starts to weep at the gland.",
+  d:"GA-1201A is on line. Polymer fines are slowly building up in the Plan 11 flush orifice RO-1201. PDI-1201 falls and the seal face runs hotter until hexane weeps at the gland.",
   r:{plug:[.9,.006]},g:["Pump back on line with PDI-1201 ≥ 1.5 bar, orifice cleaned and no leakage",S=>runOK(S)&&S.V.DP>=1.5&&S.P.plug<.1&&S.V.LK<.3],
   a:[["Check PDI-1201 reads 1.5–2.5 bar",2,0,S=>`PDI-1201 reads <b>${F(S.V.DP,2)} bar</b> — ${S.V.DP<1.5?"below the 1.5 bar minimum: flush is starving the seal.":"inside the band."}`],
      ["Tighten the gland to stop the weep",0,-1,S=>"A mechanical seal has no gland to tighten — the cause is the starved flush, not the seal faces. Nothing changes."],
@@ -1306,7 +1306,7 @@ SC["OPL-GA-1201A-01"]=[
      ["Confirm Plan 62 quench lined up to outboard side",5,1,S=>{S.P.q=1;return "N₂ quench confirmed on the outboard side."}],
      ["Verify no leak at gland / seal drain",3,0,S=>S.V.LK>.3?`Leak still present: ${F(S.V.LK,1)} L/h.`:"Gland and seal drain dry."]]},
  {n:"Pre-start check: flush line still closed",k:"proc",tr:["DP","TS","LK"],
-  d:"After a seal change the pump is ready to start, but the Plan 11 flush isolation and the Plan 62 quench were left closed. The start permissive will block the start. Follow the OPL to start the pump correctly.",
+  d:"After a seal change the pump is ready to start, but the Plan 11 flush isolation and the Plan 62 quench were left closed. The start permissive blocks the start. Start the pump as the OPL describes.",
   p:{run:0,fl:0,q:0},g:["GA-1201A running with flush dP ≥ 1.5 bar, quench ON and seal face cool",S=>runOK(S)&&S.V.DP>=1.5&&S.P.q&&S.V.TS<90],
   a:[["Line up discharge flush and open flush isolation",1,1,S=>{S.P.fl=1;return "Flush isolation open."}],
      ["Force the seal-flush permissive to start now",0,-1,S=>{S.P.pby=1;return "Permissive forced. Starting now runs the seal without flush, and the seal faces overheat within seconds."}],
@@ -1314,7 +1314,7 @@ SC["OPL-GA-1201A-01"]=[
      ["Check PDI-1201 after start",2,0,S=>S.P.run?`PDI-1201 = ${F(S.V.DP,2)} bar.`:"Pump not running — no flush dP yet."],
      ["Verify no visible drip at the seal drain",3,0,S=>S.V.LK>.3?"Drip visible at the seal drain.":"Seal drain dry."]]},
  {n:"Starting on a half-plugged orifice",k:"bad",row:0,tr:["DP","TS","LK"],
-  d:"The pump is running but PDI-1201 only shows about 1 bar. A colleague considers the reading acceptable. Determine the correct action before seal damage occurs.",
+  d:"The pump is running but PDI-1201 only shows about 1 bar. A colleague thinks the reading is acceptable. Decide what to do before the seal is damaged.",
   p:{plug:.5},r:{plug:[.75,.002]},g:["Flush dP restored above 1.5 bar with pump running",S=>runOK(S)&&S.V.DP>=1.5&&S.V.LK<.3],
   a:[["Continue operation at 1 bar differential",0,-1,S=>"OPL-01: confirm flush dP > 1.5 bar. Low flush = seal-face overheating and a hexane leak."],
      ["Stop, isolate and inspect RO-1201 for plugging",4,1,S=>{S.P.run=0;S.P.plug=0;delete S.R.plug;return "Orifice partially plugged with polymer — cleaned."}],
@@ -1332,15 +1332,15 @@ SC["OPL-GA-1201A-02"]=[
      ["Top up from the nearby ISO VG 46 drum",0,-1,S=>{S.P.oil=.5;S.P.mix=1;return "Grades are now mixed — viscosity too low, bearing runs hotter. OPL: ISO VG 68 only."},needLoto],
      ["Inspect and refill the constant-level oiler bottle",4,1,S=>{delete S.R.oil;S.P.oil=.5;return "Oiler bottle refilled — bath held at the centre mark."},needLoto],
      ["Record oil colour / water on the lube route sheet",5,0,()=>"Oil clear amber, no water. Logged."],unLoto]},
- {n:"Over-filled bath after enthusiastic top-up",k:"bad",tr:["TB"],
-  d:"A new technician filled the bearing housing to the top of the sight glass ‘to be safe’. The oil churns and the bearing temperature drifts upward.",
+ {n:"Oil bath over-filled",k:"bad",tr:["TB"],
+  d:"The bearing housing was filled to the top of the sight glass. The oil churns and the bearing temperature drifts upward.",
   p:{oil:.97},g:["Oil back at the centre mark and bearing temperature normal",S=>runOK(S)&&Math.abs(S.P.oil-.5)<.08&&S.V.TB<68],
-  a:[["Leave it — more oil is safer",0,-1,()=>"Over-filling overheats the bearing just like under-filling (churning and heat). Key learning #1."],
+  a:[["Leave it — more oil is safer",0,-1,()=>"Over-filling overheats the bearing just like under-filling (churning and heat). See key learning #1."],
      LT(1),["Drain to the middle sight-glass mark",2,1,{oil:.5},needLoto],["Record the correction on the lube route sheet",5,0,()=>"Logged."],unLoto]}];
 
 SC["OPL-GA-1201A-03"]=[
  {n:"Foundation settlement — angular misalignment",k:"fault",row:1,tr:["VB","TB"],
-  d:"After heavy rain the motor foundation settles. Angular misalignment creeps from 0.03 toward 0.12 mm/100 mm — the exact case that tripped GA-1201A at 7.4 mm/s.",
+  d:"After heavy rain the motor foundation settles. Angular misalignment creeps from 0.03 toward 0.12 mm/100 mm, the case that tripped GA-1201A at 7.4 mm/s.",
   r:{mis:[.13,.0012]},g:["Re-aligned to < 0.05 mm/100 mm and running with vibration < 3 mm/s",S=>runOK(S)&&S.P.mis<.05&&S.V.VB<3],
   a:[LT(1),["Remove the coupling guard",1,1,S=>{S.P.guard=0;return "Guard removed."},needLoto],
      ["Mount laser brackets across the coupling spacer",2,1,()=>"Laser heads mounted."],
@@ -1348,7 +1348,7 @@ SC["OPL-GA-1201A-03"]=[
      ["Shim motor feet and re-check to < 0.05",[4,5],1,S=>{S.P.mis=.03;delete S.R.mis;return "Shims adjusted under the motor feet — angular 0.03 mm/100 mm. Alignment report recorded."},needLoto],
      ["Raise the VSHH-1201 trip to 9 mm/s to stop the trips",0,-1,()=>"Changing a SIL trip set point to ‘fix’ vibration hides the cause and violates SEQ-1201."],unLoto]},
  {n:"Accepting an out-of-tolerance reading",k:"bad",tr:["VB"],
-  d:"Alignment readings after a re-shim show 0.07 mm/100 mm. The job is late and the supervisor asks whether it is good enough.",
+  d:"Alignment readings after a re-shim show 0.07 mm/100 mm. The job is late and the supervisor asks if that is acceptable.",
   p:{run:0,loto:1,mis:.07,guard:0},g:["Pump running within alignment tolerance",S=>runOK(S)&&S.P.mis<.05],
   a:[["Accept 0.07 mm/100 mm without correction",0,-1,()=>"OPL target is angular < 0.05 mm/100 mm. Starting like this will load the bearing and seal."],
      ["Capture readings 0-90-180-270°",3,1,S=>`Angular ${F(S.P.mis,2)} mm/100 mm.`],["Add / remove shims and re-check",5,1,{mis:.035},needLoto],unLoto]}];
@@ -1370,18 +1370,18 @@ SC["OPL-GA-1201A-04"]=[
      ["Hand over status to next shift",5,0,()=>"Handover logged."]]}];
 
 SC["OPL-GA-1201A-05"]=[
- {n:"Perfect cold alignment, no thermal offset",k:"fault",ts:40,tr:["VB","TB"],
-  d:"The pump was aligned cold to zero/zero. As hexane brings the casing up to temperature, the pump centreline grows and the hot misalignment appears. Simulated time runs about 40× faster.",
+ {n:"Cold alignment with no thermal offset",k:"fault",ts:40,tr:["VB","TB"],
+  d:"The pump was aligned cold to zero/zero. As hexane heats the casing, the pump centreline grows and a hot misalignment appears. Simulated time runs about 40 times faster.",
   p:{hot:0,grow:.085},r:{hot:[1,1/5400]},g:["Running hot with vibration < 3 mm/s after correct thermal-growth compensation",S=>runOK(S)&&S.P.hot>.9&&S.P.grow<.01&&S.V.VB<3],
   a:[["Hot-check the coupling after about 2 h at temperature",2,1,S=>S.P.hot<.8?`Casing only ${F(S.P.hot*100,0)} % of the way to temperature — wait.`:`Hot check: angular <b>${F(S.P.mis+S.P.grow,2)} mm/100 mm</b> versus cold 0.03.`],
      ["Compare hot readings with cold targets",3,0,S=>`Difference ≈ ${F(S.P.grow,2)} mm/100 mm — that is the thermal growth.`],
      LT(0),["Re-shim with the thermal-growth offset in the cold targets",[1,4],1,S=>{S.P.grow=0;S.P.hot=0;S.R.hot=[1,1/5400];return "Cold targets now include the offset; when hot the shafts will be collinear."},needLoto],
-     ["Re-align cold to zero/zero again",0,-1,()=>"Same result: zero cold means misaligned hot. The offset is the lesson."],
+     ["Re-align cold to zero/zero again",0,-1,()=>"Same result: aligned to zero when cold means misaligned when hot."],
      ["Log cold and hot data in the machine history",5,0,()=>"Both data sets logged."],unLoto]}];
 
 SC["OPL-GA-1201A-06"]=[
  {n:"Start-up from idle (casing full of vapour)",k:"proc",tr:["TS","PD","VB"],
-  d:"GA-1201A has been idle; the casing contains vapour and the suction valve is shut. A dry run destroys the mechanical seal in seconds. Prime, vent and start in the OPL order.",
+  d:"GA-1201A has been idle. The casing holds vapour and the suction valve is shut. Running dry destroys the mechanical seal in seconds. Prime, vent and start in the order given in the OPL.",
   p:{run:0,xv:0,prime:.25,fl:0,fva:0,fv:0},g:["Running, primed, flush established and pressure stable",S=>runOK(S)&&S.P.prime>.95&&S.V.DP>=1.5&&S.V.PD>12&&S.V.VB<3],
   a:[["Open suction fully and vent casing air via N5",1,1,S=>{S.P.xv=1;S.R.prime=[1,.08];return "Suction open, venting — liquid at the vent shortly."}],
      ["Start immediately — it will self-prime",0,-1,()=>"A centrifugal pump will not self-prime; running dry burns the seal faces."],
@@ -1406,7 +1406,7 @@ SC["OPL-GA-1201A-07"]=[
      ["Escalate to reliability (1× running speed dominant)",5,0,()=>"Spectrum shows bearing defect frequencies, not 1× — confirms bearing, not misalignment."],
      ["Wait for the trip — it will tell us",0,-1,()=>"Run-to-trip turns a planned bearing change into an emergency outage."]]},
  {n:"PDI-1201 impulse lines fouled",k:"fault",row:1,tr:["DP"],
-  d:"Seal-flush low alarms keep appearing and PDI-1201 is jumping around although the seal looks healthy. Is it the process or the instrument?",
+  d:"Seal-flush low alarms keep coming and PDI-1201 jumps around, but the seal looks healthy. Find out whether it is the process or the instrument.",
   p:{pdif:1},g:["PDI-1201 reading steady and true",S=>S.P.pdif===0&&runOK(S)],
   a:[["Compare PDI-1201 with a local test gauge",3,1,S=>`Local gauge: ${F(2.05*(1-S.P.plug),2)} bar steady; PDI-1201 jumps around ${F(S.V.DP,2)} bar → instrument fault.`],
      ["Clean impulse lines and re-zero PDI-1201",4,1,S=>{S.P.pdif=0;return "Impulse lines flushed of hexane residue and fines; transmitter re-zeroed."}],
@@ -1499,7 +1499,7 @@ const ok=S=>S.P.drv&&!S.trip;
 
 SC["OPL-YD-2301-01"]=[
  {n:"Cold start: inert first, then steam",k:"proc",ts:30,tr:["O2","TD","FN"],
-  d:"YD-2301 is full of air after an outage. Polymer powder + oxygen + heat = dust explosion. Purge with nitrogen until the vent O₂ is below 5 %, then bring the steam in gradually.",
+  d:"YD-2301 is full of air after an outage. Polymer powder, oxygen and heat can cause a dust explosion. Purge with nitrogen until the vent O₂ is below 5 %, then bring the steam in gradually.",
   p:{n2:0,steam:0,sp:30,spT:30},v:{O2:21,TD:30,FN:0},g:["Dryer at 95–110 °C with vent O₂ < 5 % and no trip",S=>ok(S)&&S.V.TD>=95&&S.V.TD<=110&&S.V.O2<5],
   a:[["Start N₂ purge, raise FT-2302 above 200 kg/h",1,1,S=>{S.P.n2=260;return "FV-2302 open, N₂ at 260 kg/h."}],
      ["Confirm AT-2307 vent O₂ below 5 %",2,1,S=>S.V.O2<5?`AT-2307 = ${F(S.V.O2,1)} % — inerting proven.`:`AT-2307 = ${F(S.V.O2,1)} % — not yet inert, keep purging.`],
@@ -1550,7 +1550,7 @@ SC["OPL-YD-2301-04"]=[
 
 SC["OPL-YD-2301-05"]=[
  {n:"Kadant carbon seal leaking live steam",k:"fault",tr:["RJL","PST"],
-  d:"Live steam is blowing at the drum-head rotary joint — a burn hazard and an energy loss. Plan the isolation and change the seal kit.",
+  d:"Live steam is leaking at the drum-head rotary joint. It is a burn hazard and wastes steam. Plan the isolation and change the seal kit.",
   p:{rj:.6},r:{rj:[1,.0015]},g:["Rotary joint leak-free, dryer back on steam",S=>ok(S)&&S.P.rj<.2&&S.P.steam&&S.V.RJL<2],
   a:[["Identify the leak at the carbon seal face",1,1,()=>"Leak confirmed at the joint carbon seal face."],
      ["Wrap the joint with rags and continue operation",0,-1,()=>"Rags do not stop 4.5 barg steam and hide a growing burn hazard."],
@@ -1561,7 +1561,7 @@ SC["OPL-YD-2301-05"]=[
 
 SC["OPL-YD-2301-06"]=[
  {n:"Steam header pressure sagging",k:"fault",ts:30,tr:["MST","PST","TD"],
-  d:"The LP steam header is drooping. The dryer cannot reach temperature and MT-2306 moisture creeps above the 300 ppm specification.",
+  d:"LP steam header pressure is falling. The dryer cannot reach temperature and MT-2306 moisture rises above the 300 ppm specification.",
   r:{stm:[3,.004]},g:["Outlet moisture below 300 ppm",S=>ok(S)&&S.V.MST<300&&!S.R.stm],
   a:[["Read MT-2306 outlet moisture",1,0,S=>`MT-2306 = ${F(S.V.MST,0)} ppm.`],
      ["Check steam pressure PT-2304 first",2,1,S=>`PT-2304 = ${F(S.V.PST,2)} barg (design 4.5).`],
@@ -1573,8 +1573,8 @@ SC["OPL-YD-2301-06"]=[
 
 SC["OPL-YD-2301-07"]=[
  {n:"Trunnion roller wear over weeks",k:"trend",ts:20000,tr:["FLT","VTR"],
-  d:"The support trunnions carry the full drum weight. Wear is building over weeks (about 5.5 h of plant time per second). Act before drum float exceeds 5 mm.",
-  r:{trun:[.95,1/(40*86400)]},g:["Rollers re-skewed / repaired with float ≤ 5 mm, dryer running",S=>ok(S)&&S.fl.fix&&S.V.FLT<=5],
+  d:"The support trunnions carry the full drum weight. Wear builds up over weeks (about 5.5 h of plant time per second). Act before drum float exceeds 5 mm.",
+  r:{trun:[.95,1/(40*86400)]},g:["Rollers re-skewed or repaired, float at or below 5 mm, dryer running",S=>ok(S)&&S.fl.fix&&S.V.FLT<=5],
   fail:S=>S.V.FLT>6.2?"Drum float exceeded the limit — riding ring hit the thrust roller.":null,
   a:[["Listening / vibration check on both trunnions",1,1,S=>`Trunnion vibration ${F(S.V.VTR,1)} mm/s.`],
      ["Grease trunnion bearings on route",2,1,S=>{S.R.trun=[.95,1/(90*86400)];return "Greased — wear rate slowed."}],
@@ -1673,7 +1673,7 @@ const hom=S=>S.V.SPR<15&&S.V.TMIN>=120&&S.V.TMIN<=135+20;
 const inert={n2:275,htr:0,sp:25,spT:25,h2:0};
 SC["OPL-DC-3401A-01"]=[
  {n:"Full reduction sequence (accelerated)",k:"proc",ts:900,tr:["O2","TMX","SPR"],
-  d:"Fresh PdO catalyst is loaded and the reactor is full of air. Run the four controlled steps — inert, heat-up, reduce, cool & preserve — in order. One second ≈ 15 minutes of plant time.",
+  d:"Fresh PdO catalyst is loaded and the reactor is full of air. Run the four controlled steps in order: inert, heat up, reduce, cool and preserve. One second is about 15 minutes of plant time.",
   p:{n2:0,htr:0,sp:25,spT:25,pv:1,th0:25},v:{O2:209000},
   g:["Catalyst reduced (> 95 %), bed below 29 °C and held under N₂",S=>S.V.RED>95&&S.V.TMX<29&&S.P.iso&&S.V.PR>1.5&&!S.trip],
   a:[["1 · Inerting: purge N₂ via FV-17343 until O₂ < 100 ppm",1,1,S=>{S.P.n2=275;return "N₂ purge at 275 kg/h."}],
@@ -1693,14 +1693,14 @@ SC["OPL-DC-3401A-01"]=[
 
 SC["OPL-DC-3401A-02"]=[
  {n:"O₂ freeing after catalyst loading",k:"proc",ts:300,tr:["O2"],
-  d:"The reactor has just been closed up with air inside. Purge with nitrogen until AI-3401 is below 100 ppm, with vents correctly lined up, and log it.",
+  d:"The reactor has just been closed up with air inside. Purge with nitrogen until AI-3401 is below 100 ppm with the vents lined up, and log it.",
   p:Object.assign({},inert,{n2:0,pv:0}),v:{O2:209000},g:["O₂ < 100 ppm and logged",S=>S.V.O2<100&&S.fl.logged],
   a:[["Inject N₂ through FV-17343",1,1,{n2:275}],["Purge until AI-3401 < 100 ppm",2,0,S=>`AI-3401 = ${F(S.V.O2,0)} ppm.`],
      ["Confirm vent and drain paths lined up",3,1,S=>{S.P.pv=1;return "PV-3404 vent path open — purge gas now sweeps the bed."}],
      ["Log O₂ value and time",4,1,S=>{if(S.V.O2<100)S.fl.logged=1;return S.V.O2<100?"Logged: "+F(S.V.O2,0)+" ppm.":"Not yet below 100 ppm."}],
      ["Start heating now to speed up the purge",0,-1,S=>{S.P.htr=1;S.P.spT=200;return "Heat-up is only allowed after inerting is proven."}]]},
  {n:"O₂ stalls — air ingress at M2 manway",k:"fault",ts:300,row:2,tr:["O2"],
-  d:"The purge has run for hours but AI-3401 plateaus well above 100 ppm. Is it the analyzer, or air getting in?",
+  d:"The purge has run for hours but AI-3401 stays well above 100 ppm. Check whether it is the analyzer or air getting in.",
   p:Object.assign({},inert,{air:.35}),v:{O2:2000},g:["O₂ below 100 ppm with the leak fixed",S=>S.V.O2<100&&S.P.air===0],
   a:[["Keep purging longer",0,0,()=>"The plateau will not move while air keeps entering."],
      ["Check manways and flanges for air ingress",5,1,()=>"Snoop test: bubbles at the bottom M2 manway flange."],
@@ -1726,7 +1726,7 @@ SC["OPL-DC-3401A-03"]=[
      ["Monitor TE-3401-1…8 until homogeneous",4,0,S=>`Spread ${F(S.V.SPR,0)} °C, coolest ${F(S.V.TMIN,0)} °C.`],
      ["Admit H₂ now (spread still large)",5,-1,S=>{S.P.h2=1.3;return "Uneven bed: the hot zone reduces first and runs away."}]]},
  {n:"Heater bank open circuit — slow heat-up",k:"fault",ts:900,row:1,tr:["TH","TMX"],
-  d:"Heat-up is taking far longer than the usual ~16 h and TIC-17343 cannot reach set point.",
+  d:"Heat-up is taking much longer than the usual 16 h and TIC-17343 cannot reach set point.",
   p:{cap:.45,sp:200,spT:200},v:{O2:50},g:["Heater capacity restored and TIC-17343 at set point",S=>S.P.cap===1&&S.V.TH>190],
   a:[["Raise the set point to 260 °C to compensate",0,-1,S=>{S.P.spT=260;return "Pushing the remaining elements harder overheats them (skin trip)."}],
      ["Check heater bank currents",0,1,()=>"Bank 2 draws 0 A — element bank open circuit."],
@@ -1734,7 +1734,7 @@ SC["OPL-DC-3401A-03"]=[
 
 SC["OPL-DC-3401A-04"]=[
  {n:"Exotherm running toward 230 °C",k:"fault",ts:60,tr:["TMX","H2","RED"],
-  d:"Reduction is under way but the H₂ rate was set too high. The PdO → Pd front is releasing heat faster than the N₂ can carry away.",
+  d:"Reduction has started but the H₂ rate was set too high. The PdO to Pd front releases heat faster than the N₂ can carry it away.",
   p:{h2:1.9,bed0:130,sp:200,spT:200},v:{O2:30},g:["Reduction past 60 % with the bed held below the 230 °C trip",S=>S.V.RED>60&&!S.trip&&S.P.h2<=1],
   a:[["Reduce H₂ to a constant low rate",2,1,{h2:.8}],["Increase N₂ carrier to 330 kg/h",0,1,{n2:330}],
      ["Lower TIC-17343 to 180 °C",0,1,S=>{S.P.spT=180;return "Set point lowered."}],
@@ -1749,7 +1749,7 @@ SC["OPL-DC-3401A-04"]=[
 
 SC["OPL-DC-3401A-05"]=[
  {n:"Cool-down and preservation after reduction",k:"proc",ts:600,tr:["TMX","CR","O2"],
-  d:"Reduction is complete; the catalyst is now pyrophoric. Cool slowly, switch off, isolate and hold under nitrogen. Never let air in.",
+  d:"Reduction is complete and the catalyst is now pyrophoric. Cool slowly, switch off, isolate and hold under nitrogen. Do not let air in.",
   p:{htr:1,sp:200,spT:200,U0:0,bed0:190,th0:200},v:{O2:20},g:["All bed TEs < 29 °C, held under N₂ at 2 kg/cm², no air",S=>S.V.TMX<29&&S.P.iso&&S.V.PR>1.5&&S.V.O2<100],
   a:[["Decrease TIC-17343 slowly (≤ 0.5 °C/s)",1,1,S=>{S.P.spT=25;S.P.rr=.02;return "Controlled ramp-down."}],
      ["Rapid cool-down: heater off, maximum cold N₂ flow",0,-1,S=>{S.P.htr=0;S.P.crash=1;S.P.n2=400;return "Cooling faster than 0.5 °C/s thermally shocks the internals."}],
@@ -1759,7 +1759,7 @@ SC["OPL-DC-3401A-05"]=[
 
 SC["OPL-DC-3401A-06"]=[
  {n:"TE-3401-4 open circuit hides a hot spot",k:"fault",ts:75,row:0,tr:["TMX","SPR"],
-  d:"During reduction one bed thermocouple has failed open circuit — and that is where the hot spot is developing. The 2oo3 vote only sees healthy points.",
+  d:"During reduction one bed thermocouple has failed open circuit, and the hot spot is developing at that point. The 2oo3 vote only sees the healthy points.",
   p:{h2:1.35,bed0:130,tcBad:3},v:{O2:20},init:S=>{S.fl.inh=.9},g:["Thermocouple replaced and reduction finished below 230 °C",S=>S.P.tcBad<0&&S.V.RED>90&&!S.trip],
   a:[["Verify all 8 TE readings and spread",1,1,()=>"TE-4 shows OPEN CIRCUIT — one-eighth of the profile is blind."],
      ["Flag any TC > 15 °C off its neighbours",2,0,()=>"TE-4 flagged as failed."],
@@ -1873,7 +1873,7 @@ const nl=S=>S.P.loto?null:"machine not isolated";const ok=S=>S.P.run&&!S.trip;
 
 SC["OPL-KC-4501-01"]=[
  {n:"Start from cold — pre-lube first",k:"proc",tr:["POIL","TB"],
-  d:"KC-4501 is stopped with no oil pressure. The shaft-driven pump only builds pressure once the crank turns — start without pre-lube and the bearings run dry for several seconds.",
+  d:"KC-4501 is stopped with no oil pressure. The shaft-driven pump only builds pressure once the crank turns. Starting without pre-lube leaves the bearings dry for several seconds.",
   p:{run:0},g:["Running with oil > 2 barg and undamaged bearings",S=>ok(S)&&S.V.POIL>2&&S.fl.bd<.1&&S.t-(S.fl.ts||0)>20],
   fail:S=>S.fl.bd>.3?"Crankshaft bearings scored during a dry start.":null,
   a:[["Run the auxiliary lube oil pump, build > 2 barg",1,1,S=>{S.P.aux=1;return "P1 running."}],
@@ -1883,14 +1883,14 @@ SC["OPL-KC-4501-01"]=[
      ["Jumper the oil permissive and start now",0,-1,S=>{S.P.pby=1;S.P.run=1;S.fl.ts=S.t;return "Started dry — oil pressure takes ~15 s to build from the shaft pump."}],
      ["Give the main motor start command",5,1,S=>{S.P.run=1;S.fl.ts=S.t;return "Main motor started."},start]]},
  {n:"Worn lube pump — PSLL-4504 trip",k:"fault",row:1,tr:["POIL"],
-  d:"Oil pressure is drifting down week by week. Lube oil pump gears are worn and the relief valve has crept low.",
+  d:"Oil pressure has been dropping week by week. The lube oil pump gears are worn and the relief valve setting has crept low.",
   r:{ow:[1,.004]},init:S=>{S.fl.ts=-100},g:["Pump overhauled, oil at 2.5 barg, compressor running",S=>ok(S)&&S.P.ow<.1&&!S.P.rv&&S.V.POIL>2.4],
   a:[["Switch on the auxiliary pump P1 as support",0,1,{aux:1}],["Raise the trip delay so it stops tripping",0,-1,S=>{S.P.byp=1;return "Defeating PSLL-4504 risks wiping the bearings."}],
      LT(0),["Overhaul lube pump, reset relief to 2.5 barg",0,1,S=>{S.P.ow=0;S.P.rv=0;delete S.R.ow;return "Gears renewed, relief set at 2.5 barg."},nl],UL]}];
 
 SC["OPL-KC-4501-02"]=[
  {n:"1st-stage suction plate fractured",k:"fault",row:0,tr:["TD","CAP"],
-  d:"A suction plate valve on Cyl-1 has fractured. Gas recirculates through the broken valve: capacity falls and discharge temperature climbs toward TSHH-4503 (140 °C).",
+  d:"A suction plate valve on Cyl-1 has fractured. Gas recirculates through the broken valve, capacity falls and discharge temperature climbs toward TSHH-4503 (140 °C).",
   r:{vb:[1,.006]},init:S=>{S.fl.ts=-100},g:["Complete valve set replaced, running with TD < 120 °C and full capacity",S=>ok(S)&&S.P.vb<.05&&S.V.TD<120],
   a:[LT(1,"Isolate, depressurise and N₂-purge the cylinder"),["Remove suction and discharge valve caps",2,1,()=>"Caps off — one plate visibly broken.",nl],
      ["Replace only the broken plate",0,-1,S=>{S.P.vb=.3;delete S.R.vb;S.R.vb=[1,.004];return "Mixed old/new parts fail again quickly — replace the complete set."},nl],
@@ -1924,7 +1924,7 @@ SC["OPL-KC-4501-04"]=[
 
 SC["OPL-KC-4501-05"]=[
  {n:"Crosshead pin clearance growing",k:"trend",ts:3600,tr:["VX","TB"],
-  d:"Running gear is loosening over days (one hour of plant time per second). Trend VT-4501 and plan a repair before VSHH-4505 trips at 11 mm/s.",
+  d:"The running gear is loosening over days (one hour of plant time per second). Trend VT-4501 and plan a repair before VSHH-4505 trips at 11 mm/s.",
   r:{ch:[1,1/(8*86400)]},init:S=>{S.fl.ts=-100},g:["Crosshead pin bushing renewed in a planned stop, no trip",S=>S.fl.fix&&ok(S)&&S.trips===0],
   a:[["Trend VT-4501 on the daily route",1,1,S=>`VT-4501 = ${F(S.V.VX,1)} mm/s.`],["Note alarm 8 / trip 11 mm/s",2,0,()=>"Noted."],
      ["Correlate with TE-4507 main bearing temp",3,1,S=>`TE-4507 = ${F(S.V.TB,0)} °C.`],
@@ -1934,7 +1934,7 @@ SC["OPL-KC-4501-05"]=[
 
 SC["OPL-KC-4501-06"]=[
  {n:"Liquid carry-over — auto-drain failed",k:"fault",row:null,tr:["LKO","VX"],
-  d:"The FA-4510 auto-drain has failed and liquid is building in the KO drum. At 80 % LSHH-4510 trips the machine; liquid past that point can bend a piston rod.",
+  d:"The FA-4510 auto-drain has failed and liquid is building up in the KO drum. At 80 % LSHH-4510 trips the machine. Liquid carried past that point can bend a piston rod.",
   p:{ad:0,ko:.8,lko0:40},init:S=>{S.fl.ts=-100},g:["KO level < 30 % with auto-drain repaired",S=>ok(S)&&S.V.LKO<30&&S.P.ad],
   a:[["Drain the FA-4510 boot",1,1,S=>{S.P.dr=1;return "Boot draining — closes itself at low level."}],
      ["Watch LT-4510 and LSHH-4510",2,0,S=>`LT-4510 = ${F(S.V.LKO,0)} %.`],
@@ -1944,7 +1944,7 @@ SC["OPL-KC-4501-06"]=[
 
 SC["OPL-KC-4501-07"]=[
  {n:"Intercooler fouling",k:"trend",ts:3600,tr:["T2","TD"],
-  d:"Cooling-water-side fouling builds in EA-4502 over days. The interstage temperature rises and pushes the final discharge temperature toward the 140 °C trip.",
+  d:"Cooling-water-side fouling builds up in EA-4502 over days. The interstage temperature rises and pushes the final discharge temperature toward the 140 °C trip.",
   r:{fo:[1,1/(6*86400)]},init:S=>{S.fl.ts=-100},g:["Intercooler cleaned before a trip, TD < 115 °C",S=>S.fl.fix&&ok(S)&&S.V.TD<115&&S.trips===0],
   a:[["Check interstage temperature drop",1,1,S=>`2nd-stage suction ${F(S.V.T2,0)} °C (clean ≈ 40 °C).`],["Verify jacket water flow FSL-4508",2,1,()=>"CW flow normal."],
      ["Clean intercooler tubes (planned stop)",3,1,S=>{if(S.V.T2<48)return "Approach still fine.";S.P.fo=0;delete S.R.fo;S.fl.fix=1;S.P.run=0;return "Tubes cleaned. Pre-lube and restart."}],
@@ -2028,7 +2028,7 @@ const ok=S=>S.P.fl&&!S.P.loto;
 
 SC["OPL-EA-5601-01"]=[
  {n:"Tube-side fouling — duty falling",k:"fault",ts:4000,row:0,tr:["PDT","TO"],
-  d:"Polymer fines are fouling the tube bores (about 1 h of plant time per second). PDT-5605 rises past 0.7 bar and TV-5602 saturates — the outlet can no longer reach 95 °C.",
+  d:"Polymer fines are fouling the tubes (about 1 h of plant time per second). PDT-5605 rises past 0.7 bar and TV-5602 saturates, so the outlet can no longer reach 95 °C.",
   p:{fo:.55},r:{fo:[1,1/(5*86400)]},g:["Cleaned, re-gasketed and back at 95 °C with dP < 0.5 bar",S=>ok(S)&&S.P.fo<.1&&S.V.PDT<.5&&S.V.TO>93&&S.P.gk<.2],
   a:[LT(1),["Open the channel cover, remove the old gasket",2,1,()=>"Channel open.",nl],
      ["Hydrojet all 246 tube bores, inspect for pitting",3,1,S=>{S.P.fo=0;delete S.R.fo;return "Tubes hydrojetted, no pitting found."},nl],
@@ -2049,7 +2049,7 @@ SC["OPL-EA-5601-02"]=[
 
 SC["OPL-EA-5601-03"]=[
  {n:"Trap failed CLOSED — shell flooding",k:"fault",row:null,tr:["LCN","TO","TCN"],
-  d:"ST-5604 has failed closed. Condensate backs up into the shell, drowning tube area — the outlet temperature falls although TV-5602 opens fully.",
+  d:"ST-5604 has failed closed. Condensate backs up into the shell and covers tube area. The outlet temperature falls even though TV-5602 is fully open.",
   p:{tp:1},g:["Trap replaced, pot level normal, outlet at 95 °C",S=>ok(S)&&!S.P.tp&&S.V.LCN<30&&S.V.TO>93],
   a:[["Compare TI-5604 with steam temperature",1,1,S=>`TI-5604 = ${F(S.V.TCN,0)} °C vs steam ≈ 170 °C → ${S.P.tp===1?"cold trap = flooding":"normal"}.`],
      ["Ultrasonic / listening-stick check",2,1,()=>"No cycling noise — trap not discharging."],
@@ -2057,7 +2057,7 @@ SC["OPL-EA-5601-03"]=[
      ["Raise TIC set point to 110 °C to compensate",0,-1,S=>{S.P.spT=110;return "More set point cannot heat through flooded tubes."}],
      ["Replace the trap element",5,1,{tp:0}]]},
  {n:"Trap failed OPEN — live steam blowing",k:"fault",row:2,tr:["STM","TCN"],
-  d:"Steam use is up and the condensate header is blowing live steam: the trap element has failed open.",
+  d:"Steam use is up and live steam is blowing into the condensate header. The trap element has failed open.",
   p:{tp:-1},g:["Trap repaired and steam use normal",S=>ok(S)&&!S.P.tp&&S.V.STM<1.2],
   a:[["Compare TI-5604 with steam temperature",1,1,S=>`TI-5604 = ${F(S.V.TCN,0)} °C — continuously hot = leak-through.`],
      ["Ultrasonic check",2,1,()=>"Continuous flow noise — failed open."],["Replace the trap element",5,1,{tp:0}],
@@ -2065,7 +2065,7 @@ SC["OPL-EA-5601-03"]=[
 
 SC["OPL-EA-5601-04"]=[
  {n:"Start-up from cold",k:"proc",tr:["TO","RATE"],
-  d:"The heater is cold and empty of flow. Bring it to 95 °C without thermally shocking the tube-to-tubesheet joints (keep the outlet change below about 5 °C/min).",
+  d:"The heater is cold with no flow. Bring it to 95 °C without thermal shock to the tube-to-tubesheet joints (keep the outlet change below about 5 °C/min).",
   p:{fl:0,au:0,tv:0,sp:30,spT:30},v:{TO:30},init:S=>{S.fl.t0=30},g:["At 93–97 °C with thermal stress < 50 %",S=>ok(S)&&S.V.TO>93&&S.V.TO<97&&S.fl.sh<.5&&S.P.au],
   a:[["Establish solvent (tube-side) flow first",1,1,{fl:1}],
      ["Open TV-5602 100 % in manual",0,-1,S=>{S.P.au=0;S.P.tv=1;S.P.stm=1;return "Full steam on a cold bundle — fast, uneven expansion."}],
@@ -2076,7 +2076,7 @@ SC["OPL-EA-5601-04"]=[
 
 SC["OPL-EA-5601-05"]=[
  {n:"Steam leaking into the solvent",k:"fault",tr:["H2O","TO"],
-  d:"Water is appearing in the solvent and the outlet runs above set point: a tube has started leaking.",
+  d:"Water is showing up in the solvent and the outlet runs above set point. A tube has started leaking.",
   r:{lk:[.6,.004]},g:["Leaking tube plugged both ends, back in service with dry solvent",S=>ok(S)&&S.P.lk===0&&S.V.H2O<50&&S.P.pl>0],
   a:[LT(1),["Bubble-test to find the leaking tube",2,1,()=>"Tube row 7, position 12 bubbling.",nl],
      ["Plug only the inlet end",0,-1,S=>{S.P.lk=.3;delete S.R.lk;S.P.pl+=1;return "A tube plugged at one end still leaks from the other."},nl],
@@ -2099,13 +2099,13 @@ SC["OPL-EA-5601-06"]=[
 
 SC["OPL-EA-5601-07"]=[
  {n:"Blocked-in with steam on, PSV isolation closed",k:"bad",ts:5,tr:["PT"],
-  d:"Solvent inlet and outlet were closed for a downstream job while steam stayed on. Worse, the PSV-5607 car-seal isolation was found closed. Trapped hexane is expanding.",
+  d:"Solvent inlet and outlet were closed for a downstream job while steam stayed on. The PSV-5607 car-seal isolation was also found closed. The trapped hexane is expanding.",
   p:{blk:1,cso:0,fl:0},g:["Tube-side pressure < 12 barg, PSV car-sealed open, steam isolated",S=>S.V.PT<12&&S.P.cso&&(!S.P.stm||S.P.tv<.02)],
   a:[["Verify PSV-5607 isolation car-sealed OPEN",3,1,{cso:1}],["Close TV-5602 / isolate steam",0,1,S=>{S.P.stm=0;S.P.au=0;S.P.tv=0;return "Steam isolated."}],
      ["Re-open the solvent path",0,1,S=>{S.P.blk=0;S.P.fl=1;return "Path open — pressure relieved downstream."}],
      ["Confirm PSV set 16 barg on nameplate",1,0,()=>"Nameplate 16 barg."],["Never block-in a live PSV without a spare",5,0,()=>"Understood."]]},
  {n:"Statutory pop test",k:"proc",tr:["PT"],
-  d:"PSV-5607 is due for its off-line pop test. The bench will reveal whether the set pressure has drifted.",
+  d:"PSV-5607 is due for its off-line pop test. The bench test shows whether the set pressure has drifted.",
   p:{psv:17.2},g:["Overhauled, set at 16 barg and certified",S=>S.P.psv===16&&S.fl.cert],
   a:[["Confirm nameplate set 16 barg",1,1,()=>"16 barg."],["Off-line pop test on the bench",2,1,S=>`Popped at ${F(S.P.psv,1)} barg.`],
      ["Accept — within 10 %",0,-1,()=>"Drift above set means the exchanger can exceed design before relief."],
@@ -2192,7 +2192,7 @@ SC["OPL-LV-6701-01"]=[
 
 SC["OPL-LV-6701-02"]=[
  {n:"Filter-regulator clogging, water in bowl",k:"fault",ts:4,tr:["PA","LV","POS"],
-  d:"Wet, dirty instrument air is clogging the filter-regulator. Supply to the positioner sags, the valve gets sluggish, then PSL-6702 vents the actuator and the valve fails closed — level rises.",
+  d:"Wet, dirty instrument air is clogging the filter-regulator. Supply to the positioner drops and the valve gets sluggish. Then PSL-6702 vents the actuator, the valve fails closed and the level rises.",
   r:{fi:[.9,.004]},g:["Air ≥ 1.3 barg, valve back in AUTO with level 40–60 %",S=>S.V.PA>=1.3&&S.P.au&&S.V.LV>40&&S.V.LV<60&&!S.fl.vent],
   a:[["Check PI-6702 is 1.4 barg",1,1,S=>`PI-6702 = ${F(S.V.PA,2)} barg.`],["Drain the filter-regulator bowl",2,1,S=>{S.P.fi=Math.max(0,S.P.fi-.3);return "Water drained."}],
      ["Replace the clogged filter element",3,1,S=>{S.P.fi=0;delete S.R.fi;S.fl.vent=0;return "Element replaced."}],
@@ -2201,7 +2201,7 @@ SC["OPL-LV-6701-02"]=[
 
 SC["OPL-LV-6701-03"]=[
  {n:"Over-tight packing — stem sticking",k:"fault",row:0,tr:["LV","POS"],
-  d:"Packing was cranked down to stop a weep. Now the stem sticks and slips, and the separator level cycles.",
+  d:"The packing was tightened hard to stop a weep. Now the stem sticks and slips, and the separator level cycles.",
   p:{st:.45},g:["Smooth travel, level cycling < 4 %",S=>S.P.st<.1&&osc(S)<4&&S.P.au&&S.P.bk],
   a:[BY,["Isolate the valve and depressurise before packing work",1,1,S=>{S.P.bk=0;return "Blocks closed, body depressurised."},S=>S.P.hv>0?null:"open the bypass first or the level will run away"],
      ["Back off and snug packing nuts evenly in small steps",2,1,S=>{S.P.st=.04;S.P.lo=.1;return "Packing snug, even."},S=>S.P.bk?"valve not isolated":null],
@@ -2214,7 +2214,7 @@ SC["OPL-LV-6701-03"]=[
 
 SC["OPL-LV-6701-04"]=[
  {n:"Positioner gain too high — level cycling",k:"fault",row:1,tr:["LV","POS","OUT"],
-  d:"After a firmware update the positioner tuning is far too aggressive. The valve overshoots and the separator level cycles.",
+  d:"After a firmware update the positioner tuning is too aggressive. The valve overshoots and the separator level cycles.",
   p:{gn:3.2},g:["Level steady (cycling < 3 %) in AUTO",S=>S.P.gn<=1.5&&S.P.gn>=.6&&osc(S)<3],
   a:[["Step LIC output and watch the response",1,1,()=>"Overshoot ≈ 35 %, ringing."],["Check ZSL/ZSH feedback",2,0,()=>"Limit switches healthy."],
      ["Tune positioner gain to a stable, prompt setting",3,1,{gn:1}],["Set gain very low to be safe",0,-1,S=>{S.P.gn=.3;return "Sluggish valve — the level now wanders."}],
@@ -2222,7 +2222,7 @@ SC["OPL-LV-6701-04"]=[
 
 SC["OPL-LV-6701-05"]=[
  {n:"Isolate LV-6701 using HV-6701 bypass",k:"proc",tr:["LV"],
-  d:"Maintenance needs LV-6701. Keep FA-6710 level safe on the manual bypass, then put everything back. Order matters.",
+  d:"Maintenance needs LV-6701. Hold the FA-6710 level on the manual bypass, then restore everything. The order matters.",
   g:["Valve isolated on bypass with level held, then restored to AUTO",S=>S.fl.isoOK&&S.P.bk&&S.P.hv===0&&S.P.au&&Math.abs(S.V.LV-50)<8],
   a:[["Notify panel, take LIC-6701 to MANUAL",1,1,S=>{S.P.au=0;S.P.mo=S.fl.out;return "Manual at "+F(S.fl.out,0)+" %."}],
      ["Crack open HV-6701 slowly",2,1,{hv:.2}],["Throttle HV-6701 +10 %",3,1,S=>{S.P.hv=CL(S.P.hv+.1);return "HV "+F(S.P.hv*100,0)+" %"}],["Throttle HV-6701 −10 %",3,1,S=>{S.P.hv=CL(S.P.hv-.1);return "HV "+F(S.P.hv*100,0)+" %"}],
@@ -2238,14 +2238,14 @@ SC["OPL-LV-6701-06"]=[
      ["Time the closure (≤ 5 s)",3,1,S=>S.fl.cls!=null?`Closed in ${F(S.fl.cls,1)} s.`:"Not closed yet."],["Check ZSL-6701 on DCS",4,1,S=>{if(S.V.POS<2)S.fl.zsl=1;return S.V.POS<2?"ZSL-6701 made.":"ZSL not made."}],
      ["Reset ESD, return valve to AUTO",5,1,S=>{S.P.esd=0;S.P.au=1;S.fl.I=0;return "Reset."}]]},
  {n:"Slow closure — exhaust port blocked",k:"fault",tr:["POS"],
-  d:"The solenoid exhaust is partly blocked by an insect nest. Will the valve still close in time?",
+  d:"The solenoid exhaust is partly blocked by an insect nest. Check whether the valve still closes in time.",
   p:{vb:.8},g:["Re-test passes ≤ 5 s",S=>S.fl.cls!=null&&S.fl.cls<=5&&!S.P.esd&&S.P.vb===0],
   a:[["Trip XV-6701 and time the closure",[1,3],1,S=>{S.P.esd=1;S.fl.t0=S.t;S.fl.cls=null;return "Timing…"}],["Accept 11 s — it still closes",0,-1,()=>"5 s is the safety requirement."],
      ["Clean / replace the solenoid exhaust",0,1,{vb:0}],["Reset ESD",5,1,S=>{S.P.esd=0;S.P.au=1;return "Reset."}]]}];
 
 SC["OPL-LV-6701-07"]=[
  {n:"Hardened diaphragm splitting",k:"fault",ts:2,tr:["POS","LV"],
-  d:"The Fisher 667 diaphragm has hardened and is splitting. Air bleeds continuously and the valve cannot reach full travel; at high inflow the level climbs.",
+  d:"The Fisher 667 diaphragm has hardened and is splitting. Air bleeds off continuously and the valve cannot reach full travel. At high inflow the level rises.",
   p:{inf:1.35},r:{dp:[.85,.006]},g:["Diaphragm replaced, full 38 mm travel, level controlled",S=>S.P.dp===0&&S.P.au&&S.V.LV<60&&S.fl.rc],
   a:[["Inspect the diaphragm (listen for air)",1,1,()=>"Hiss at the diaphragm case — perished fabric."],["Check bench set 0.2–1.0 barg",2,0,()=>"Bench set OK."],BY,
      ["Isolate LV-6701 with the block valves",0,1,{bk:0},S=>S.P.hv>0?null:"open the bypass first"],
@@ -2333,7 +2333,7 @@ const nl=S=>S.P.loto?null:"fan not locked out";const ok=S=>S.P.run&&!S.trip;
 
 SC["OPL-CT-7801-01"]=[
  {n:"Leaves and bio-growth clogging the barscreen",k:"fault",ts:120,row:0,tr:["DL","CWF","TB"],
-  d:"Debris is building on the suction barscreen (2 minutes of plant time per second). Differential level rises, CW pump flow falls and the whole unit loses cooling.",
+  d:"Debris is building up on the suction bar screen (2 minutes of plant time per second). The differential level rises, CW pump flow falls and the whole unit loses cooling.",
   r:{sc:[.95,1/9000]},g:["Screen clear, CW flow > 95 %, fouling rate addressed",S=>S.V.DL<6&&S.V.CWF>95&&S.fl.rep],
   a:[["Rake the SS304 barscreen",[1,2],1,S=>{S.P.sc=Math.max(0,S.P.sc-.85);return "Raked clear — leaves and slime removed."}],
      ["Check differential level across the screen",3,1,S=>`Differential ${F(S.V.DL,0)} cm.`],["Dispose of debris, log the cleaning",4,0,()=>"Logged."],
@@ -2371,12 +2371,12 @@ SC["OPL-CT-7801-04"]=[
      ["Cross-check with a lab titration",3,1,S=>`Lab pH ${F(S.V.PH-S.P.pho,2)}.`],["Double the dosing set point to catch up",4,-1,S=>{S.P.dsp=1;return "Overdosing drives pH below 7 — corrosion."}],
      ["Set dosing set point back to normal",4,1,{dsp:.5}],["Report swing to water treatment",5,0,()=>"Reported."]]},
  {n:"pH electrode drift",k:"fault",ts:600,row:0,tr:["PH"],
-  d:"AI-7805 reads 7.0, but the scale on the fill says otherwise.",p:{pho:-1.1,ds:1,dsp:.7},g:["Electrode recalibrated and true pH in range",S=>S.P.pho===0&&S.V.PH>7&&S.V.PH<8.5],
-  a:[["Cross-check with a lab titration",3,1,S=>`Lab pH ${F(S.V.PH-S.P.pho,2)} vs AI-7805 ${F(S.V.PH,2)}.`],["Recalibrate AI-7805 on buffers, replace electrode",0,1,{pho:0}],["Reduce acid to bring the reading up",0,-1,()=>"This would pursue a faulty reading."],["Restore dosing set point",4,1,{dsp:.5}]]}];
+  d:"AI-7805 reads 7.0, but the scale on the fill points to a different pH.",p:{pho:-1.1,ds:1,dsp:.7},g:["Electrode recalibrated and true pH in range",S=>S.P.pho===0&&S.V.PH>7&&S.V.PH<8.5],
+  a:[["Cross-check with a lab titration",3,1,S=>`Lab pH ${F(S.V.PH-S.P.pho,2)} vs AI-7805 ${F(S.V.PH,2)}.`],["Recalibrate AI-7805 on buffers, replace electrode",0,1,{pho:0}],["Reduce acid to bring the reading up",0,-1,()=>"That chases a faulty reading."],["Restore dosing set point",4,1,{dsp:.5}]]}];
 
 SC["OPL-CT-7801-05"]=[
  {n:"Scaled fill and displaced eliminators",k:"trend",ts:20000,tr:["TB"],
-  d:"Over months the fill scales and several drift-eliminator packs have shifted. Basin temperature creeps up and drift loss grows.",
+  d:"Over months the fill scales and several drift-eliminator packs have shifted. Basin temperature creeps up and drift loss increases.",
   p:{fil:.5,de:.6},r:{fil:[1,1/(120*86400)]},g:["Basin temperature below 31 °C, packs aligned",S=>S.V.TB<31&&S.P.de<.1],
   a:[["Inspect PVC fill for scaling and collapse",1,1,S=>`Scale ${F(S.P.fil*100,0)} % of the pack area.`],["Re-seat drift eliminator packs",2,1,{de:0}],LT(0),
      ["Hose down fouled fill during outage",3,1,S=>{S.P.fil=Math.max(0,S.P.fil-.45);return "Fill cleaned."},nl],UL,
@@ -2392,7 +2392,7 @@ SC["OPL-CT-7801-06"]=[
 
 SC["OPL-CT-7801-07"]=[
  {n:"Blowdown valve XV-7806 failed closed",k:"fault",ts:2400,tr:["COND"],
-  d:"XV-7806 has seized closed. Cycles of concentration climb, and conductivity heads past 2400 µS/cm — scaling risk.",
+  d:"XV-7806 has seized closed. Cycles of concentration climb and conductivity heads past 2400 µS/cm, which risks scaling.",
   p:{bd:0},init:S=>{S.fl.coc=5},g:["Conductivity < 2000 µS/cm with automatic blowdown working",S=>S.V.COND<2000&&S.P.bd],
   a:[["Read AI-7806 conductivity",1,1,S=>`AI-7806 ${F(S.V.COND,0)} µS/cm.`],["Verify XV-7806 operates",2,1,()=>"Commanded open — no movement, stem seized."],
      ["Free / repair XV-7806",0,1,{bd:1}],["Increase make-up water only",0,-1,()=>"Without blowdown, dissolved solids stay in the loop."],
@@ -2477,7 +2477,7 @@ EQ[8].P0.in0f=()=>1;
 const ok=S=>!S.trip;
 SC["OPL-FA-8901-01"]=[
  {n:"LT-8901 zero drift — reading low",k:"fault",row:0,tr:["LT","LG"],
-  d:"LT-8901 is drifting low. LIC-8901 believes the drum is half full and holds back reflux, so the real level climbs toward LSHH-8901 (85 %) and a column-feed trip.",
+  d:"LT-8901 is drifting low. LIC-8901 reads the drum as half full and holds back reflux, so the real level climbs toward LSHH-8901 (85 %) and a column-feed trip.",
   r:{ld:[-28,.08]},g:["Transmitter agrees with the gauge and level is 40–60 %",S=>Math.abs(S.P.ld)<1&&S.fl.L>40&&S.fl.L<60&&!S.trip],
   a:[["Cross-check LT-8901 against the bridle gauge",1,1,S=>`LT-8901 ${F(S.V.LT,0)} % vs gauge ${F(S.V.LG,0)} % — ${Math.abs(S.P.ld)>3?"transmitter off by "+F(-S.P.ld,0)+" %":"agree"}.`],
      ["Blow down the bridle",2,1,S=>{S.P.br=0;return "Bridle blown down — gauge live."}],["Confirm LSHH / LSLL switch actions",3,0,()=>"Both switches tested OK."],
@@ -2485,13 +2485,13 @@ SC["OPL-FA-8901-01"]=[
      ["Recalibrate LT-8901",5,1,S=>{S.P.ld=0;delete S.R.ld;S.P.au=1;return "Recalibrated against the gauge; back in AUTO."}],
      ["Trust the transmitter — gauges are old",0,-1,()=>"The transmitter is the instrument drifting."]]},
  {n:"Bridle plugged — gauge frozen",k:"fault",tr:["LT","LG"],
-  d:"The gauge glass sits at exactly 50 % no matter what. The bridle connections are plugged.",
+  d:"The gauge glass stays at exactly 50 % whatever the level does. The bridle connections are plugged.",
   p:{br:1,in:1.2},g:["Gauge live and agreeing with LT-8901",S=>!S.P.br&&Math.abs(S.V.LG-S.V.LT)<2],
   a:[["Cross-check LT-8901 against the gauge",1,1,S=>`LT ${F(S.V.LT,0)} % vs gauge ${F(S.V.LG,0)} % (not moving).`],["Blow down the bridle",2,1,{br:0}],["Recalibrate LT-8901 to match the gauge",0,-1,()=>"Calibrating a good transmitter to a frozen gauge."]]}];
 
 SC["OPL-FA-8901-02"]=[
  {n:"Cooling lost — PSV isolation found closed",k:"bad",tr:["PR"],
-  d:"Overhead condenser cooling is failing and drum pressure is rising faster than PCV-8905 can vent. On the walk-round, the PSV-8901 inlet isolation is found closed.",
+  d:"Overhead condenser cooling is failing and drum pressure is rising faster than PCV-8905 can vent. On the walk-round the PSV-8901 inlet isolation is found closed.",
   p:{ci:0},r:{op:[1,.01]},g:["Pressure back below 5 barg with PSV car-sealed OPEN",S=>S.P.ci&&S.V.PR<5],
   a:[["Verify PSV-8901 isolation is car-sealed OPEN",3,1,{ci:1}],["Confirm PSV set 10 barg",1,0,()=>"10 barg."],
      ["Restore condenser cooling (reduce reboil)",0,1,S=>{S.P.op=0;delete S.R.op;return "Reboil cut; condenser restored."}],
@@ -2504,7 +2504,7 @@ SC["OPL-FA-8901-02"]=[
 
 SC["OPL-FA-8901-03"]=[
  {n:"Boot filling with water",k:"fault",ts:8,tr:["IF"],
-  d:"Water make has increased. The boot interface climbs; at the top it carries water into the reflux pump. Drain it — and stop before hexane breaks through.",
+  d:"Water make has increased. The boot interface rises and at the top it carries water into the reflux pump. Drain it, and stop before hexane breaks through.",
   p:{wi:.5},init:S=>{S.fl.I=55},g:["Interface 15–45 %, drained at least once, water make reported",S=>S.fl.I>15&&S.fl.I<45&&S.fl.drained&&S.P.wi<.3&&!S.P.dr],
   a:[["Monitor LT-8903 interface",1,1,S=>`LT-8903 ${F(S.V.IF,0)} %.`],["Open HV-8904 boot drain",2,1,S=>{S.P.dr=1;S.fl.drained=1;return "Draining to the oily-water sewer."}],
      ["Close HV-8904 before hydrocarbon breaks through",3,1,{dr:0}],["Log the drain volume",4,0,()=>"Logged."],["Report rising water make",5,1,{wi:.15}],
@@ -2512,36 +2512,36 @@ SC["OPL-FA-8901-03"]=[
 
 SC["OPL-FA-8901-04"]=[
  {n:"N₂ header lost while the drum cools",k:"fault",ts:10,tr:["PR","O2"],
-  d:"At night the N₂ header failed and the overhead is cooling. Pressure falls toward atmospheric and air can be drawn in.",
+  d:"The N₂ header failed overnight and the overhead is cooling. Pressure falls toward atmospheric and air can be drawn in.",
   p:{n2:0},r:{cool:[1,.004]},g:["Blanket restored: pressure ≈ 3 barg and O₂ < 1 %",S=>S.P.n2&&Math.abs(S.V.PR-3)<.4&&S.V.O2<1],
   a:[["Verify PCV-8905 holds PT-8902",1,1,S=>`PT-8902 ${F(S.V.PR,2)} barg — PCV-A fully open, no N₂ flowing.`],["Check N₂ supply header pressure",5,1,()=>"Header at 0.4 barg — supply failure."],
      ["Switch to back-up N₂ bottle bank",4,1,{n2:1}],["Open the vent to equalise with atmosphere",0,-1,()=>"That invites air straight in."]]},
  {n:"Split-range overlap — PCV hunting",k:"fault",row:1,tr:["PR"],
-  d:"PCV-8905 A and B overlap: N₂ and vent valves fight each other and pressure swings.",
+  d:"PCV-8905 A and B overlap, so the N₂ and vent valves work against each other and pressure swings.",
   p:{pc:1},g:["Pressure steady at 3 barg",S=>!S.P.pc&&Math.abs(S.V.PR-3)<.2],
   a:[["Watch PT-8902 trend",1,0,()=>"Cycling ± 0.8 bar."],["Re-tune the split range (no overlap)",0,1,{pc:0}],["Put both PCVs in manual open",0,-1,()=>"N₂ straight to flare."]]}];
 
 SC["OPL-FA-8901-05"]=[
  {n:"Reflux pump on an LSLL bypass",k:"bad",tr:["LT","PV"],
-  d:"LSLL-8901 was bypassed for a test and never removed. A column upset cuts the overhead flow; the drum empties and the pump starts to cavitate.",
+  d:"LSLL-8901 was bypassed for a test and the bypass was never removed. A column upset cuts the overhead flow, the drum empties and the pump starts to cavitate.",
   p:{lb:1},r:{in:[.2,.02]},g:["Pump protected (no cavitation damage) and level recovering above 25 %",S=>!S.P.lb&&S.fl.pd<.4&&S.fl.L>25&&S.P.in>.9],
   a:[["Remove the LSLL-8901 bypass",0,1,{lb:0}],["Switch LIC to MANUAL, cut reflux",0,1,S=>{S.P.au=0;S.P.pm=0;return "Reflux pump stopped."}],
      ["Restore column overhead (process)",0,1,S=>{delete S.R.in;S.P.in=1;return "Column stabilised."}],["Keep pumping — the column needs reflux",0,-1,()=>"Cavitation is destroying the pump."]]},
  {n:"LSLL-8901 proof test",k:"proc",tr:["LT"],
-  d:"Prove that the low-low level switch stops the reflux pump. Lower the level in manual and watch the trip.",
+  d:"Prove that the low-low level switch stops the reflux pump. Lower the level in manual and check the trip.",
   g:["LSLL trip demonstrated and pump restarted",S=>S.trips>0&&S.P.pm&&S.fl.L>30],
   a:[["LIC to MANUAL, raise reflux to draw level down",0,1,S=>{S.P.au=0;S.P.in0f=()=>1.8;return "Drawing level down."}],["Restore normal reflux",0,1,S=>{S.P.in0f=()=>1;S.P.au=1;return "Normal."}],["Restart pump after reset",0,1,{pm:1},S=>S.trip?"reset first":null]]}];
 
 SC["OPL-FA-8901-06"]=[
  {n:"Boot wall thinning under the water phase",k:"trend",ts:4e5,tr:["WT"],
-  d:"The water-wetted boot corrodes slowly (≈ 12 days of plant time per second). Survey, slow the corrosion and plan repair before the 9 mm minimum.",
+  d:"The water-wetted boot corrodes slowly (about 12 days of plant time per second). Survey it, slow the corrosion and plan the repair before the wall reaches the 9 mm minimum.",
   p:{cr:1.2},init:S=>{S.fl.wt=10.6},g:["Corrosion slowed and repair planned with wall ≥ 9.5 mm",S=>S.fl.plan&&S.P.cr<.5&&S.fl.wt>=9.5],
   a:[["UT survey of boot and shell bottom",0,1,S=>`Boot ${F(S.fl.wt,2)} mm; rate ≈ ${F(S.P.cr,2)} mm/yr.`],["Drain the boot more often",0,1,S=>{S.P.cr*=.7;return "Less water contact."}],
      ["Inject neutraliser / corrosion inhibitor",0,1,S=>{S.P.cr*=.5;return "Inhibitor programme started."}],["Plan repair in the next turnaround (RBI)",0,1,S=>{S.fl.plan=1;return "Logged in the RBI file."}]]}];
 
 SC["OPL-FA-8901-07"]=[
  {n:"Manway box-up after inspection",k:"proc",tr:["PR"],
-  d:"Internal inspection complete. Box up with the right gasket and bolt torque and prove tightness at 3 barg N₂.",
+  d:"Internal inspection is complete. Close up with the right gasket and bolt torque and prove tightness at 3 barg N₂.",
   p:{mw:.7,n2:0,P0:0,op:0},init:S=>{S.fl.P=0},g:["Tight at 3 barg after correct gasket and torque",S=>S.P.mw<.05&&S.fl.press&&S.V.PR>2.8],
   a:[["Fit a new spiral-wound gasket",0,1,S=>{S.P.mw=.3;S.fl.ng=1;return "New gasket."}],["Reuse the old gasket",0,-1,S=>{S.fl.ng=0;return "Single-use gasket."}],
      ["Torque bolts in a cross pattern",0,1,S=>{S.P.mw=S.fl.ng?0:.4;return "Torqued in passes."}],["Pressurise with N₂ to 3 barg",0,1,S=>{S.P.n2=1;S.fl.press=1;return "Pressurising."}],

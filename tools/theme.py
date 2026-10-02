@@ -20,5 +20,5 @@ def strip_emoji(h):
 def remap(h):
     return re.sub(r'#[0-9a-fA-F]{6}\b',lambda m:HEXMAP.get(m.group(0).lower(),m.group(0)),h)
 def dashes(h):
-    h=h.replace(' — ',' - ').replace('—','-').replace('–','-')
+    h=h.replace(' — ',', ').replace('—','-').replace('–','-')
     return h
