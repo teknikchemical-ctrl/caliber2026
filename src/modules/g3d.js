@@ -239,7 +239,7 @@ function g3Init(box){const id=box.id,o=G3.cfg[id];if(!o)return;box.setAttribute(
  g3Draw(id)}
 function g3Scan(){document.querySelectorAll(".g3box:not([data-ok])").forEach(b=>{if(!b.hidden&&!b.closest("[hidden]"))g3Init(b)});
  const keep=new Set([...document.querySelectorAll(".g3box")].map(b=>b.id));Object.keys(G3.inst).forEach(id=>{if(!keep.has(id)){delete G3.inst[id];delete G3.cfg[id]}})}
-function g3Loop(now){requestAnimationFrame(g3Loop);Object.keys(G3.inst).forEach(id=>{const I=G3.inst[id],box=document.getElementById(id);if(!box||box.hidden||box.closest("[hidden]"))return;if(now-(I.drawn||0)<33)return;const dt=Math.min(.1,(now-I.last)/1000);I.last=now;
+function g3Loop(now){requestAnimationFrame(g3Loop);if(document.hidden)return;Object.keys(G3.inst).forEach(id=>{const I=G3.inst[id],box=document.getElementById(id);if(!box||box.hidden||box.closest("[hidden]"))return;if(now-(I.drawn||0)<33)return;const dt=Math.min(.1,(now-I.last)/1000);I.last=now;
   I.clock=(I.clock||0)+dt;const fo=G3.cfg[id].fx&&G3.cfg[id].fx();if(fo)I.dirty=true;if(I.spin&&!I.drag){I.yaw+=dt*.45;I.dirty=true}if(I.run&&!(fo&&fo.state==='trip')&&(G3M[G3.cfg[id].n]||[]).some(p=>p.anim)){I.t+=dt;I.dirty=true}
   const sel=I.pin||(G3.cfg[id].sel?G3.cfg[id].sel():null);if(sel!==I.lastSel){I.lastSel=sel;I.dirty=true}
   if(I.needHi&&now-(I.lastMove||0)>320&&!I.drag&&!I.spin&&!((G3M[G3.cfg[id].n]||[]).some(p=>p.anim)&&I.run)){I.needHi=false;I.dirty=true}

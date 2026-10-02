@@ -30,3 +30,9 @@ AI.tools.failure_modes={description:"Failure modes of the plant or one equipment
   const hits=K.issues.filter(x=>/High|Medium/i.test(x.severity||"")&&[...tags].some(t=>(x.issue+" "+x.source+" "+x.suggested_action).includes(t)));
   if(!hits.length)return h;const note=`<div class="note-warn" style="margin-top:6px"><b>Open document conflict.</b> ${esc(String(hits[0].issue).slice(0,150))}${hits.length>1?` (and ${hits.length-1} more)`:""}. Check the field before acting. <a class="alink" onclick="go('quality')">Open the register</a></div>`;
   let r=h.replace(/<div id="why-[^"]*"><\/div>/,x=>note+x);if(r===h)r=h.replace(/<div class="src">/,note+'<div class="src">');if(r===h)r=h.replace(/<\/div>$/,note+"</div>");return r}}
+
+/* an answer built on a draft or unapproved source says so */
+{const _m2=aiMsgHtml;aiMsgHtml=function(id,m,i){const h=_m2.apply(this,arguments);if(!m||m.role==="u"||m.live||!m.sources)return h;
+  const weak=m.sources.filter(s=>s.status&&/^(Draft|In review|Superseded)/i.test(s.status));if(!weak.length)return h;
+  const note=`<div class="note-warn" style="margin-top:6px"><b>Not fully approved.</b> ${weak.length} of ${m.sources.length} source${m.sources.length===1?"":"s"} ${weak.length===1?"is":"are"} ${[...new Set(weak.map(s=>s.status.toLowerCase()))].join(" or ")}. Confirm with the document owner before acting on it.</div>`;
+  let r=h.replace(/<div class="src">/,note+'<div class="src">');return r===h?h.replace(/<\/div>$/,note+"</div>"):r}}

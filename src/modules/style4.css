@@ -244,3 +244,10 @@ aside{overflow-y:auto}
 .pd2seg{display:flex;flex-wrap:wrap;height:auto}.pd2seg button{flex:0 1 auto}
 .rdyic{display:inline-block;width:20px;height:20px;border-radius:50%;text-align:center;line-height:20px;font-size:12px;font-weight:700;color:#fff}.rdyic.ok{background:#1a7f37}.rdyic.warn{background:#c77700}.rdyic.bad{background:#cf222e}.rdyic.muted{background:#5c6b7b}
 .rdyv{color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;font-size:15px;letter-spacing:.02em}
+#plerr{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:9999;background:#fdecea;border:1px solid #f1b6bb;color:#7a1f26;border-radius:10px;padding:10px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:90vw;font-size:13px}
+#plhelp{position:fixed;inset:0;background:rgba(15,42,74,.45);z-index:9998;display:flex;align-items:center;justify-content:center}.plhelp-in{background:#fff;border-radius:12px;padding:18px 20px;width:min(520px,92vw);box-shadow:0 20px 50px rgba(0,0,0,.3)}kbd{background:#eef2f7;border:1px solid #cfd8e3;border-bottom-width:2px;border-radius:5px;padding:1px 6px;font:12px monospace}
+.plattn{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 4px}.plattn-h{font-weight:700;font-size:13px;color:#0f2a4a;margin-right:4px}
+.plat{display:flex;align-items:baseline;gap:6px;border:1px solid #cfd8e3;background:#fff;border-radius:999px;padding:5px 12px;cursor:pointer;font-size:12.5px;color:#1d2b3d}.plat b{font-size:15px}.plat.bad{border-color:#f1b6bb;background:#fdecea}.plat.bad b{color:#cf222e}.plat.warn{border-color:#f0d9a8;background:#fff6e0}.plat.warn b{color:#9a6700}.plat.ok b{color:#1a7f37}
+abbr[title]{text-decoration:underline dotted;text-underline-offset:2px;cursor:help}
+@media (max-width:1000px){.split{grid-template-columns:minmax(0,1fr)!important}.hseform{grid-template-columns:1fr}.hse3{height:460px}}
+@media print{.side,.sidebar,nav,.nav,button,.hsetl,.p3tools{display:none!important}body{background:#fff}.card{box-shadow:none;break-inside:avoid}}

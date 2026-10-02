@@ -31,6 +31,17 @@ A simple sign-in screen, for the demo and not for security: the account list is 
 - Interface language switch (English or Bahasa Indonesia); questions in Bahasa are understood by the offline search
 - Installable as an app, and the page opens offline from the service worker (served sites only)
 - Ctrl+K searches everything
+- Equipment drawings and the plant render with a depth buffer (own renderer): smooth surfaces, correct hidden parts, edge lines and a sharper picture when still. A build step (`node tools/g3bridge.js`) joins any part that would hang in the air
+- Start-up readiness for each unit: start permissives read against the live model, latched trips, valves out of position, recent repairs, lessons to read, earlier start-up problems and open document conflicts, with a GO / GO WITH CHECKS / NO-GO result, sign-off and a printable handover note
+- HSE hazard simulator on the plot plan, in 2D and in a 3D site model: gas cloud (25, 50 and 100% of the lower flammable limit), jet fire, pool fire and blast, detectors, shutdown timing, walk to muster, worst-case wind and ignition time, and kept cases to compare
+- Reliability analysis in Maintenance, Predictive: failure modes ranked by risk priority, reliability measures, chance of each failure mode in 90 days, lessons whose warning signs appear in recent work orders, lesson use, and a combined score that is tested on the history
+- A failure mode with no lesson can be turned into a draft lesson from its own work orders
+- The assistant has 20 computed tools, including hazard effects and failure modes, and warns about open document conflicts and unapproved sources
+- Dashboard strip of what needs attention, readiness and hazard chips on each equipment header, CSV exports, error banner, keyboard help (`?`)
+
+## Pitch deck
+
+`deck/build_all.sh` takes screenshots of the built app, builds `deck/CALIBER2026_Asset_Knowledge_Platform_Deck.pptx` (7 required slides plus appendix) and renders a preview. The business case numbers are in `deck/make_deck.py` and flagged as data or assumption.
 
 ## Working on the code
 
