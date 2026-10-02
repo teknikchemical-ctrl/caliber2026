@@ -239,3 +239,5 @@ aside{overflow-y:auto}
 .hse3k i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .hsebox{min-width:0}.hsebox .mht td,.hsebox .mht th{white-space:normal;vertical-align:top}.hsebox .mht{width:100%;table-layout:auto}#ppp{min-width:0;overflow:hidden}
 .hse3bar{position:absolute;left:10px;top:10px;display:flex;gap:6px}.hse3bar button{padding:4px 10px;font-size:12px;background:rgba(255,255,255,.94);color:#1d2b3d;border:1px solid #c5d0de;border-radius:8px}
+.pd2bar{position:relative;height:18px;background:#eef2f7;border-radius:5px;overflow:hidden;min-width:90px}.pd2bar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;opacity:.85}.pd2bar b{position:relative;padding-left:6px;font-size:12px;line-height:18px}
+.pd2rng{position:relative;height:10px;background:#eef2f7;border-radius:5px;margin-bottom:3px}.pd2rng i{position:absolute;top:0;bottom:0;background:#9db8e0;border-radius:5px}.pd2rng u{position:absolute;top:-2px;bottom:-2px;width:3px;background:#0b5fd7;border-radius:2px;text-decoration:none}
