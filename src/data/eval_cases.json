@@ -1176,5 +1176,43 @@
    "cannot help with this"
   ],
   "tool": "safety_guard"
+ },
+ {
+  "id": "E121",
+  "cat": "Performance",
+  "q": "Show me the KPIs of the plant",
+  "must": [
+   "Availability",
+   "MTBF"
+  ],
+  "tool": "kpi_summary"
+ },
+ {
+  "id": "E122",
+  "cat": "Performance",
+  "q": "What are the key performance indicators of KC-4501?",
+  "must": [
+   "KC-4501",
+   "Availability"
+  ],
+  "tool": "kpi_summary"
+ },
+ {
+  "id": "E123",
+  "cat": "Performance",
+  "q": "Which spare parts will be needed soon?",
+  "must": [
+   "Stock levels"
+  ],
+  "tool": "spares_outlook"
+ },
+ {
+  "id": "E124",
+  "cat": "Bahasa Indonesia",
+  "q": "Tampilkan KPI pabrik",
+  "must": [
+   "Availability"
+  ],
+  "tool": "kpi_summary"
  }
 ]

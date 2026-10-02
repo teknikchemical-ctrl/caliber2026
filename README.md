@@ -22,7 +22,10 @@ A simple sign-in screen, for the demo and not for security: the account list is 
 - Scenarios: replay an OPL case or work order on the P&ID, or trip a unit and follow the knock-on effects
 - AI Assistant with sources, a confidence level and a check of every number
 - Knowledge Studio: ingestion wizard, review and approval, failure reports
-- Failure Memory, Report Center, Case 1 Coverage, Integrations, Data Quality
+- Failure Memory, Report Center, Integrations, Data Quality, Governance (controls, feasibility, roadmap, business case)
+- Performance: key indicators per equipment and for the plant, targets, knowledge status and spare parts outlook
+- 2D and 3D views of every equipment drawing (own renderer, no library), with X-ray and part selection
+- AI reading of uploaded documents (`/api/extract`): structure and facts with quotes, secrets masked, unsupported items dropped, reviewed before saving
 - My work, notification bell, and Data Quality items that can be resolved or accepted by the roles allowed to review
 - Report Center includes a Solution brief; Settings has a scripted demo walkthrough
 - Interface language switch (English or Bahasa Indonesia); questions in Bahasa are understood by the offline search

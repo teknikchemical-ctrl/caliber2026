@@ -33,6 +33,7 @@ Environment variables are read at build time. After changing one, trigger a new 
 | `POST /api/ai` | Writes the answer. May hand tool calls back to the page |
 | `POST /api/embed` | Embeddings for search by meaning, cached by content hash |
 | `/api/kb/*` | Shared knowledge store. `GET /api/kb/export` and `POST /api/kb/import` are the admin backup |
+| `POST /api/extract` | Reads a document for the ingestion wizard. Masks secrets, asks the model for JSON, keeps only quoted steps and facts, caches by content hash. Counts against the AI budget |
 | `/api/config` | Admin only (needs `ADMIN_CODE`). `POST` saves a provider key in the server store, `GET` says whether one is saved (never the key), `DELETE` removes it. A saved key overrides `AI_API_KEY` and applies at once |
 | `GET /api/health` | Status, which codes are required, today's AI use |
 | `GET /api/selftest` | Diagnostics |
@@ -66,3 +67,7 @@ LOCAL_STORE_DIR=/tmp/akp AI_PROVIDER=mock node tools/devserver.mjs 8888
 ```
 
 Then open http://localhost:8888. The mock provider gives canned answers, so no key is needed. `node tests/live.js` runs the full local check.
+
+## Drop folder
+
+`python3 build.py && python3 tools/pack.py` writes `AKP-netlify-drop.zip` (page, functions and the one dependency). It can be dropped on Netlify Drop. Deploying from GitHub is the supported route; the drop route has not been tested on Netlify.

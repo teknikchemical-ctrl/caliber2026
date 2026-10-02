@@ -44,7 +44,7 @@ const AUDIT=`(()=>{
   const run=async(name,fn)=>{try{if(fn)await p.evaluate(fn);await p.waitForTimeout(800);const r=await p.evaluate(AUDIT);r.forEach(x=>{const k=x;(all[k]=all[k]||new Set()).add(W+" "+name)});total+=r.length}catch(e){errs.push(name+": "+e.message.slice(0,80))}};
   const tabsOf=async()=>p.evaluate(()=>[...document.querySelectorAll("main .tabs > *, main .seg button, main .tab")].map((e,i)=>i));
   const crawl=async(name,fn)=>{await run(name,fn);const n=(await tabsOf()).length;for(let i=0;i<n;i++){await p.evaluate(fn||"0");await p.evaluate(i=>{const t=[...document.querySelectorAll("main .tabs > *, main .seg button, main .tab")][i];if(t)t.click()},i);await run(name+" tab"+i)}};
-  for(const pg of ["dashboard","plot","mnt","scn","il","ai","ks","fm","documents","rc","perf","int","quality"])await crawl(pg,`go('${pg}')`);
+  for(const pg of ["dashboard","plot","mnt","scn","il","ai","ks","fm","documents","rc","perf","gov","int","quality"])await crawl(pg,`go('${pg}')`);
   for(let n=1;n<=8;n++)await crawl("equipment"+n,`go('equipment',{set:${n},tab:'overview'})`);
   const oplN=await p.evaluate(()=>Object.keys(OPL).length);
   for(const no of await p.evaluate(()=>Object.keys(OPL).slice(0,40))){await run("opl "+no+" sheet",`go('opl',{opl:'${no}',om:'sheet'})`);await run("opl "+no+" sim",`go('opl',{opl:'${no}',om:'sim',si:0})`)}

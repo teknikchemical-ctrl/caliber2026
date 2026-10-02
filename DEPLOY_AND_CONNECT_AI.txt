@@ -1,0 +1,72 @@
+ASSET KNOWLEDGE PLATFORM
+Put it online and connect the free Gemini AI
+=========================================================================================
+
+You have three files:
+   knowledge-hub-integrated_BAP5.html   the whole site in one file. Double-click to open it.
+                                        Works on its own, but without the shared database and the AI
+                                        (those are server functions and need a Netlify site).
+   AKP-netlify-drop.zip                 the same site plus the server functions, ready to drop on Netlify
+   this file                            the steps
+
+OPTION A. DROP THE ZIP ON NETLIFY (fastest, about 5 minutes)
+-----------------------------------------------------------------------------------------
+1. Unzip AKP-netlify-drop.zip. You get a folder with index.html, netlify.toml, netlify/functions and
+   node_modules inside it.
+2. Go to https://app.netlify.com/drop and sign in (free account).
+3. Drag the unzipped FOLDER onto the page (the folder, not only index.html). Wait until it says published.
+4. Open the address it gives you. You should see the sign-in screen. Sign in as  Caliber / Caliber2026.
+5. Open Settings (gear at the bottom of the left menu). Under "Connect the AI" the key can be added
+   once you have set an administrator code, see below.
+
+If the footer says "Local only" after a minute, Netlify did not pick up the functions from the dropped
+folder. That is the one thing I could not test from here. Use OPTION B instead, it is the supported route.
+
+OPTION B. DEPLOY FROM GITHUB (most reliable, 10 minutes)
+-----------------------------------------------------------------------------------------
+Follow LAUNCH_NETLIFY_GEMINI.txt. In short: Netlify > Add new site > Import from GitHub > pick
+teknikchemical-ctrl/caliber2026 and the branch claude/great-tesla-l0uw33. The build settings are read from
+netlify.toml. Do not drag a folder in for this option.
+
+CONNECT THE AI (works for both options)
+-----------------------------------------------------------------------------------------
+1. Get a free key: https://aistudio.google.com > Get API key > Create API key. It starts with AIza.
+   Keep it private. Free-tier prompts may be used by Google to improve its products, so do not put
+   confidential plant data into a site that uses a free key.
+2. In Netlify: Site configuration > Environment variables > add
+      ADMIN_CODE     any code you choose (for example a long phrase). It unlocks key entry and backups.
+      AI_MODEL       gemini-2.5-flash       (optional, this is the default)
+   Then Deploys > Trigger deploy > Clear cache and deploy site. (A dropped folder: drop it again.)
+3. Open your site, sign in as Caliber / Caliber2026.
+4. Settings > Access codes: type the ADMIN_CODE once.
+5. Settings > Connect the AI: paste the key, press "Save and test". The key is stored on the server and is
+   never sent to the browser. No redeploy is needed after this.
+   (You can also set AI_API_KEY as an environment variable instead, then redeploy.)
+6. Check it: Settings > Run diagnostics. Every line should say OK. Then open AI Assistant and ask
+   "What is the start permissive for the recycle gas compressor KC-4501?". The answer should stream in with
+   numbered sources and a confidence level.
+
+TRY THE DOCUMENT READING
+-----------------------------------------------------------------------------------------
+Knowledge Studio > Add with the wizard. Paste a procedure or a datasheet, or drop a file. When the AI is
+connected, the card "Read by the AI" appears with the steps, facts and the exact quotes. Anything the text
+does not support is dropped and listed. Check it, finish the wizard, and the item is saved as a draft with
+its facts, shared with all users and searchable by the assistant.
+
+NEW IN THIS VERSION
+-----------------------------------------------------------------------------------------
+ - 3D model next to every equipment drawing (2D drawing / 3D model switch). Drag to rotate, scroll to zoom,
+   X-ray shows the internals. Selecting a part works in both views.
+ - Performance page: availability, MTBF, MTTR, breakdowns, downtime, cost, planned work share and forecast
+   risk for the whole plant and every equipment set, with targets, knowledge status and spare parts outlook.
+ - Governance page: controls in place, feasibility, roadmap and a business case with editable assumptions.
+ - The Case 1 Coverage page was removed. The assistant evaluation moved to Integrations > Usage and quality.
+
+LIMITS TO KNOW
+-----------------------------------------------------------------------------------------
+ - I could not reach Netlify or Google from where I built this, so the live deployment and the real Gemini
+   calls are not tested. The tests use a local copy of the functions and a fake Gemini.
+ - Roles and the sign-in are a demonstration. They are checked in the page, not on the server.
+ - OEE, energy, emissions and cost of downtime need data that is not in the package. The Performance page
+   says so instead of estimating them.
+ - The business case numbers are assumptions you can edit. They are not measured.
