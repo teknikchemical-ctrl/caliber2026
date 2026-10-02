@@ -20,8 +20,8 @@ const DEMO=[
  {page:"mnt",sel:'.nav[data-page="mnt"]',t:"Maintenance history and forecast",x:"Work orders by period, root causes, and which units are most likely to fail next, with the amount of data behind each forecast."},
  {page:"ks",sel:'.nav[data-page="ks"]',t:"Add what people know",x:"A new lesson or document goes in as a draft, is checked for gaps, and waits for review. Only an approved item is treated as trusted."},
  {page:"mywork",sel:'.nav[data-page="mywork"]',t:"Each person sees their own work",x:"Items waiting for approval, your own drafts and what changed since you last looked. What you can do depends on your role."},
- {page:"rc",sel:'.nav[data-page="rc"]',t:"Reports for sign-off",x:"Equipment dossiers, reliability and forecast reports, incident packs and a solution brief, all printable or exported to Word."},
- {page:"cov",sel:'.nav[data-page="cov"]',t:"Requirements and evidence",x:"Each requirement from the case, how it is met, and the evidence now in the system, including the assistant evaluation score."}];
+ {page:"perf",sel:'.nav[data-page="perf"]',t:"Key indicators",x:"Availability, MTBF, repair time, cost, forecast risk and knowledge status for each equipment set and for the whole plant, against targets."},
+ {page:"rc",sel:'.nav[data-page="rc"]',t:"Reports for sign-off",x:"Equipment dossiers, reliability and forecast reports, incident packs and a solution brief, all printable or exported to Word."}];
 const TOURS={i:-1,demo:false};
 const TL=()=>TOURS.demo?DEMO:TOUR;
 function tourStart(demo){try{setClose()}catch(e){}TOURS.demo=!!demo;TOURS.i=0;tourShow()}

@@ -8,7 +8,7 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
  await p.goto(FILE);await p.waitForTimeout(900);
  const ev=async c=>{try{const r=await p.evaluate(c);await p.waitForTimeout(120);return r}catch(e){errs.push("EVAL "+c.slice(0,60)+" "+e.message.slice(0,100))}};
  /* pages */
- for(const pg of ["dashboard","equipment","plot","mnt","il","scn","ai","ks","fm","rc","cov","int","documents","opl","quality"])await ev(`go('${pg}')`);
+ for(const pg of ["dashboard","equipment","plot","mnt","il","scn","ai","ks","fm","rc","perf","int","documents","opl","quality"])await ev(`go('${pg}')`);
  for(let n=1;n<=8;n++)for(const t of ["overview","a360","pid","ga","plot","docs","ds","seq","opl","maint","rel"])await ev(`go('equipment',{set:${n},tab:'${t}'})`);
  for(const v of ["dash","table","time","pdm","replay"])await ev(`MHS.view='${v}';go('mnt')`);
  ok(errs.length===0,"all pages render without script errors ("+errs.length+" errors)");errs.splice(0).forEach(e=>console.log("   ",e));
@@ -35,9 +35,9 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
  ok((await ev("AI.cfg.remote===false&&!AI.cfg.endpoint"))===true,"no AI provider is configured by default");
  /* navigation and accessibility */
  ok((await ev("document.querySelectorAll('.navsec').length"))===3,"navigation has three groups");
- const a11y=[];for(const pg of ["dashboard","cov","ks","ai","int","rc","fm"]){await ev(`go('${pg}')`);const bad=await ev("[...document.querySelectorAll('#app [onclick]')].filter(e=>!/^(BUTTON|A|INPUT|SELECT|TEXTAREA|LABEL|OPTION)$/.test(e.tagName)&&!e.closest('svg')&&!e.hasAttribute('tabindex')).length");if(bad)a11y.push(pg+":"+bad)}
+ const a11y=[];for(const pg of ["dashboard","perf","ks","ai","int","rc","fm"]){await ev(`go('${pg}')`);const bad=await ev("[...document.querySelectorAll('#app [onclick]')].filter(e=>!/^(BUTTON|A|INPUT|SELECT|TEXTAREA|LABEL|OPTION)$/.test(e.tagName)&&!e.closest('svg')&&!e.hasAttribute('tabindex')).length");if(bad)a11y.push(pg+":"+bad)}
  ok(a11y.length===0,"clickable elements are keyboard focusable "+a11y.join(","));
- const ovf=[];for(const pg of ["dashboard","cov","ks","ai","int","rc","fm","mnt"]){await ev(`go('${pg}')`);const w=await ev("document.documentElement.scrollWidth-innerWidth");if(w>4)ovf.push(pg+":"+w)}
+ const ovf=[];for(const pg of ["dashboard","perf","ks","ai","int","rc","fm","mnt"]){await ev(`go('${pg}')`);const w=await ev("document.documentElement.scrollWidth-innerWidth");if(w>4)ovf.push(pg+":"+w)}
  ok(ovf.length===0,"no page overflows horizontally "+ovf.join(","));
  /* predictive validation */
  const bt=await ev("(()=>{const o=pdmCompare();return{fleet:o.fleet.N,auc:o.fleet.auc,verdict:o.fleet.verdict.length}})()");ok(bt.fleet>40&&bt.verdict>10,"predictive backtest runs ("+bt.fleet+" forecasts)");

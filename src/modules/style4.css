@@ -151,3 +151,13 @@ aside{overflow-y:auto}
 #bellN{position:absolute;top:-5px;right:-5px;min-width:15px;height:15px;border-radius:8px;background:#cf222e;color:#fff;font-size:10px;font-style:normal;font-weight:700;line-height:15px;text-align:center;padding:0 3px}
 #notifbox{position:fixed;left:12px;bottom:96px;width:330px;max-width:calc(100vw - 24px);max-height:60vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 12px 36px rgba(11,42,74,.25);z-index:70;animation:riseIn .25s ease-out}
 .nitem{padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;border-left-width:4px}.nitem:hover{background:#f3f7fd}.nitem.warn{border-left-color:#d97706}.nitem.bad{border-left-color:#cf222e}
+/* 3D equipment view */
+.gtog{display:inline-flex;border:1px solid var(--line,#cfd8e3);border-radius:8px;overflow:hidden;margin:0 0 8px}
+.gtog button{border:0;background:#fff;padding:5px 12px;font-size:12.5px;cursor:pointer;color:#33445c}
+.gtog button.on{background:#155ea3;color:#fff}
+.g3box{background:#f4f7fb;border:1px solid #d5deea;border-radius:8px;overflow:hidden}
+.g3bar{display:flex;flex-wrap:wrap;gap:6px;padding:8px}.g3bar button{padding:3px 10px;font-size:12px}.g3bar button.on{background:#e8f1fb;border-color:#155ea3;color:#155ea3}
+.g3svg{width:100%;height:auto;display:block;touch-action:none;cursor:grab;user-select:none}.g3svg:active{cursor:grabbing}
+.g3cap{padding:6px 10px 8px;font-size:12.5px;min-height:20px}
+@keyframes g3p{0%,100%{stroke-opacity:1}50%{stroke-opacity:.25}}.g3hl{animation:g3p 1.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.g3hl{animation:none}}

@@ -46,7 +46,7 @@ async function syPull(first){const s=await syApi("kb/state"+(SYNC.rev&&!first?"?
   /* audit and answer log: union by content */
   const au=new Map(STORE.mem.audit.map(a=>[a.t+"|"+a.act+"|"+a.detail+"|"+a.who,a]));(s.audit||[]).forEach(a=>au.set(a.t+"|"+a.act+"|"+a.detail+"|"+a.who,a));STORE.mem.audit=[...au.values()].sort((a,b)=>String(b.t).localeCompare(String(a.t))).slice(0,800);
   const qm=new Map(STORE.mem.qa.map(a=>[a.id,a]));(s.qa||[]).forEach(a=>{if(!qm.has(a.id))qm.set(a.id,a)});STORE.mem.qa=[...qm.values()].sort((a,b)=>String(b.t).localeCompare(String(a.t))).slice(0,500);
-  if(changed||mhChanged){STORE.mem.uk=UKB.items;STORE.put("uk");STORE.put("fb");if(mhChanged){mhReindex();mhSaveGen()}DB.dirty();BUS.emit("kb:changed");if(!document.activeElement?.matches?.("input,textarea,select")&&["dashboard","fm","rc","cov","documents","opl"].includes(st.page))render()}
+  if(changed||mhChanged){STORE.mem.uk=UKB.items;STORE.put("uk");STORE.put("fb");if(mhChanged){mhReindex();mhSaveGen()}DB.dirty();BUS.emit("kb:changed");if(!document.activeElement?.matches?.("input,textarea,select")&&["dashboard","fm","rc","perf","documents","opl"].includes(st.page))render()}
   STORE.put("audit");STORE.put("qa")}
  finally{SYNC.applying=false}
  syFlush().catch(()=>{})}

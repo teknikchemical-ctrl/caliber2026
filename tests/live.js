@@ -10,6 +10,13 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  if(rq.method==="GET"&&rq.url.includes("/models")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({models:[{name:"models/gemini-2.0-flash"},{name:"models/gemini-2.5-flash"}]}))}
  if(rq.url.includes("batchEmbedContents")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({embeddings:(j.requests||[]).map((_,i)=>({values:[1,i%3,2,0.5]}))}))}
  if(rq.url.includes("/models/badmodel:")){rs.writeHead(404,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"models/badmodel is not found for API version v1beta"}}))}
+ if(rq.url.includes(":generateContent")){const tx=(((j.contents||[{}])[0].parts||[{}])[0].text||""),body=(/TEXT:\n([\s\S]*?)\n\nKnown equipment/.exec(tx)||[])[1]||"";
+  const out={kind:"sop",confidence:88,title:"Start-up of KC-4501",summary:"Start-up checks for the recycle gas compressor.",tags:["KC-4501","PSLL-4504","XX-9999"],set_tag:"KC-4501",revision:"B",date:"2026-03-01",classification:"internal",
+   steps:[{n:1,text:"Check lube oil level",quote:"1. Check lube oil level"},{n:2,text:"Open suction valve ZSO-4510",quote:"2. Open suction valve ZSO-4510"},{n:3,text:"Run the compressor for one hour",quote:"3. Run the compressor for one hour"}],
+   warnings:[{text:"Do not start with lube oil pressure below 2 barg",quote:"WARNING: Do not start with lube oil pressure below 2 barg"}],
+   facts:[{tag:"PSLL-4504",kind:"setpoint",name:"Lube oil pressure low-low trip",value:"2",unit:"barg",vote:"1oo1",quote:"PSLL-4504 trip set point: 2 barg"},{tag:"TSHH-4503",kind:"setpoint",name:"Discharge temperature trip",value:"140",unit:"degC",vote:"1oo1",quote:"TSHH-4503 trip: 140 degC"}],
+   kv:[],opl:{objective:"",steps:[],symptom:"",cause:"",action:"",keypoints:[],caution:""},incident:{description:"",symptom:"",cause:"",action:"",prevent:"",impact:""},gaps:["no approver named"],_seen:body.length};
+  rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({candidates:[{content:{parts:[{text:/BADJSON/.test(body)?"not json at all":JSON.stringify(out)}]}}]}))}
  rs.writeHead(200,{"content-type":"text/event-stream"});
  if(rq.url.includes("chat/completions")){for(const w of ["The set point is ","95 degC [1]."])rs.write("data: "+JSON.stringify({choices:[{delta:{content:w}}]})+"\n\n");rs.write("data: [DONE]\n\n")}
  else if(j.tools&&/TOOLTEST/.test(JSON.stringify(j.contents))){rs.write("data: "+JSON.stringify({candidates:[{content:{parts:[{functionCall:{name:"maintenance_stats",args:{set:1}}}]}}]})+"\n\n")}
@@ -29,7 +36,18 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  let n429=0;for(let i=0;i<16;i++){const x=await post(8901);if(x.s===429)n429++}ok(n429>=3,"per visitor rate limit applies ("+n429+" blocked)");
  s1.kill();
  let s2=proc(8902,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k"});await up(8902);
- r=await post(8902);ok(r.s===200&&/Gemini says/.test(r.j.answer),"Gemini adapter returns an answer");s2.kill();
+ r=await post(8902);ok(r.s===200&&/Gemini says/.test(r.j.answer),"Gemini adapter returns an answer");
+ /* AI reading of documents */
+ {const EX="Start-up KC-4501 Rev B 2026-03-01\n1. Check lube oil level\n2. Open suction valve ZSO-4510\nWARNING: Do not start with lube oil pressure below 2 barg\nPSLL-4504 trip set point: 2 barg\nContact password: hunter22 or mail ops@example.com";
+  const ex=await fetch("http://localhost:8902/api/extract",{method:"POST",body:JSON.stringify({text:EX,name:"startup.txt",known:[{tag:"KC-4501",name:"Recycle Gas Compressor"}]})}).then(async r=>({s:r.status,j:await r.json()}));
+  ok(ex.s===200&&ex.j.ok&&ex.j.result.kind==="sop","extraction returns the structure the model read");
+  ok(ex.j.result.steps.length===2&&ex.j.verified.rejected>=3,"steps and facts not found in the text are dropped ("+ex.j.verified.rejected+" dropped)");
+  ok(ex.j.result.facts.length===1&&ex.j.result.facts[0].tag==="PSLL-4504"&&!ex.j.result.tags.includes("XX-9999"),"only quoted facts and tags that occur in the text are kept");
+  const last=await fetch("http://localhost:8977/__last").then(r=>r.json());ok(!JSON.stringify(last.body).includes("hunter22")&&!JSON.stringify(last.body).includes("ops@example.com")&&ex.j.redacted.count===2,"secrets and email addresses are masked before the text reaches the model");
+  const bj=await fetch("http://localhost:8902/api/extract",{method:"POST",body:JSON.stringify({text:"BADJSON ".repeat(10),name:"x"})}).then(r=>r.status);ok(bj===502,"an answer that is not JSON is reported as a provider error");
+  const sh=await fetch("http://localhost:8902/api/extract",{method:"POST",body:JSON.stringify({text:"short"})}).then(r=>r.status);ok(sh===400,"too little text is rejected");
+  const ex2=await fetch("http://localhost:8902/api/extract",{method:"POST",body:JSON.stringify({text:EX,name:"startup.txt"})}).then(r=>r.json());ok(ex2.cached===true,"the same text is answered from the cache")}
+ s2.kill();
  let s3=proc(8903,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:1/v1beta",AI_API_KEY:"k"});await up(8903);r=await post(8903);ok(r.s===502,"provider failure returns 502 so the page falls back");s3.kill();
  let s4=proc(8904,{AI_PROVIDER:"",AI_API_KEY:"",GEMINI_API_KEY:""});await up(8904);r=await post(8904);ok(r.s===503,"unconfigured server answers 503");s4.kill();
  let s5=proc(8905,{AI_PROVIDER:"mock",AI_DAILY_MAX:"2",AI_RATE_PER_MIN:"50"});await up(8905);await post(8905,{...body});await post(8905,{...body});r=await post(8905,{...body});ok(r.s===429&&/budget/.test(r.j.error),"daily budget guard stops the AI");s5.kill();
@@ -111,6 +129,17 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  /* feedback */
  await A.evaluate(()=>FB.add({verdict:"Wrong",q:"test question",note:""}));await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(800);
  ok(await B.evaluate(()=>STORE.mem.fb.some(f=>f.q==="test question")),"feedback shared to B");
+ /* AI ingestion in the wizard: read, review, save, share */
+ await A.evaluate(()=>{ROLE.name="Engineer";ROLE.user="Ingest Tester"});
+ const wz=await A.evaluate(async()=>{const it={id:"wt1",name:"startup-kc4501.txt",raw:"Start-up KC-4501 Rev C 2026-04-01\n1. Check lube oil level\n2. Open suction valve ZSO-4510\n3. Start the lube oil pump\nWARNING: Do not start with lube oil pressure below 2 barg\nPSLL-4504 trip set point: 2 barg",rows:null};
+  wzDetect(it);WZ.q=[it];WZ.i=0;await aiRead(it);const st=it.ai.state;wzStructure(it);wzMeta(it);it.gates=wzGates(it);wzCreate("In review");
+  const ui=UKB.items.find(x=>x.fname==="startup-kc4501.txt");return{st,kind:it.kind,model:it.ai.model,id:ui&&ui.id,ai:ui&&ui.meta.ai,src:ui&&ui.meta.sourceText&&ui.meta.sourceText.length,facts:ui&&ui.meta.facts&&ui.meta.facts.length,steps:ui&&ui.meta.steps&&ui.meta.steps.length,set:ui&&ui.set,rev:ui&&ui.meta.docRev}});
+ ok(wz.st==="done"&&wz.kind==="sop"&&wz.model==="mock","the wizard reads a pasted document with the AI ("+wz.st+", "+wz.kind+")");
+ ok(wz.steps===3&&wz.facts>=1&&wz.set===4&&wz.rev==="C","steps, a typed fact, the equipment set and the revision are filled from the reading");
+ ok(wz.ai&&wz.ai.reviewedBy==="Ingest Tester"&&wz.src>100,"the saved item records the AI reading and keeps the source text");
+ await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(800);
+ ok(await B.evaluate(id=>{const u=UKB.get(id);return !!u&&u.meta&&u.meta.ai&&u.meta.facts&&u.meta.facts.length>=1},wz.id),"the AI-read item and its facts reach the other user");
+ const as=await B.evaluate(async()=>{AI.cfg.remote=false;const r=await aiAsk("What is the trip set point of PSLL-4504?",{noLog:true});return r.text});ok(/2\s*barg/i.test(as),"the assistant can answer from the facts that were read");
  /* delete */
  await A.evaluate(i=>UKB.remove(i),id);await A.evaluate(()=>syFlush());await B.evaluate(()=>syNow());await B.waitForTimeout(800);
  ok(await B.evaluate(i=>!UKB.get(i)&&!MH.some(r=>r.imp===i),id),"deleting on A removes the item and its work orders on B");
