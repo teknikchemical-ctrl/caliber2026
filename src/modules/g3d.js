@@ -12,6 +12,13 @@ const g3c={steel:"#b4c0cf",body:"#d3dce7",dark:"#4d5b70",blue:"#4f86c9",gray:"#9
 const g3B=(k,x,y,z,w,h,d,c,o)=>Object.assign({t:"r",k,x,y,z,w,h,d,c},o),
  g3C=(k,ax,x,y,z,len,r,c,o,r2)=>Object.assign({t:"c",k,ax,x,y,z,len,r,r2:r2==null?r:r2,c},o),
  g3E=(k,ax,x,y,z,ra,rb,c,a0,a1,o)=>Object.assign({t:"e",k,ax,x,y,z,ra,rb,c,a0,a1},o);
+/* moving parts: rotation about an axis through a point, or a sliding stroke along an axis */
+function g3Anim(a,v,t){if(!a)return v;if(a.type==="slide"){const d=Math.sin(t*a.rate+(a.ph||0))*a.amp,i=a.ax==="x"?0:a.ax==="y"?1:2,r=v.slice();r[i]+=d;return r}
+ const g=a.rate*t*Math.PI/180,c=Math.cos(g),s=Math.sin(g),p=[v[0]-a.at[0],v[1]-a.at[1],v[2]-a.at[2]];let q;
+ if(a.ax==="y")q=[p[0]*c+p[2]*s,p[1],-p[0]*s+p[2]*c];else if(a.ax==="x")q=[p[0],p[1]*c-p[2]*s,p[1]*s+p[2]*c];else q=[p[0]*c-p[1]*s,p[0]*s+p[1]*c,p[2]];
+ return[q[0]+a.at[0],q[1]+a.at[1],q[2]+a.at[2]]}
+function g3AnimN(a,n,t){if(!a||a.type==="slide")return n;const g=a.rate*t*Math.PI/180,c=Math.cos(g),s=Math.sin(g);
+ if(a.ax==="y")return[n[0]*c+n[2]*s,n[1],-n[0]*s+n[2]*c];if(a.ax==="x")return[n[0],n[1]*c-n[2]*s,n[1]*s+n[2]*c];return[n[0]*c-n[1]*s,n[0]*s+n[1]*c,n[2]]}
 const G3M={};
 /* assemblies reused by several machines */
 const g3Motor=(k,x,y,z,len,r,o)=>{const a=[g3C(k,"x",x,y,z,len,r,"blue",{m:.5}),g3C(k,"x",x+len/2+.05,y,z,.1,r*.92,"dark"),g3C(k,"x",x+len/2+.16,y,z,.14,r*.84,"steel",{},r*.9),
@@ -94,9 +101,59 @@ G3M[8]=[g3C("1","x",0,1.05,0,2.4,.56,"paint",{sh:1,m:.5}),g3E("2","x",-1.2,1.05,
  g3C("8","y",1.05,1.05,.64,1.2,.05,"steel",{m:.6}),g3C("8","x",1.05,1.55,.32,.66,.04,"steel"),g3C("8","x",1.05,.55,.32,.66,.04,"steel"),g3C("8","y",1.05,1.05,.64,.4,.08,"white",{seg:14}),g3B("10",-.1,1.05,.58,.22,.13,.03,"dark",{r:.01}),g3B("10",-.1,1.05,.6,.2,.11,.01,"white"),g3C("12","y",-.3,.5,0,.08,.04,"amber"),
  g3C("N1","y",.2,1.8,0,.3,.08,"amber"),g3C("N2","y",-.85,.2,0,.34,.08,"amber"),g3C("N3","y",-.1,.2,0,.34,.08,"amber"),g3C("N4","y",.8,-.1,0,.2,.07,"amber"),
  g3C("N5","y",.65,1.8,0,.3,.06,"amber"),g3C("9","y",.65,1.72,0,.06,.1,"steel"),g3C("9","y",.65,1.98,0,.28,.07,"red"),g3C("M1","y",-.45,1.88,0,.2,.07,"amber")];
+/* ---------- finer detail and moving parts for each machine ---------- */
+const g3L=(x,y,z)=>g3C("","y",x,y,z,.08,.05,"green",{light:1,seg:10});
+const g3Gauge=(k,x,y,z,ax)=>[g3C(k,ax||"z",x,y,z,.05,.075,"white",{seg:16,m:.6}),g3C(k,ax||"z",x,y,z-.02,.03,.085,"steel",{seg:16})];
+const g3Hand=(k,x,y,z)=>[g3C(k,"y",x,y,z,.3,.015,"steel",{seg:8}),g3C(k,"y",x,y+.17,z,.025,.11,"red",{seg:20,m:.4})];
+/* pump: discharge valve, gauge, rotating impeller vanes and shaft key (seen with X-ray), drip tray, nameplate */
+G3M[1].push(g3B("11",-.5,.15,-.12,1.1,.03,.5,"dark",{r:.03,zb:.2}),g3B("N2",-.68,.86,.1,.2,.2,.16,"paint",{r:.04}),...g3Hand("N2",-.68,.96,.1),...g3Gauge("N2",-.68,1.12,.16,"z"),
+ g3C("N1","y",-1.15,.28,0,.2,.12,"paint",{m:.5}),g3B("M",1.3,.47,.3,.2,.1,.02,"white"),g3L(.9,.78,.15),
+ g3C("3","x",.02,.47,0,.04,.045,"dark",{in:1,anim:{ax:"x",rate:220,at:[0,.47,0]}}),g3B("3",.02,.5,0,.05,.03,.04,"brass",{in:1,anim:{ax:"x",rate:220,at:[0,.47,0]}}),
+ ...[0,1,2,3,4,5].map(i=>g3B("2",-.68,.47+Math.cos(i*Math.PI/3)*.12,Math.sin(i*Math.PI/3)*.12,.08,.09,.03,"brass",{in:1,r:.01,ry:0,anim:{ax:"x",rate:220,at:[-.68,.47,0]}})),
+ g3C("8","x",-.1,.47,.0,.3,.01,"steel",{in:1}),g3B("10",.3,.47,0,.02,.3,.02,"dark",{in:1,anim:{ax:"x",rate:220,at:[.3,.47,0]}}));
+/* dryer: stripes on the turning drum, ring gear teeth, screw feeder, platform and ladder, drive guard */
+G3M[2].push(...[0,1,2,3,4,5].map(i=>{const a=i*Math.PI/3;return g3B("1",0,1.25+Math.cos(a)*.745,Math.sin(a)*.745,3.5,.025,.07,"dark",{r:.01,ry:0,anim:{ax:"x",rate:42,at:[0,1.25,0]}})}),
+ ...Array.from({length:28},(_,i)=>{const a=i/28*Math.PI*2;return g3B("4",-.55,1.25+Math.cos(a)*.93,Math.sin(a)*.93,.1,.07,.05,"dark",{r:.005,anim:{ax:"x",rate:42,at:[0,1.25,0]}})}),
+ g3C("N1","x",-2.0,2.0,0,.6,.1,"steel",{m:.5}),g3B("N1",-2.35,2.0,0,.26,.26,.26,"blue",{r:.04}),g3C("","y",-1.0,2.0,-.02,.1,.04,"dark"),
+ g3B("",0,2.62,-1.2,4.2,.04,.5,"gray",{r:.01}),g3C("","y",-2.1,2.2,-1.2,.82,.02,"gray",{seg:8}),g3C("","y",2.1,2.2,-1.2,.82,.02,"gray",{seg:8}),g3B("",0,2.95,-1.42,4.2,.02,.02,"gray"),...g3Ladder(2.4,.0,2.62,-1.2),
+ g3B("6",0,.52,.95,.6,.05,.2,"dark",{r:.02}),g3L(-2.4,1.05,.32),g3C("","y",-.55,1.0,-.95,.5,.015,"steel",{seg:8}));
+/* reactor: gauges, relief tail pipe, hoops on the ladder, thermowell head, nameplate, blinking beacon */
+G3M[3].push(...g3Gauge("N3",.88,3.38,.1,"z"),...g3Gauge("N1",-.86,3.2,.1,"z"),g3C("9","y",.9,3.8,0,.28,.035,"steel",{seg:10}),g3C("9","x",1.05,3.94,0,.3,.035,"steel",{seg:10}),
+ ...[.7,1.2,1.7,2.2,2.6].map(y=>g3C("","y",.55,y,.4,.025,.17,"gray",{seg:16,m:.5})),g3C("6","y",0,4.0,0,.14,.06,"red",{m:.4}),g3B("1",.4,1.5,.5,.02,.18,.14,"white"),
+ g3C("","y",0,4.1,0,.2,.035,"dark",{seg:10}),g3L(0,4.28,0),g3C("N2","y",.95,.55,0,.8,.05,"paint",{m:.5}),g3C("N2","x",.95,.15,0,.6,.05,"paint",{m:.5}),
+ g3B("10",0,.02,.0,.02,.02,.02,"dark"),...[0,1,2,3,4,5].map(i=>g3B("10",Math.cos(i*Math.PI/3)*.62,.2,Math.sin(i*Math.PI/3)*.62,.12,.32,.06,"dark",{r:.01,ry:0})));
+/* compressor: flywheel with spokes, sliding pistons and crossheads, breather, gauge panel, blinking light */
+G3M[4].push(...Array.from({length:6},(_,i)=>g3B("2",-.62,.88+Math.cos(i*Math.PI/3)*.2,.55+0,.08,.36,.06,"dark",{r:.01,anim:{ax:"z",rate:130,at:[-.62,.88,.55]}})),
+ g3B("2",-.62,.88,.62,.34,.34,.04,"steel",{r:.1,anim:{ax:"z",rate:130,at:[-.62,.88,.55]}}),
+ g3C("5","x",1.3,.98,.28,.24,.23,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9}}),g3C("6","x",1.3,.98,-.28,.24,.18,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9,ph:1.57}}),
+ g3B("4",.8,.98,.28,.2,.12,.12,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9}}),g3B("4",.8,.98,-.28,.2,.12,.12,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9,ph:1.57}}),
+ g3C("3","x",.35,.88,.15,.02,.025,"dark",{in:1}),g3C("9","x",.96,.98,.28,.3,.03,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9}}),
+ g3C("1","y",.2,1.45,.2,.2,.07,"white",{m:.5}),g3B("11",.9,.55,.8,.5,.4,.05,"white",{r:.02}),...g3Gauge("11",.75,.6,.84,"z"),...g3Gauge("11",1.05,.6,.84,"z"),g3L(.9,.88,.84),
+ g3C("N4","x",2.35,.98,-.28,.03,.12,"steel"),g3C("12","y",1.2,1.7,.0,.12,.05,"steel"),g3C("","y",.2,1.7,.2,.5,.04,"steel",{seg:10}));
+/* heater: steam control valve on the supply, condensate pot with level glass, insulation straps, lifting lugs */
+G3M[5].push(g3C("N3","y",1.2,1.45,0,.35,.075,"paint",{m:.5}),g3B("N3",1.2,1.7,0,.16,.16,.16,"blue",{r:.03}),g3C("N3","y",1.2,1.95,0,.2,.1,"steel",{m:.5}),g3C("N3","y",1.2,2.1,0,.05,.12,"blue"),...g3Hand("N3",1.0,1.3,0),
+ g3C("12","y",1.55,.55,.38,.45,.1,"paint",{sh:0,m:.5}),g3C("12","y",1.55,.55,.5,.3,.015,"steel",{seg:8}),g3C("12","y",1.55,.5,.5,.14,.02,"water",{seg:8}),
+ ...[-1.2,-.4,.4,1.2].map(x=>g3C("1","x",x,.72,0,.05,.325,"steel",{m:.7,seg:36})),g3B("1",-.4,1.04,0,.08,.14,.1,"steel",{r:.02}),g3B("1",.8,1.04,0,.08,.14,.1,"steel",{r:.02}),...g3Gauge("N4",.4,.5,.34,"z"),g3L(-1.82,1.28,0),
+ g3C("N1","x",-1.82,1.35,0,.5,.045,"steel",{seg:10}),g3C("N5","y",-.6,1.35,0,.2,.03,"steel",{seg:10}));
+/* control valve: sliding stem and indicator, handwheel, limit switch box, tubing, supports */
+G3M[6].push(g3C("4","y",0,.98,0,.16,.02,"steel",{seg:10,m:.9,anim:{type:"slide",ax:"y",amp:.05,rate:2.2}}),g3B("4",.0,1.0,.1,.05,.03,.08,"red",{r:.01,anim:{type:"slide",ax:"y",amp:.05,rate:2.2}}),
+ g3B("11",.2,1.12,0,.04,.25,.01,"white"),g3B("11",.0,1.5,0,.18,.1,.18,"steel",{r:.03}),g3C("8","y",0,1.62,0,.04,.1,"steel"),g3C("8","y",0,1.7,0,.12,.015,"steel",{seg:8}),g3C("8","y",0,1.78,0,.03,.1,"red",{seg:18}),
+ g3B("9",.3,.82,0,.08,.08,.08,"dark",{r:.015}),g3B("",-.45,.12,0,.2,.24,.28,"gray",{r:.03}),g3B("",.45,.12,0,.2,.24,.28,"gray",{r:.03}),...g3Gauge("12",.62,.66,.2,"z"),g3L(.15,1.55,.1),
+ g3C("N1","x",-.62,.4,0,.04,.15,"steel"),g3C("10","y",0,.62,0,.035,.17,"steel",{m:.7}));
+/* cooling tower: louvers on every side, sump water, spray header, ladder cage, make-up pipe, motor cowl */
+G3M[7].push(...[-1,1].flatMap(sg=>Array.from({length:7},(_,i)=>g3B("12",0,.28+i*.1,sg*1.215,2.2,.03,.1,"steel",{r:.008,ry:0}))),...Array.from({length:7},(_,i)=>g3B("12",1.215,.28+i*.1,0,.1,.03,2.2,"steel",{r:.008})),
+ g3B("8",0,.2,0,2.2,.12,2.2,"water",{in:1,r:.02}),g3C("8","x",0,.9,0,2.1,.03,"paint",{in:1,seg:12}),...[-.6,0,.6].map(z=>g3C("8","z",0,.9,z,1.9,.02,"paint",{in:1,seg:10})),
+ g3C("N2","y",1.35,.4,0,.4,.05,"paint",{seg:10}),g3C("N2","x",1.35,.2,0,.6,.05,"paint",{seg:10}),g3C("5","x",1.62,1.2,0,.12,.185,"dark"),g3B("5",1.62,1.4,0,.2,.1,.2,"steel",{r:.03}),g3L(1.55,1.1,.0),
+ ...[.14,.34,.54,.74,.94].map(y=>g3C("","y",1.2,y,1.31,.025,.17,"gray",{seg:16,m:.5})),g3B("11",.34,1.35,.1,.06,.1,.06,"red",{r:.01}),g3B("",.0,.02,1.4,2.6,.02,.04,"white"));
+/* drum: level float and gauge glass, ladder and platform to the manway, boot drain valve, gauge, insulation rings, nameplate */
+G3M[8].push(g3C("8","y",1.05,1.05,.64,1.0,.03,"water",{seg:10,m:.9}),g3C("8","y",1.05,1.05,.64,.12,.028,"red",{seg:10,anim:{type:"slide",ax:"y",amp:.28,rate:.9}}),
+ ...[-.9,-.3,.3,.9].map(x=>g3C("1","x",x,1.05,0,.04,.575,"steel",{m:.7,seg:36})),g3B("N4",.8,.12,.18,.14,.14,.14,"paint",{r:.03}),...g3Hand("N4",.8,.22,.18),...g3Gauge("N1",.2,2.0,.14,"z"),
+ g3B("",-.45,1.9,-.55,1.0,.04,.5,"gray",{r:.01}),g3B("",-.45,2.05,-.78,1.0,.02,.02,"gray"),g3B("",-.95,2.0,-.55,.02,.2,.5,"gray"),g3B("",.05,2.0,-.55,.02,.2,.5,"gray"),...g3Ladder(-.95,.0,1.9,-.9),
+ g3C("9","y",.65,2.1,0,.12,.06,"steel",{seg:10}),g3C("9","x",.78,2.3,0,.26,.05,"steel",{seg:10}),g3C("12","x",-.3,.42,0,.18,.012,"dark",{seg:8}),g3L(-.1,2.08,.0),
+ g3C("M1","y",-.45,1.98,0,.05,.09,"steel"),g3C("N3","x",-.1,.05,.0,.02,.1,"dark"));
 /* ---------- geometry ---------- */
-const g3Seg=p=>p.seg||(p.r&&p.r<.07||p.len&&p.len<.06?14:34);
-function g3Parts(p){const F=[],C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#b4c0cf")),cen=[p.x,p.y,p.z],sm=p.t!=="r",mk=(pts,s,sc)=>F.push({p:pts,k:p.k,c:C,sh:p.sh,in:p.in,zb:p.zb||0,cen,anim:p.anim,m:p.m||.18,sm:s!==undefined?s:sm,sc:sc||0});
+const g3Seg=p=>Math.max(8,Math.round((p.seg||(p.r&&p.r<.07||p.len&&p.len<.06?14:34))*(G3.q||1)));
+function g3Parts(p){const F=[],C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#b4c0cf")),cen=[p.x,p.y,p.z],sm=p.t!=="r",mk=(pts,s,sc)=>F.push({p:pts,k:p.k,c:C,sh:p.sh,in:p.in,zb:p.zb||0,light:p.light,cen,anim:p.anim,m:p.m||.18,sm:s!==undefined?s:sm,sc:sc||0});
  if(p.t==="r"){const hx=p.w/2,hz=p.d/2,hy=p.h/2,rr=Math.min(p.r==null?Math.min(hx,hz)*.18:p.r,hx*.95,hz*.95),o=p.off||[0,0,0],prof=[];
   const cs=[[hx-rr,hz-rr,0],[-(hx-rr),hz-rr,1],[-(hx-rr),-(hz-rr),2],[hx-rr,-(hz-rr),3]],K=rr>.001?4:1;
   cs.forEach(([cx,cz,q])=>{for(let i=0;i<=K;i++){const a=(q+i/K)*Math.PI/2;prof.push([cx+(rr>.001?Math.cos(a)*rr:Math.sign(cx||1)*0),cz+(rr>.001?Math.sin(a)*rr:0)])}});
@@ -117,15 +174,17 @@ function g3Extra(prims){const c=[0,0,0];prims.forEach(p=>{c[0]+=p.x;c[1]+=p.y;c[
  prims.forEach(p=>{if(p.t!=="c"||p.r2!==p.r||!/^(N\d|M\d)$/.test(p.k)||p.len<.12)return;const ax=p.ax,idx=ax==="x"?0:ax==="y"?1:2,pos=[p.x,p.y,p.z],sgn=(pos[idx]-c[idx])>=0?1:-1,end=pos.slice();end[idx]+=sgn*p.len/2;
   const fr=p.r*1.55,th=Math.max(.03,p.r*.4);const e2=end.slice();e2[idx]-=sgn*th/2;out.push(g3C(p.k,ax,e2[0],e2[1],e2[2],th,fr,"steel",{m:.7,seg:p.r<.06?14:30}));
   const nb=p.r<.06?4:8;for(let i=0;i<nb;i++){const t=i/nb*Math.PI*2,u=Math.cos(t)*fr*.78,v=Math.sin(t)*fr*.78,e3=end.slice();e3[idx]+=sgn*.004;const m=ax==="x"?[e3[0],e3[1]+u,e3[2]+v]:ax==="y"?[e3[0]+u,e3[1],e3[2]+v]:[e3[0]+u,e3[1]+v,e3[2]];out.push(g3C(p.k,ax,m[0],m[1],m[2],.025,p.r*.16,"dark",{seg:8,m:.6}))}});return out}
-function g3Mesh(n){if(G3.mesh[n])return G3.mesh[n];const prims=(G3M[n]||[]).concat(g3Extra(G3M[n]||[])),faces=[];
- prims.forEach(p=>{g3Parts(p).forEach(f=>{const q=f.p,u=[q[1][0]-q[0][0],q[1][1]-q[0][1],q[1][2]-q[0][2]],v=[q[2][0]-q[0][0],q[2][1]-q[0][1],q[2][2]-q[0][2]];
+/* outward normal and centre of a face of primitive p */
+function g3Orient(p,f){const q=f.p,u=[q[1][0]-q[0][0],q[1][1]-q[0][1],q[1][2]-q[0][2]],v=[q[2][0]-q[0][0],q[2][1]-q[0][1],q[2][2]-q[0][2]];
   let nm=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];const l=Math.hypot(...nm)||1;nm=nm.map(x=>x/l);
   const c=[0,1,2].map(i=>q.reduce((a,b)=>a+b[i],0)/q.length);let off=f.cen;if(p.t==="r"&&p.off){const a=(p.ry||0)*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a);off=[f.cen[0]+p.off[0]*cs+p.off[2]*sn,f.cen[1]+p.off[1],f.cen[2]-p.off[0]*sn+p.off[2]*cs]}
-  if(p.t==="c"){/* a cylinder side face points away from its axis; caps point along it */const ai=p.ax==="x"?0:p.ax==="y"?1:2,rel=[c[0]-f.cen[0],c[1]-f.cen[1],c[2]-f.cen[2]];if(f.sc===0)rel[ai]=0;off=[c[0]-rel[0],c[1]-rel[1],c[2]-rel[2]]}
-  const d=(c[0]-off[0])*nm[0]+(c[1]-off[1])*nm[1]+(c[2]-off[2])*nm[2];if(d<0)nm=nm.map(x=>-x);f.n=nm;f.m=f.m;f.mid=c;faces.push(f)})});
+  if(p.t==="c"){const ai=p.ax==="x"?0:p.ax==="y"?1:2,rel=[c[0]-f.cen[0],c[1]-f.cen[1],c[2]-f.cen[2]];if(f.sc===0)rel[ai]=0;off=[c[0]-rel[0],c[1]-rel[1],c[2]-rel[2]]}
+  const d=(c[0]-off[0])*nm[0]+(c[1]-off[1])*nm[1]+(c[2]-off[2])*nm[2];if(d<0)nm=nm.map(x=>-x);f.n=nm;f.mid=c}
+function g3Mesh(n,q){const key=n+(q?"q"+q:"");if(G3.mesh[key])return G3.mesh[key];const q0=G3.q;G3.q=q||1;try{const prims=(G3M[n]||[]).concat(g3Extra(G3M[n]||[])),faces=[];
+ prims.forEach(p=>{g3Parts(p).forEach(f=>{g3Orient(p,f);faces.push(f)})});
  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];faces.forEach(f=>f.p.forEach(v=>{for(let i=0;i<3;i++){mn[i]=Math.min(mn[i],v[i]);mx[i]=Math.max(mx[i],v[i])}}));
  const ctr=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],Rs=Math.hypot(...[0,1,2].map(i=>(mx[i]-mn[i])/2)),Rf=Math.max((mx[1]-mn[1])/2*1.12,Math.hypot((mx[0]-mn[0])/2,(mx[2]-mn[2])/2)*.78);
- return G3.mesh[n]={faces,ctr,R:Rs,Rf,ymin:mn[1],mn,mx}}
+ return G3.mesh[key]={faces,ctr,R:Rs,Rf,ymin:mn[1],mn,mx}}finally{G3.q=q0}}
 function g3Info(n,k){if(!k)return"";const nz=GA[n]&&GA[n].nz.find(q=>q.m===k),b=nz?null:gBom(n,k),s=S(n);if(!nz&&!b)return"";
  const wo=MH.filter(m=>m.n===n&&mhParts(m).includes(k)),V=nz?null:gVal(n,k),rows=nz?[["Nozzle",k],["Service",nz.sv],["Size and rating",nz.sz],["Remarks",nz.r]]:[["Item",k==="M"?"Driver":k],["Material",b.mat],["Quantity",b.qty],["Drawing",s.ga.dwg_no]];
  let live="";if(V&&G.cond!==false){const st0=gState(V.m,V.v),cl=st0==="ok"?"ok":st0==="warn"?"warn":"bad";live=`<div class="g3live"><span class="tag ${cl}">${st0==="ok"?"Normal":st0==="warn"?"Alarm":"Trip"}</span> <b>${V.v.toFixed(V.m[3]<5?1:0)} ${V.m[2]}</b> <span class="muted">${esc(V.m[1])}</span></div>`}
@@ -135,10 +194,9 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  const W=900,H=500,cy=Math.cos(I.yaw),sy=Math.sin(I.yaw),cp=Math.cos(I.pit),sp=Math.sin(I.pit),D=M.R*3.4,sc=I.zoom*(H*.46)/M.Rf,t=I.t;
  const sel=I.pin||(o.sel?o.sel():null),hl=o.hl||[],heat=o.heat||{},tint=o.tint;
  const rot=v=>{const x=v[0]-M.ctr[0],y=v[1]-M.ctr[1],z=v[2]-M.ctr[2],x1=x*cy+z*sy,z1=-x*sy+z*cy;return[x1,y*cp+z1*sp,-y*sp+z1*cp]};
- const spin=(f,v)=>{const a=f.anim;if(!a||!I.run)return v;const ang=a.rate*t*Math.PI/180,c=Math.cos(ang),s=Math.sin(ang),dx=v[0]-a.at[0],dz=v[2]-a.at[2];return[dx*c+dz*s+a.at[0],v[1],-dx*s+dz*c+a.at[2]]};
  const out=[];
- M.faces.forEach(f=>{if(f.in&&!I.xray)return;const anim=f.anim&&I.run;const pts=f.p.map(v=>rot(anim?spin(f,v):v));let nm=f.n;
-  if(anim){const a=f.anim.rate*t*Math.PI/180,c=Math.cos(a),s=Math.sin(a);nm=[nm[0]*c+nm[2]*s,nm[1],-nm[0]*s+nm[2]*c]}
+ M.faces.forEach(f=>{if(f.in&&!I.xray)return;const anim=f.anim&&I.run;const pts=f.p.map(v=>rot(anim?g3Anim(f.anim,v,t):v));let nm=f.n;
+  if(anim)nm=g3AnimN(f.anim,nm,t);
   const nx=nm[0]*cy+nm[2]*sy,nz1=-nm[0]*sy+nm[2]*cy,ny=nm[1]*cp+nz1*sp,nzz=-nm[1]*sp+nz1*cp;
   if(!(I.xray&&f.sh)&&nzz>=0)return;let zc=0;for(const p of pts)zc+=p[2];zc=zc/pts.length+f.zb;out.push({f,pts,zc,nx,ny,nz:nzz})});
  out.sort((a,b)=>b.zc-a.zc);
@@ -150,7 +208,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  const sh=[];for(let i=0;i<24;i++){const a=i/24*Math.PI*2;sh.push(proj(rot([M.ctr[0]+Math.cos(a)*(M.mx[0]-M.mn[0])*.52,gy,M.ctr[2]+Math.sin(a)*(M.mx[2]-M.mn[2])*.6])))}
  let s=`<path d="${grid}" stroke="#d3dbe6" stroke-width=".7" fill="none"/><polygon points="${sh.map(p=>fx(p[0])+","+fx(p[1])).join(" ")}" fill="#223047" opacity=".16" filter="url(#g3b)"/>`;
  const over=[];
- out.forEach(({f,pts,nx,ny,nz})=>{let c=f.c.slice(0,3);const k=f.k;
+ out.forEach(({f,pts,nx,ny,nz})=>{let c=f.light?(o.light?o.light():[63,185,80]):f.c.slice(0,3);const k=f.k;
   const tc=k&&(tint&&tint(k)||heat[k]);if(tc){const q=typeof tc==="string"?g3Parse(tc):tc,a=q[3]==null?.6:q[3];c=c.map((v,i)=>v*(1-a)+q[i]*a)}
   const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=(ny*.5+.5),spec=Math.pow(Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),22)*f.m;
   const lum=.36+.5*d1+.16*d2+.12*hemi,hlOn=k&&hl.includes(k),selOn=k&&k===sel;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.1+26));
@@ -162,7 +220,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  const cap=box.querySelector(".g3cap");if(cap&&!I.hover&&!box.dataset.mini)cap.textContent=sel?g3Name(o.n,sel):"Drag to rotate, scroll to zoom, select a part for its details";
  const card=box.querySelector(".g3side");if(card&&I.cardKey!==sel){I.cardKey=sel;card.innerHTML=box.dataset.mini?"":g3Info(o.n,sel)}}
 function g3Init(box){const id=box.id,o=G3.cfg[id];if(!o)return;box.setAttribute("data-ok","1");const mini=!!box.dataset.mini;
- box.innerHTML=(mini?"":`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Fan running</button>':""}<button class="ghost" data-v="reset">Reset</button></div>`)+
+ box.innerHTML=(mini?"":`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Moving parts</button>':""}<button class="ghost" data-v="reset">Reset</button></div>`)+
  `<div class="g3stage"><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><rect width="900" height="500" fill="url(#g3bg)"/><g class="g3s"></g></svg><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
  const I=G3.inst[id]={yaw:-.62,pit:.34,zoom:mini?1.05:1,px:0,py:0,spin:mini,xray:false,run:true,t:0,drag:null,hover:null,dirty:true,last:performance.now(),pin:null,cardKey:undefined};
  const svg=box.querySelector("svg"),dirty=()=>{I.dirty=true},views={iso:[-.62,.34],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2-.001]};

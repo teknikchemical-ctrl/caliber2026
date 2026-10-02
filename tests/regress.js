@@ -118,6 +118,16 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
   const dk=await q.evaluate(()=>{go("dashboard");ovPick(2,{});return st.page==="equipment"&&st.set===2&&st.tab==="overview"});ok(dk,"selecting a P&ID tile on the dashboard opens that equipment set");
   const ds=await q.evaluate(()=>{go("equipment",{set:4,tab:"ds"});return document.querySelectorAll(".dsrow").length>20&&!!document.querySelector(".dskeys")});ok(ds,"the datasheet renders as grouped specifications");
   const hd=await q.evaluate(()=>{go("equipment",{set:4,tab:"overview"});return !!document.querySelector(".eqhero")&&document.querySelectorAll(".eqr").length===8&&!!document.querySelector(".g3mini")});ok(hd,"the equipment page shows the header, key indicators and eight record cards");
+  /* 3D plant on the dashboard */
+  await q.evaluate(()=>go("dashboard"));await q.waitForTimeout(1800);
+  const pl=await q.evaluate(()=>({faces:P3.faces.length,labs:document.querySelectorAll(".p3lab").length,ms:P3.frameMs,order:document.getElementById("p3").compareDocumentPosition(document.getElementById("ovsvg"))&4,routes:P3.routes.length,units:Object.keys(P3.units).length}));
+  ok(pl.faces>8000&&pl.labs===8&&pl.units===8&&pl.routes>=11,"the 3D plant is built with eight units, floating labels and the process streams ("+pl.faces+" faces, "+pl.routes+" pipes)");
+  ok(pl.order===4&&Number.isFinite(pl.ms),"the 3D plant comes first on the dashboard and the P&ID overview follows below it");
+  const hp=await q.evaluate(()=>{for(let y=60;y<580;y+=12)for(let x=20;x<1100;x+=12){const h=p3Pick(x,y);if(h&&h.u)return{x,y,u:h.u}}return null});ok(!!hp,"a unit can be picked in the 3D plant");
+  await q.evaluate(()=>{P3.open=true;p3Select(4,true)});await q.waitForTimeout(4500);
+  ok(await q.evaluate(()=>st.page==="equipment"&&st.set===4&&st.tab==="overview"),"selecting a unit flies the camera to it and opens its equipment set");
+  await q.evaluate(()=>go("dashboard"));await q.waitForTimeout(1200);
+  const tp=await q.evaluate(async()=>{ovTrip(4);p3State();const a=P3.st[4].st,b=P3.st[3].st;ovTrip(4);p3State();return{a,b,after:P3.st[4].st}});ok(tp.a==="trip"&&tp.after==="ok","a trip started in the simulator shows in the 3D plant and clears again ("+tp.a+", downstream "+tp.b+")");
   const cv=await q.evaluate(()=>!document.querySelector('.nav[data-page="cov"]')&&typeof covPage==="undefined");ok(cv,"the Case 1 Coverage page is gone");
   const kp=await q.evaluate(async()=>{AI.cfg.remote=false;const r=await aiAsk("Show me the KPIs of the plant",{noLog:true});return r.tool+" "+/Availability/.test(r.text)});ok(kp==="kpi_summary true","the assistant answers key indicator questions");
   ok(qe.length===0,"new pages produce no script errors ("+qe.join("; ")+")");await q.close()}

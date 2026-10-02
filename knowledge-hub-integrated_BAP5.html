@@ -300,6 +300,23 @@ aside{overflow-y:auto}
 .dsrow{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:12px;padding:7px 0;border-bottom:1px solid #f0f3f8;font-size:13.5px}.dsrow:last-child{border-bottom:0}.dsrow>span{color:#5c6b7b}.dsrow b{font-weight:600}.dsu{color:#6b7a8d;font-size:12.5px}
 @media (max-width:1100px){.eqhero{grid-template-columns:1fr}.eqkpis{grid-template-columns:repeat(3,minmax(0,1fr))}.eqrecs{grid-template-columns:repeat(2,minmax(0,1fr))}.eq2c{grid-template-columns:1fr}.dsgrid{column-count:1}.dskeys{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.eqkpis,.eqrecs{grid-template-columns:repeat(2,minmax(0,1fr))}.eqfs,.eqflow{grid-template-columns:1fr}.dsrow{grid-template-columns:1fr;gap:2px}}
+
+/* 3D plant */
+.p3head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;padding:14px 18px 8px}.p3head>div:first-child{max-width:62ch}
+.p3tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:12.5px}.p3tools label{display:flex;gap:5px;align-items:center;cursor:pointer;color:#33445c}
+.p3chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 18px 10px}.p3chips button{padding:3px 11px;font-size:12.5px}.p3chips button.on{background:#e8f1fb;border-color:#155ea3;color:#155ea3}
+.p3stage{position:relative;height:620px;background:#e9f0f8;border-top:1px solid #d5deea;overflow:hidden}
+.p3labs{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.p3lab{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;background:rgba(255,255,255,.94);border:1px solid #c5d3e4;border-radius:10px;padding:5px 9px 6px;font-size:12px;line-height:1.3;box-shadow:0 3px 12px rgba(20,40,70,.18);white-space:nowrap;transition:opacity .2s;will-change:transform}
+.p3lab b{font-size:13px;margin-right:6px}.p3lab small{display:none;color:#5c6b7b;font-size:11.5px}.p3lab.full small{display:block}.p3lab .p3st{font-size:0;width:9px;height:9px;padding:0;border-radius:50%;vertical-align:middle}.p3lab.full .p3st{font-size:10.5px;width:auto;height:auto;padding:1px 8px;border-radius:9px}.p3lab.full b{margin-right:6px}.p3lab b{margin-right:5px}.p3lab .p3st.ok{background:#1a7f37}.p3lab .p3st.alarm,.p3lab .p3st.upset{background:#f0aa28}.p3lab .p3st.trip{background:#e13c37}.p3lab.full .p3st.ok{background:#dcf5e1}.p3lab.full .p3st.alarm,.p3lab.full .p3st.upset{background:#ffecc7}.p3lab.full .p3st.trip{background:#fde0de}.p3lab:hover,.p3lab.sel{border-color:#155ea3;box-shadow:0 4px 16px rgba(21,94,163,.3)}.p3lab:focus-visible{outline:2px solid #155ea3}
+.p3st{display:inline-block;font-size:10.5px;font-weight:700;border-radius:9px;padding:1px 8px;letter-spacing:.02em}.p3st.ok{background:#dcf5e1;color:#1a7f37}.p3st.alarm,.p3st.upset{background:#ffecc7;color:#9a6700}.p3st.trip{background:#fde0de;color:#cf222e;animation:p3b .9s ease-in-out infinite}
+@keyframes p3b{50%{opacity:.55}}@media (prefers-reduced-motion:reduce){.p3st.trip{animation:none}}
+.p3card{position:absolute;top:12px;right:12px;width:310px;max-width:calc(100% - 24px);background:#fff;border:1px solid #cfd8e3;border-radius:12px;box-shadow:0 10px 30px rgba(20,40,70,.22);padding:12px 14px;z-index:5000}
+.p3m{display:grid;grid-template-columns:1fr 1fr;gap:8px}.p3m div{background:#f4f7fb;border-radius:8px;padding:6px 9px}.p3m b{display:block;font-size:16px}.p3m span{font-size:11.5px;color:#5c6b7b}
+.p3key{position:absolute;left:12px;bottom:10px;display:flex;gap:12px;flex-wrap:wrap;background:rgba(255,255,255,.88);border-radius:10px;padding:5px 10px;font-size:11.5px;color:#33445c;max-width:calc(100% - 24px)}
+.p3key i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.p3key u{display:inline-block;width:16px;height:4px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:700px){.p3stage{height:480px}.p3card{top:auto;bottom:56px;right:8px;left:8px;width:auto}.p3key{display:none}}
 .pbar{padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;font-size:12.5px;background:var(--panel2)}
 .sheet{background:#fbfbf8;border:1px solid #c9c9c0;border-radius:6px;overflow:auto;max-height:76vh}
 .sheet svg{display:block;font-family:Arial,Helvetica,sans-serif}.sheet text{fill:#111}
@@ -4599,6 +4616,13 @@ const g3c={steel:"#b4c0cf",body:"#d3dce7",dark:"#4d5b70",blue:"#4f86c9",gray:"#9
 const g3B=(k,x,y,z,w,h,d,c,o)=>Object.assign({t:"r",k,x,y,z,w,h,d,c},o),
  g3C=(k,ax,x,y,z,len,r,c,o,r2)=>Object.assign({t:"c",k,ax,x,y,z,len,r,r2:r2==null?r:r2,c},o),
  g3E=(k,ax,x,y,z,ra,rb,c,a0,a1,o)=>Object.assign({t:"e",k,ax,x,y,z,ra,rb,c,a0,a1},o);
+/* moving parts: rotation about an axis through a point, or a sliding stroke along an axis */
+function g3Anim(a,v,t){if(!a)return v;if(a.type==="slide"){const d=Math.sin(t*a.rate+(a.ph||0))*a.amp,i=a.ax==="x"?0:a.ax==="y"?1:2,r=v.slice();r[i]+=d;return r}
+ const g=a.rate*t*Math.PI/180,c=Math.cos(g),s=Math.sin(g),p=[v[0]-a.at[0],v[1]-a.at[1],v[2]-a.at[2]];let q;
+ if(a.ax==="y")q=[p[0]*c+p[2]*s,p[1],-p[0]*s+p[2]*c];else if(a.ax==="x")q=[p[0],p[1]*c-p[2]*s,p[1]*s+p[2]*c];else q=[p[0]*c-p[1]*s,p[0]*s+p[1]*c,p[2]];
+ return[q[0]+a.at[0],q[1]+a.at[1],q[2]+a.at[2]]}
+function g3AnimN(a,n,t){if(!a||a.type==="slide")return n;const g=a.rate*t*Math.PI/180,c=Math.cos(g),s=Math.sin(g);
+ if(a.ax==="y")return[n[0]*c+n[2]*s,n[1],-n[0]*s+n[2]*c];if(a.ax==="x")return[n[0],n[1]*c-n[2]*s,n[1]*s+n[2]*c];return[n[0]*c-n[1]*s,n[0]*s+n[1]*c,n[2]]}
 const G3M={};
 /* assemblies reused by several machines */
 const g3Motor=(k,x,y,z,len,r,o)=>{const a=[g3C(k,"x",x,y,z,len,r,"blue",{m:.5}),g3C(k,"x",x+len/2+.05,y,z,.1,r*.92,"dark"),g3C(k,"x",x+len/2+.16,y,z,.14,r*.84,"steel",{},r*.9),
@@ -4681,9 +4705,59 @@ G3M[8]=[g3C("1","x",0,1.05,0,2.4,.56,"paint",{sh:1,m:.5}),g3E("2","x",-1.2,1.05,
  g3C("8","y",1.05,1.05,.64,1.2,.05,"steel",{m:.6}),g3C("8","x",1.05,1.55,.32,.66,.04,"steel"),g3C("8","x",1.05,.55,.32,.66,.04,"steel"),g3C("8","y",1.05,1.05,.64,.4,.08,"white",{seg:14}),g3B("10",-.1,1.05,.58,.22,.13,.03,"dark",{r:.01}),g3B("10",-.1,1.05,.6,.2,.11,.01,"white"),g3C("12","y",-.3,.5,0,.08,.04,"amber"),
  g3C("N1","y",.2,1.8,0,.3,.08,"amber"),g3C("N2","y",-.85,.2,0,.34,.08,"amber"),g3C("N3","y",-.1,.2,0,.34,.08,"amber"),g3C("N4","y",.8,-.1,0,.2,.07,"amber"),
  g3C("N5","y",.65,1.8,0,.3,.06,"amber"),g3C("9","y",.65,1.72,0,.06,.1,"steel"),g3C("9","y",.65,1.98,0,.28,.07,"red"),g3C("M1","y",-.45,1.88,0,.2,.07,"amber")];
+/* ---------- finer detail and moving parts for each machine ---------- */
+const g3L=(x,y,z)=>g3C("","y",x,y,z,.08,.05,"green",{light:1,seg:10});
+const g3Gauge=(k,x,y,z,ax)=>[g3C(k,ax||"z",x,y,z,.05,.075,"white",{seg:16,m:.6}),g3C(k,ax||"z",x,y,z-.02,.03,.085,"steel",{seg:16})];
+const g3Hand=(k,x,y,z)=>[g3C(k,"y",x,y,z,.3,.015,"steel",{seg:8}),g3C(k,"y",x,y+.17,z,.025,.11,"red",{seg:20,m:.4})];
+/* pump: discharge valve, gauge, rotating impeller vanes and shaft key (seen with X-ray), drip tray, nameplate */
+G3M[1].push(g3B("11",-.5,.15,-.12,1.1,.03,.5,"dark",{r:.03,zb:.2}),g3B("N2",-.68,.86,.1,.2,.2,.16,"paint",{r:.04}),...g3Hand("N2",-.68,.96,.1),...g3Gauge("N2",-.68,1.12,.16,"z"),
+ g3C("N1","y",-1.15,.28,0,.2,.12,"paint",{m:.5}),g3B("M",1.3,.47,.3,.2,.1,.02,"white"),g3L(.9,.78,.15),
+ g3C("3","x",.02,.47,0,.04,.045,"dark",{in:1,anim:{ax:"x",rate:220,at:[0,.47,0]}}),g3B("3",.02,.5,0,.05,.03,.04,"brass",{in:1,anim:{ax:"x",rate:220,at:[0,.47,0]}}),
+ ...[0,1,2,3,4,5].map(i=>g3B("2",-.68,.47+Math.cos(i*Math.PI/3)*.12,Math.sin(i*Math.PI/3)*.12,.08,.09,.03,"brass",{in:1,r:.01,ry:0,anim:{ax:"x",rate:220,at:[-.68,.47,0]}})),
+ g3C("8","x",-.1,.47,.0,.3,.01,"steel",{in:1}),g3B("10",.3,.47,0,.02,.3,.02,"dark",{in:1,anim:{ax:"x",rate:220,at:[.3,.47,0]}}));
+/* dryer: stripes on the turning drum, ring gear teeth, screw feeder, platform and ladder, drive guard */
+G3M[2].push(...[0,1,2,3,4,5].map(i=>{const a=i*Math.PI/3;return g3B("1",0,1.25+Math.cos(a)*.745,Math.sin(a)*.745,3.5,.025,.07,"dark",{r:.01,ry:0,anim:{ax:"x",rate:42,at:[0,1.25,0]}})}),
+ ...Array.from({length:28},(_,i)=>{const a=i/28*Math.PI*2;return g3B("4",-.55,1.25+Math.cos(a)*.93,Math.sin(a)*.93,.1,.07,.05,"dark",{r:.005,anim:{ax:"x",rate:42,at:[0,1.25,0]}})}),
+ g3C("N1","x",-2.0,2.0,0,.6,.1,"steel",{m:.5}),g3B("N1",-2.35,2.0,0,.26,.26,.26,"blue",{r:.04}),g3C("","y",-1.0,2.0,-.02,.1,.04,"dark"),
+ g3B("",0,2.62,-1.2,4.2,.04,.5,"gray",{r:.01}),g3C("","y",-2.1,2.2,-1.2,.82,.02,"gray",{seg:8}),g3C("","y",2.1,2.2,-1.2,.82,.02,"gray",{seg:8}),g3B("",0,2.95,-1.42,4.2,.02,.02,"gray"),...g3Ladder(2.4,.0,2.62,-1.2),
+ g3B("6",0,.52,.95,.6,.05,.2,"dark",{r:.02}),g3L(-2.4,1.05,.32),g3C("","y",-.55,1.0,-.95,.5,.015,"steel",{seg:8}));
+/* reactor: gauges, relief tail pipe, hoops on the ladder, thermowell head, nameplate, blinking beacon */
+G3M[3].push(...g3Gauge("N3",.88,3.38,.1,"z"),...g3Gauge("N1",-.86,3.2,.1,"z"),g3C("9","y",.9,3.8,0,.28,.035,"steel",{seg:10}),g3C("9","x",1.05,3.94,0,.3,.035,"steel",{seg:10}),
+ ...[.7,1.2,1.7,2.2,2.6].map(y=>g3C("","y",.55,y,.4,.025,.17,"gray",{seg:16,m:.5})),g3C("6","y",0,4.0,0,.14,.06,"red",{m:.4}),g3B("1",.4,1.5,.5,.02,.18,.14,"white"),
+ g3C("","y",0,4.1,0,.2,.035,"dark",{seg:10}),g3L(0,4.28,0),g3C("N2","y",.95,.55,0,.8,.05,"paint",{m:.5}),g3C("N2","x",.95,.15,0,.6,.05,"paint",{m:.5}),
+ g3B("10",0,.02,.0,.02,.02,.02,"dark"),...[0,1,2,3,4,5].map(i=>g3B("10",Math.cos(i*Math.PI/3)*.62,.2,Math.sin(i*Math.PI/3)*.62,.12,.32,.06,"dark",{r:.01,ry:0})));
+/* compressor: flywheel with spokes, sliding pistons and crossheads, breather, gauge panel, blinking light */
+G3M[4].push(...Array.from({length:6},(_,i)=>g3B("2",-.62,.88+Math.cos(i*Math.PI/3)*.2,.55+0,.08,.36,.06,"dark",{r:.01,anim:{ax:"z",rate:130,at:[-.62,.88,.55]}})),
+ g3B("2",-.62,.88,.62,.34,.34,.04,"steel",{r:.1,anim:{ax:"z",rate:130,at:[-.62,.88,.55]}}),
+ g3C("5","x",1.3,.98,.28,.24,.23,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9}}),g3C("6","x",1.3,.98,-.28,.24,.18,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9,ph:1.57}}),
+ g3B("4",.8,.98,.28,.2,.12,.12,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9}}),g3B("4",.8,.98,-.28,.2,.12,.12,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9,ph:1.57}}),
+ g3C("3","x",.35,.88,.15,.02,.025,"dark",{in:1}),g3C("9","x",.96,.98,.28,.3,.03,"steel",{in:1,anim:{type:"slide",ax:"x",amp:.14,rate:9}}),
+ g3C("1","y",.2,1.45,.2,.2,.07,"white",{m:.5}),g3B("11",.9,.55,.8,.5,.4,.05,"white",{r:.02}),...g3Gauge("11",.75,.6,.84,"z"),...g3Gauge("11",1.05,.6,.84,"z"),g3L(.9,.88,.84),
+ g3C("N4","x",2.35,.98,-.28,.03,.12,"steel"),g3C("12","y",1.2,1.7,.0,.12,.05,"steel"),g3C("","y",.2,1.7,.2,.5,.04,"steel",{seg:10}));
+/* heater: steam control valve on the supply, condensate pot with level glass, insulation straps, lifting lugs */
+G3M[5].push(g3C("N3","y",1.2,1.45,0,.35,.075,"paint",{m:.5}),g3B("N3",1.2,1.7,0,.16,.16,.16,"blue",{r:.03}),g3C("N3","y",1.2,1.95,0,.2,.1,"steel",{m:.5}),g3C("N3","y",1.2,2.1,0,.05,.12,"blue"),...g3Hand("N3",1.0,1.3,0),
+ g3C("12","y",1.55,.55,.38,.45,.1,"paint",{sh:0,m:.5}),g3C("12","y",1.55,.55,.5,.3,.015,"steel",{seg:8}),g3C("12","y",1.55,.5,.5,.14,.02,"water",{seg:8}),
+ ...[-1.2,-.4,.4,1.2].map(x=>g3C("1","x",x,.72,0,.05,.325,"steel",{m:.7,seg:36})),g3B("1",-.4,1.04,0,.08,.14,.1,"steel",{r:.02}),g3B("1",.8,1.04,0,.08,.14,.1,"steel",{r:.02}),...g3Gauge("N4",.4,.5,.34,"z"),g3L(-1.82,1.28,0),
+ g3C("N1","x",-1.82,1.35,0,.5,.045,"steel",{seg:10}),g3C("N5","y",-.6,1.35,0,.2,.03,"steel",{seg:10}));
+/* control valve: sliding stem and indicator, handwheel, limit switch box, tubing, supports */
+G3M[6].push(g3C("4","y",0,.98,0,.16,.02,"steel",{seg:10,m:.9,anim:{type:"slide",ax:"y",amp:.05,rate:2.2}}),g3B("4",.0,1.0,.1,.05,.03,.08,"red",{r:.01,anim:{type:"slide",ax:"y",amp:.05,rate:2.2}}),
+ g3B("11",.2,1.12,0,.04,.25,.01,"white"),g3B("11",.0,1.5,0,.18,.1,.18,"steel",{r:.03}),g3C("8","y",0,1.62,0,.04,.1,"steel"),g3C("8","y",0,1.7,0,.12,.015,"steel",{seg:8}),g3C("8","y",0,1.78,0,.03,.1,"red",{seg:18}),
+ g3B("9",.3,.82,0,.08,.08,.08,"dark",{r:.015}),g3B("",-.45,.12,0,.2,.24,.28,"gray",{r:.03}),g3B("",.45,.12,0,.2,.24,.28,"gray",{r:.03}),...g3Gauge("12",.62,.66,.2,"z"),g3L(.15,1.55,.1),
+ g3C("N1","x",-.62,.4,0,.04,.15,"steel"),g3C("10","y",0,.62,0,.035,.17,"steel",{m:.7}));
+/* cooling tower: louvers on every side, sump water, spray header, ladder cage, make-up pipe, motor cowl */
+G3M[7].push(...[-1,1].flatMap(sg=>Array.from({length:7},(_,i)=>g3B("12",0,.28+i*.1,sg*1.215,2.2,.03,.1,"steel",{r:.008,ry:0}))),...Array.from({length:7},(_,i)=>g3B("12",1.215,.28+i*.1,0,.1,.03,2.2,"steel",{r:.008})),
+ g3B("8",0,.2,0,2.2,.12,2.2,"water",{in:1,r:.02}),g3C("8","x",0,.9,0,2.1,.03,"paint",{in:1,seg:12}),...[-.6,0,.6].map(z=>g3C("8","z",0,.9,z,1.9,.02,"paint",{in:1,seg:10})),
+ g3C("N2","y",1.35,.4,0,.4,.05,"paint",{seg:10}),g3C("N2","x",1.35,.2,0,.6,.05,"paint",{seg:10}),g3C("5","x",1.62,1.2,0,.12,.185,"dark"),g3B("5",1.62,1.4,0,.2,.1,.2,"steel",{r:.03}),g3L(1.55,1.1,.0),
+ ...[.14,.34,.54,.74,.94].map(y=>g3C("","y",1.2,y,1.31,.025,.17,"gray",{seg:16,m:.5})),g3B("11",.34,1.35,.1,.06,.1,.06,"red",{r:.01}),g3B("",.0,.02,1.4,2.6,.02,.04,"white"));
+/* drum: level float and gauge glass, ladder and platform to the manway, boot drain valve, gauge, insulation rings, nameplate */
+G3M[8].push(g3C("8","y",1.05,1.05,.64,1.0,.03,"water",{seg:10,m:.9}),g3C("8","y",1.05,1.05,.64,.12,.028,"red",{seg:10,anim:{type:"slide",ax:"y",amp:.28,rate:.9}}),
+ ...[-.9,-.3,.3,.9].map(x=>g3C("1","x",x,1.05,0,.04,.575,"steel",{m:.7,seg:36})),g3B("N4",.8,.12,.18,.14,.14,.14,"paint",{r:.03}),...g3Hand("N4",.8,.22,.18),...g3Gauge("N1",.2,2.0,.14,"z"),
+ g3B("",-.45,1.9,-.55,1.0,.04,.5,"gray",{r:.01}),g3B("",-.45,2.05,-.78,1.0,.02,.02,"gray"),g3B("",-.95,2.0,-.55,.02,.2,.5,"gray"),g3B("",.05,2.0,-.55,.02,.2,.5,"gray"),...g3Ladder(-.95,.0,1.9,-.9),
+ g3C("9","y",.65,2.1,0,.12,.06,"steel",{seg:10}),g3C("9","x",.78,2.3,0,.26,.05,"steel",{seg:10}),g3C("12","x",-.3,.42,0,.18,.012,"dark",{seg:8}),g3L(-.1,2.08,.0),
+ g3C("M1","y",-.45,1.98,0,.05,.09,"steel"),g3C("N3","x",-.1,.05,.0,.02,.1,"dark"));
 /* ---------- geometry ---------- */
-const g3Seg=p=>p.seg||(p.r&&p.r<.07||p.len&&p.len<.06?14:34);
-function g3Parts(p){const F=[],C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#b4c0cf")),cen=[p.x,p.y,p.z],sm=p.t!=="r",mk=(pts,s,sc)=>F.push({p:pts,k:p.k,c:C,sh:p.sh,in:p.in,zb:p.zb||0,cen,anim:p.anim,m:p.m||.18,sm:s!==undefined?s:sm,sc:sc||0});
+const g3Seg=p=>Math.max(8,Math.round((p.seg||(p.r&&p.r<.07||p.len&&p.len<.06?14:34))*(G3.q||1)));
+function g3Parts(p){const F=[],C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#b4c0cf")),cen=[p.x,p.y,p.z],sm=p.t!=="r",mk=(pts,s,sc)=>F.push({p:pts,k:p.k,c:C,sh:p.sh,in:p.in,zb:p.zb||0,light:p.light,cen,anim:p.anim,m:p.m||.18,sm:s!==undefined?s:sm,sc:sc||0});
  if(p.t==="r"){const hx=p.w/2,hz=p.d/2,hy=p.h/2,rr=Math.min(p.r==null?Math.min(hx,hz)*.18:p.r,hx*.95,hz*.95),o=p.off||[0,0,0],prof=[];
   const cs=[[hx-rr,hz-rr,0],[-(hx-rr),hz-rr,1],[-(hx-rr),-(hz-rr),2],[hx-rr,-(hz-rr),3]],K=rr>.001?4:1;
   cs.forEach(([cx,cz,q])=>{for(let i=0;i<=K;i++){const a=(q+i/K)*Math.PI/2;prof.push([cx+(rr>.001?Math.cos(a)*rr:Math.sign(cx||1)*0),cz+(rr>.001?Math.sin(a)*rr:0)])}});
@@ -4704,15 +4778,17 @@ function g3Extra(prims){const c=[0,0,0];prims.forEach(p=>{c[0]+=p.x;c[1]+=p.y;c[
  prims.forEach(p=>{if(p.t!=="c"||p.r2!==p.r||!/^(N\d|M\d)$/.test(p.k)||p.len<.12)return;const ax=p.ax,idx=ax==="x"?0:ax==="y"?1:2,pos=[p.x,p.y,p.z],sgn=(pos[idx]-c[idx])>=0?1:-1,end=pos.slice();end[idx]+=sgn*p.len/2;
   const fr=p.r*1.55,th=Math.max(.03,p.r*.4);const e2=end.slice();e2[idx]-=sgn*th/2;out.push(g3C(p.k,ax,e2[0],e2[1],e2[2],th,fr,"steel",{m:.7,seg:p.r<.06?14:30}));
   const nb=p.r<.06?4:8;for(let i=0;i<nb;i++){const t=i/nb*Math.PI*2,u=Math.cos(t)*fr*.78,v=Math.sin(t)*fr*.78,e3=end.slice();e3[idx]+=sgn*.004;const m=ax==="x"?[e3[0],e3[1]+u,e3[2]+v]:ax==="y"?[e3[0]+u,e3[1],e3[2]+v]:[e3[0]+u,e3[1]+v,e3[2]];out.push(g3C(p.k,ax,m[0],m[1],m[2],.025,p.r*.16,"dark",{seg:8,m:.6}))}});return out}
-function g3Mesh(n){if(G3.mesh[n])return G3.mesh[n];const prims=(G3M[n]||[]).concat(g3Extra(G3M[n]||[])),faces=[];
- prims.forEach(p=>{g3Parts(p).forEach(f=>{const q=f.p,u=[q[1][0]-q[0][0],q[1][1]-q[0][1],q[1][2]-q[0][2]],v=[q[2][0]-q[0][0],q[2][1]-q[0][1],q[2][2]-q[0][2]];
+/* outward normal and centre of a face of primitive p */
+function g3Orient(p,f){const q=f.p,u=[q[1][0]-q[0][0],q[1][1]-q[0][1],q[1][2]-q[0][2]],v=[q[2][0]-q[0][0],q[2][1]-q[0][1],q[2][2]-q[0][2]];
   let nm=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];const l=Math.hypot(...nm)||1;nm=nm.map(x=>x/l);
   const c=[0,1,2].map(i=>q.reduce((a,b)=>a+b[i],0)/q.length);let off=f.cen;if(p.t==="r"&&p.off){const a=(p.ry||0)*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a);off=[f.cen[0]+p.off[0]*cs+p.off[2]*sn,f.cen[1]+p.off[1],f.cen[2]-p.off[0]*sn+p.off[2]*cs]}
-  if(p.t==="c"){/* a cylinder side face points away from its axis; caps point along it */const ai=p.ax==="x"?0:p.ax==="y"?1:2,rel=[c[0]-f.cen[0],c[1]-f.cen[1],c[2]-f.cen[2]];if(f.sc===0)rel[ai]=0;off=[c[0]-rel[0],c[1]-rel[1],c[2]-rel[2]]}
-  const d=(c[0]-off[0])*nm[0]+(c[1]-off[1])*nm[1]+(c[2]-off[2])*nm[2];if(d<0)nm=nm.map(x=>-x);f.n=nm;f.m=f.m;f.mid=c;faces.push(f)})});
+  if(p.t==="c"){const ai=p.ax==="x"?0:p.ax==="y"?1:2,rel=[c[0]-f.cen[0],c[1]-f.cen[1],c[2]-f.cen[2]];if(f.sc===0)rel[ai]=0;off=[c[0]-rel[0],c[1]-rel[1],c[2]-rel[2]]}
+  const d=(c[0]-off[0])*nm[0]+(c[1]-off[1])*nm[1]+(c[2]-off[2])*nm[2];if(d<0)nm=nm.map(x=>-x);f.n=nm;f.mid=c}
+function g3Mesh(n,q){const key=n+(q?"q"+q:"");if(G3.mesh[key])return G3.mesh[key];const q0=G3.q;G3.q=q||1;try{const prims=(G3M[n]||[]).concat(g3Extra(G3M[n]||[])),faces=[];
+ prims.forEach(p=>{g3Parts(p).forEach(f=>{g3Orient(p,f);faces.push(f)})});
  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];faces.forEach(f=>f.p.forEach(v=>{for(let i=0;i<3;i++){mn[i]=Math.min(mn[i],v[i]);mx[i]=Math.max(mx[i],v[i])}}));
  const ctr=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],Rs=Math.hypot(...[0,1,2].map(i=>(mx[i]-mn[i])/2)),Rf=Math.max((mx[1]-mn[1])/2*1.12,Math.hypot((mx[0]-mn[0])/2,(mx[2]-mn[2])/2)*.78);
- return G3.mesh[n]={faces,ctr,R:Rs,Rf,ymin:mn[1],mn,mx}}
+ return G3.mesh[key]={faces,ctr,R:Rs,Rf,ymin:mn[1],mn,mx}}finally{G3.q=q0}}
 function g3Info(n,k){if(!k)return"";const nz=GA[n]&&GA[n].nz.find(q=>q.m===k),b=nz?null:gBom(n,k),s=S(n);if(!nz&&!b)return"";
  const wo=MH.filter(m=>m.n===n&&mhParts(m).includes(k)),V=nz?null:gVal(n,k),rows=nz?[["Nozzle",k],["Service",nz.sv],["Size and rating",nz.sz],["Remarks",nz.r]]:[["Item",k==="M"?"Driver":k],["Material",b.mat],["Quantity",b.qty],["Drawing",s.ga.dwg_no]];
  let live="";if(V&&G.cond!==false){const st0=gState(V.m,V.v),cl=st0==="ok"?"ok":st0==="warn"?"warn":"bad";live=`<div class="g3live"><span class="tag ${cl}">${st0==="ok"?"Normal":st0==="warn"?"Alarm":"Trip"}</span> <b>${V.v.toFixed(V.m[3]<5?1:0)} ${V.m[2]}</b> <span class="muted">${esc(V.m[1])}</span></div>`}
@@ -4722,10 +4798,9 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  const W=900,H=500,cy=Math.cos(I.yaw),sy=Math.sin(I.yaw),cp=Math.cos(I.pit),sp=Math.sin(I.pit),D=M.R*3.4,sc=I.zoom*(H*.46)/M.Rf,t=I.t;
  const sel=I.pin||(o.sel?o.sel():null),hl=o.hl||[],heat=o.heat||{},tint=o.tint;
  const rot=v=>{const x=v[0]-M.ctr[0],y=v[1]-M.ctr[1],z=v[2]-M.ctr[2],x1=x*cy+z*sy,z1=-x*sy+z*cy;return[x1,y*cp+z1*sp,-y*sp+z1*cp]};
- const spin=(f,v)=>{const a=f.anim;if(!a||!I.run)return v;const ang=a.rate*t*Math.PI/180,c=Math.cos(ang),s=Math.sin(ang),dx=v[0]-a.at[0],dz=v[2]-a.at[2];return[dx*c+dz*s+a.at[0],v[1],-dx*s+dz*c+a.at[2]]};
  const out=[];
- M.faces.forEach(f=>{if(f.in&&!I.xray)return;const anim=f.anim&&I.run;const pts=f.p.map(v=>rot(anim?spin(f,v):v));let nm=f.n;
-  if(anim){const a=f.anim.rate*t*Math.PI/180,c=Math.cos(a),s=Math.sin(a);nm=[nm[0]*c+nm[2]*s,nm[1],-nm[0]*s+nm[2]*c]}
+ M.faces.forEach(f=>{if(f.in&&!I.xray)return;const anim=f.anim&&I.run;const pts=f.p.map(v=>rot(anim?g3Anim(f.anim,v,t):v));let nm=f.n;
+  if(anim)nm=g3AnimN(f.anim,nm,t);
   const nx=nm[0]*cy+nm[2]*sy,nz1=-nm[0]*sy+nm[2]*cy,ny=nm[1]*cp+nz1*sp,nzz=-nm[1]*sp+nz1*cp;
   if(!(I.xray&&f.sh)&&nzz>=0)return;let zc=0;for(const p of pts)zc+=p[2];zc=zc/pts.length+f.zb;out.push({f,pts,zc,nx,ny,nz:nzz})});
  out.sort((a,b)=>b.zc-a.zc);
@@ -4737,7 +4812,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  const sh=[];for(let i=0;i<24;i++){const a=i/24*Math.PI*2;sh.push(proj(rot([M.ctr[0]+Math.cos(a)*(M.mx[0]-M.mn[0])*.52,gy,M.ctr[2]+Math.sin(a)*(M.mx[2]-M.mn[2])*.6])))}
  let s=`<path d="${grid}" stroke="#d3dbe6" stroke-width=".7" fill="none"/><polygon points="${sh.map(p=>fx(p[0])+","+fx(p[1])).join(" ")}" fill="#223047" opacity=".16" filter="url(#g3b)"/>`;
  const over=[];
- out.forEach(({f,pts,nx,ny,nz})=>{let c=f.c.slice(0,3);const k=f.k;
+ out.forEach(({f,pts,nx,ny,nz})=>{let c=f.light?(o.light?o.light():[63,185,80]):f.c.slice(0,3);const k=f.k;
   const tc=k&&(tint&&tint(k)||heat[k]);if(tc){const q=typeof tc==="string"?g3Parse(tc):tc,a=q[3]==null?.6:q[3];c=c.map((v,i)=>v*(1-a)+q[i]*a)}
   const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=(ny*.5+.5),spec=Math.pow(Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),22)*f.m;
   const lum=.36+.5*d1+.16*d2+.12*hemi,hlOn=k&&hl.includes(k),selOn=k&&k===sel;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.1+26));
@@ -4749,7 +4824,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  const cap=box.querySelector(".g3cap");if(cap&&!I.hover&&!box.dataset.mini)cap.textContent=sel?g3Name(o.n,sel):"Drag to rotate, scroll to zoom, select a part for its details";
  const card=box.querySelector(".g3side");if(card&&I.cardKey!==sel){I.cardKey=sel;card.innerHTML=box.dataset.mini?"":g3Info(o.n,sel)}}
 function g3Init(box){const id=box.id,o=G3.cfg[id];if(!o)return;box.setAttribute("data-ok","1");const mini=!!box.dataset.mini;
- box.innerHTML=(mini?"":`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Fan running</button>':""}<button class="ghost" data-v="reset">Reset</button></div>`)+
+ box.innerHTML=(mini?"":`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Moving parts</button>':""}<button class="ghost" data-v="reset">Reset</button></div>`)+
  `<div class="g3stage"><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><rect width="900" height="500" fill="url(#g3bg)"/><g class="g3s"></g></svg><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
  const I=G3.inst[id]={yaw:-.62,pit:.34,zoom:mini?1.05:1,px:0,py:0,spin:mini,xray:false,run:true,t:0,drag:null,hover:null,dirty:true,last:performance.now(),pin:null,cardKey:undefined};
  const svg=box.querySelector("svg"),dirty=()=>{I.dirty=true},views={iso:[-.62,.34],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2-.001]};
@@ -4781,6 +4856,174 @@ function gaFig(n,svg2d,o){const id="g3_"+(++G3.seq);G3.cfg[id]=Object.assign({n}
  return `<div class="gfig"><div class="gtog" role="group" aria-label="Drawing view"><button data-m="2d" class="${m==="2d"?"on":""}" onclick="g3Mode('2d')">2D drawing</button><button data-m="3d" class="${m==="3d"?"on":""}" onclick="g3Mode('3d')">3D model</button></div><div class="g2" ${m==="3d"?"hidden":""}>${svg2d}</div><div class="g3box" id="${id}" ${m==="3d"?"":"hidden"}></div></div>`}
 /* a small turning model for headers; a click opens the drawing */
 function g3Mini(n){const id="g3_"+(++G3.seq);G3.cfg[id]={n};return `<div class="g3box g3mini" id="${id}" data-mini="1" title="Open the equipment drawing"></div>`}
+/* =====================================================================================================
+   3D PLANT LAYOUT
+   The eight machines are placed as on the plot plan (two rows either side of the main pipe rack), joined by the same process,
+   gas, cooling water, nitrogen and steam streams as the plant P&ID overview. Floating labels show each unit's state. Drag to orbit,
+   scroll to zoom, shift-drag to move. Selecting a unit flies the camera to it and then opens its equipment set. Trips from the
+   simulator colour the unit, stop the flow out of it and show the upset downstream.
+   Drawn on a canvas with a small software renderer; the models are the same solids as the equipment drawings.
+   ===================================================================================================== */
+regMod("plant3d","1.0",["g3d"],"3D plant layout");
+const P3={built:false,cam:{yaw:-.62,pit:.6,dist:46,tx:0,ty:1.5,tz:0},to:null,sel:0,hover:0,pipe:null,orbit:true,labels:true,flow:true,motion:true,open:true,faces:[],units:{},pipes:[],t:0,dirty:true,cv:null,st:{},hit:[],pend:0,at:0,seq:0};
+const P3POS={1:[-16.5,-9],2:[-5.5,-9],3:[5.5,-9],4:[16.5,-9],5:[-16.5,9],6:[-5.5,9],7:[5.5,9],8:[16.5,9]};
+const P3SC={1:2.5,2:1.75,3:2.0,4:1.85,5:1.95,6:4.0,7:2.9,8:2.2};
+const P3SKY=[[233,240,248],[203,218,236]],P3GR=[214,220,228];
+function p3Prim(list,u,layer,id){const out=[];list.forEach(p=>g3Parts(p).forEach(f=>{g3Orient(p,f);let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r;f.u=u;f.layer=layer||2;f.pid=id||null;out.push(f)}));return out}
+function p3Place(n){const M=g3Mesh(n,.5),s=P3SC[n],[x0,z0]=P3POS[n],cx=(M.mn[0]+M.mx[0])/2,cz=(M.mn[2]+M.mx[2])/2,out=[];
+ const T=v=>[x0+(v[0]-cx)*s,(v[1]-M.ymin)*s+.25,z0+(v[2]-cz)*s];
+ M.faces.forEach(f=>{if(f.in)return;if(f.rad==null){let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r}const g={p:f.p.map(T),n:f.n,mid:T(f.mid),rad:f.rad,c:f.c,m:f.m,sh:f.sh,k:f.k,u:n,layer:2,light:f.light,sm:f.sm,anim:f.anim?Object.assign({},f.anim,f.anim.at?{at:T(f.anim.at)}:{}, f.anim.type==="slide"?{amp:f.anim.amp*s}:{}):null};out.push(g)});
+ P3.units[n]={x:x0,z:z0,s,top:(M.mx[1]-M.ymin)*s+.25,r:Math.hypot(M.mx[0]-M.mn[0],M.mx[2]-M.mn[2])*s/2,faces:out,lights:out.filter(f=>f.light)};return out}
+const p3B=(x,y,z,w,h,d,c,o)=>g3B("",x,y,z,w,h,d,c,o),p3C=(ax,x,y,z,len,r,c,o,r2)=>g3C("",ax,x,y,z,len,r,c,o,r2);
+function p3Scene(){const F=[],add=(list,u,layer,id)=>F.push(...p3Prim(list,u||0,layer==null?1:layer,id));
+ add([p3B(-1,-.2,0,70,.4,42,"#cdd6e2",{r:1.5,zb:3})],0,0);
+ K.sets.forEach(s=>{const [x,z]=P3POS[s.n];add([p3B(x,.06,z,11,.2,9.5,"#e3e9f1",{r:.4,zb:1.2}),p3B(x,.17,z-4.65,11,.02,.12,"amber"),p3B(x,.17,z+4.65,11,.02,.12,"amber")],0,1)});
+ /* road */
+ add([p3B(0,.02,-22,92,.1,5,"dark",{r:.2,zb:1}),p3B(0,.02,22,92,.1,5,"dark",{r:.2,zb:1}),...Array.from({length:14},(_,i)=>p3B(-40+i*6.2,.09,-22,2.6,.02,.18,"white")),...Array.from({length:14},(_,i)=>p3B(-40+i*6.2,.09,22,2.6,.02,.18,"white"))],0,1);
+ /* pipe rack: portal frames, two beam levels and a walkway */
+ const cols=[-27,-18,-9,0,9,18,27];
+ add(cols.flatMap(x=>[p3C("y",x,3.3,-2.6,6.6,.2,"dark"),p3C("y",x,3.3,2.6,6.6,.2,"dark"),p3B(x,4.0,0,.25,.22,5.4,"dark",{r:.03}),p3B(x,6.2,0,.25,.22,5.4,"dark",{r:.03}),p3B(x,2.0,-2.6,.12,.12,.12,"steel")]).concat([p3B(0,6.05,-2.6,56,.18,.2,"steel",{r:.02}),p3B(0,6.05,2.6,56,.18,.2,"steel",{r:.02}),p3B(0,3.85,-2.6,56,.18,.2,"steel",{r:.02}),p3B(0,3.85,2.6,56,.18,.2,"steel",{r:.02})]),0,2);
+ /* control room, storage tank, flare, separator */
+ add([p3B(-33,2.2,0,9,4.4,7,"white",{r:.3,m:.1}),p3B(-33,4.5,0,9.4,.35,7.4,"steel",{r:.1}),...[-3,-1,1,3].map(x=>p3B(-33+x,2.4,3.52,1.4,1.1,.06,"blue",{r:.03})),p3B(-33,1.2,3.52,1.3,2.1,.06,"dark",{r:.04}),p3C("y",-30,5.2,-2,1.6,.08,"steel")],0,2);
+ add([p3C("y",-33,3.6,-15,7.2,4.2,"paint",{m:.4,seg:48}),g3E("",  "y",-33,7.2,-15,1.4,4.2,"paint",0,Math.PI/2,{m:.4}),p3C("y",-29,3.6,-15,7.2,.1,"gray"),p3C("y",-33,.35,-15,.5,4.5,"gray"),...Array.from({length:6},(_,i)=>p3C("y",-33,.9+i*1.1,-15,.08,4.25,"steel",{m:.6,seg:48}))],0,2);
+ add([p3C("y",33,13,-17,26,.45,"white",{m:.3,seg:16},.3),p3B(33,.3,-17,3,.6,3,"gray",{r:.2}),...[0,1,2,3,4,5].map(i=>p3B(33,3+i*4,-17,1.4,.18,1.4,"steel",{r:.05})),p3C("x",33,25,-17,2.2,.08,"steel",{seg:8})],0,2);
+ const [sx,sz]=P3POS[6];add([p3C("y",sx-5.2,4,sz+1.2,7.2,1.5,"paint",{m:.5,seg:36}),g3E("","y",sx-5.2,7.6,sz+1.2,.9,1.5,"paint",0,Math.PI/2,{m:.5}),g3E("","y",sx-5.2,.4,sz+1.2,.9,1.5,"paint",Math.PI/2,Math.PI,{m:.5}),p3B(sx-5.2,.2,sz+1.2,2.4,.4,2.4,"gray",{r:.2})],0,2);
+ return F}
+/* pipes: from a unit's top, up to a lane in the rack, along the rack, and down to the next unit */
+const P3LANE=(L)=>({y:4.3+(L%3)*.8+(L>=3?.0:0),z:(L-4)*.52});
+function p3Routes(){const R=[],tops=n=>P3.units[n].top+.5,anch=(n,off)=>[P3POS[n][0]+Math.max(-3.4,Math.min(3.4,(off||0)/42)),P3POS[n][1]],pad=[];
+ const lanes={feed:0,slr:7,eff:1,pol:8,rg:2,rgr:9,cwk:3,cwf:10,sol:4,n2:5,stm:6};
+ OVL.forEach(([id,lab,a,b,svc,ln_,off])=>{const L=P3LANE(lanes[id]);
+  if(a===0){const tg=b.map((n,i)=>[...anch(n,off[1][i]),n]),xs=tg.map(t=>t[0]);const hdr=[[Math.min(...xs,-26),L.y,L.z],[Math.max(...xs),L.y,L.z]];
+   R.push({id,lab,svc,from:0,to:b,pts:hdr,r:.22,hdr:1});tg.forEach(([x,z,n])=>{R.push({id:id+n,lab,svc,from:0,to:[n],pts:[[x,L.y,L.z],[x,L.y,z],[x,tops(n),z]],r:.14,stub:1,base:id})});return}
+  const A=anch(a,off&&off[0]),B=anch(b,off&&off[1]);
+  R.push({id,lab,svc,from:a,to:[b],pts:[[A[0],tops(a),A[1]],[A[0],L.y,A[1]],[A[0],L.y,L.z],[B[0],L.y,L.z],[B[0],L.y,B[1]],[B[0],tops(b),B[1]]],r:svc==="cw"?.26:svc==="gas"?.2:.18})});
+ /* feed from the storage tank */
+ const f1=P3.units[1],tk=[-33,-15];R.push({id:"tank",lab:"Hexane from 12-T-01",svc:"proc",from:0,to:[1],pts:[[tk[0]+4.2,1.2,tk[1]],[P3POS[1][0]-6,1.2,tk[1]],[P3POS[1][0]-6,1.2,P3POS[1][1]],[P3POS[1][0]-2.6,1.2,P3POS[1][1]]],r:.2});
+ /* separator outlet to the control valve */
+ const sp=P3POS[6];R.push({id:"sep",lab:"Separator outlet",svc:"proc",from:0,to:[6],pts:[[sp[0]-5.2,.9,sp[1]+1.2],[sp[0]-2.3,.9,sp[1]+1.2],[sp[0]-2.3,.9,sp[1]]],r:.18});
+ return R}
+function p3PipeFaces(R){const out=[];
+ R.forEach((r,ri)=>{const col=(SVC[r.svc]||SVC.proc)[1],pts=r.pts,len=[0];
+  for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],d=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],L=Math.hypot(...d);len.push(len[i]+L);if(L<.01)continue;const ax=Math.abs(d[0])>=Math.abs(d[1])&&Math.abs(d[0])>=Math.abs(d[2])?"x":Math.abs(d[1])>=Math.abs(d[2])?"y":"z",c=[(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2];
+   out.push(...p3Prim([g3C("",ax,c[0],c[1],c[2],L,r.r,col,{m:.55,seg:9})],0,2,r.id));
+   const nf=Math.floor(L/5);for(let k=1;k<=nf;k++){const t=k/(nf+1),q=[a[0]+d[0]*t,a[1]+d[1]*t,a[2]+d[2]*t];out.push(...p3Prim([g3C("",ax,q[0],q[1],q[2],.12,r.r*1.45,"steel",{m:.7,seg:12})],0,2,r.id))}
+   if(i>0)out.push(...p3Prim([g3E("","y",a[0],a[1],a[2],r.r*1.08,r.r*1.08,col,0,Math.PI,{m:.55,seg:10})],0,2,r.id))}
+  r.len=len;r.total=len[len.length-1]});return out}
+function p3Build(){if(P3.built)return;K.sets.forEach(s=>{P3.faces.push(...p3Place(s.n))});P3.routes=p3Routes();const sc=p3Scene(),pf=p3PipeFaces(P3.routes);
+ P3.faces.push(...sc,...pf);P3.built=true;
+ P3.faces.forEach((f,i)=>{if(f.layer==null)f.layer=2;f.i=i})}
+/* ---------- camera and drawing ---------- */
+const p3Col=(c,lum,spec,fog,bg,tint,lift)=>{let r=c[0],g=c[1],b=c[2];if(tint){r=r*(1-tint[3])+tint[0]*tint[3];g=g*(1-tint[3])+tint[1]*tint[3];b=b*(1-tint[3])+tint[2]*tint[3]}
+ r=r*lum+255*spec*.5+lift;g=g*lum+255*spec*.5+lift;b=b*lum+255*spec*.5+lift;if(fog>0){r+= (bg[0]-r)*fog;g+=(bg[1]-g)*fog;b+=(bg[2]-b)*fog}return"rgb("+(r<0?0:r>255?255:r|0)+","+(g<0?0:g>255?255:g|0)+","+(b<0?0:b>255?255:b|0)+")"};
+const P3STC={ok:[63,185,80],alarm:[240,170,40],upset:[240,170,40],trip:[225,60,55]};
+function p3Frame(now,tick){const cv=P3.cv;if(!cv||!cv.isConnected){P3.cv=null;return}requestAnimationFrame(tick);
+ if(document.hidden||cv.offsetParent===null)return;const dt=Math.min(.1,(now-(P3.last||now))/1000);P3.last=now;const cam=P3.cam;
+ /* camera easing and auto orbit */
+ if(P3.to){const k=1-Math.pow(.0009,dt),T=P3.to;let dy=T.yaw-cam.yaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));cam.yaw+=dy*k;cam.pit+=(T.pit-cam.pit)*k;cam.dist+=(T.dist-cam.dist)*k;cam.tx+=(T.tx-cam.tx)*k;cam.ty+=(T.ty-cam.ty)*k;cam.tz+=(T.tz-cam.tz)*k;
+  if(Math.abs(dy)<.01&&Math.abs(T.dist-cam.dist)<.4&&Math.abs(T.tx-cam.tx)<.1&&Math.abs(T.tz-cam.tz)<.1){P3.to=null;if(P3.pend){const n=P3.pend;P3.pend=0;go("equipment",{set:n,tab:"overview"});return}}}
+ else if(P3.orbit&&!P3.drag){cam.yaw+=dt*.06}
+ if(P3.motion)P3.t+=dt;
+ const W=cv.clientWidth,H=cv.clientHeight,dpr=Math.min(2,window.devicePixelRatio||1);if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}
+ const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+ const cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw),cp=Math.cos(cam.pit),sp=Math.sin(cam.pit),F=H*.95,t=P3.t;
+ const trn=n=>{const z1=-n[0]*sy+n[2]*cy;return[n[0]*cy+n[2]*sy,n[1]*cp+z1*sp,-n[1]*sp+z1*cp]};
+ /* sky */
+ const proj=v=>{const x=v[0]-cam.tx,y=v[1]-cam.ty,z=v[2]-cam.tz,x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp+z1*sp,z2=-y*sp+z1*cp,d=cam.dist+z2;return d<1?null:[W/2+x1*F/d,H/2-y2*F/d,d]};
+ const gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,"rgb("+P3SKY[1].join(",")+")");gr.addColorStop(.55,"rgb("+P3SKY[0].join(",")+")");gr.addColorStop(1,"rgb(244,247,251)");ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+ const L0=[-.42,.8,.38],ll=Math.hypot(...L0),Ls=[L0[0]/ll,L0[1]/ll,L0[2]/ll];const Lc=trn(Ls),Hv=(()=>{const h=[Lc[0],Lc[1],Lc[2]-1],l=Math.hypot(...h);return[h[0]/l,h[1]/l,h[2]/l]})();
+ const st=P3.st,foc=P3.focus,list=P3.list=[],Q=P3.Q||(P3.Q=new Float64Array(3)),tx=cam.tx,ty=cam.ty,tz=cam.tz,D=cam.dist;
+ const pq=v=>{const x=v[0]-tx,y=v[1]-ty,z=v[2]-tz,x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp+z1*sp,z2=-y*sp+z1*cp,d=D+z2;Q[0]=W/2+x1*F/d;Q[1]=H/2-y2*F/d;Q[2]=d;return d>=1};
+ P3.pq=pq;
+ const pool=P3.pool||(P3.pool=[]);let cnt=0;
+ for(let i=0;i<P3.faces.length;i++){const f=P3.faces[i];let nrm=f.n,mid=f.mid,pts=null;
+  if(f.anim&&P3.motion){pts=f.p.map(v=>g3Anim(f.anim,v,t));nrm=g3AnimN(f.anim,f.n,t);mid=g3Anim(f.anim,f.mid,t)}
+  const x=mid[0]-tx,y=mid[1]-ty,z=mid[2]-tz,x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp+z1*sp,z2=-y*sp+z1*cp,d=D+z2;if(d<1.5||f.rad*F/d<.9)continue;
+  const nz1=-nrm[0]*sy+nrm[2]*cy,nx=nrm[0]*cy+nrm[2]*sy,ny=nrm[1]*cp+nz1*sp,nzz=-nrm[1]*sp+nz1*cp;
+  if(-(nx*x1+ny*y2)-nzz*d<=0)continue;
+  const e=pool[cnt]||(pool[cnt]={xs:[],ys:[]});cnt++;e.f=f;e.pts=pts;e.nrm=nrm;e.nx=nx;e.ny=ny;e.nz=nzz;const d2=x1*x1+y2*y2+d*d;e.d2=d2;e.key=f.layer*1e9-d2;e.skip=false;list.push(e)}
+ list.sort((a,b)=>a.key-b.key);
+ /* contact shadows */
+ for(const n in P3.units){const u=P3.units[n],ring=[];let ok=true;for(let i=0;i<20;i++){const a=i/20*Math.PI*2;if(!pq([u.x+Math.cos(a)*u.r*1.05,.3,u.z+Math.sin(a)*u.r*.8])){ok=false;break}ring.push([Q[0],Q[1]])}
+  if(ok){ctx.beginPath();ring.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath();ctx.fillStyle="rgba(30,45,70,.16)";ctx.fill()}}
+ const fog0=cam.dist*.55;
+ for(const e of list){const f=e.f,pts=e.pts||f.p,m=pts.length;let ok=true,mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;const xs=e.xs,ys=e.ys;xs.length=m;ys.length=m;
+  for(let i=0;i<m;i++){if(!pq(pts[i])){ok=false;break}const X=Q[0],Y=Q[1];xs[i]=X;ys[i]=Y;if(X<mnx)mnx=X;if(X>mxx)mxx=X;if(Y<mny)mny=Y;if(Y>mxy)mxy=Y}
+  e.skip=true;if(!ok||mxx<0||mnx>W||mxy<0||mny>H)continue;if(mxx-mnx<.7&&mxy-mny<.7)continue;e.skip=false;
+  const nrm=e.nrm,d1=Math.max(0,(nrm[0]*Ls[0]+nrm[1]*Ls[1]+nrm[2]*Ls[2])),hemi=nrm[1]*.5+.5,spec=Math.pow(Math.max(0,e.nx*Hv[0]+e.ny*Hv[1]+e.nz*Hv[2]),22)*(f.m||.18);let lum=.4+.5*d1+.14*hemi;
+  const u=f.u,s=u?st[u]:null;let tint=null,lift=0,col=f.c;
+  if(f.light){col=P3STC[(s&&s.st)||"ok"];lum=1.1;if(s&&(s.st==="trip"||s.st==="alarm"))lum=.7+.5*Math.abs(Math.sin(t*5))}
+  else if(s&&s.st==="trip")tint=[225,60,55,.5];else if(s&&(s.st==="alarm"||s.st==="upset"))tint=[240,170,40,.32];
+  if(f.pid&&(P3.pipe===f.pid))lift=30;
+  if(u&&(u===P3.sel||u===P3.hover))lift=u===P3.sel?22:12;
+  const fog=Math.min(.55,Math.max(0,(Math.sqrt(e.d2)-fog0)/(cam.dist*1.7)))*.9;
+  let alpha=1;if(foc&&u!==foc&&f.layer>0)alpha=.22;else if(foc&&f.layer===0)alpha=.7;
+  ctx.globalAlpha=alpha;ctx.fillStyle=p3Col(col,lum,spec,fog,P3SKY[0],tint,lift);ctx.beginPath();ctx.moveTo(xs[0],ys[0]);for(let i=1;i<m;i++)ctx.lineTo(xs[i],ys[i]);ctx.closePath();ctx.fill();
+  if(f.sm){ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=.6;ctx.stroke()}else if(f.layer>0&&m<=8&&(mxx-mnx>5||mxy-mny>5)){ctx.strokeStyle="rgba(25,40,65,.35)";ctx.lineWidth=.5;ctx.stroke()}}
+ ctx.globalAlpha=1;
+ /* status rings on the ground */
+ for(const n in P3.units){const u=P3.units[n],s=st[n]||{st:"ok"},ring=[],pulse=.5+.5*Math.sin(t*(s.st==="trip"?6:s.st==="ok"?1.4:3.5));
+  for(let i=0;i<36;i++){const a=i/36*Math.PI*2,q=proj([u.x+Math.cos(a)*(u.r*1.25+pulse*.35),.34,u.z+Math.sin(a)*(u.r*1.0+pulse*.3)]);if(!q){ring.length=0;break}ring.push(q)}
+  if(!ring.length)continue;const c=P3STC[s.st]||P3STC.ok,sel=+n===P3.sel;ctx.beginPath();ring.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath();ctx.lineWidth=sel?3:2;ctx.strokeStyle="rgba("+c.join(",")+","+(sel?.95:.35+.35*pulse)+")";ctx.globalAlpha=foc&&+n!==foc?.3:1;ctx.stroke()}
+ ctx.globalAlpha=1;
+ /* flow pulses along the pipes; none out of a tripped unit */
+ if(P3.flow){P3.routes.forEach(r=>{const s=r.from?st[r.from]:null;if(s&&s.st==="trip")return;const col=(SVC[r.svc]||SVC.proc)[1],sp0=r.svc==="gas"?5:r.svc==="cw"?3.5:3,n=Math.max(1,Math.round(r.total/5));
+   for(let k=0;k<n;k++){let d=((t*sp0+k*r.total/n)%r.total);let i=1;while(i<r.len.length-1&&r.len[i]<d)i++;const a=r.pts[i-1],b=r.pts[i],seg=r.len[i]-r.len[i-1]||1,q=(d-r.len[i-1])/seg,w=[a[0]+(b[0]-a[0])*q,a[1]+(b[1]-a[1])*q+r.r*.0,a[2]+(b[2]-a[2])*q],pr=proj(w);if(!pr)continue;
+    const rad=Math.max(1.4,r.r*F/pr[2]*.9);const g2=ctx.createRadialGradient(pr[0],pr[1],0,pr[0],pr[1],rad*2.2);g2.addColorStop(0,"rgba(255,255,255,.95)");g2.addColorStop(.35,col);g2.addColorStop(1,"rgba(255,255,255,0)");ctx.globalAlpha=foc&&!(r.to.includes(foc)||r.from===foc)?.15:.9;ctx.fillStyle=g2;ctx.beginPath();ctx.arc(pr[0],pr[1],rad*2.2,0,7);ctx.fill()}});ctx.globalAlpha=1}
+ /* flare flame */
+ {const q=proj([33,26.2,-17]);if(q){const h=Math.max(6,F/q[2]*1.4*(1+.2*Math.sin(t*14)+.1*Math.sin(t*23)));const g3=ctx.createRadialGradient(q[0],q[1]-h*.3,0,q[0],q[1]-h*.3,h);g3.addColorStop(0,"rgba(255,240,150,.95)");g3.addColorStop(.5,"rgba(255,140,40,.7)");g3.addColorStop(1,"rgba(255,90,20,0)");ctx.fillStyle=g3;ctx.beginPath();ctx.ellipse(q[0],q[1]-h*.3,h*.38,h*.62,0,0,7);ctx.fill()}}
+ /* pipe name flags */
+ if((P3.sel||P3.pipe)&&cam.dist<44){ctx.font="600 11px system-ui,sans-serif";ctx.textAlign="center";P3.routes.forEach(r=>{if(r.stub||r.id==="sep")return;if(!P3.pipe&&!(r.from===P3.sel||r.to.includes(P3.sel)))return;const m=r.pts[Math.floor(r.pts.length/2)-1]||r.pts[0],m2=r.pts[Math.floor(r.pts.length/2)]||r.pts[0],mid=[(m[0]+m2[0])/2,(m[1]+m2[1])/2+.5,(m[2]+m2[2])/2],q=proj(mid);if(!q||q[0]<0||q[0]>W)return;const w=ctx.measureText(r.lab).width+12;ctx.globalAlpha=foc?.3:.92;ctx.fillStyle="#fff";ctx.strokeStyle=(SVC[r.svc]||SVC.proc)[1];ctx.lineWidth=1.2;ctx.beginPath();ctx.roundRect?ctx.roundRect(q[0]-w/2,q[1]-9,w,17,8):ctx.rect(q[0]-w/2,q[1]-9,w,17);ctx.fill();ctx.stroke();ctx.fillStyle="#1d2b3d";ctx.fillText(r.lab,q[0],q[1]+3.5)});ctx.globalAlpha=1}
+ /* floating unit labels */
+ K.sets.forEach(s=>{const el=P3.labs&&P3.labs[s.n];if(!el)return;const u=P3.units[s.n],q=proj([u.x,u.top+2.0+(cam.dist<30?.4:0),u.z]),base=proj([u.x,u.top+.2,u.z]);
+  if(!q||!P3.labels||q[0]<-80||q[0]>W+80||q[1]<-40||q[1]>H+40){el.style.display="none";return}
+  el.style.display="";el.style.transform="translate("+(q[0]|0)+"px,"+(q[1]|0)+"px) translate(-50%,-100%)";el.style.opacity=foc&&foc!==s.n?.25:1;el.classList.toggle("sel",P3.sel===s.n);el.classList.toggle("full",cam.dist<30||P3.sel===s.n||P3.hover===s.n);el.style.zIndex=1000-Math.round(q[2]);
+  if(base){ctx.strokeStyle="rgba(21,94,163,.55)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(base[0],base[1]);ctx.stroke()}});
+ P3.frameMs=performance.now()-now}
+function p3State(){K.sets.forEach(s=>{let st="ok";try{st=ovState(s.n)}catch(e){}const u=pdmUnit(s.n),m=perfM(s.n);P3.st[s.n]={st,health:u.health,level:u.level,av:m.k.av,bd:m.k.bd};
+  const el=P3.labs&&P3.labs[s.n];if(el){const T={ok:"Running",alarm:"Alarm",trip:"Trip",upset:"Upset"}[st];el.querySelector(".p3st").className="p3st "+st;el.querySelector(".p3st").textContent=T;el.querySelector("small").innerHTML=`Health <b>${u.health}</b> | ${m.k.av.toFixed(2)}% available`}});
+ const el=document.getElementById("p3card");if(el&&P3.sel)el.innerHTML=p3Card(P3.sel);else if(el&&P3.pipe)el.innerHTML=p3PipeCard(P3.pipe)}
+/* ---------- interaction ---------- */
+function p3Fly(n,open){const u=P3.units[n];P3.orbit=false;P3.sel=n;P3.focus=n;P3.pipe=null;P3.pend=open?n:0;P3.to={tx:u.x,ty:u.top*.45,tz:u.z,dist:Math.max(13,u.r*5.2),yaw:P3.cam.yaw,pit:.42};p3Panel()}
+function p3Reset(){P3.sel=0;P3.focus=0;P3.pipe=null;P3.pend=0;P3.to={tx:0,ty:1.5,tz:0,dist:46,yaw:P3.cam.yaw,pit:.6};p3Panel()}
+function p3Select(n,fly){if(fly)return p3Fly(n,P3.open);P3.sel=n;P3.focus=0;P3.pipe=null;P3.pend=0;P3.orbit=false;const u=P3.units[n];P3.to={tx:u.x,ty:2,tz:u.z,dist:Math.max(28,P3.cam.dist*.7),yaw:P3.cam.yaw,pit:P3.cam.pit};p3Panel()}
+function p3Card(n){const s=S(n),a=P3.st[n]||{st:"ok"},T={ok:"Running",alarm:"Alarm",trip:"Trip active",upset:"Upset from a supply loss"}[a.st];
+ return `<div class="row between"><div><span class="tag acc">${esc(s.tag)}</span> <span class="p3st ${a.st}">${T}</span></div><button class="ghost g3x" onclick="p3Reset()" aria-label="Back to the whole plant">Whole plant</button></div><h3 style="margin:8px 0 2px">${esc(s.name)}</h3><div class="muted" style="font-size:12px;margin-bottom:8px">Area ${s.area}, ${esc(s.unit)}</div>
+ <div class="p3m"><div><b>${a.health??"n/a"}</b><span>Health index</span></div><div><b>${a.av!=null?a.av.toFixed(2)+"%":"n/a"}</b><span>Availability</span></div><div><b>${a.bd??"n/a"}</b><span>Breakdowns</span></div><div><b>${(a.level||"").toUpperCase()}</b><span>Forecast risk</span></div></div>
+ <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px"><button onclick="go('equipment',{set:${n},tab:'overview'})">Open equipment set</button><button class="ghost" onclick="ovTrip(${n});p3State()">${typeof ovState_==="function"&&ovState_(n)?"Clear trip":"Simulate trip"}</button><button class="ghost" onclick="go('equipment',{set:${n},tab:'ga'})">Drawing and 3D</button></div>`}
+function p3PipeCard(id){const r=P3.routes.find(x=>x.id===id);if(!r)return"";const base=r.base?P3.routes.find(x=>x.id===r.base):r,src=base.from?S(base.from).tag:"Header or tank",dst=base.to.map(t=>S(t).tag).join(", ");
+ return `<div class="row between"><span class="tag" style="border-color:${(SVC[r.svc]||SVC.proc)[1]};color:${(SVC[r.svc]||SVC.proc)[1]}">${(SVC[r.svc]||SVC.proc)[0]}</span><button class="ghost g3x" onclick="p3Reset()">Close</button></div><h3 style="margin:8px 0 4px">${esc(r.lab)}</h3><p class="muted" style="font-size:12.5px;margin:0">From <b>${esc(src)}</b> to <b>${esc(dst)}</b>. Stream links are taken from the battery limit notes on the P&amp;IDs; routing in the rack is schematic.</p>`}
+function p3Panel(){const el=document.getElementById("p3card");if(!el)return;el.style.display=(P3.sel||P3.pipe)?"":"none";el.innerHTML=P3.sel?p3Card(P3.sel):P3.pipe?p3PipeCard(P3.pipe):"";
+ document.querySelectorAll(".p3chips button").forEach(b=>b.classList.toggle("on",+b.dataset.n===P3.sel));const live=document.getElementById("p3live");if(live)live.textContent=P3.sel?S(P3.sel).tag+" selected":""}
+function p3Pick(x,y){const L=P3.list,pq=P3.pq,Q=P3.Q;if(!L||!pq)return null;
+ for(let i=L.length-1;i>=0;i--){const e=L[i],f=e.f;if(!(f.u||f.pid)||e.skip)continue;const xs=e.xs,ys=e.ys;if(!xs)continue;let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;for(let k=0;k<xs.length;k++){if(xs[k]<mnx)mnx=xs[k];if(xs[k]>mxx)mxx=xs[k];if(ys[k]<mny)mny=ys[k];if(ys[k]>mxy)mxy=ys[k]}
+  if(x<mnx||x>mxx||y<mny||y>mxy)continue;let c=false;for(let a=0,b=xs.length-1;a<xs.length;b=a++){if(((ys[a]>y)!==(ys[b]>y))&&(x<(xs[b]-xs[a])*(y-ys[a])/(ys[b]-ys[a])+xs[a]))c=!c}if(c)return{u:f.u,pid:f.pid}}return null}
+function p3Init(root){if(root.dataset.ok)return;root.dataset.ok="1";p3Build();const cv=root.querySelector("canvas");P3.cv=cv;P3.last=0;P3.to=null;
+ P3.labs={};const lay=root.querySelector(".p3labs");K.sets.forEach(s=>{const el=document.createElement("div");el.className="p3lab";el.setAttribute("role","button");el.setAttribute("tabindex","0");el.setAttribute("aria-label",s.tag+" "+s.name);el.innerHTML=`<b>${esc(s.tag)}</b><span class="p3st ok">Running</span><small></small>`;
+  el.onclick=e=>p3Select(s.n,!e.shiftKey);el.onkeydown=e=>{if(e.key==="Enter")p3Select(s.n,!e.shiftKey)};lay.appendChild(el);P3.labs[s.n]=el});
+ p3State();clearInterval(P3.timer);P3.timer=setInterval(()=>{if(!P3.cv||!P3.cv.isConnected)return clearInterval(P3.timer);p3State()},1000);
+ const ptr=new Map();let down=null;
+ cv.addEventListener("pointerdown",e=>{ptr.set(e.pointerId,[e.clientX,e.clientY]);try{cv.setPointerCapture(e.pointerId)}catch(_){}down={x:e.clientX,y:e.clientY,mv:0,pan:e.shiftKey||e.button===2};P3.drag=true;P3.orbit=false;if(P3.to&&!P3.pend){P3.to=null}if(P3.pend){P3.pend=0;P3.to=null}});
+ cv.addEventListener("contextmenu",e=>e.preventDefault());
+ cv.addEventListener("pointermove",e=>{const r=cv.getBoundingClientRect();const prev=ptr.get(e.pointerId);
+  if(ptr.size===2&&prev){const o=[...ptr.entries()].find(([id])=>id!==e.pointerId)[1],d0=Math.hypot(prev[0]-o[0],prev[1]-o[1]),d1=Math.hypot(e.clientX-o[0],e.clientY-o[1]);if(d0>0)P3.cam.dist=Math.max(10,Math.min(150,P3.cam.dist*d0/d1));ptr.set(e.pointerId,[e.clientX,e.clientY]);return}
+  if(prev)ptr.set(e.pointerId,[e.clientX,e.clientY]);
+  if(down&&P3.drag&&prev){const dx=e.clientX-down.x,dy=e.clientY-down.y;down.mv+=Math.abs(dx)+Math.abs(dy);down.x=e.clientX;down.y=e.clientY;const cam=P3.cam;
+   if(down.pan){const k=cam.dist/ (r.height*.95),cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw);cam.tx-=(dx*cy)*k;cam.tz-=(dx*sy)*k;cam.tx-= (dy*sy)*k*1.3;cam.tz+=(dy*cy)*k*1.3}
+   else{cam.yaw+=dx*.006;cam.pit=Math.max(.08,Math.min(1.45,cam.pit+dy*.005))}}
+  else{const now=performance.now();if(now-(P3.hv||0)>50){P3.hv=now;const h=p3Pick(e.clientX-r.left,e.clientY-r.top),n=h&&h.u?h.u:0;if(n!==P3.hover){P3.hover=n;cv.style.cursor=h?"pointer":"grab"}}}});
+ const up=e=>{const r=cv.getBoundingClientRect();ptr.delete(e.pointerId);P3.drag=false;if(down&&down.mv<6&&!down.pan){const h=p3Pick(e.clientX-r.left,e.clientY-r.top);if(h&&h.u)p3Select(h.u,!e.shiftKey);else if(h&&h.pid){P3.pipe=h.pid;P3.sel=0;P3.focus=0;p3Panel()}else if(P3.sel||P3.pipe){p3Reset()}}down=null};
+ cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",e=>{ptr.delete(e.pointerId);P3.drag=false;down=null});
+ cv.addEventListener("wheel",e=>{e.preventDefault();P3.orbit=false;P3.to=null;P3.cam.dist=Math.max(10,Math.min(150,P3.cam.dist*(e.deltaY<0?.9:1.1)))},{passive:false});
+ cv.addEventListener("dblclick",()=>p3Reset());
+ root.querySelectorAll(".p3chips button[data-n]").forEach(b=>b.onclick=()=>p3Select(+b.dataset.n,true));
+ const id=P3.loop=(P3.loop||0)+1,tick=now=>{if(id!==P3.loop)return;p3Frame(now,tick)};requestAnimationFrame(tick);p3Panel()}
+function p3Scan(){const r=document.getElementById("p3");if(r&&!r.dataset.ok)p3Init(r)}
+{let tm=null;new MutationObserver(()=>{if(!tm)tm=setTimeout(()=>{tm=null;p3Scan()},40)}).observe(document.body,{childList:true,subtree:true})}
+function p3Hero(){return `<div class="card p3" id="p3" style="padding:0;overflow:hidden;margin-top:12px"><div class="p3head"><div><h2 style="margin:0">Plant in 3D</h2><div class="muted" style="font-size:12.5px;margin-top:2px">All eight units as laid out on the plot plan, joined by their process, gas, water, nitrogen and steam lines. Drag to look around. Select a unit to fly to it and open its equipment set.</div></div>
+  <div class="p3tools"><label><input type="checkbox" id="p3o" ${P3.orbit?"checked":""} onchange="P3.orbit=this.checked">Slow turn</label><label><input type="checkbox" ${P3.labels?"checked":""} onchange="P3.labels=this.checked">Labels</label><label><input type="checkbox" ${P3.flow?"checked":""} onchange="P3.flow=this.checked">Flow</label><label><input type="checkbox" ${P3.motion?"checked":""} onchange="P3.motion=this.checked">Moving parts</label><label title="After the camera arrives, open the equipment set"><input type="checkbox" ${P3.open?"checked":""} onchange="P3.open=this.checked">Open set on arrival</label><button class="ghost" onclick="p3Reset()">Whole plant</button></div></div>
+  <div class="p3chips" role="group" aria-label="Units">${K.sets.map(s=>`<button class="ghost" data-n="${s.n}">${esc(s.tag)}</button>`).join("")}</div>
+  <div class="p3stage"><canvas aria-label="Interactive 3D model of the plant. Use the unit buttons above to move to a unit." style="width:100%;height:100%;display:block;touch-action:none;cursor:grab"></canvas><div class="p3labs"></div><div class="p3card" id="p3card" style="display:none"></div><div class="p3key"><span><i style="background:#1a7f37"></i>Running</span><span><i style="background:#f0aa28"></i>Alarm or upset</span><span><i style="background:#e13c37"></i>Trip</span>${Object.entries(SVC).filter(e=>e[0]!=="sig").map(e=>`<span><u style="background:${e[1][1]}"></u>${e[1][0]}</span>`).join("")}</div></div><div id="p3live" class="sr" aria-live="polite"></div></div>`}
 /* =====================================================================================================
    INDONESIAN SUPPORT
    1. Questions written in Bahasa Indonesia are translated word by word into the English terms the records use before the
@@ -4932,7 +5175,7 @@ function dashboard(){const hi=K.issues.filter(i=>i.severity==="High"),noApp=cnt(
  const mon=MONS.map(m=>({l:m.slice(2).replace("-","/"),v:MH.filter(r=>r.mon===m).length,c:"#0b5fd7",js:`MHS.set=0;mhPick('${m}','');go('mnt')`}));
  const instSet=K.sets.map(s=>({l:s.tag,js:`go('il',{il:${s.n}})`,vals:{Listed:cnt(K.inst,i=>i.set===s.n&&!i.flag),Review:cnt(K.inst,i=>i.set===s.n&&i.flag)}}));
  const oplCl=["Basic Knowledge","Improvement","Trouble Case"].map((c,i)=>({l:c,v:cnt(K.opl,o=>o.cls===c),c:CPAL[i],js:`st.f.oc='${c}';st.f.os='';go('opl')`}));
- const an=DSH.tab==="analytics";return `${ph("Dashboard",`${K.sets.length} equipment sets | ${K.docs.length} documents | ${MH.length} work orders | ${K.sets.length} interlock documents`,`<div class="seg"><button class="${an?"":"on"}" onclick="DSH.tab='overview';render()">Overview</button><button class="${an?"on":""}" onclick="DSH.tab='analytics';render()">Analytics</button></div>`)}${an?"":ovHero()}
+ const an=DSH.tab==="analytics";return `${ph("Dashboard",`${K.sets.length} equipment sets | ${K.docs.length} documents | ${MH.length} work orders | ${K.sets.length} interlock documents`,`<div class="seg"><button class="${an?"":"on"}" onclick="DSH.tab='overview';render()">Overview</button><button class="${an?"on":""}" onclick="DSH.tab='analytics';render()">Analytics</button></div>`)}${an?"":p3Hero()}
  <div class="grid" style="grid-template-columns:repeat(6,1fr);gap:12px">${kpiTile(K.sets.length,"Equipment sets","","go('equipment',{set:null})")}${kpiTile(K.docs.length,"Documents","","go('documents')")}${kpiTile(MH.length,"Work orders","","MHS.set=0;MHS.p=null;go('mnt')")}${kpiTile(bd.length,"Breakdowns","bad","MHS.set=0;MHS.p=null;mhFilt('bd','Yes');go('mnt')")}${kpiTile(7,"Safety functions","","go('il')")}${kpiTile(K.opl.length,"One-point lessons","","go('opl')")}</div>
  <div class="split" style="margin-top:14px"><div class="card"><h3>Knowledge base status</h3><div class="grid" style="grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px">${kpiTile(DB.stats().n,"Indexed chunks","","go('int')")}${kpiTile(UKB.items.length,"Added by users","","go('ks')")}${kpiTile(UKB.items.filter(x=>x.status==="In review").length,"Waiting for review","warn","go('ks')")}${kpiTile(FB.items().filter(f=>f.status==="Open").length,"Open answer feedback","bad","go('ks')")}</div><div class="row" style="gap:8px;margin-top:12px;flex-wrap:wrap"><button onclick="go('ai')">Ask the assistant</button><button class="ghost" onclick="go('ks')">Add knowledge</button><button class="ghost" onclick="go('fm')">Failure memory</button><button class="ghost" onclick="rcOpen('summary',{})">Management summary</button></div></div>
  <div class="card"><h3>Items requiring attention</h3>
@@ -4940,6 +5183,7 @@ function dashboard(){const hi=K.issues.filter(i=>i.severity==="High"),noApp=cnt(
   <div class="row between" style="padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="st.f.dst='Not stated';go('documents')"><span>Documents without approval status</span>${tg(noApp+" of "+K.docs.length,"warn")}</div>
   <div class="row between" style="padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="go('quality')"><span>Instruments flagged for review</span>${tg(cnt(K.inst,i=>i.flag),"warn")}</div>
   <h3 style="margin-top:16px">High severity data issues (${hi.length})</h3>${hi.slice(0,5).map(i=>`<div style="padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="st.f.qs='High';go('quality')"><span class="tag bad">${esc(i.source)}</span> <span class="muted">${esc(i.issue).slice(0,90)}</span></div>`).join("")}<p class="back" style="margin:10px 0 0" onclick="st.f.qs='';go('quality')">View all ${K.issues.length} issues &rarr;</p></div></div>
+ ${an?"":ovHero()}
  ${an?`<div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;align-items:start">
   ${cCard("Work orders by type",cDonut(byType,{center:MH.length,sub:"work orders"}),"select a segment")}
   ${cCard("Breakdown downtime by equipment (h)",cHBar(dtSet),"select a bar")}

@@ -55,6 +55,9 @@ its facts, shared with all users and searchable by the assistant.
 
 NEW IN THIS VERSION
 -----------------------------------------------------------------------------------------
+ - The dashboard opens on a 3D plant. Drag to look around, scroll to zoom, shift-drag to move. Select a unit
+   (or its button) and the camera flies to it, then its equipment set opens. "Simulate trip" in the unit card
+   colours the unit red, stops the flow out of it and shows the upset downstream.
  - 3D model next to every equipment drawing (2D drawing / 3D model switch). Drag to rotate, scroll to zoom,
    X-ray shows the internals. Selecting a part works in both views.
  - Performance page: availability, MTBF, MTTR, breakdowns, downtime, cost, planned work share and forecast

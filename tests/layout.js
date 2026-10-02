@@ -8,7 +8,7 @@ const AUDIT=`(()=>{
  const root=document.querySelector(".modalbg")||document.querySelector("main");
  const els=[...root.querySelectorAll("*")].filter(e=>!e.closest("svg")&&!e.closest("select,option,.noaudit")&&vis(e));
  const tb0=els.filter(e=>[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim().length>1)&&!["SCRIPT","STYLE"].includes(e.tagName));
- const tb=tb0.filter(e=>!e.closest("pre"));
+ const tb=tb0.filter(e=>!e.closest("pre")&&!e.closest(".p3labs"));
  const out=[],seen=new Set();
  const clippedAway=e=>{const r=e.getBoundingClientRect();for(let p=e.parentElement;p&&p!==root;p=p.parentElement){const o=getComputedStyle(p);if(/auto|scroll|hidden|clip/.test(o.overflowX+o.overflowY)){const q=p.getBoundingClientRect();if(r.right>q.right+1||r.left<q.left-1||r.bottom>q.bottom+1||r.top<q.top-1)return true}}return false};
  const rects=tb.map(e=>{if(e.closest("details:not([open])")&&!e.closest("summary"))return{e,rs:[]};const rg=document.createRange();rg.selectNodeContents(e);const rs=[...rg.getClientRects()].filter(r=>r.width>1&&r.height>1);return{e,rs}});
