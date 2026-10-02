@@ -11,7 +11,7 @@ const AUDIT=`(()=>{
  const tb=tb0.filter(e=>!e.closest("pre"));
  const out=[],seen=new Set();
  const clippedAway=e=>{const r=e.getBoundingClientRect();for(let p=e.parentElement;p&&p!==root;p=p.parentElement){const o=getComputedStyle(p);if(/auto|scroll|hidden|clip/.test(o.overflowX+o.overflowY)){const q=p.getBoundingClientRect();if(r.right>q.right+1||r.left<q.left-1||r.bottom>q.bottom+1||r.top<q.top-1)return true}}return false};
- const rects=tb.map(e=>{const rg=document.createRange();rg.selectNodeContents(e);const rs=[...rg.getClientRects()].filter(r=>r.width>1&&r.height>1);return{e,rs}});
+ const rects=tb.map(e=>{if(e.closest("details:not([open])")&&!e.closest("summary"))return{e,rs:[]};const rg=document.createRange();rg.selectNodeContents(e);const rs=[...rg.getClientRects()].filter(r=>r.width>1&&r.height>1);return{e,rs}});
  for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const a=rects[i],b=rects[j];if(a.e.contains(b.e)||b.e.contains(a.e))continue;
   let hit=false;for(const r of a.rs){for(const q of b.rs){const w=Math.min(r.right,q.right)-Math.max(r.left,q.left),h=Math.min(r.bottom,q.bottom)-Math.max(r.top,q.top);if(w>3&&h>3&&(w*h)/Math.min(r.width*r.height,q.width*q.height)>.2){hit=true;break}}if(hit)break}
   if(hit&&!clippedAway(a.e)&&!clippedAway(b.e)){const k="overlap "+sel(a.e)+" x "+sel(b.e);if(!seen.has(k)){seen.add(k);out.push(k+" :: "+a.e.textContent.trim().slice(0,28)+" | "+b.e.textContent.trim().slice(0,28))}}}

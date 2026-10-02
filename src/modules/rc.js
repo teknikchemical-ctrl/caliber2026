@@ -64,7 +64,7 @@ function rcIncident(wo){const r=MH.find(x=>x.wo===wo);if(!r)return rcDoc("Incide
  ${rcH(4,"Related interlock")}<p>${esc(d.desc)} (${ilIsLoop(n)?"control loop":d.logic}).</p>${rcT(["ID","Initiating cause","Tag","Set point","Voting"],d.trig.slice(0,8).map(x=>[x.id,esc(x.c),x.tag,esc(x.sp),x.vote]))}
  ${rcH(5,"Similar past failures")}${rcT(["Case","Equipment","Symptom","Cause","Action","Downtime h"],R.cases.slice(0,8).map(c=>[c.id,c.tag,esc((c.symptom||"").slice(0,80)),esc((c.cause||"").slice(0,70)),esc((c.action||"").slice(0,80)),c.dt??""]))}
  ${R.actions.length?`<h3>Recommended actions from the failure memory</h3>${rcT(["Action","Cases","Recurred"],R.actions.slice(0,4).map(a=>[esc(a.text.slice(0,120)),a.n,a.recN?a.rec+" of "+a.recN:"n/a"]))}`:""}
- ${rcH(6,"Earlier work on the same component")}${rcT(["Work order","Date","Problem"],MH.filter(x=>x.n===n&&x.wo!==r.wo&&ks.length&&mhParts(x).includes(ks[0])).slice(-6).map(x=>[x.wo,dstr(x.t0),esc((x.prob||"").slice(0,90))]))}
+ ${rcH(6,"Earlier work on this component")}${rcT(["Work order","Date","Problem"],MH.filter(x=>x.n===n&&x.wo!==r.wo&&ks.length&&mhParts(x).includes(ks[0])).slice(-6).map(x=>[x.wo,dstr(x.t0),esc((x.prob||"").slice(0,90))]))}
  <div class="sig"><div>Investigator</div><div>Reviewed by</div><div>Approved by</div></div>`;
  return rcDoc("Incident investigation pack "+r.wo,`${r.tag} | ${r.prob}`,body,{kind:"inci"})}
 function rcSummary(){const U=pdmAll().sort((a,b)=>b.risk-a.risk),k=rcKpi(MH,8),E=pdmEnts().filter(e=>e.key!=null&&e.risk>0).sort((a,b)=>b.risk-a.risk).slice(0,6),ob=Date.now();

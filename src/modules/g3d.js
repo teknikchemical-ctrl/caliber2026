@@ -1,150 +1,190 @@
 /* =====================================================================================================
    3D EQUIPMENT MODELS
-   Every machine is assembled from boxes, cylinders and ellipsoids that carry the same part numbers as the 2D drawing, so a click on
-   a solid selects the same BOM item or nozzle. A small software renderer projects the solids to SVG (no external library, works
-   offline): drag to rotate, wheel to zoom, buttons for standard views, X-ray (shows internals) and fan motion.
+   Every machine is assembled from rounded boxes, cylinders and ellipsoids that carry the same part numbers as the 2D drawing, so a click
+   on a solid selects the same BOM item or nozzle and opens the same information. A small software renderer projects the solids to SVG
+   (no external library, works offline) with smooth shading, highlights and a soft ground shadow. Drag to rotate, scroll to zoom,
+   shift-drag to move, buttons for standard views, X-ray (shows internals) and fan motion.
    Wherever an equipment drawing is shown, gaFig() puts a 2D / 3D switch above it.
    ===================================================================================================== */
-regMod("g3d","1.0",[],"3D equipment models");
+regMod("g3d","2.0",[],"3D equipment models");
 const G3={cfg:{},inst:{},seq:0,mode:(()=>{try{return localStorage.getItem("akp_gmode")||"2d"}catch(e){return"2d"}})(),mesh:{}};
-const g3c={steel:"#a9b8c9",body:"#c6d3e2",dark:"#56657a",blue:"#5f8fd0",gray:"#8f9cae",amber:"#e0a43a",brass:"#c9a24a",water:"#8cc3ea",red:"#cf6a62",green:"#6fb883",cat:"#8a6a4a",white:"#e9eef4"};
-const g3B=(k,x,y,z,w,h,d,c,o)=>Object.assign({t:"b",k,x,y,z,w,h,d,c},o),
+const g3c={steel:"#b4c0cf",body:"#d3dce7",dark:"#4d5b70",blue:"#4f86c9",gray:"#98a4b5",amber:"#e3a93b",brass:"#cfa84e",water:"#7fbbe6",red:"#cc5f58",green:"#6fb883",cat:"#8a6a4a",white:"#eef2f7",paint:"#c9d6e3",black:"#2d3646"};
+const g3B=(k,x,y,z,w,h,d,c,o)=>Object.assign({t:"r",k,x,y,z,w,h,d,c},o),
  g3C=(k,ax,x,y,z,len,r,c,o,r2)=>Object.assign({t:"c",k,ax,x,y,z,len,r,r2:r2==null?r:r2,c},o),
  g3E=(k,ax,x,y,z,ra,rb,c,a0,a1,o)=>Object.assign({t:"e",k,ax,x,y,z,ra,rb,c,a0,a1},o);
 const G3M={};
-/* 1 pump: casing, bearing housing, coupling and motor on a baseplate */
-G3M[1]=[g3B("11",0,.06,0,1.95,.12,.6,"gray"),
- g3C("M","x",.8,.42,0,.9,.26,"blue"),g3C("M","x",1.3,.42,0,.1,.27,"dark"),g3B("M",.8,.74,0,.24,.1,.22,"steel"),g3B("M",.6,.2,0,.3,.14,.5,"blue"),g3B("M",1.0,.2,0,.3,.14,.5,"blue"),
- g3C("10","x",.22,.42,0,.22,.1,"dark"),g3C("8","x",-.1,.42,0,.4,.13,"steel"),
- g3C("3","x",-.42,.42,0,1.1,.03,"dark",{in:1}),g3C("6","x",-.02,.42,0,.1,.1,"brass",{in:1}),g3C("7","x",-.28,.42,0,.1,.1,"brass",{in:1}),
- g3C("5","x",-.42,.42,0,.1,.09,"amber",{in:1}),g3C("4","x",-.47,.42,0,.14,.05,"steel",{in:1}),g3C("12","x",-.2,.42,0,.03,.12,"dark",{in:1}),
- g3C("9","z",-.64,.42,0,.05,.22,"steel",{in:1}),g3C("2","z",-.64,.42,0,.1,.19,"brass",{in:1}),
- g3C("1","z",-.64,.42,0,.3,.31,"body",{sh:1}),
- g3C("N2","y",-.64,.9,0,.4,.07,"amber"),g3C("N1","x",-1.0,.42,0,.3,.09,"amber"),g3C("N3","y",-.4,.78,0,.16,.04,"amber"),g3C("N4","y",-.64,.08,0,.14,.05,"amber"),g3C("N5","y",-.5,.78,.1,.16,.04,"amber")];
+/* assemblies reused by several machines */
+const g3Motor=(k,x,y,z,len,r,o)=>{const a=[g3C(k,"x",x,y,z,len,r,"blue",{m:.5}),g3C(k,"x",x+len/2+.05,y,z,.1,r*.92,"dark"),g3C(k,"x",x+len/2+.16,y,z,.14,r*.84,"steel",{},r*.9),
+  g3B(k,x-len*.1,y+r+.09,z,.28,.18,.24,"steel",{r:.03}),g3B(k,x-len*.28,y-r*.7,z+r*.8,.34,.16,.1,"blue",{r:.02}),g3B(k,x-len*.28,y-r*.7,z-r*.8,.34,.16,.1,"blue",{r:.02}),
+  g3B(k,x+len*.28,y-r*.7,z+r*.8,.34,.16,.1,"blue",{r:.02}),g3B(k,x+len*.28,y-r*.7,z-r*.8,.34,.16,.1,"blue",{r:.02}),g3C(k,"x",x-len/2-.03,y,z,.06,r*1.0,"dark")];
+ for(let i=0;i<10;i++)a.push(g3C(k,"x",x-len/2+.1+i*(len-.25)/9,y,z,.025,r*1.06,"blue",{seg:28}));return a};
+const g3Ladder=(x,y0,y1,z,ax)=>{const a=[],n=Math.floor((y1-y0)/.12);a.push(g3C("","y",x,(y0+y1)/2,z-.1,y1-y0,.012,"gray",{seg:8}),g3C("","y",x,(y0+y1)/2,z+.1,y1-y0,.012,"gray",{seg:8}));for(let i=0;i<n;i++)a.push(g3C("","z",x,y0+.08+i*.12,z,.2,.008,"gray",{seg:8}));return a};
+/* 1 centrifugal pump API 610 with motor on a baseplate */
+G3M[1]=[g3B("11",0,.07,0,2.05,.14,.68,"gray",{r:.05}),g3B("11",0,.012,0,2.12,.03,.76,"dark",{r:.04,zb:.6}),
+ ...g3Motor("M",.9,.47,0,1.0,.27),
+ g3C("10","x",.3,.47,0,.4,.16,"amber",{sh:1,m:.3}),g3C("10","x",.3,.47,0,.36,.09,"dark",{in:1}),
+ g3C("8","x",-.1,.47,0,.42,.15,"steel",{m:.6}),g3C("8","x",-.1,.47,0,.05,.18,"steel"),g3C("8","x",-.28,.47,0,.05,.18,"steel"),g3C("8","z",-.1,.4,.16,.06,.05,"white",{seg:14}),
+ g3C("3","x",-.4,.47,0,1.15,.035,"dark",{in:1}),g3C("6","x",-.02,.47,0,.1,.11,"brass",{in:1}),g3C("7","x",-.3,.47,0,.1,.11,"brass",{in:1}),
+ g3C("5","x",-.46,.47,0,.12,.17,"amber",{m:.4}),g3C("5","x",-.46,.47,0,.1,.12,"brass",{in:1}),g3C("4","x",-.5,.47,0,.16,.055,"steel",{in:1}),g3C("12","x",-.22,.47,0,.03,.13,"dark",{in:1}),
+ g3C("9","z",-.68,.47,0,.05,.23,"steel",{in:1}),g3C("2","z",-.68,.47,0,.12,.2,"brass",{in:1}),
+ g3C("1","z",-.68,.47,0,.32,.34,"paint",{sh:1,m:.5}),g3B("1",-.68,.17,0,.34,.1,.5,"paint",{r:.03}),g3C("1","z",-.68,.47,.17,.05,.26,"steel"),
+ g3C("N2","y",-.68,.98,0,.5,.075,"amber"),g3C("N1","x",-1.08,.47,0,.38,.095,"amber"),g3C("N3","y",-.5,.84,0,.14,.035,"amber"),g3C("N4","y",-.68,.08,0,.14,.05,"amber"),
+ g3C("N5","y",-.46,.72,.12,.22,.03,"amber"),g3C("N5","z",-.46,.82,.06,.12,.03,"amber")];
 /* 2 rotary steam-tube dryer */
-G3M[2]=(()=>{const a=[g3C("1","x",0,1.2,0,3.6,.72,"body",{sh:1}),g3C("1","x",-1.95,1.2,0,.3,.3,"body",{sh:1},.72),g3C("1","x",1.95,1.2,0,.3,.72,"body",{sh:1},.3),
- g3C("2","x",0,1.2,0,5,.06,"dark",{in:1}),g3C("4","x",-.9,1.2,0,.1,.86,"dark"),
- g3B("3",-2.35,.62,0,.25,.4,.5,"steel"),g3B("3",2.35,.62,0,.25,.4,.5,"steel"),g3B("6",-1.0,.45,0,.3,.5,.95,"gray"),g3B("6",1.0,.45,0,.3,.5,.95,"gray"),
- g3C("5","x",-2.5,1.2,0,.3,.13,"brass"),g3C("7","x",-2.2,1.2,0,.07,.18,"dark"),g3C("8","x",2.2,1.2,0,.07,.18,"dark"),g3C("9","x",-2.28,1.2,0,.03,.2,"dark"),g3C("10","x",2.28,1.2,0,.03,.2,"dark"),g3C("11","x",-2.37,1.2,0,.02,.16,"red"),
- g3C("N1","y",-1.4,2.15,0,.35,.1,"amber"),g3C("N2","y",1.4,.18,0,.35,.1,"amber"),g3C("N3","y",-2.1,1.95,0,.3,.06,"amber"),g3C("N4","y",2.1,1.95,0,.3,.06,"amber"),g3C("N5","y",-1.1,2.1,.2,.25,.05,"amber"),g3C("N6","y",1.1,2.1,.2,.25,.05,"amber")];
- for(let i=0;i<8;i++){const t=i/8*Math.PI*2;a.push(g3C("12","x",0,1.2+.46*Math.cos(t),.46*Math.sin(t),3.4,.05,"red",{in:1}))}return a})();
-/* 3 vertical catalyst reactor */
-G3M[3]=[g3C("10","y",0,.35,0,.7,.5,"gray"),g3C("1","y",0,2.1,0,2.8,.5,"body",{sh:1}),g3E("2","y",0,3.5,0,.28,.5,"body",0,Math.PI/2,{sh:1}),g3E("3","y",0,.7,0,.28,.5,"body",Math.PI/2,Math.PI,{sh:1}),
- g3C("12","y",0,1.75,0,1.3,.46,"cat",{in:1}),g3C("5","y",0,2.45,0,.04,.46,"steel",{in:1}),g3C("4","y",0,1.1,0,.04,.46,"steel",{in:1}),g3C("7","y",0,3.2,0,.3,.04,"amber",{in:1},.3),
- g3C("6","y",0,2.3,0,2.4,.025,"red",{in:1}),g3C("8","y",0,3.8,0,.12,.17,"steel"),g3C("11","y",0,3.74,0,.03,.19,"dark"),g3C("9","x",.62,3.1,0,.3,.06,"amber"),
- g3C("N1","x",-.62,3.05,0,.3,.07,"amber"),g3C("N2","x",.62,.95,0,.3,.07,"amber"),g3C("N3","x",.62,3.2,0,.3,.06,"amber"),g3C("N4","x",-.62,2.1,0,.3,.06,"amber"),g3C("M1","y",0,3.9,0,.05,.18,"amber"),g3C("M2","x",-.55,.5,0,.2,.1,"amber")];
-/* 4 reciprocating recycle gas compressor with motor and intercooler */
-G3M[4]=[g3B("",0,.06,0,4.2,.12,1.4,"gray"),g3C("M","x",-1.55,.85,0,1.2,.48,"blue"),g3B("M",-1.55,1.4,0,.4,.14,.3,"steel"),
- g3B("1",0,.85,0,1.3,1,.9,"body",{sh:1}),g3C("2","z",0,.85,0,.8,.07,"dark",{in:1}),g3C("10","z",-.45,.85,.2,.1,.11,"brass",{in:1}),
- g3B("3",.35,.85,.15,.5,.05,.06,"steel",{in:1}),g3B("4",.8,.95,.28,.2,.12,.12,"steel",{in:1}),g3B("4",.8,.95,-.28,.2,.12,.12,"steel",{in:1}),
- g3C("5","x",1.5,.95,.28,1,.27,"body",{sh:1}),g3C("5","x",1.3,.95,.28,.25,.23,"steel",{in:1}),g3C("6","x",1.45,.95,-.28,.9,.2,"body",{sh:1}),g3C("6","x",1.3,.95,-.28,.25,.17,"steel",{in:1}),
- g3C("7","x",1.18,.95,.28,.04,.245,"amber",{in:1}),g3C("9","x",.98,.95,.28,.1,.1,"dark"),g3B("8",1.5,1.28,.28,.2,.12,.14,"steel"),g3B("8",1.6,1.2,-.28,.2,.1,.12,"steel"),
- g3B("11",.4,.3,.55,.3,.25,.2,"gray"),g3C("12","x",1.2,1.85,0,1.4,.2,"water"),g3B("12",.55,1.45,0,.12,.35,.12,"steel"),g3B("12",1.85,1.45,0,.12,.35,.12,"steel"),
- g3C("N1","y",1.4,1.35,.28,.2,.06,"amber"),g3C("N2","y",1.6,1.35,.28,.2,.06,"amber"),g3C("N3","y",1.9,1.25,-.28,.2,.05,"amber"),g3C("N4","x",2.05,.95,-.28,.25,.07,"amber"),g3C("N5","y",1.1,.2,.28,.2,.06,"amber"),g3C("N6","x",.3,.35,.7,.2,.05,"amber")];
+G3M[2]=(()=>{const a=[g3C("1","x",0,1.25,0,3.6,.74,"paint",{sh:1,m:.4}),g3C("1","x",-1.95,1.25,0,.32,.34,"paint",{sh:1},.74),g3C("1","x",1.95,1.25,0,.32,.74,"paint",{sh:1},.34),
+ g3C("1","x",-1.0,1.25,0,.14,.82,"steel",{m:.6}),g3C("1","x",1.0,1.25,0,.14,.82,"steel",{m:.6}),
+ g3C("2","x",0,1.25,0,5.2,.06,"dark",{in:1}),g3C("4","x",-.55,1.25,0,.12,.9,"dark",{m:.4}),
+ g3B("3",-2.38,.62,0,.28,.42,.56,"gray",{r:.05}),g3B("3",2.38,.62,0,.28,.42,.56,"gray",{r:.05}),g3B("6",-1.0,.28,0,.5,.4,1.2,"gray",{r:.06}),g3B("6",1.0,.28,0,.5,.4,1.2,"gray",{r:.06}),
+ g3C("6","z",-1.0,.62,.38,.16,.17,"dark",{m:.5}),g3C("6","z",-1.0,.62,-.38,.16,.17,"dark",{m:.5}),g3C("6","z",1.0,.62,.38,.16,.17,"dark",{m:.5}),g3C("6","z",1.0,.62,-.38,.16,.17,"dark",{m:.5}),
+ g3C("5","x",-2.58,1.25,0,.34,.14,"brass",{m:.7}),g3C("5","x",-2.8,1.25,0,.14,.07,"steel"),g3C("7","x",-2.2,1.25,0,.08,.19,"dark"),g3C("8","x",2.2,1.25,0,.08,.19,"dark"),g3C("9","x",-2.3,1.25,0,.03,.21,"dark"),g3C("10","x",2.3,1.25,0,.03,.21,"dark"),g3C("11","x",-2.4,1.25,0,.025,.17,"red"),
+ g3B("",-.55,.3,-1.0,.6,.4,.5,"blue",{r:.05}),g3C("","y",-.55,.7,-.95,.2,.12,"dark"),g3C("N1","y",-1.4,2.2,0,.4,.1,"amber"),g3C("N1","y",-1.4,2.5,0,.3,.26,"paint",{},.1),
+ g3C("N2","y",1.4,.3,0,.6,.26,"paint",{},.1),g3C("N2","y",1.4,.0,0,.3,.1,"amber"),g3C("N3","y",-2.1,2.0,0,.3,.06,"amber"),g3C("N4","y",2.1,2.0,0,.3,.06,"amber"),g3C("N5","y",-1.1,2.12,.2,.25,.05,"amber"),g3C("N6","y",1.1,2.12,.2,.25,.05,"amber")];
+ for(let i=0;i<10;i++){const t=i/10*Math.PI*2;a.push(g3C("12","x",0,1.25+.5*Math.cos(t),.5*Math.sin(t),3.4,.05,"red",{in:1,seg:12}))}return a})();
+/* 3 vertical catalyst reactor with platform and ladder */
+G3M[3]=(()=>{const a=[g3C("10","y",0,.35,0,.7,.52,"gray",{m:.3}),g3C("10","y",0,.02,0,.04,.62,"dark",{zb:.5}),g3C("1","y",0,2.1,0,2.8,.52,"paint",{sh:1,m:.5}),g3E("2","y",0,3.5,0,.3,.52,"paint",0,Math.PI/2,{sh:1,m:.5}),g3E("3","y",0,.7,0,.3,.52,"paint",Math.PI/2,Math.PI,{sh:1,m:.5}),
+ g3C("12","y",0,1.75,0,1.3,.48,"cat",{in:1}),g3C("5","y",0,2.45,0,.04,.48,"steel",{in:1}),g3C("4","y",0,1.1,0,.04,.48,"steel",{in:1}),g3C("7","y",0,3.2,0,.3,.04,"amber",{in:1},.3),g3C("6","y",0,2.3,0,2.4,.025,"red",{in:1,seg:10}),
+ g3C("8","y",0,3.86,0,.12,.18,"steel"),g3C("8","y",0,3.93,0,.04,.24,"steel"),g3C("11","y",0,3.8,0,.03,.2,"dark"),g3C("9","x",.66,3.1,0,.34,.06,"amber"),g3C("9","y",.9,3.3,0,.3,.09,"red"),g3C("9","y",.9,3.52,0,.14,.05,"steel"),
+ g3C("N1","x",-.66,3.05,0,.34,.07,"amber"),g3C("N2","x",.66,.95,0,.34,.07,"amber"),g3C("N3","x",.66,3.2,0,.34,.06,"amber"),g3C("N4","x",-.66,2.1,0,.34,.06,"amber"),g3C("M1","y",0,3.98,0,.05,.19,"amber"),g3C("M2","x",-.56,.5,0,.22,.1,"amber"),
+ g3C("","y",0,2.6,0,.04,.98,"gray",{m:.2}),g3C("","y",0,2.95,0,.025,.98,"steel",{seg:30}),...g3Ladder(.55,.1,2.95,.4)];
+ [.9,1.5,2.1,2.7,3.2].forEach(y=>a.push(g3C("1","y",0,y,0,.05,.535,"steel",{m:.6})));return a})();
+/* 4 reciprocating recycle gas compressor with motor, bottles and intercooler */
+G3M[4]=[g3B("",0,.07,0,4.4,.14,1.5,"gray",{r:.05}),g3B("",0,.012,0,4.5,.03,1.6,"dark",{r:.05,zb:.8}),
+ ...g3Motor("M",-1.7,.88,0,1.25,.5),g3C("","x",-.95,.88,0,.3,.14,"dark"),
+ g3B("1",0,.86,0,1.34,1.0,.96,"paint",{sh:1,r:.08,m:.4}),g3B("1",0,.86,.5,.9,.7,.04,"steel",{r:.03}),g3C("2","z",-.62,.88,.55,.1,.44,"dark",{m:.5}),g3C("2","z",0,.88,0,.9,.07,"dark",{in:1}),g3C("10","z",-.45,.88,.2,.1,.12,"brass",{in:1}),
+ g3B("3",.35,.88,.15,.5,.05,.06,"steel",{in:1}),g3B("4",.8,.98,.28,.2,.12,.12,"steel",{in:1}),g3B("4",.8,.98,-.28,.2,.12,.12,"steel",{in:1}),
+ g3C("5","x",1.55,.98,.28,1.05,.28,"paint",{sh:1,m:.5}),g3C("5","x",1.3,.98,.28,.26,.24,"steel",{in:1}),g3C("6","x",1.5,.98,-.28,.9,.21,"paint",{sh:1,m:.5}),g3C("6","x",1.3,.98,-.28,.26,.18,"steel",{in:1}),
+ g3C("7","x",1.18,.98,.28,.04,.25,"amber",{in:1}),g3C("9","x",.98,.98,.28,.12,.1,"dark"),g3C("9","x",.98,.98,-.28,.12,.1,"dark"),
+ g3C("5","x",2.1,.98,.28,.06,.3,"steel",{m:.6}),g3C("6","x",1.98,.98,-.28,.06,.23,"steel",{m:.6}),
+ g3B("8",1.55,1.3,.28,.2,.12,.16,"steel",{r:.03}),g3B("8",1.75,1.3,.28,.2,.12,.16,"steel",{r:.03}),g3B("8",1.6,1.22,-.28,.2,.1,.14,"steel",{r:.03}),
+ g3B("11",.4,.3,.58,.32,.28,.22,"gray",{r:.04}),g3C("11","y",.4,.52,.58,.1,.06,"steel"),
+ g3C("","x",1.55,1.7,.28,1.1,.15,"steel",{m:.5}),g3C("","y",1.55,1.5,.28,.2,.06,"steel"),
+ g3C("12","x",1.2,2.0,0,1.5,.21,"water",{m:.4}),g3C("12","x",.4,2.0,0,.05,.25,"steel"),g3C("12","x",1.98,2.0,0,.05,.25,"steel"),g3B("12",.55,1.55,0,.14,.55,.14,"steel",{r:.03}),g3B("12",1.85,1.55,0,.14,.55,.14,"steel",{r:.03}),
+ g3C("N1","y",1.55,1.95,.28,.3,.06,"amber"),g3C("N2","y",1.9,1.55,.28,.25,.06,"amber"),g3C("N3","y",1.9,1.25,-.28,.25,.05,"amber"),g3C("N4","x",2.25,.98,-.28,.28,.075,"amber"),g3C("N5","y",1.15,.2,.28,.25,.06,"amber"),g3C("N6","x",.2,.4,.82,.22,.05,"amber")];
 /* 5 shell and tube solvent heater */
-G3M[5]=(()=>{const a=[g3C("1","x",0,.7,0,3.2,.3,"body",{sh:1}),g3C("2","x",-1.85,.7,0,.5,.34,"steel"),g3C("7","x",-2.12,.7,0,.04,.35,"dark"),g3C("8","x",-1.61,.7,0,.03,.36,"dark"),g3C("9","x",-2.08,.7,0,.03,.36,"red"),
- g3C("4","x",-1.58,.7,0,.04,.29,"steel",{in:1}),g3B("10",-.9,.28,0,.3,.45,.5,"gray"),g3B("10",.9,.28,0,.3,.45,.5,"gray"),g3C("11","y",1.3,.2,0,.2,.04,"amber"),g3B("12",1.55,.25,.35,.2,.2,.18,"dark"),
- g3C("N1","y",-1.85,1.15,0,.3,.08,"amber"),g3C("N2","y",-1.85,.25,0,.3,.08,"amber"),g3C("N3","y",1.2,1.1,0,.3,.08,"amber"),g3C("N4","y",.4,.25,0,.3,.08,"amber"),g3C("N5","y",-.6,1.1,0,.25,.06,"amber"),g3C("N6","y",1.5,.2,0,.2,.05,"amber")];
- [-.8,-.2,.4,1.0].forEach(x=>a.push(g3C("5","x",x,.7,0,.03,.27,"steel",{in:1})));
- [[0,0],[.1,.1],[-.1,.1],[.1,-.1],[-.1,-.1],[0,.17],[0,-.17]].forEach(([y,z])=>a.push(g3C("3","x",0,.7+y,z,3,.03,"brass",{in:1})));
- a.push(g3C("6","x",0,.93,.0,3,.012,"dark",{in:1}));return a})();
-/* 6 control valve with diaphragm actuator */
-G3M[6]=[g3C("N1","x",-.42,.38,0,.5,.09,"amber"),g3C("N2","x",.42,.38,0,.5,.09,"amber"),g3C("N1","x",-.62,.38,0,.04,.15,"dark"),g3C("N2","x",.62,.38,0,.04,.15,"dark"),
- g3C("1","y",0,.38,0,.42,.19,"body",{sh:1}),g3C("10","y",0,.6,0,.03,.14,"dark"),g3C("2","y",0,.72,0,.26,.11,"steel"),g3C("6","y",0,.88,0,.08,.05,"dark"),
- g3B("11",-.1,1.0,0,.03,.3,.05,"steel"),g3B("11",.1,1.0,0,.03,.3,.05,"steel"),g3C("4","y",0,.82,0,.9,.015,"dark",{in:1}),g3C("3","y",0,.38,0,.28,.1,"steel",{in:1}),g3C("5","y",0,.24,0,.04,.12,"brass",{in:1}),
- g3E("7","y",0,1.16,0,.16,.3,"blue",Math.PI/2,Math.PI,{sh:1}),g3E("7","y",0,1.16,0,.2,.3,"blue",0,Math.PI/2,{sh:1}),g3C("7","y",0,1.16,0,.02,.3,"dark",{in:1}),g3C("8","y",0,1.3,0,.25,.08,"brass",{in:1}),
- g3B("9",.4,1.0,0,.14,.14,.12,"steel"),g3C("9","x",.26,1.0,0,.2,.02,"dark"),g3B("12",.48,.65,.12,.12,.1,.1,"dark"),g3C("12","x",.2,.65,.12,.5,.012,"dark"),g3C("12","y",.4,.85,.12,.4,.012,"dark")];
+G3M[5]=(()=>{const a=[g3C("1","x",0,.72,0,3.2,.31,"paint",{sh:1,m:.5}),g3C("2","x",-1.82,.72,0,.5,.355,"steel",{m:.5}),g3C("7","x",-2.1,.72,0,.05,.37,"dark",{m:.5}),g3C("8","x",-1.58,.72,0,.03,.37,"dark"),g3C("9","x",-2.06,.72,0,.03,.37,"red"),
+ g3C("1","x",-1.6,.72,0,.07,.4,"steel",{m:.6}),g3C("2","x",-2.02,.72,0,.07,.4,"steel",{m:.6}),g3E("1","x",1.62,.72,0,.2,.31,"paint",0,Math.PI/2,{sh:1,m:.5}),g3C("1","x",1.6,.72,0,.07,.4,"steel",{m:.6}),
+ g3C("4","x",-1.55,.72,0,.04,.3,"steel",{in:1}),g3B("10",-.9,.26,0,.34,.5,.58,"gray",{r:.05}),g3B("10",.9,.26,0,.34,.5,.58,"gray",{r:.05}),g3B("10",-.9,.012,0,.5,.03,.7,"dark",{zb:.5}),g3B("10",.9,.012,0,.5,.03,.7,"dark",{zb:.5}),
+ g3C("11","y",1.3,.2,0,.2,.04,"amber"),g3B("12",1.55,.28,.38,.2,.2,.18,"dark",{r:.03}),g3C("12","y",1.55,.42,.38,.1,.04,"steel"),g3B("",0,1.05,0,.14,.1,.14,"steel",{r:.02}),g3B("",.1,.32,-.31,.2,.08,.02,"white"),
+ g3C("N1","y",-1.82,1.2,0,.34,.08,"amber"),g3C("N2","y",-1.82,.22,0,.34,.08,"amber"),g3C("N3","y",1.2,1.15,0,.34,.08,"amber"),g3C("N4","y",.4,.22,0,.34,.08,"amber"),g3C("N5","y",-.6,1.15,0,.28,.06,"amber"),g3C("N6","y",1.5,.14,0,.22,.05,"amber")];
+ [-.8,-.2,.4,1.0].forEach(x=>a.push(g3C("5","x",x,.72,0,.03,.28,"steel",{in:1})));
+ [[0,0],[.1,.1],[-.1,.1],[.1,-.1],[-.1,-.1],[0,.18],[0,-.18]].forEach(([y,z])=>a.push(g3C("3","x",0,.72+y,z,3,.03,"brass",{in:1,seg:10})));
+ a.push(g3C("6","x",0,.96,0,3,.012,"dark",{in:1,seg:8}));return a})();
+/* 6 control valve with diaphragm actuator, positioner and air set */
+G3M[6]=[g3C("N1","x",-.45,.4,0,.54,.095,"amber"),g3C("N2","x",.45,.4,0,.54,.095,"amber"),
+ g3E("1","y",0,.4,0,.2,.22,"paint",0,Math.PI,{sh:1,m:.6}),g3C("1","y",0,.4,0,.34,.2,"paint",{sh:1,m:.6}),g3C("1","x",0,.4,0,.5,.17,"paint",{sh:1,m:.6}),
+ g3C("10","y",0,.62,0,.04,.15,"dark"),g3C("2","y",0,.74,0,.24,.115,"steel",{m:.7}),g3C("2","y",0,.62,0,.03,.2,"steel",{m:.6}),g3C("6","y",0,.9,0,.1,.06,"dark"),
+ g3B("11",-.11,1.02,0,.035,.32,.06,"steel",{r:.01}),g3B("11",.11,1.02,0,.035,.32,.06,"steel",{r:.01}),g3C("11","y",0,1.02,0,.2,.045,"steel"),
+ g3C("4","y",0,.82,0,.9,.016,"dark",{in:1,seg:10}),g3C("3","y",0,.4,0,.3,.1,"steel",{in:1}),g3C("5","y",0,.25,0,.04,.125,"brass",{in:1}),
+ g3E("7","y",0,1.2,0,.17,.32,"blue",Math.PI/2,Math.PI,{sh:1,m:.5}),g3E("7","y",0,1.2,0,.21,.32,"blue",0,Math.PI/2,{sh:1,m:.5}),g3C("7","y",0,1.2,0,.02,.32,"dark",{in:1}),g3C("8","y",0,1.36,0,.26,.085,"brass",{in:1,seg:12}),
+ g3C("7","y",0,1.2,0,.03,.335,"steel",{m:.7}),g3B("9",.42,1.04,0,.15,.15,.13,"steel",{r:.02}),g3C("9","x",.27,1.04,0,.2,.018,"dark",{seg:8}),g3C("9","z",.42,.94,.08,.1,.025,"white"),
+ g3B("12",.5,.66,.14,.13,.11,.1,"dark",{r:.02}),g3C("12","y",.5,.76,.14,.1,.04,"white"),g3C("12","x",.2,.66,.14,.5,.011,"dark",{seg:8}),g3C("12","y",.42,.85,.14,.44,.011,"dark",{seg:8})];
 /* 7 cooling tower cell with fan and drive */
-G3M[7]=[g3B("",0,.5,0,2.4,1,2.4,"body",{sh:1}),g3B("12",-1.22,.45,0,.05,.7,1.6,"dark"),g3B("8",0,.55,0,2.3,.5,2.2,"water",{in:1}),g3B("7",0,.98,0,2.3,.08,2.2,"steel",{in:1}),
- g3B("6",0,1.05,0,2.4,.08,2.4,"gray"),g3C("6","y",0,1.22,0,.3,.85,"white",{sh:1}),g3C("2","y",0,1.4,0,.18,.1,"dark"),g3B("3",0,1.18,0,.3,.2,.26,"steel"),
- g3C("4","x",.75,1.2,0,1.2,.035,"dark"),g3C("5","x",1.55,1.2,0,.5,.17,"blue"),g3C("10","y",0,1.1,0,.08,.1,"brass",{in:1}),g3C("9","y",0,1.2,0,.03,.12,"dark"),g3B("11",.3,1.35,.1,.08,.06,.06,"red"),
- ...[0,90,180,270].map(a=>g3B("1",0,1.42,0,.78,.025,.16,"steel",{ry:a,off:[.4,0,0],anim:{ax:"y",rate:140,at:[0,1.42,0]}})),
- g3C("N1","x",-1.35,.7,0,.3,.1,"amber"),g3C("N2","x",1.3,.2,0,.3,.1,"amber"),g3C("N3","y",-.6,.0,0,.2,.07,"amber"),g3C("N4","y",.6,.0,0,.2,.07,"amber")];
-/* 8 horizontal reflux accumulator drum with water boot */
-G3M[8]=[g3C("1","x",0,1,0,2.4,.55,"body",{sh:1}),g3E("2","x",-1.2,1,0,.28,.55,"body",Math.PI/2,Math.PI,{sh:1}),g3E("2","x",1.2,1,0,.28,.55,"body",0,Math.PI/2,{sh:1}),
- g3C("3","y",.8,.35,0,.7,.2,"body",{sh:1}),g3B("4",-.7,.4,0,.25,.75,.9,"gray"),g3B("4",.5,.4,0,.25,.75,.9,"gray"),
- g3C("5","y",-.45,1.6,0,.1,.18,"steel"),g3C("11","y",-.45,1.57,0,.03,.2,"dark"),g3B("6",-.9,.8,0,.3,.2,.25,"steel",{in:1}),g3C("7","x",-.2,1.1,0,.04,.38,"steel",{in:1}),
- g3C("8","y",1.05,1.0,.62,1.1,.05,"steel"),g3C("8","x",1.05,1.5,.31,.64,.04,"steel"),g3C("8","x",1.05,.55,.31,.64,.04,"steel"),g3B("10",-.1,1.05,.56,.2,.12,.03,"dark"),g3C("12","y",-.3,.5,0,.08,.04,"amber"),
- g3C("N1","y",.2,1.7,0,.3,.08,"amber"),g3C("N2","y",-.85,.25,0,.3,.08,"amber"),g3C("N3","y",-.1,.25,0,.3,.08,"amber"),g3C("N4","y",.8,.1,0,.2,.07,"amber"),g3C("N5","y",.65,1.7,0,.3,.06,"amber"),g3C("9","y",.65,1.58,0,.06,.1,"steel"),g3C("M1","y",-.45,1.7,0,.2,.07,"amber")];
-function g3Parts(p){ /* faces of one solid */
- const F=[],N=22,C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#a9b8c9")),mk=(pts,cen)=>{F.push({p:pts,k:p.k,c:C,sh:p.sh,in:p.in,cen,anim:p.anim,al:p.sh})};
- let cen,pts=[];
- if(p.t==="b"){const hx=p.w/2,hy=p.h/2,hz=p.d/2,o=p.off||[0,0,0];cen=[p.x,p.y,p.z];
-  const V=[];for(const sx of[-1,1])for(const sy of[-1,1])for(const sz of[-1,1])V.push([sx*hx,sy*hy,sz*hz]);
-  const tr=v=>{let q=[v[0]+o[0],v[1]+o[1],v[2]+o[2]];if(p.ry){const a=p.ry*Math.PI/180,c=Math.cos(a),s=Math.sin(a);q=[q[0]*c+q[2]*s,q[1],-q[0]*s+q[2]*c]}return[q[0]+p.x,q[1]+p.y,q[2]+p.z]};
-  [[0,1,3,2],[4,6,7,5],[0,4,5,1],[2,3,7,6],[0,2,6,4],[1,5,7,3]].forEach(f=>mk(f.map(i=>tr(V[i])),cen));return F}
- const ax=p.ax,mp=(a,u,v)=>ax==="x"?[a,u,v]:ax==="y"?[u,a,v]:[u,v,a];
- if(p.t==="c"){cen=[p.x,p.y,p.z];const h=p.len/2,r1=p.r,r2=p.r2;
-  for(let i=0;i<N;i++){const t0=i/N*Math.PI*2,t1=(i+1)/N*Math.PI*2,c0=Math.cos(t0),s0=Math.sin(t0),c1=Math.cos(t1),s1=Math.sin(t1);
-   const q=[mp(-h,r1*c0,r1*s0),mp(-h,r1*c1,r1*s1),mp(h,r2*c1,r2*s1),mp(h,r2*c0,r2*s0)].map(v=>[v[0]+p.x,v[1]+p.y,v[2]+p.z]);mk(q,cen)}
-  [[-h,r1],[h,r2]].forEach(([a,r])=>{if(r<=0)return;const f=[];for(let i=0;i<N;i++){const t=i/N*Math.PI*2;const v=mp(a,r*Math.cos(t),r*Math.sin(t));f.push([v[0]+p.x,v[1]+p.y,v[2]+p.z])}mk(f,cen)});return F}
- if(p.t==="e"){cen=[p.x,p.y,p.z];const LA=10,LO=N;
-  for(let i=0;i<LA;i++){const a0=p.a0+(p.a1-p.a0)*i/LA,a1=p.a0+(p.a1-p.a0)*(i+1)/LA;
-   for(let j=0;j<LO;j++){const t0=j/LO*Math.PI*2,t1=(j+1)/LO*Math.PI*2;
-    const P=(a,t)=>{const v=mp(p.ra*Math.cos(a),p.rb*Math.sin(a)*Math.cos(t),p.rb*Math.sin(a)*Math.sin(t));return[v[0]+p.x,v[1]+p.y,v[2]+p.z]};
-    mk([P(a0,t0),P(a0,t1),P(a1,t1),P(a1,t0)],cen)}}
-  return F}
+G3M[7]=(()=>{const a=[g3B("",0,.07,0,2.6,.14,2.6,"gray",{r:.05}),g3B("",0,.55,0,2.4,.95,2.4,"paint",{sh:1,r:.05,m:.2}),g3B("12",-1.22,.45,0,.05,.7,1.6,"dark",{r:.01}),g3B("8",0,.58,0,2.3,.5,2.2,"water",{in:1,r:.03}),g3B("7",0,.99,0,2.3,.08,2.2,"steel",{in:1,r:.02}),
+ g3B("6",0,1.06,0,2.5,.1,2.5,"gray",{r:.05}),g3C("6","y",0,1.25,0,.3,.9,"white",{sh:1,m:.3}),g3C("6","y",0,1.43,0,.04,.93,"steel",{m:.6}),g3C("2","y",0,1.45,0,.2,.1,"dark",{m:.6}),g3B("3",0,1.2,0,.34,.22,.28,"steel",{r:.04,m:.5}),g3B("",0,1.2,0,2.1,.05,.1,"gray",{r:.01}),
+ g3C("4","x",.75,1.2,0,1.2,.035,"dark",{m:.5}),g3C("5","x",1.62,1.2,0,.62,.17,"blue",{m:.5}),g3C("5","x",1.96,1.2,0,.1,.18,"dark"),g3B("",1.55,.98,0,.3,.14,.3,"gray",{r:.03}),g3C("10","y",0,1.1,0,.08,.1,"brass",{in:1}),g3C("9","y",0,1.26,0,.03,.12,"dark"),g3B("11",.34,1.42,.1,.09,.07,.07,"red",{r:.015}),
+ ...[0,90,180,270].map(an=>g3B("1",0,1.5,0,.8,.026,.19,"steel",{ry:an,off:[.46,0,0],anim:{ax:"y",rate:140,at:[0,1.5,0]},r:.01,m:.5})),
+ g3C("","y",0,1.55,0,.02,.95,"steel",{seg:30}),
+ g3C("N1","x",-1.38,.7,0,.3,.1,"amber"),g3C("N2","x",1.35,.2,0,.3,.1,"amber"),g3C("N3","y",-.6,.0,0,.2,.07,"amber"),g3C("N4","y",.6,.0,0,.2,.07,"amber"),...g3Ladder(1.2,.14,1.06,1.31)];
+ for(let i=0;i<9;i++)a.push(g3B("12",1.2,.2+i*.09,-.9+0*i,.04,.05,1.3,"steel",{r:.005}));return a})();
+/* 8 horizontal reflux accumulator drum with water boot and level bridle */
+G3M[8]=[g3C("1","x",0,1.05,0,2.4,.56,"paint",{sh:1,m:.5}),g3E("2","x",-1.2,1.05,0,.3,.56,"paint",Math.PI/2,Math.PI,{sh:1,m:.5}),g3E("2","x",1.2,1.05,0,.3,.56,"paint",0,Math.PI/2,{sh:1,m:.5}),
+ g3C("1","x",-1.18,1.05,0,.06,.575,"steel",{m:.6}),g3C("1","x",1.18,1.05,0,.06,.575,"steel",{m:.6}),
+ g3C("3","y",.8,.35,0,.7,.2,"paint",{sh:1,m:.5}),g3E("3","y",.8,.0,0,.1,.2,"paint",Math.PI/2,Math.PI,{sh:1}),g3B("4",-.7,.4,0,.26,.78,.95,"gray",{r:.05}),g3B("4",.5,.4,0,.26,.78,.95,"gray",{r:.05}),g3B("4",-.7,.012,0,.4,.03,1.1,"dark",{zb:.5}),g3B("4",.5,.012,0,.4,.03,1.1,"dark",{zb:.5}),
+ g3C("5","y",-.45,1.64,0,.12,.19,"steel",{m:.6}),g3C("5","y",-.45,1.72,0,.03,.24,"steel",{m:.6}),g3C("11","y",-.45,1.69,0,.03,.21,"dark"),g3B("6",-.9,.8,0,.3,.2,.25,"steel",{in:1,r:.03}),g3C("7","x",-.2,1.1,0,.04,.4,"steel",{in:1}),
+ g3C("8","y",1.05,1.05,.64,1.2,.05,"steel",{m:.6}),g3C("8","x",1.05,1.55,.32,.66,.04,"steel"),g3C("8","x",1.05,.55,.32,.66,.04,"steel"),g3C("8","y",1.05,1.05,.64,.4,.08,"white",{seg:14}),g3B("10",-.1,1.05,.58,.22,.13,.03,"dark",{r:.01}),g3B("10",-.1,1.05,.6,.2,.11,.01,"white"),g3C("12","y",-.3,.5,0,.08,.04,"amber"),
+ g3C("N1","y",.2,1.8,0,.3,.08,"amber"),g3C("N2","y",-.85,.2,0,.34,.08,"amber"),g3C("N3","y",-.1,.2,0,.34,.08,"amber"),g3C("N4","y",.8,-.1,0,.2,.07,"amber"),
+ g3C("N5","y",.65,1.8,0,.3,.06,"amber"),g3C("9","y",.65,1.72,0,.06,.1,"steel"),g3C("9","y",.65,1.98,0,.28,.07,"red"),g3C("M1","y",-.45,1.88,0,.2,.07,"amber")];
+/* ---------- geometry ---------- */
+const g3Seg=p=>p.seg||(p.r&&p.r<.07||p.len&&p.len<.06?14:34);
+function g3Parts(p){const F=[],C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#b4c0cf")),cen=[p.x,p.y,p.z],sm=p.t!=="r",mk=(pts,s,sc)=>F.push({p:pts,k:p.k,c:C,sh:p.sh,in:p.in,zb:p.zb||0,cen,anim:p.anim,m:p.m||.18,sm:s!==undefined?s:sm,sc:sc||0});
+ if(p.t==="r"){const hx=p.w/2,hz=p.d/2,hy=p.h/2,rr=Math.min(p.r==null?Math.min(hx,hz)*.18:p.r,hx*.95,hz*.95),o=p.off||[0,0,0],prof=[];
+  const cs=[[hx-rr,hz-rr,0],[-(hx-rr),hz-rr,1],[-(hx-rr),-(hz-rr),2],[hx-rr,-(hz-rr),3]],K=rr>.001?4:1;
+  cs.forEach(([cx,cz,q])=>{for(let i=0;i<=K;i++){const a=(q+i/K)*Math.PI/2;prof.push([cx+(rr>.001?Math.cos(a)*rr:Math.sign(cx||1)*0),cz+(rr>.001?Math.sin(a)*rr:0)])}});
+  if(rr<=.001){prof.length=0;prof.push([hx,hz],[-hx,hz],[-hx,-hz],[hx,-hz])}
+  const tr=(x,y,z)=>{let q=[x+o[0],y+o[1],z+o[2]];if(p.ry){const a=p.ry*Math.PI/180,c=Math.cos(a),s=Math.sin(a);q=[q[0]*c+q[2]*s,q[1],-q[0]*s+q[2]*c]}return[q[0]+p.x,q[1]+p.y,q[2]+p.z]};
+  for(let i=0;i<prof.length;i++){const a=prof[i],b=prof[(i+1)%prof.length];mk([tr(a[0],-hy,a[1]),tr(b[0],-hy,b[1]),tr(b[0],hy,b[1]),tr(a[0],hy,a[1])],rr>.001&&K>1,0)}
+  mk(prof.map(a=>tr(a[0],hy,a[1])),false,1);mk(prof.slice().reverse().map(a=>tr(a[0],-hy,a[1])),false,1);return F}
+ const N=g3Seg(p),ax=p.ax,mp=(a,u,v)=>ax==="x"?[a,u,v]:ax==="y"?[u,a,v]:[u,v,a],at=(v)=>[v[0]+p.x,v[1]+p.y,v[2]+p.z];
+ if(p.t==="c"){const h=p.len/2;
+  for(let i=0;i<N;i++){const t0=i/N*Math.PI*2,t1=(i+1)/N*Math.PI*2;mk([at(mp(-h,p.r*Math.cos(t0),p.r*Math.sin(t0))),at(mp(-h,p.r*Math.cos(t1),p.r*Math.sin(t1))),at(mp(h,p.r2*Math.cos(t1),p.r2*Math.sin(t1))),at(mp(h,p.r2*Math.cos(t0),p.r2*Math.sin(t0)))],true,0)}
+  [[-h,p.r],[h,p.r2]].forEach(([a,r])=>{if(r<=0)return;const f=[];for(let i=0;i<N;i++){const t=i/N*Math.PI*2;f.push(at(mp(a,r*Math.cos(t),r*Math.sin(t))))}mk(f,false,1)});return F}
+ const LA=Math.max(6,Math.round(N/3)),LO=N,P=(a,t)=>at(mp(p.ra*Math.cos(a),p.rb*Math.sin(a)*Math.cos(t),p.rb*Math.sin(a)*Math.sin(t)));
+ for(let i=0;i<LA;i++){const a0=p.a0+(p.a1-p.a0)*i/LA,a1=p.a0+(p.a1-p.a0)*(i+1)/LA;for(let j=0;j<LO;j++){const t0=j/LO*Math.PI*2,t1=(j+1)/LO*Math.PI*2;mk([P(a0,t0),P(a0,t1),P(a1,t1),P(a1,t0)],true,0)}}
  return F}
 function g3Parse(h){const m=/^#?([0-9a-f]{6})$/i.exec(h||"");if(m){const n=parseInt(m[1],16);return[n>>16,(n>>8)&255,n&255]}const r=/rgba?\(([^)]+)\)/.exec(h||"");if(r){const q=r[1].split(",").map(Number);return[q[0],q[1],q[2],q[3]]}return[169,184,201]}
-/* faces of a whole model, cached; cutting and orientation fixed once */
-function g3Mesh(n){if(G3.mesh[n])return G3.mesh[n];const faces=[];(G3M[n]||[]).forEach(p=>{g3Parts(p).forEach(f=>{const q=f.p,u=[q[1][0]-q[0][0],q[1][1]-q[0][1],q[1][2]-q[0][2]],v=[q[2][0]-q[0][0],q[2][1]-q[0][1],q[2][2]-q[0][2]];
+/* flanges with bolt heads on every nozzle, added at the free end */
+function g3Extra(prims){const c=[0,0,0];prims.forEach(p=>{c[0]+=p.x;c[1]+=p.y;c[2]+=p.z});c[0]/=prims.length;c[1]/=prims.length;c[2]/=prims.length;const out=[];
+ prims.forEach(p=>{if(p.t!=="c"||p.r2!==p.r||!/^(N\d|M\d)$/.test(p.k)||p.len<.12)return;const ax=p.ax,idx=ax==="x"?0:ax==="y"?1:2,pos=[p.x,p.y,p.z],sgn=(pos[idx]-c[idx])>=0?1:-1,end=pos.slice();end[idx]+=sgn*p.len/2;
+  const fr=p.r*1.55,th=Math.max(.03,p.r*.4);const e2=end.slice();e2[idx]-=sgn*th/2;out.push(g3C(p.k,ax,e2[0],e2[1],e2[2],th,fr,"steel",{m:.7,seg:p.r<.06?14:30}));
+  const nb=p.r<.06?4:8;for(let i=0;i<nb;i++){const t=i/nb*Math.PI*2,u=Math.cos(t)*fr*.78,v=Math.sin(t)*fr*.78,e3=end.slice();e3[idx]+=sgn*.004;const m=ax==="x"?[e3[0],e3[1]+u,e3[2]+v]:ax==="y"?[e3[0]+u,e3[1],e3[2]+v]:[e3[0]+u,e3[1]+v,e3[2]];out.push(g3C(p.k,ax,m[0],m[1],m[2],.025,p.r*.16,"dark",{seg:8,m:.6}))}});return out}
+function g3Mesh(n){if(G3.mesh[n])return G3.mesh[n];const prims=(G3M[n]||[]).concat(g3Extra(G3M[n]||[])),faces=[];
+ prims.forEach(p=>{g3Parts(p).forEach(f=>{const q=f.p,u=[q[1][0]-q[0][0],q[1][1]-q[0][1],q[1][2]-q[0][2]],v=[q[2][0]-q[0][0],q[2][1]-q[0][1],q[2][2]-q[0][2]];
   let nm=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];const l=Math.hypot(...nm)||1;nm=nm.map(x=>x/l);
-  const c=[0,1,2].map(i=>q.reduce((a,b)=>a+b[i],0)/q.length),cn=f.cen||[0,0,0];let off=p.t==="b"&&p.off?[cn[0]+p.off[0],cn[1]+p.off[1],cn[2]+p.off[2]]:cn;
-  if(p.ry&&p.off){const a=p.ry*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a);off=[cn[0]+p.off[0]*cs+p.off[2]*sn,cn[1]+p.off[1],cn[2]-p.off[0]*sn+p.off[2]*cs]}
-  const d=(c[0]-off[0])*nm[0]+(c[1]-off[1])*nm[1]+(c[2]-off[2])*nm[2];if(d<0)nm=nm.map(x=>-x);f.n=nm;f.m=c;faces.push(f)})});
+  const c=[0,1,2].map(i=>q.reduce((a,b)=>a+b[i],0)/q.length);let off=f.cen;if(p.t==="r"&&p.off){const a=(p.ry||0)*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a);off=[f.cen[0]+p.off[0]*cs+p.off[2]*sn,f.cen[1]+p.off[1],f.cen[2]-p.off[0]*sn+p.off[2]*cs]}
+  if(p.t==="c"){/* a cylinder side face points away from its axis; caps point along it */const ai=p.ax==="x"?0:p.ax==="y"?1:2,rel=[c[0]-f.cen[0],c[1]-f.cen[1],c[2]-f.cen[2]];if(f.sc===0)rel[ai]=0;off=[c[0]-rel[0],c[1]-rel[1],c[2]-rel[2]]}
+  const d=(c[0]-off[0])*nm[0]+(c[1]-off[1])*nm[1]+(c[2]-off[2])*nm[2];if(d<0)nm=nm.map(x=>-x);f.n=nm;f.m=f.m;f.mid=c;faces.push(f)})});
  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];faces.forEach(f=>f.p.forEach(v=>{for(let i=0;i<3;i++){mn[i]=Math.min(mn[i],v[i]);mx[i]=Math.max(mx[i],v[i])}}));
- const ctr=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],R=Math.max(...[0,1,2].map(i=>(mx[i]-mn[i])/2),.5)*1.25,Rs=Math.hypot(...[0,1,2].map(i=>(mx[i]-mn[i])/2));
- const Rf=Math.max((mx[1]-mn[1])/2*1.12,Math.hypot((mx[0]-mn[0])/2,(mx[2]-mn[2])/2)*.78);return G3.mesh[n]={faces,ctr,R:Rs,Rf,ymin:mn[1],mn,mx}}
+ const ctr=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],Rs=Math.hypot(...[0,1,2].map(i=>(mx[i]-mn[i])/2)),Rf=Math.max((mx[1]-mn[1])/2*1.12,Math.hypot((mx[0]-mn[0])/2,(mx[2]-mn[2])/2)*.78);
+ return G3.mesh[n]={faces,ctr,R:Rs,Rf,ymin:mn[1],mn,mx}}
+function g3Info(n,k){if(!k)return"";const nz=GA[n]&&GA[n].nz.find(q=>q.m===k),b=nz?null:gBom(n,k),s=S(n);if(!nz&&!b)return"";
+ const wo=MH.filter(m=>m.n===n&&mhParts(m).includes(k)),V=nz?null:gVal(n,k),rows=nz?[["Nozzle",k],["Service",nz.sv],["Size and rating",nz.sz],["Remarks",nz.r]]:[["Item",k==="M"?"Driver":k],["Material",b.mat],["Quantity",b.qty],["Drawing",s.ga.dwg_no]];
+ let live="";if(V&&G.cond!==false){const st0=gState(V.m,V.v),cl=st0==="ok"?"ok":st0==="warn"?"warn":"bad";live=`<div class="g3live"><span class="tag ${cl}">${st0==="ok"?"Normal":st0==="warn"?"Alarm":"Trip"}</span> <b>${V.v.toFixed(V.m[3]<5?1:0)} ${V.m[2]}</b> <span class="muted">${esc(V.m[1])}</span></div>`}
+ return `<div class="g3card"><div class="row between"><b>${esc(nz?k+" | "+nz.sv:(k==="M"?"":k+" | ")+b.name)}</b><button class="ghost g3x" onclick="G3.pin=null;this.closest('.g3card').remove()" aria-label="Close">x</button></div>${rows.map(r=>`<div class="g3r"><span>${esc(r[0])}</span><b>${esc(String(r[1]??"n/a"))}</b></div>`).join("")}${live}<div class="g3r"><span>Work orders</span><b>${wo.length}</b></div>${wo.length?`<div class="muted" style="font-size:11.5px;margin-top:2px">Latest ${esc(wo[wo.length-1].wo)}, ${esc((wo[wo.length-1].prob||"").slice(0,58))}</div>`:""}<div class="row" style="gap:6px;margin-top:8px"><button class="ghost" style="padding:2px 9px;font-size:12px" onclick="go('equipment',{set:${n},tab:'ga'});setTimeout(()=>gSel('${k}'),80)">Open in drawing</button><button class="ghost" style="padding:2px 9px;font-size:12px" onclick="go('mnt');MHS.set=${n};setTimeout(()=>mhPartFilter('${k}'),80)">Work orders</button></div></div>`}
 function g3Name(n,k){const nz=GA[n]&&GA[n].nz.find(q=>q.m===k);if(nz)return k+" | "+nz.sv;const b=gBom(n,k);return b?(k==="M"?"":k+" | ")+b.name:k}
 function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!box)return;const o=G3.cfg[id],M=g3Mesh(o.n),svg=box.querySelector("svg");if(!svg)return;
- const W=900,H=500,yaw=I.yaw,pit=I.pit,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pit),sp=Math.sin(pit),D=M.R*3.2,sc=I.zoom*(H*.46)/M.Rf,t=I.t;
- const sel=o.sel?o.sel():null,hl=o.hl||[],heat=o.heat||{},tint=o.tint;
- const rot=(v,at)=>{let x=v[0]-M.ctr[0],y=v[1]-M.ctr[1],z=v[2]-M.ctr[2];const x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp-z1*sp,z2=y*sp+z1*cp;return[x1,y2,z2]};
- const out=[];const spin=(f,v)=>{const a=f.anim;if(!a||!I.run)return v;const ang=a.rate*t*Math.PI/180,c=Math.cos(ang),s=Math.sin(ang),dx=v[0]-a.at[0],dz=v[2]-a.at[2];return[dx*c+dz*s+a.at[0],v[1],-dx*s+dz*c+a.at[2]]};
+ const W=900,H=500,cy=Math.cos(I.yaw),sy=Math.sin(I.yaw),cp=Math.cos(I.pit),sp=Math.sin(I.pit),D=M.R*3.4,sc=I.zoom*(H*.46)/M.Rf,t=I.t;
+ const sel=I.pin||(o.sel?o.sel():null),hl=o.hl||[],heat=o.heat||{},tint=o.tint;
+ const rot=v=>{const x=v[0]-M.ctr[0],y=v[1]-M.ctr[1],z=v[2]-M.ctr[2],x1=x*cy+z*sy,z1=-x*sy+z*cy;return[x1,y*cp+z1*sp,-y*sp+z1*cp]};
+ const spin=(f,v)=>{const a=f.anim;if(!a||!I.run)return v;const ang=a.rate*t*Math.PI/180,c=Math.cos(ang),s=Math.sin(ang),dx=v[0]-a.at[0],dz=v[2]-a.at[2];return[dx*c+dz*s+a.at[0],v[1],-dx*s+dz*c+a.at[2]]};
+ const out=[];
  M.faces.forEach(f=>{if(f.in&&!I.xray)return;const anim=f.anim&&I.run;const pts=f.p.map(v=>rot(anim?spin(f,v):v));let nm=f.n;
   if(anim){const a=f.anim.rate*t*Math.PI/180,c=Math.cos(a),s=Math.sin(a);nm=[nm[0]*c+nm[2]*s,nm[1],-nm[0]*s+nm[2]*c]}
-  const nx=nm[0]*cy+nm[2]*sy,nz1=-nm[0]*sy+nm[2]*cy,ny=nm[1]*cp-nz1*sp,nzz=nm[1]*sp+nz1*cp;
-  const zc=pts.reduce((a,b)=>a+b[2],0)/pts.length;if(!(I.xray&&f.sh)&&(nzz>=0.0))return; /* camera sits at negative z, so visible faces point to -z */
-  out.push({f,pts,zc,nx,ny,nz:nzz})});
+  const nx=nm[0]*cy+nm[2]*sy,nz1=-nm[0]*sy+nm[2]*cy,ny=nm[1]*cp+nz1*sp,nzz=-nm[1]*sp+nz1*cp;
+  if(!(I.xray&&f.sh)&&nzz>=0)return;let zc=0;for(const p of pts)zc+=p[2];zc=zc/pts.length+f.zb;out.push({f,pts,zc,nx,ny,nz:nzz})});
  out.sort((a,b)=>b.zc-a.zc);
- const L=[-.45,.75,-.5],ll=Math.hypot(...L);const proj=p=>{const k=D/(D+p[2]);return[W/2+p[0]*sc*k+I.px,H/2-p[1]*sc*k+I.py]};
- let s="";
- /* ground grid under the model */
- const gy=M.ymin,gr=M.R*1.15,step=gr/4;let grid="";
- for(let i=-4;i<=4;i++){const a=rot([M.ctr[0]+i*step,gy,M.ctr[2]-gr]),b=rot([M.ctr[0]+i*step,gy,M.ctr[2]+gr]),c=rot([M.ctr[0]-gr,gy,M.ctr[2]+i*step]),d=rot([M.ctr[0]+gr,gy,M.ctr[2]+i*step]);
-  const pa=proj(a),pb=proj(b),pc=proj(c),pd=proj(d);grid+=`M${pa[0].toFixed(1)} ${pa[1].toFixed(1)}L${pb[0].toFixed(1)} ${pb[1].toFixed(1)}M${pc[0].toFixed(1)} ${pc[1].toFixed(1)}L${pd[0].toFixed(1)} ${pd[1].toFixed(1)}`}
- s+=`<path d="${grid}" stroke="#c5ced9" stroke-width=".8" fill="none"/>`;
+ const proj=p=>{const k=D/(D+p[2]);return[W/2+p[0]*sc*k+I.px,H/2-p[1]*sc*k+I.py]},fx=v=>v.toFixed(1);
+ const L1=[-.5,.72,-.48],L2=[.6,.25,-.5],l1=Math.hypot(...L1),l2=Math.hypot(...L2),Hv=[L1[0]/l1,L1[1]/l1,L1[2]/l1-1],hl_=Math.hypot(...Hv);
+ /* ground: shadow and grid */
+ const gy=M.ymin,gr=M.R*1.2,step=gr/5;let grid="";
+ for(let i=-5;i<=5;i++){const a=proj(rot([M.ctr[0]+i*step,gy,M.ctr[2]-gr])),b=proj(rot([M.ctr[0]+i*step,gy,M.ctr[2]+gr])),c=proj(rot([M.ctr[0]-gr,gy,M.ctr[2]+i*step])),d=proj(rot([M.ctr[0]+gr,gy,M.ctr[2]+i*step]));grid+=`M${fx(a[0])} ${fx(a[1])}L${fx(b[0])} ${fx(b[1])}M${fx(c[0])} ${fx(c[1])}L${fx(d[0])} ${fx(d[1])}`}
+ const sh=[];for(let i=0;i<24;i++){const a=i/24*Math.PI*2;sh.push(proj(rot([M.ctr[0]+Math.cos(a)*(M.mx[0]-M.mn[0])*.52,gy,M.ctr[2]+Math.sin(a)*(M.mx[2]-M.mn[2])*.6])))}
+ let s=`<path d="${grid}" stroke="#d3dbe6" stroke-width=".7" fill="none"/><polygon points="${sh.map(p=>fx(p[0])+","+fx(p[1])).join(" ")}" fill="#223047" opacity=".16" filter="url(#g3b)"/>`;
+ const over=[];
  out.forEach(({f,pts,nx,ny,nz})=>{let c=f.c.slice(0,3);const k=f.k;
   const tc=k&&(tint&&tint(k)||heat[k]);if(tc){const q=typeof tc==="string"?g3Parse(tc):tc,a=q[3]==null?.6:q[3];c=c.map((v,i)=>v*(1-a)+q[i]*a)}
-  const lum=.42+.58*Math.max(0,(nx*L[0]+ny*L[1]+nz*L[2])/ll);
-  const hlOn=k&&hl.includes(k),selOn=k&&k===sel;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.08+22));
-  const fill=`rgb(${Math.round(Math.min(255,c[0]*lum))},${Math.round(Math.min(255,c[1]*lum))},${Math.round(Math.min(255,c[2]*lum))})`;
-  const al=I.xray&&f.sh?.2:1;
-  s+=`<polygon points="${pts.map(p=>proj(p).map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="${fill}" fill-opacity="${al}" stroke="${selOn?"#0b5fd7":hlOn?"#cf222e":"rgba(30,45,70,.35)"}" stroke-width="${selOn||hlOn?1.6:.5}" ${k?`data-k="${k}" style="cursor:pointer"`:""}${hlOn?' class="g3hl"':""}/>`});
- svg.querySelector(".g3s").innerHTML=s;
- const cap=box.querySelector(".g3cap");if(cap&&!I.hover)cap.textContent=sel?g3Name(o.n,sel):"Drag to rotate, scroll to zoom, select a part"}
-function g3Init(box){const id=box.id,o=G3.cfg[id];if(!o)return;box.setAttribute("data-ok","1");
- box.innerHTML=`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Fan running</button>':""}<button class="ghost" data-v="reset">Reset</button></div>
- <svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><rect width="900" height="500" fill="#f4f7fb"/><g class="g3s"></g></svg><div class="g3cap muted"></div>`;
- const I=G3.inst[id]={yaw:-.62,pit:.38,zoom:1,px:0,py:0,spin:false,xray:false,run:true,t:0,drag:null,hover:null,dirty:true,last:performance.now()};
- const svg=box.querySelector("svg"),dirty=()=>{I.dirty=true};
- const views={iso:[-.62,.38],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2-.001]};
- box.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==="reset"){I.yaw=-.62;I.pit=.38;I.zoom=1;I.px=I.py=0}else{I.yaw=views[v][0];I.pit=views[v][1]}dirty()});
+  const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=(ny*.5+.5),spec=Math.pow(Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),22)*f.m;
+  const lum=.36+.5*d1+.16*d2+.12*hemi,hlOn=k&&hl.includes(k),selOn=k&&k===sel;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.1+26));
+  const r=Math.min(255,c[0]*lum+255*spec*.55),g=Math.min(255,c[1]*lum+255*spec*.55),b=Math.min(255,c[2]*lum+255*spec*.55),fill=`rgb(${r|0},${g|0},${b|0})`,al=I.xray&&f.sh?.18:1;
+  const pp=pts.map(p=>{const q=proj(p);return fx(q[0])+","+fx(q[1])}).join(" ");
+  s+=`<polygon points="${pp}" fill="${fill}" fill-opacity="${al}" stroke="${f.sm?fill:"rgba(25,40,65,.5)"}" stroke-opacity="${al}" stroke-width="${f.sm?.7:.6}" stroke-linejoin="round" ${k?`data-k="${k}" style="cursor:pointer"`:""}/>`;
+  if(selOn||hlOn)over.push(`<polygon points="${pp}" fill="none" stroke="${selOn?"#0b5fd7":"#cf222e"}" stroke-width="${selOn?1.5:1.2}" stroke-linejoin="round"${hlOn&&!selOn?' class="g3hl"':""} pointer-events="none"/>`)});
+ svg.querySelector(".g3s").innerHTML=s+over.join("");
+ const cap=box.querySelector(".g3cap");if(cap&&!I.hover&&!box.dataset.mini)cap.textContent=sel?g3Name(o.n,sel):"Drag to rotate, scroll to zoom, select a part for its details";
+ const card=box.querySelector(".g3side");if(card&&I.cardKey!==sel){I.cardKey=sel;card.innerHTML=box.dataset.mini?"":g3Info(o.n,sel)}}
+function g3Init(box){const id=box.id,o=G3.cfg[id];if(!o)return;box.setAttribute("data-ok","1");const mini=!!box.dataset.mini;
+ box.innerHTML=(mini?"":`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Fan running</button>':""}<button class="ghost" data-v="reset">Reset</button></div>`)+
+ `<div class="g3stage"><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><rect width="900" height="500" fill="url(#g3bg)"/><g class="g3s"></g></svg><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
+ const I=G3.inst[id]={yaw:-.62,pit:.34,zoom:mini?1.05:1,px:0,py:0,spin:mini,xray:false,run:true,t:0,drag:null,hover:null,dirty:true,last:performance.now(),pin:null,cardKey:undefined};
+ const svg=box.querySelector("svg"),dirty=()=>{I.dirty=true},views={iso:[-.62,.34],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2-.001]};
+ box.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==="reset"){I.yaw=-.62;I.pit=.34;I.zoom=1;I.px=I.py=0}else{I.yaw=views[v][0];I.pit=views[v][1]}dirty()});
  box.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="spin")I.spin=!I.spin;else if(k==="xray")I.xray=!I.xray;else I.run=!I.run;b.classList.toggle("on",k==="spin"?I.spin:k==="xray"?I.xray:I.run);dirty()});
+ const keyAt=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.getAttribute&&el.closest&&el.closest("svg")===svg?el.getAttribute("data-k"):null};
  svg.addEventListener("pointerdown",e=>{I.drag={x:e.clientX,y:e.clientY,mv:0,pan:e.shiftKey||e.button===2};try{svg.setPointerCapture(e.pointerId)}catch(_){}});
  svg.addEventListener("contextmenu",e=>e.preventDefault());
  svg.addEventListener("pointermove",e=>{const d=I.drag;if(d){const dx=e.clientX-d.x,dy=e.clientY-d.y;d.mv+=Math.abs(dx)+Math.abs(dy);d.x=e.clientX;d.y=e.clientY;
-   if(d.pan){const r=svg.getBoundingClientRect(),k=900/r.width;I.px+=dx*k;I.py+=dy*k}else{I.yaw+=dx*.008;I.pit=Math.max(-1.5,Math.min(1.5,I.pit+dy*.006))}dirty()}
-  else{const k=e.target.getAttribute&&e.target.getAttribute("data-k"),cap=box.querySelector(".g3cap");if(k!==I.hover){I.hover=k||null;if(cap)cap.textContent=k?g3Name(o.n,k):(o.sel&&o.sel()?g3Name(o.n,o.sel()):"Drag to rotate, scroll to zoom, select a part")}}});
- svg.addEventListener("pointerup",e=>{const d=I.drag;I.drag=null;if(d&&d.mv<5&&!d.pan){const k=e.target.getAttribute&&e.target.getAttribute("data-k");if(k&&o.click){try{(typeof o.click==="function"?o.click:window[o.click])(k)}catch(_){}}dirty()}});
- svg.addEventListener("wheel",e=>{e.preventDefault();I.zoom=Math.max(.5,Math.min(3.5,I.zoom*(e.deltaY<0?1.1:.9)));dirty()},{passive:false});
+   if(d.pan){const r=svg.getBoundingClientRect(),k=900/r.width;I.px+=dx*k;I.py+=dy*k}else{I.yaw+=dx*.008;I.pit=Math.max(-1.5,Math.min(1.5,I.pit+dy*.006))}if(d.mv>5)I.spin=I.spin&&mini?false:I.spin;dirty()}
+  else{const k=keyAt(e),cap=box.querySelector(".g3cap");if(k!==I.hover){I.hover=k||null;if(cap)cap.textContent=k?g3Name(o.n,k):(I.pin||(o.sel&&o.sel())?g3Name(o.n,I.pin||o.sel()):"Drag to rotate, scroll to zoom, select a part for its details");svg.style.cursor=k?"pointer":"grab"}}});
+ svg.addEventListener("pointerup",e=>{const d=I.drag;I.drag=null;if(d&&d.mv<6&&!d.pan){const k=keyAt(e);if(mini){if(k)go("equipment",{set:o.n,tab:"ga"});return}
+   I.pin=k&&k!==I.pin?k:null;if(k&&o.click){try{(typeof o.click==="function"?o.click:window[o.click])(k)}catch(_){}}else if(!k&&o.click&&o.sel&&o.sel()){}dirty()}});
+ svg.addEventListener("wheel",e=>{if(mini)return;e.preventDefault();I.zoom=Math.max(.5,Math.min(3.5,I.zoom*(e.deltaY<0?1.1:.9)));dirty()},{passive:false});
  svg.addEventListener("dblclick",()=>{I.zoom=1;I.px=I.py=0;dirty()});
  g3Draw(id)}
 function g3Scan(){document.querySelectorAll(".g3box:not([data-ok])").forEach(b=>{if(!b.hidden&&!b.closest("[hidden]"))g3Init(b)});
  const keep=new Set([...document.querySelectorAll(".g3box")].map(b=>b.id));Object.keys(G3.inst).forEach(id=>{if(!keep.has(id)){delete G3.inst[id];delete G3.cfg[id]}})}
-function g3Loop(now){requestAnimationFrame(g3Loop);Object.keys(G3.inst).forEach(id=>{const I=G3.inst[id],box=document.getElementById(id);if(!box||box.hidden||box.closest("[hidden]"))return;const dt=Math.min(.1,(now-I.last)/1000);I.last=now;
-  if(I.spin&&!I.drag){I.yaw+=dt*.5;I.dirty=true}if(I.run&&(G3M[G3.cfg[id].n]||[]).some(p=>p.anim)){I.t+=dt;I.dirty=true}
-  if(I.dirty||now-(I.lt||0)>1500){I.dirty=false;I.lt=now;g3Draw(id)}})}
+function g3Loop(now){requestAnimationFrame(g3Loop);Object.keys(G3.inst).forEach(id=>{const I=G3.inst[id],box=document.getElementById(id);if(!box||box.hidden||box.closest("[hidden]"))return;if(now-(I.drawn||0)<33)return;const dt=Math.min(.1,(now-I.last)/1000);I.last=now;
+  if(I.spin&&!I.drag){I.yaw+=dt*.45;I.dirty=true}if(I.run&&(G3M[G3.cfg[id].n]||[]).some(p=>p.anim)){I.t+=dt;I.dirty=true}
+  const sel=I.pin||(G3.cfg[id].sel?G3.cfg[id].sel():null);if(sel!==I.lastSel){I.lastSel=sel;I.dirty=true}
+  if(I.dirty||now-(I.lt||0)>1500){I.dirty=false;I.lt=now;I.drawn=now;g3Draw(id)}})}
 requestAnimationFrame(g3Loop);
 {let tm=null;new MutationObserver(()=>{if(!tm)tm=setTimeout(()=>{tm=null;g3Scan()},40)}).observe(document.body,{childList:true,subtree:true})}
 function g3Mode(m){G3.mode=m;try{localStorage.setItem("akp_gmode",m)}catch(e){}
@@ -152,3 +192,5 @@ function g3Mode(m){G3.mode=m;try{localStorage.setItem("akp_gmode",m)}catch(e){}
 /* one switchable figure: svg2d is the existing drawing, o carries sel(), hl[], heat{}, tint(k) and click(k) for the 3D view */
 function gaFig(n,svg2d,o){const id="g3_"+(++G3.seq);G3.cfg[id]=Object.assign({n},o||{});const m=G3.mode;
  return `<div class="gfig"><div class="gtog" role="group" aria-label="Drawing view"><button data-m="2d" class="${m==="2d"?"on":""}" onclick="g3Mode('2d')">2D drawing</button><button data-m="3d" class="${m==="3d"?"on":""}" onclick="g3Mode('3d')">3D model</button></div><div class="g2" ${m==="3d"?"hidden":""}>${svg2d}</div><div class="g3box" id="${id}" ${m==="3d"?"":"hidden"}></div></div>`}
+/* a small turning model for headers; a click opens the drawing */
+function g3Mini(n){const id="g3_"+(++G3.seq);G3.cfg[id]={n};return `<div class="g3box g3mini" id="${id}" data-mini="1" title="Open the equipment drawing"></div>`}
