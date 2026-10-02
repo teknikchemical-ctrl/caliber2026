@@ -13,7 +13,7 @@ def P(old,new,cnt=1):
     h=h.replace(old,new)
 # ---------- 1. AI assistant: remove original code, keep nav/buttons, rewire to ai.js ----------
 P('<div class="nav" data-page="assistant">🤖 AI Assistant</div>','<div class="nav" data-page="ai">AI Assistant</div>\n  <div class="nav" data-page="ks">Knowledge Studio</div>\n  <div class="nav" data-page="fm">Failure Memory</div>\n  <div class="nav" data-page="rc">Report Center</div>\n  <div class="nav" data-page="cov">Case 1 Coverage</div>\n  <div class="nav" data-page="int">Integrations</div>')
-i=h.index('  <div class="foot">');j=h.index('</div>',i)+6;h=h[:i]+'  <div class="foot"><span class="dot" id="aidot" style="background:var(--warn)"></span><span id="aistat">Local knowledge base</span></div>'+h[j:]
+i=h.index('  <div class="foot">');j=h.index('</div>',i)+6;h=h[:i]+'  <div class="foot"><div class="fline"><span class="dot" id="syncdot" style="background:var(--warn)"></span><span id="syncstat">Local only</span></div><div class="fline between"><span class="fline"><span class="dot" id="aidot" style="background:var(--warn)"></span><span id="aistat">Offline knowledge search</span></span><button class="gear" onclick="setOpen()" aria-label="Settings" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div></div>'+h[j:]
 i=h.index('/* AI Assistant: retrieval');j=h.index('/* Render */');h=h[:i]+h[j:]
 P('p==="quality"?quality():assistant();','p==="quality"?quality():p==="il"?ilPage():p==="ai"?aiPage():p==="ks"?ksPage():p==="fm"?fmPage():p==="rc"?rcPage():p==="cov"?covPage():p==="int"?intPage():p==="scn"?scnPage():dashboard();')
 P('if(p==="assistant")$("#q")?.focus()','if(p==="ai")$("#q")?.focus()')
@@ -32,7 +32,7 @@ for x,y in [('const vb=full?PP.vb:[0,0,880,830],o=[];','const vb=opt.vb||(full?P
     assert x in pp,x; pp=pp.replace(x,y)
 a=h.index('const gKey=(d,i)=>');b=h.index('const _r1=render;')
 mods=[w('dl.js'),w('ui.js'),w('facts.js'),w('ai.js'),w('intent.js'),w('gad.js'),w('ga.js'),pp,'const MH='+open(os.path.join(ROOT,'src','data','mh.json')).read()+';\nconst EVAL_CASES='+open(os.path.join(ROOT,'src','data','eval_cases.json')).read()+';\nconst SCHEMA_SQL='+json.dumps(open(os.path.join(ROOT,'src','data','schema.sql')).read())+';\nconst PROMPT_TEMPLATE='+json.dumps(open(os.path.join(ROOT,'src','data','prompt_template.md')).read())+';\n']
-for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pidx.js','pid2.js','pdm.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','dash.js']:
+for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pidx.js','pid2.js','pdm.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','sync.js','dash.js']:
     try: mods.append(w(f))
     except FileNotFoundError: pass
 h=h[:a]+''.join(mods)+h[b:]
@@ -108,6 +108,8 @@ h=remap(h)
 h=h.replace(ROOT_OLD,ROOT_NEW)
 h=strip_emoji(h); h=dashes(h)
 open(os.path.join(ROOT,'knowledge-hub-integrated_BAP5.html'),'w').write(h)
+os.makedirs(os.path.join(ROOT,'dist'),exist_ok=True)
+open(os.path.join(ROOT,'dist','index.html'),'w').write(h)
 bad=0
 for k,m in enumerate(re.finditer(r'<script>(.*?)</script>',h,re.S)):
     open(os.path.join(TMP,f'sc{k}.js'),'w').write(m.group(1))

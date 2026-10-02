@@ -30,3 +30,7 @@ All data is sample data provided for CALIBER purposes only.
 - Scenarios page and equipment tab "Scenarios" replay OPL troubleshooting cases and work orders on the P&ID, and simulate plant wide chain reactions (unit trip, nitrogen or steam loss). Stream links, delays and interlock effects are engineering assumptions, not plant data. Outage estimates are averages of historical breakdowns.
 - Predictive Maintenance can weight priority by chain reaction size (toggle) and links to the plant P&ID view.
 - Assistant tool `cascade_analysis` answers plant impact questions with cited OPL guidance.
+
+## Live deployment (Netlify)
+
+The page works as a plain file and as a Netlify site with a shared database and a server side AI. See `docs/DEPLOY_NETLIFY.md` for the 10 minute setup, the environment variables and the limits of open access. Tests: `npm test` (regression) and `node tests/live.js` (shared database between two users, AI adapters, rate limits and offline fallback).

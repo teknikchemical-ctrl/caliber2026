@@ -3,9 +3,13 @@
   "private": true,
   "scripts": {
     "build": "python3 build.py",
-    "test": "python3 build.py && node tests/regress.js"
+    "test": "python3 build.py && node tests/regress.js && node tests/live.js",
+    "dev": "LOCAL_STORE_DIR=/tmp/akp-dev AI_PROVIDER=mock node tools/devserver.mjs"
   },
   "devDependencies": {
     "playwright": "^1.45.0"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
   }
 }

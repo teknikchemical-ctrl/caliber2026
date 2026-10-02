@@ -36,7 +36,7 @@ try{Object.assign(ROLE,JSON.parse(localStorage.getItem("akp_role")||"{}"))}catch
 function setRole(n){ROLE.name=n;try{localStorage.setItem("akp_role",JSON.stringify({name:n,user:ROLE.user}))}catch(e){}audit("Role changed",n);BUS.emit("role",n);if(typeof render==="function")render()}
 /* ---------- user knowledge with approval workflow ---------- */
 const UKB={items:[],TYPES:{document:"Ingested document",tacit:"Tacit knowledge",lesson:"Lesson learned",failure:"Failure report"},FLOW:["Draft","In review","Approved","Superseded","Rejected"],
- next(){return "UK-"+String(1+Math.max(0,...UKB.items.map(x=>+String(x.id).replace(/\D/g,"")||0))).padStart(4,"0")},
+ next(){let id;do{id="UK-"+Date.now().toString(36).toUpperCase().slice(-5)+Math.random().toString(36).toUpperCase().slice(2,4)}while(UKB.items.some(x=>x.id===id));return id},
  add(o){const it={id:UKB.next(),type:o.type||"document",title:o.title||"Untitled",text:o.text||"",set:+o.set||0,tags:o.tags||[],author:o.author||ROLE.user,role:ROLE.name,status:"Draft",rev:"A",created:nowIso(),updated:nowIso(),src:o.src||"manual",fname:o.fname||"",meta:o.meta||{},hist:[{t:nowIso(),who:ROLE.user,act:"Created",note:o.src==="upload"?"Ingested from "+(o.fname||"file"):"Entered manually"}]};
   it.tags=[...new Set([...(it.tags||[]),...DB.tagsOf(it.title+" "+it.text)])];UKB.items.push(it);UKB.save();audit("Knowledge item created",it.title,it.id);return it},
  get:id=>UKB.items.find(x=>x.id===id),
@@ -44,7 +44,7 @@ const UKB={items:[],TYPES:{document:"Ingested document",tacit:"Tacit knowledge",
  update(id,patch,note){const it=UKB.get(id);if(!it)return;Object.assign(it,patch);it.updated=nowIso();it.rev=String.fromCharCode(Math.min(90,it.rev.charCodeAt(0)+1));it.hist.push({t:nowIso(),who:ROLE.user,act:"Edited",note:note||"Revision "+it.rev});if(it.status==="Approved"){it.status="In review";it.hist.push({t:nowIso(),who:"System",act:"Approved to In review",note:"Content changed, re-approval required"})}UKB.save();audit("Knowledge item edited",it.title,id)},
  remove(id){const it=UKB.get(id);if(typeof MH!=="undefined"&&MH.some(r=>r.imp===id)){for(let i=MH.length-1;i>=0;i--)if(MH[i].imp===id)MH.splice(i,1);try{mhReindex();mhSaveGen()}catch(e){}}UKB.items=UKB.items.filter(x=>x.id!==id);UKB.save();audit("Knowledge item deleted",it?it.title:id,id)},
  save(){STORE.mem.uk=UKB.items;STORE.put("uk");DB.dirty();BUS.emit("kb:changed")}};
-const FB={items:()=>STORE.mem.fb,add(o){STORE.mem.fb.unshift({id:"FB-"+(STORE.mem.fb.length+1),t:nowIso(),who:ROLE.user,status:"Open",...o});STORE.put("fb");audit("Answer feedback",o.verdict+": "+(o.q||"").slice(0,80));BUS.emit("kb:changed")},resolve(id,note){const f=STORE.mem.fb.find(x=>x.id===id);if(f){f.status="Resolved";f.note=note||"";STORE.put("fb")}}};
+const FB={items:()=>STORE.mem.fb,add(o){STORE.mem.fb.unshift({id:"FB-"+Date.now().toString(36).toUpperCase().slice(-5)+Math.random().toString(36).toUpperCase().slice(2,4),t:nowIso(),u:nowIso(),who:ROLE.user,status:"Open",...o});STORE.put("fb");audit("Answer feedback",o.verdict+": "+(o.q||"").slice(0,80));BUS.emit("kb:changed")},resolve(id,note){const f=STORE.mem.fb.find(x=>x.id===id);if(f){f.status="Resolved";f.note=note||"";f.u=nowIso();STORE.put("fb");BUS.emit("kb:changed")}}};
 /* ---------- text analysis ---------- */
 const TAGX=/\b[A-Z]{1,5}-\d{3,5}[A-Z]?(?:-\d)?\b/g;
 const STOP=new Set("the a an is are was were what do does did i how of to for on in and or why we should be with my our need can this that it at when which tell me about give show list please there their from by as if not no any all into than then also".split(" "));
@@ -105,6 +105,6 @@ const DB={chunks:[],byId:new Map(),byCid:new Map(),rel:[],hasEmb:false,df:new Ma
  facts(o={}){FX.ensure();return FX.rows.filter(f=>(!o.set||f.set===o.set)&&(!o.kind||f.kind===o.kind)&&(!o.name||f.name.toLowerCase().includes(String(o.name).toLowerCase())||f.tag.toLowerCase()===String(o.name).toLowerCase()))},
  relations(o={}){FX.ensure();return DB.rel.filter(r=>(!o.type||r.from_type===o.type||r.to_type===o.type)&&(!o.id||r.from_id===o.id||r.to_id===o.id))},
  stats(){DB.ensure();const by=f=>DB.chunks.reduce((a,c)=>(a[f(c)]=(a[f(c)]||0)+1,a),{});return{n:DB.N,kind:by(c=>c.k),sys:by(c=>c.sys),status:by(c=>STATUS[c.stat].label),statCode:by(c=>c.stat),facts:(typeof FX!=="undefined"?FX.ensure().length:0),rels:DB.rel.length,tagged:DB.chunks.filter(c=>c.tags.length).length,terms:DB.df.size}}};
-function dbBootstrap(){return STORE.load().then(()=>{UKB.items=STORE.mem.uk||[];DB.dirty();BUS.emit("kb:changed")})}
+function dbBootstrap(){return STORE.load().then(()=>{UKB.items=STORE.mem.uk||[];DB.dirty();BUS.emit("kb:changed");if(typeof SYNC!=="undefined")SYNC.init()})}
 /* compatibility wrappers used by older modules */
 const aiCorpus=()=>{DB.ensure();return DB.chunks};
