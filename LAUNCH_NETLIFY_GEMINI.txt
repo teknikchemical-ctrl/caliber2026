@@ -66,6 +66,11 @@ Optional:
 
 Mark AI_API_KEY as secret if Netlify offers the option.
 
+You can also skip AI_API_KEY and enter the key on the site itself. Set ADMIN_CODE (see the access codes
+section below), deploy, sign in as Caliber, open Settings > Connect the AI, paste the key and press
+"Save and test". The key is stored on the server only and takes effect at once, with no redeploy. A key
+saved there overrides AI_API_KEY. "Remove the saved key" goes back to the Netlify variable.
+
 Netlify reads these when it builds. If you add or change one after the first deploy, go to
 Deploys > Trigger deploy > Clear cache and deploy site.
 
@@ -91,6 +96,30 @@ the people named in the work orders (username = first name, password = first nam
 for example Oscar / Oscar2026). "Demo accounts" on the sign-in screen lists all of them. This is
 a simple demo login, not real security.
 
+
+ROLES
+-----------------------------------------------------------------------------------------
+Each account has a role, and the page enforces it:
+   Operator      ask questions, search, read everything, add draft lessons
+   Engineer      the above, plus approve and remove knowledge items, accept scenario rules
+   Reliability   the above, plus import, bulk remove and generate records
+   HSE           ask, read, approve knowledge
+   Manager       everything, including Settings > Administration
+Caliber can switch the view to any role under Settings > Account. "My work" in the menu lists what is
+waiting for the signed-in person, and the bell in the left menu counts it. Names on knowledge items,
+approvals, data quality marks and reports come from the account that did the work.
+
+The roles are enforced in the page only. A person who knows the API address can still call it, so use the
+access codes below if that matters.
+
+INDONESIAN AND INSTALLING
+-----------------------------------------------------------------------------------------
+Settings > Account > Interface language switches the menus and main labels to Bahasa Indonesia.
+Questions typed in Bahasa Indonesia are understood by the offline search as well as by Gemini. In a supported
+browser the site can be installed as an app (the install icon in the address bar, or "Add to Home screen"
+on a phone) and opens without a network connection, although the shared database and the AI need one.
+Settings > Account > "Run the demo walkthrough" steps through the main pages for a presentation.
+Report Center has a Solution brief that lists each requirement, the evidence and the known limits.
 
 STEP 5. CHECK IT WORKS
 -----------------------------------------------------------------------------------------

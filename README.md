@@ -23,6 +23,10 @@ A simple sign-in screen, for the demo and not for security: the account list is 
 - AI Assistant with sources, a confidence level and a check of every number
 - Knowledge Studio: ingestion wizard, review and approval, failure reports
 - Failure Memory, Report Center, Case 1 Coverage, Integrations, Data Quality
+- My work, notification bell, and Data Quality items that can be resolved or accepted by the roles allowed to review
+- Report Center includes a Solution brief; Settings has a scripted demo walkthrough
+- Interface language switch (English or Bahasa Indonesia); questions in Bahasa are understood by the offline search
+- Installable as an app, and the page opens offline from the service worker (served sites only)
 - Ctrl+K searches everything
 
 ## Working on the code

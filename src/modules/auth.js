@@ -28,3 +28,23 @@ function authInit(){let k=null;try{k=localStorage.getItem(AUTH.key)}catch(e){}le
  if(!u&&navigator.webdriver&&!/[?&]login\b/.test(location.search))u=AUTH_USERS[0];
  if(u){AUTH.user=null;try{localStorage.setItem(AUTH.key,u[0])}catch(e){}authApply(u)}else{authLine();authShow()}}
 if(document.body&&document.querySelector(".foot"))authInit();else document.addEventListener("DOMContentLoaded",authInit);
+
+/* ---------- what each role may do ---------- */
+const PERM={approve:["Engineer","Reliability","HSE","Manager"],remove:["Engineer","Reliability","Manager"],bulk:["Reliability","Manager"],review:["Engineer","Reliability","Manager"],admin:["Manager"]};
+const PERMTXT={approve:"approve knowledge",remove:"delete knowledge items that are not your own drafts",bulk:"import, bulk remove or generate records",review:"accept scenario rules",admin:"open the administration settings"};
+function can(act,it){if(PERM[act]&&PERM[act].includes(ROLE.name))return true;if(act==="remove"&&it&&it.author===ROLE.user&&it.status==="Draft")return true;return false}
+function needRole(act){try{toast(ROLE.name+" cannot "+(PERMTXT[act]||act)+". Roles that can: "+PERM[act].join(", ")+".","warn")}catch(e){}return false}
+{const wrap=(name,act)=>{try{const f=eval(name);eval(name+"=function(){if(!can('"+act+"'))return needRole('"+act+"');return f.apply(this,arguments)}")}catch(e){}};
+ ["ksClear","ksImport","mhGenRandom","mhGenManual","mhGenClear"].forEach(n=>wrap(n,"bulk"));
+ const _rm=UKB.remove;UKB.remove=function(id){if(!can("remove",UKB.get(id)))return needRole("remove");return _rm.apply(this,arguments)};
+ const _ss=UKB.setStatus;UKB.setStatus=function(id,st){if(st==="Approved"&&!can("approve"))return needRole("approve");return _ss.apply(this,arguments)};
+ const _rr=scnRuleSet;scnRuleSet=function(id,f,v){if(f==="status"&&!can("review")){needRole("review");render();return}return _rr.apply(this,arguments)}}
+/* ---------- My work ---------- */
+function myWorkPage(){const me=ROLE.user,mine=UKB.items.filter(x=>x.author===me),wait=UKB.items.filter(x=>x.status==="In review"&&can("approve")&&x.author!==me),Q=(STORE.mem.qa||[]).filter(q=>q.who===me).slice(0,12),A=(STORE.mem.audit||[]).filter(a=>a.who===me).slice(0,12),fb=(STORE.mem.fb||[]).filter(f=>f.who===me);
+ const u=AUTH.user;
+ return `${ph("My work",esc(me)+" | "+ROLE.name+(u?" | "+u[4]:""))}
+ <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">${kpiTile(mine.length,"Items I wrote")}${kpiTile(wait.length,"Waiting for my approval",wait.length?"warn":"")}${kpiTile(Q.length,"Recent questions")}${kpiTile(fb.length,"Feedback I gave")}</div>
+ <div class="card" style="margin-bottom:12px;padding:4px 8px"><h3 style="margin:10px 8px 4px">Waiting for my approval</h3>${can("approve")?(wait.length?ksTable(wait):'<p class="muted" style="padding:6px 8px 12px">Nothing waiting.</p>'):`<p class="muted" style="padding:6px 8px 12px">${ROLE.name} cannot approve. Roles that can: ${PERM.approve.join(", ")}.</p>`}</div>
+ <div class="card" style="margin-bottom:12px;padding:4px 8px"><h3 style="margin:10px 8px 4px">Items I wrote</h3>${mine.length?ksTable(mine):'<p class="muted" style="padding:6px 8px 12px">You have not added anything yet. Use Knowledge Studio.</p>'}</div>
+ <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px;align-items:start"><div class="card"><h3 style="margin:0 0 6px">My recent questions</h3>${Q.length?`<table class="mht"><tr><th>When</th><th>Question</th><th>Conf.</th><th></th></tr>${Q.map(q=>`<tr><td>${esc(String(q.t).slice(5,16))}</td><td style="white-space:normal">${esc(q.q)}</td><td>${q.confidence??""}%</td><td><a class="alink" onclick="go('ai');setTimeout(()=>aiSend('main',${JSON.stringify(q.q).replace(/"/g,"&quot;")}),200)">Ask again</a></td></tr>`).join("")}</table>`:'<p class="muted">None yet.</p>'}</div>
+ <div class="card"><h3 style="margin:0 0 6px">My recent activity</h3>${A.length?`<table class="mht"><tr><th>When</th><th>Action</th><th>Detail</th></tr>${A.map(a=>`<tr><td>${esc(String(a.t).slice(5,16))}</td><td>${esc(a.act)}</td><td style="white-space:normal">${esc(String(a.detail||"").slice(0,90))}</td></tr>`).join("")}</table>`:'<p class="muted">None yet.</p>'}</div></div>`}

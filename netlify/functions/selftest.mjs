@@ -1,8 +1,8 @@
 /* Diagnostics for the Settings panel: checks storage, the AI call and embeddings and reports each in plain language. */
-import { J, store, cfg2 } from "./_lib.mjs";
+import { J, cfgA, store, cfg2 } from "./_lib.mjs";
 export const config = { path: "/api/selftest" };
 export default async (req) => {
-  const c = cfg2(), out = [];
+  const c = await cfgA(), out = [];
   const add = (name, ok, detail) => out.push({ name, ok, detail });
   try { const s = await store("rl"); await s.setJSON("selftest", { t: Date.now() }); const r = await s.get("selftest"); add("Shared storage", !!r, r ? "read and write work" : "write did not persist"); } catch (e) { add("Shared storage", false, String(e.message || e).slice(0, 140)); }
   const configured = c.provider === "mock" || (c.provider && c.key);

@@ -6,7 +6,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const proc=(port,env)=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),"akp-"));const c=spawn("node",[path.resolve(__dirname,"..","tools","devserver.mjs"),String(port)],{env:{...process.env,LOCAL_STORE_DIR:dir,...env},stdio:"pipe"});return c};
 const up=async port=>{for(let i=0;i<40;i++){try{const r=await fetch(`http://localhost:${port}/api/health`);if(r.ok)return true}catch(e){}await sleep(150)}return false};
 /* fake upstream providers (OpenAI compatible and Gemini shapes) */
-const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+=d);rq.on("end",()=>{const j=JSON.parse(b||"{}");
+let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+=d);rq.on("end",()=>{const j=JSON.parse(b||"{}");if(rq.url==="/__last"){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify(LAST))}if(rq.method==="POST")LAST={url:rq.url,body:j,key:rq.headers["x-goog-api-key"]};if(rq.url.includes("/models/nothink:")&&j.generationConfig&&j.generationConfig.thinkingConfig){rs.writeHead(400,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"Thinking is not supported by this model"}}))}
  if(rq.method==="GET"&&rq.url.includes("/models")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({models:[{name:"models/gemini-2.0-flash"},{name:"models/gemini-2.5-flash"}]}))}
  if(rq.url.includes("batchEmbedContents")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({embeddings:(j.requests||[]).map((_,i)=>({values:[1,i%3,2,0.5]}))}))}
  if(rq.url.includes("/models/badmodel:")){rs.writeHead(404,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"models/badmodel is not found for API version v1beta"}}))}
@@ -48,6 +48,26 @@ const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+=d);rq.on("end
  r=await post(8907,{question:"TOOLTEST",tool_results:[{name:"maintenance_stats",result:"26 work orders"}],tools:[{name:"maintenance_stats",description:"x",parameters:{type:"object"}}],retrieved:[]});ok(/26 work orders/.test(r.j.answer),"tool results are used to write the answer");
  r=await fetch("http://localhost:8907/api/health").then(r=>r.json());ok(r.ai.today&&r.ai.today.q>=2,"health reports today's AI usage");
  s7.kill();
+  /* Gemini request details and key entry from Settings */
+ let s10=proc(8912,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k",AI_MODEL:"gemini-2.5-flash",AI_RATE_PER_MIN:"60"});await up(8912);
+ await post(8912);let last=await fetch("http://localhost:8977/__last").then(r=>r.json());ok(last.body.generationConfig.thinkingConfig&&last.body.generationConfig.thinkingConfig.thinkingBudget===0&&last.key==="k","2.5 flash is called with reasoning switched off and the key header");
+ await post(8912,{question:"x",model:"gemini-2.5-flash",tools:[{name:"noargs_tool",description:"d",parameters:{type:"object",properties:{},required:[]}},{name:"with_args",description:"d",parameters:{type:"object",properties:{set:{type:"integer",description:"s"},metric:{type:"string",enum:["a","b"]}},required:["set"],additionalProperties:false}}],retrieved:[]});
+ last=await fetch("http://localhost:8977/__last").then(r=>r.json());const fd=last.body.tools[0].functionDeclarations;ok(!fd[0].parameters&&fd[1].parameters.type==="OBJECT"&&fd[1].parameters.properties.set.type==="INTEGER"&&!("additionalProperties" in fd[1].parameters),"tool schemas are cleaned for Gemini (no empty objects, upper case types)");
+ s10.kill();
+ let s11=proc(8913,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k",AI_MODEL:"nothink",AI_MODEL_FALLBACK:"",AI_RATE_PER_MIN:"60"});await up(8913);
+ r=await post(8913);ok(r.s===502||r.s===200,"model that rejects reasoning settings is handled");r=await post(8913);ok(r.s===200&&/Gemini says/.test(r.j.answer),"request is repeated without the reasoning setting");s11.kill();
+ let s12=proc(8914,{AI_PROVIDER:"",AI_API_KEY:"",GEMINI_API_KEY:"",AI_BASE_URL:"http://localhost:8977/v1beta",ADMIN_CODE:"adm",AI_RATE_PER_MIN:"60"});await up(8914);
+ const cfgc=(m,b,h)=>fetch("http://localhost:8914/api/config",{method:m,body:b?JSON.stringify(b):undefined,headers:h||{}}).then(async r=>({s:r.status,j:await r.json().catch(()=>null)}));
+ r=await fetch("http://localhost:8914/api/health").then(r=>r.json());ok(!r.ai.configured&&r.canSetKey,"no key yet, key entry is offered");
+ r=await cfgc("POST",{key:"abcdefghijklmnop"});ok(r.s===401,"saving a key needs the administrator code");
+ r=await cfgc("POST",{key:"short"},{"x-admin-code":"adm"});ok(r.s===400,"a malformed key is refused");
+ r=await cfgc("POST",{provider:"gemini",key:"AIzaSyTESTKEY1234567890"},{"x-admin-code":"adm"});ok(r.s===200,"administrator saves a key");
+ r=await fetch("http://localhost:8914/api/health").then(r=>r.json());ok(r.ai.configured&&r.ai.source==="saved","health shows the saved key is in use");
+ r=await cfgc("GET",null,{"x-admin-code":"adm"});ok(r.j.hasKey&&r.j.keyEnd==="7890"&&!JSON.stringify(r.j).includes("AIzaSy"),"the saved key is never sent back");
+ r=await post(8914);ok(r.s===200&&/Gemini says/.test(r.j.answer),"the assistant answers with the saved key");
+ last=await fetch("http://localhost:8977/__last").then(r=>r.json());ok(last.key==="AIzaSyTESTKEY1234567890","the saved key is the one sent to the provider");
+ r=await cfgc("DELETE",null,{"x-admin-code":"adm"});r=await fetch("http://localhost:8914/api/health").then(r=>r.json());ok(!r.ai.configured,"removing the saved key turns the AI off again");
+ s12.kill();
  /* access codes, conflicts, backup */
  let s8=proc(8908,{AI_PROVIDER:"mock",EDIT_CODE:"ed1",APPROVE_CODE:"ap1",ADMIN_CODE:"ad1"});await up(8908);
  const kb=(m,p,b,h)=>fetch("http://localhost:8908/api/kb/"+p,{method:m,body:b?JSON.stringify(b):undefined,headers:h||{}}).then(async r=>({s:r.status,j:await r.json().catch(()=>null)}));
@@ -66,7 +86,7 @@ const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+=d);rq.on("end
  let s9=proc(8909,{AI_PROVIDER:"mock"});await up(8909);r=await fetch("http://localhost:8909/api/kb/export").then(r=>r.status);ok(r===403,"admin routes stay disabled when no admin code is set");s9.kill();
  /* two users in two browsers */
  const srv=proc(8910,{AI_PROVIDER:"mock",AI_RATE_PER_MIN:"60",AI_RATE_PER_DAY:"500"});ok(await up(8910),"dev server up");
- const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{}),errs=[];
+ const b=await chromium.launch({args:["--disable-background-timer-throttling","--disable-renderer-backgrounding","--disable-backgrounding-occluded-windows","--disable-features=IntensiveWakeUpThrottling"],...(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{})}),errs=[];
  const mk=async()=>{const c=await b.newContext({viewport:{width:1440,height:900}}),p=await c.newPage();p.on("pageerror",e=>errs.push(e.message));p.on("dialog",d=>d.accept("t"));await p.goto("http://localhost:8910/",{waitUntil:"commit"});await p.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await p.waitForTimeout(1800);return p};
  const A=await mk(),B=await mk();
  ok(await A.evaluate(()=>SYNC.state)==="online","user A connected to the shared database");
@@ -86,13 +106,13 @@ const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+=d);rq.on("end
  ok(/flush plan 32/i.test(a1.t),"AI answer draws on the shared knowledge item");
  /* work orders imported on A visible on B */
  await A.evaluate(i=>{const src=MH.find(r=>!r.gen);const r={...src,wo:"WO-IMP-1",gen:true,imp:i,prob:"Imported test work order",rd:"2026-01-05",sd:"2026-01-06",cd:"2026-01-07"};MH.push(r);mhReindex();mhSaveGen()},id);
- await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(800);
+ await A.evaluate(()=>syFlush());await B.evaluate(()=>syNow());await B.waitForTimeout(800);
  ok(await B.evaluate(()=>MH.some(r=>r.wo==="WO-IMP-1")),"imported work order shared to B");
  /* feedback */
  await A.evaluate(()=>FB.add({verdict:"Wrong",q:"test question",note:""}));await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(800);
  ok(await B.evaluate(()=>STORE.mem.fb.some(f=>f.q==="test question")),"feedback shared to B");
  /* delete */
- await A.evaluate(i=>UKB.remove(i),id);await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(800);
+ await A.evaluate(i=>UKB.remove(i),id);await A.evaluate(()=>syFlush());await B.evaluate(()=>syNow());await B.waitForTimeout(800);
  ok(await B.evaluate(i=>!UKB.get(i)&&!MH.some(r=>r.imp===i),id),"deleting on A removes the item and its work orders on B");
  /* editing the same item from two browsers: the later save becomes a conflict copy */
  const cid=await A.evaluate(()=>{const it=UKB.add({type:"lesson",title:"Conflict test",text:"base",set:1});return it.id});await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(900);
@@ -124,6 +144,16 @@ const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+=d);rq.on("end
  const ks=await fetch("http://localhost:8911/api/kb/state").then(r=>r.json());ok(ks.uk.some(x=>x.title==="Needs code"),"after entering the edit code the item reaches the shared database");
  await D.evaluate(()=>setOpen());await D.waitForTimeout(300);ok(await D.evaluate(()=>document.querySelector("#setbody").innerText.includes("Access codes")),"Settings shows the access code fields when the site requires codes");
  await bc.close();sc.kill();
+ /* entering the AI key from Settings */
+ const sk=proc(8915,{AI_PROVIDER:"",AI_API_KEY:"",GEMINI_API_KEY:"",AI_BASE_URL:"http://localhost:8977/v1beta",ADMIN_CODE:"adm",AI_RATE_PER_MIN:"60"});await up(8915);
+ const kc=await b.newContext({viewport:{width:1280,height:900}}),K=await kc.newPage();K.on("pageerror",e=>errs.push(e.message));await K.goto("http://localhost:8915/",{waitUntil:"commit"});await K.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await K.waitForTimeout(1800);
+ ok(await K.evaluate(()=>SYNC.state==="online"&&!SYNC.ai.configured&&AI.conn.state==="local"),"site without a key starts in search-only mode");
+ await K.evaluate(()=>{ACC.admin="adm";accSave();setOpen()});await K.waitForTimeout(300);
+ ok(await K.evaluate(()=>document.querySelector("#setbody").innerText.includes("Connect the AI")),"Settings offers to connect the AI");
+ await K.fill("#cfg_k","AIzaSyBROWSERTEST123456");await K.click("text=Save and test");await K.waitForTimeout(2500);
+ ok(await K.evaluate(()=>SYNC.ai.configured&&AI.conn.state==="remote"&&AI.conn.label==="AI connected"),"after saving the key the assistant switches to the AI");
+ const ka=await K.evaluate(async()=>{const r=await aiAsk("Where is CT-7801 located?",{noLog:true});return{via:r.via}});ok(ka.via==="remote","a question is answered by the AI with the saved key");
+ await kc.close();sk.kill();
  /* offline fallback */
  srv.kill();await sleep(300);
  const off=await A.evaluate(async()=>{const r=await aiAsk("Where is CT-7801 located?",{noLog:true});SYNC.busy=false;await syTick();return{via:r.via,txt:r.text.length>20,st:SYNC.state}});

@@ -1,6 +1,6 @@
 /* Regression suite: loads the built single file in a headless browser and checks pages, data layer, knowledge workflow,
    reports, provider contract and the answer audit. Run with: npm test (needs playwright and a Chromium build). */
-const path=require("path"),{chromium}=require("playwright");
+const path=require("path"),fs=require("fs"),{chromium}=require("playwright");
 const FILE="file://"+path.resolve(__dirname,"..","knowledge-hub-integrated_BAP5.html");
 let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.log("ok  ",m)};
 (async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
@@ -61,6 +61,9 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
  /* new pages */
  const nw=await ev(`(()=>{go('int');INT.tab='usage';render();const u=document.querySelector('#app').innerText.includes('Questions per day');go('scn');SCN.tab='rules';render();const r=document.querySelector('#app').innerText.includes('Assumptions')||document.querySelector('#app').innerText.includes('Pending review');SCN.tab='plant';return{u,r,tour:typeof tourStart==='function',rpt:rcDoc('My Title','Sub','<p>x</p>').includes('<h1>My Title</h1>')}})()`);
  ok(nw&&nw.u,"usage and quality page renders");ok(nw&&nw.r,"assumptions register renders");ok(nw&&nw.tour,"guided tour is available");ok(nw&&nw.rpt,"report headings show the real title");
+ /* notifications and data quality follow-up */
+ const nq=await ev(`(()=>{const i=K.issues[0],k=dqKey(i);ROLE.name="Engineer";ROLE.user="Test Engineer";dqSet(k,"Open");const w=window.prompt;window.prompt=()=>"checked on site";dqSet(k,"Resolved");window.prompt=w;const rec=dqRec(i);go('quality');const page=document.querySelector('#app').innerText.includes('Resolved');ROLE.name="Operator";const blocked=(()=>{dqSet(k,"Open");return dqRec(i).status==="Resolved"})();ROLE.name="Engineer";dqSet(k,"Open");ROLE.name="Manager";ROLE.user="Caliber";return{rec:rec&&rec.status,page,blocked,bell:!!document.getElementById('bell'),n:notifList().length,fbclean:FB.items().every(f=>f.kind!=="dq")}})()`);
+ ok(nq&&nq.rec==="Resolved"&&nq.page,"a data issue can be marked resolved and the page shows it");ok(nq&&nq.blocked,"an Operator cannot change data issues");ok(nq&&nq.bell,"notification bell is in the sidebar");ok(nq&&nq.fbclean,"data issue marks stay out of the feedback queue");
  /* curated evaluation */
  await ev("evalRun()");await p.waitForFunction("!EV.running",{timeout:180000});const E=await ev("({s:evSummary(),f:EV.res.filter(r=>!r.pass).map(r=>r.id+' '+r.why.join('; '))})");
  ok(E.s.ok/E.s.n>=.9,"curated evaluation passed "+E.s.ok+" of "+E.s.n);E.f.forEach(x=>console.log("    failed:",x));
@@ -79,6 +82,20 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
   await q.evaluate(()=>authLogout());await q.waitForTimeout(200);ok(await q.evaluate(()=>!!document.getElementById("loginbg")),"sign out returns to the sign-in screen");
   await q.fill("#lg_u","Oscar");await q.fill("#lg_p","Oscar2026");await q.press("#lg_p","Enter");await q.waitForTimeout(700);
   ok(await q.evaluate(()=>ROLE.name==="Operator"&&ROLE.user==="Oscar Timothy"&&document.body.classList.contains("role-locked")),"a document name signs in with its role");
+  const pr=await q.evaluate(()=>{const it=UKB.add({type:"lesson",title:"Role test item",text:"Role test text about GA-1201A seal flush.",set:1});UKB.setStatus(it.id,"In review");const before=UKB.items.length;UKB.setStatus(it.id,"Approved");const st=UKB.get(it.id).status;ksClear();return{st,kept:UKB.items.length===before,can:can("approve"),mine:myWorkPage().includes("Items I wrote"),id:it.id}});
+  ok(pr.st==="In review"&&!pr.can,"an Operator cannot approve knowledge");ok(pr.kept,"an Operator cannot remove all user items");ok(pr.mine,"My work page renders");
+  await q.evaluate(()=>authLogout());await q.fill("#lg_u","Yudha");await q.fill("#lg_p","Yudha2026");await q.press("#lg_p","Enter");await q.waitForTimeout(600);
+  ok(await q.evaluate(id=>{const w=myWorkPage().includes("Role test item");UKB.setStatus(id,"Approved");return w&&UKB.get(id).status==="Approved"&&UKB.get(id).approvedBy==="Yudha Permana"},pr.id),"a Manager sees the item waiting and approves it under their own name");
   const accs=await q.evaluate(()=>AUTH_USERS.length);ok(accs>=20,"accounts built from the document names ("+accs+")");
   ok(qe.length===0,"sign-in produces no script errors");await q.close()}
+ /* solution brief, demo walkthrough, Indonesian, installable app */
+ {const q=await b.newPage(),qe=[];q.on("pageerror",e=>qe.push(e.message));await q.goto("file://"+path.resolve("dist/index.html"),{waitUntil:"commit"});await q.waitForFunction(()=>typeof rcBuild==="function"&&typeof AUTH!=="undefined"&&AUTH.user,null,{timeout:60000});
+  const br=await q.evaluate(()=>{const h=rcBuild("brief");return{ok:h.includes("Solution brief")&&h.includes("Known limits")&&h.includes("Who can do what")&&!h.includes("${"),n:h.length}});ok(br.ok,"solution brief report builds ("+br.n+" characters)");
+  ok(await q.evaluate(()=>{demoStart();const a=document.getElementById("tourcard").innerText.includes("Step 1 of "+DEMO.length);let all=true;for(let i=0;i<DEMO.length;i++){TOURS.i=i;tourShow();if(!document.getElementById("tourcard"))all=false}tourEnd();return a&&all}),"demo walkthrough steps through every page");
+  const id1=await q.evaluate(()=>({a:idIs("Berapa MTBF kipas menara pendingin?"),b:idIs("What is the MTBF of the cooling tower fan?"),t:idToEn("Bandingkan YD-2301 dan EA-5601")}));ok(id1.a&&!id1.b&&/Compare YD-2301 and EA-5601/.test(id1.t),"Indonesian questions are detected and translated, English is left alone");
+  ok(await q.evaluate(()=>EVAL_CASES.filter(c=>c.cat==="Bahasa Indonesia").length>=30&&EVAL_CASES.length>=110),"evaluation set has 110 or more cases including Bahasa Indonesia");
+  ok(/manifest/.test(await q.evaluate(()=>document.querySelector("link[rel=manifest]")?.getAttribute("rel")||""))&&fs.existsSync("dist/sw.js")&&fs.existsSync("dist/manifest.webmanifest")&&fs.existsSync("dist/icon-512.png"),"installable app files are built");
+  ok(qe.length===0,"new pages produce no script errors ("+qe.join("; ")+")");await q.close()}
+ {const q=await b.newPage();await q.addInitScript(()=>{try{localStorage.setItem("akp_lang","id")}catch(e){}});await q.goto("file://"+path.resolve("dist/index.html"),{waitUntil:"commit"});await q.waitForFunction(()=>typeof AUTH!=="undefined"&&AUTH.user,null,{timeout:60000});await q.waitForTimeout(900);
+  const t=await q.evaluate(()=>[...document.querySelectorAll(".nav")].map(n=>n.innerText.trim()).join("|"));ok(/Pemeliharaan/.test(t)&&/Asisten AI/.test(t),"Indonesian interface translates the menu ("+t.slice(0,80)+")");await q.close()}
  await b.close();console.log(fails?"\n"+fails+" check(s) failed":"\nAll checks passed");process.exit(fails?1:0)})();

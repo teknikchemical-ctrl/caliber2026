@@ -147,3 +147,7 @@ body.enter .pmn .pm:nth-child(1)>i{animation-delay:18ms}body.enter .pmn .pm:nth-
 body:not(.signed-in) aside,body:not(.signed-in) main,body:not(.signed-in) #navtoggle{visibility:hidden}
 body.role-locked .rolesel{display:none}
 aside{overflow-y:auto}
+
+#bellN{position:absolute;top:-5px;right:-5px;min-width:15px;height:15px;border-radius:8px;background:#cf222e;color:#fff;font-size:10px;font-style:normal;font-weight:700;line-height:15px;text-align:center;padding:0 3px}
+#notifbox{position:fixed;left:12px;bottom:96px;width:330px;max-width:calc(100vw - 24px);max-height:60vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 12px 36px rgba(11,42,74,.25);z-index:70;animation:riseIn .25s ease-out}
+.nitem{padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;border-left-width:4px}.nitem:hover{background:#f3f7fd}.nitem.warn{border-left-color:#d97706}.nitem.bad{border-left-color:#cf222e}

@@ -55,19 +55,29 @@ export async function budget(max, peek = false) {
   if (!peek) { r.c++; await s.setJSON("global", r); }
   return { ok: true, left: max - r.c };
 }
-export const cfg = () => ({
-  provider: (process.env.AI_PROVIDER || (process.env.AI_API_KEY || process.env.GEMINI_API_KEY ? "gemini" : "")).toLowerCase(),
-  key: process.env.AI_API_KEY || process.env.GEMINI_API_KEY || "",
-  model: process.env.AI_MODEL || "gemini-2.5-flash",
+export const cfg = (o = {}) => ({
+  provider: (o.provider || process.env.AI_PROVIDER || (o.key || process.env.AI_API_KEY || process.env.GEMINI_API_KEY ? "gemini" : "")).toLowerCase(),
+  key: o.key || process.env.AI_API_KEY || process.env.GEMINI_API_KEY || "",
+  model: o.model || process.env.AI_MODEL || "gemini-2.5-flash",
   models: (process.env.AI_MODELS || "").split(",").map(s => s.trim()).filter(Boolean),
-  base: process.env.AI_BASE_URL || "",
+  base: o.base || process.env.AI_BASE_URL || "",
   daily: +process.env.AI_DAILY_MAX || 800,
   perMin: +process.env.AI_RATE_PER_MIN || 12,
   perDay: +process.env.AI_RATE_PER_DAY || 120
 });
+export const cfg2 = (o = {}) => ({ ...cfg(o), fallbacks: (process.env.AI_MODEL_FALLBACK || "gemini-2.0-flash,gemini-1.5-flash").split(",").map(s => s.trim()).filter(Boolean), embedModel: process.env.AI_EMBED_MODEL || "gemini-embedding-001", embedDaily: +process.env.AI_EMBED_DAILY || 4000 });
+/* AI settings saved from the Settings page (admin) are kept on the server and win over the environment variables. */
+let _stored = { at: 0, v: {} };
+export async function storedCfg(force) {
+  if (!force && Date.now() - _stored.at < 15000) return _stored.v;
+  try { const s = await store("rl"); _stored = { at: Date.now(), v: (await s.get("aicfg")) || {} }; } catch { _stored = { at: Date.now(), v: {} }; }
+  return _stored.v;
+}
+export async function cfgA() { const o = await storedCfg(); const c = cfg2(o); c.source = o.key ? "saved" : "environment"; return c; }
+export async function saveCfg(v) { const s = await store("rl"); if (v) await s.setJSON("aicfg", v); else await s.delete("aicfg"); _stored = { at: 0, v: {} }; }
 
 /* Optional access codes. All unset = fully open (default). EDIT_CODE protects every write, APPROVE_CODE protects approving
-   knowledge items, ADMIN_CODE enables backup, restore and bulk removal (admin routes stay disabled while it is unset). */
+   knowledge items, ADMIN_CODE enables backup, restore, bulk removal and the AI settings (admin routes stay disabled while it is unset). */
 export function guard(req, level) {
   const want = { edit: process.env.EDIT_CODE, approve: process.env.APPROVE_CODE, admin: process.env.ADMIN_CODE }[level];
   if (level === "admin" && !want) return { ok: false, status: 403, error: "admin routes are disabled: set ADMIN_CODE on the server" };
@@ -83,4 +93,3 @@ export async function bump(name, field, n = 1) {
 export async function statsToday(name) {
   try { const s = await store("rl"); return (await s.get("stats/" + name + "/" + new Date().toISOString().slice(0, 10))) || {}; } catch { return {}; }
 }
-export const cfg2 = () => ({ ...cfg(), fallbacks: (process.env.AI_MODEL_FALLBACK || "gemini-2.0-flash,gemini-1.5-flash").split(",").map(s => s.trim()).filter(Boolean), embedModel: process.env.AI_EMBED_MODEL || "gemini-embedding-001", embedDaily: +process.env.AI_EMBED_DAILY || 4000 });

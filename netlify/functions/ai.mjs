@@ -3,7 +3,7 @@
    Providers (env AI_PROVIDER): gemini (default when a key is set), openai (any OpenAI compatible API such as Groq or OpenRouter, needs AI_BASE_URL), mock (tests).
    Gemini: if the configured model is unknown to the key, the models in AI_MODEL_FALLBACK are tried in order. When the page sends tool
    definitions and no computed draft exists, the model may answer with tool calls; the page runs them and calls again with the results. */
-import { J, clientId, limit, budget, cfg2, bump } from "./_lib.mjs";
+import { J, cfgA, clientId, limit, budget, cfg2, bump } from "./_lib.mjs";
 export const config = { path: "/api/ai" };
 
 const SYSTEM = `You are the knowledge assistant of a petrochemical plant (LLDPE unit). You help engineers, operators, reliability and HSE staff.
@@ -32,27 +32,54 @@ ${p.draft ? `<verified_draft tool="${clip(p.draft.tool, 40)}">${clip(p.draft.tex
 ${p.style === "detailed" ? "Give a complete answer with the reasoning steps." : "Answer in at most 6 sentences or a short list."}${lang}`;
   return { user, src };
 }
-const upper = o => Array.isArray(o) ? o.map(upper) : o && typeof o === "object" ? Object.fromEntries(Object.entries(o).map(([k, v]) => [k, k === "type" && typeof v === "string" ? v.toUpperCase() : upper(v)])) : o;
-const decls = tools => (Array.isArray(tools) ? tools : []).slice(0, 20).filter(t => t && /^[a-z_]{2,40}$/.test(t.name || "")).map(t => ({ name: t.name, description: clip(t.description, 300), parameters: upper(t.parameters && t.parameters.type ? t.parameters : { type: "object", properties: {} }) }));
+const KEEP = new Set(["type", "description", "properties", "items", "enum", "required", "format", "nullable"]);
+function clean(o) {
+  if (Array.isArray(o)) return o.map(clean);
+  if (!o || typeof o !== "object") return o;
+  const r = {};
+  for (const [k, v] of Object.entries(o)) {
+    if (k === "properties") { r.properties = Object.fromEntries(Object.entries(v || {}).map(([n, s]) => [n, clean(s)])); continue; }
+    if (!KEEP.has(k)) continue;
+    if (k === "type" && typeof v === "string") r.type = v.toUpperCase();
+    else if (k === "required" && (!Array.isArray(v) || !v.length)) continue;
+    else r[k] = clean(v);
+  }
+  return r;
+}
+/* Gemini rejects an object schema without properties, so a tool with no arguments is declared without parameters */
+const decls = tools => (Array.isArray(tools) ? tools : []).slice(0, 20).filter(t => t && /^[a-z_]{2,40}$/.test(t.name || "")).map(t => {
+  const p = t.parameters ? clean(t.parameters) : null, d = { name: t.name, description: clip(t.description, 300) };
+  if (p && p.properties && Object.keys(p.properties).length) d.parameters = p;
+  return d;
+});
 
 class ProviderError extends Error { constructor(m, status) { super(m); this.status = status; } }
 async function failText(r) { let m = "provider HTTP " + r.status; try { const j = JSON.parse(await r.text()); if (j.error && j.error.message) m += ": " + String(j.error.message).slice(0, 140); } catch {} return new ProviderError(m, r.status); }
 
 async function* gemini(c, model, user, signal, tools) {
   const base = c.base || "https://generativelanguage.googleapis.com/v1beta";
-  const body = { systemInstruction: { parts: [{ text: SYSTEM }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 900 } };
-  if (tools && tools.length) { body.tools = [{ functionDeclarations: tools }]; body.toolConfig = { functionCallingConfig: { mode: "AUTO" } }; }
-  const r = await fetch(`${base}/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, { method: "POST", signal, headers: { "content-type": "application/json", "x-goog-api-key": c.key }, body: JSON.stringify(body) });
+  const mk = think => {
+    const body = { systemInstruction: { parts: [{ text: SYSTEM }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 1400 } };
+    /* 2.5 flash models spend the output budget on hidden reasoning unless it is switched off */
+    if (think && /gemini-2\.5-flash/.test(model)) body.generationConfig.thinkingConfig = { thinkingBudget: 0 };
+    if (tools && tools.length) { body.tools = [{ functionDeclarations: tools }]; body.toolConfig = { functionCallingConfig: { mode: "AUTO" } }; }
+    return body;
+  };
+  const call = body => fetch(`${base}/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, { method: "POST", signal, headers: { "content-type": "application/json", "x-goog-api-key": c.key }, body: JSON.stringify(body) });
+  let r = await call(mk(true));
+  if (r.status === 400) { const e = await failText(r); if (/thinking/i.test(e.message)) r = await call(mk(false)); else if (tools && tools.length && /function|tool|schema|parameters/i.test(e.message)) { tools = null; r = await call(mk(true)); } else throw e; }
   if (!r.ok) throw await failText(r);
-  let got = false, block = "";
+  let got = false, block = "", fin = "";
   yield* sse(r, j => {
     if (j.promptFeedback && j.promptFeedback.blockReason) block = j.promptFeedback.blockReason;
-    const parts = (j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [];
+    const cand = j.candidates && j.candidates[0];
+    if (cand && cand.finishReason && cand.finishReason !== "STOP") fin = cand.finishReason;
+    const parts = (cand && cand.content && cand.content.parts) || [];
     const out = [];
-    for (const x of parts) { if (x.text) { out.push(x.text); got = true; } if (x.functionCall) { out.push({ call: { name: x.functionCall.name, args: x.functionCall.args || {} } }); got = true; } }
+    for (const x of parts) { if (x.text && !x.thought) { out.push(x.text); got = true; } if (x.functionCall) { out.push({ call: { name: x.functionCall.name, args: x.functionCall.args || {} } }); got = true; } }
     return out;
   });
-  if (!got) throw new ProviderError(block ? "the provider declined this request (" + block + ")" : "the provider returned no answer", 502);
+  if (!got) throw new ProviderError(block ? "the provider declined this request (" + block + ")" : fin ? "the provider stopped without an answer (" + fin + ")" : "the provider returned no answer", 502);
 }
 async function* openai(c, model, user, signal) {
   const r = await fetch(`${c.base.replace(/\/$/, "")}/chat/completions`, {
@@ -97,7 +124,7 @@ async function* run(c, p, user, signal, useTools) {
 
 export default async (req, ctx) => {
   if (req.method !== "POST") return J({ error: "POST only" }, 405);
-  const c = cfg2();
+  const c = await cfgA();
   if (!(c.provider === "mock" || (c.provider && c.key))) return J({ error: "AI is not configured on the server" }, 503);
   const raw = await req.text();
   if (raw.length > 250000) return J({ error: "request too large" }, 413);

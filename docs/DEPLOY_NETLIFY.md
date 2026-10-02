@@ -33,6 +33,7 @@ Environment variables are read at build time. After changing one, trigger a new 
 | `POST /api/ai` | Writes the answer. May hand tool calls back to the page |
 | `POST /api/embed` | Embeddings for search by meaning, cached by content hash |
 | `/api/kb/*` | Shared knowledge store. `GET /api/kb/export` and `POST /api/kb/import` are the admin backup |
+| `/api/config` | Admin only (needs `ADMIN_CODE`). `POST` saves a provider key in the server store, `GET` says whether one is saved (never the key), `DELETE` removes it. A saved key overrides `AI_API_KEY` and applies at once |
 | `GET /api/health` | Status, which codes are required, today's AI use |
 | `GET /api/selftest` | Diagnostics |
 
@@ -43,6 +44,14 @@ Environment variables are read at build time. After changing one, trigger a new 
 - The page finds the matching records and works out any counts, rankings or forecasts itself, then sends both to `/api/ai`. The model writes the wording. The page checks the citations and every number before showing the answer. A request to bypass a protection never goes to the model.
 - If the key is missing, the daily limit is used up, the provider fails or the visitor hits a limit, the assistant answers straight from the records and the footer says so.
 - Opened as a plain file, the page keeps working from browser storage.
+
+## Entering the key on the site
+
+Instead of setting `AI_API_KEY` in Netlify, set `ADMIN_CODE`, sign in as the demo admin, open Settings, Connect the AI, paste the key and press Save and test. The key is kept in the server store and is never sent back to the browser. It is used on the next request, so no redeploy is needed. Removing it falls back to the Netlify variable.
+
+## Roles
+
+The sign-in role is enforced in the page: approving and removing knowledge, bulk import, accepting scenario rules and Administration are limited by role (see `PERM` in `src/modules/auth.js`). The API itself only checks the access codes, so use `EDIT_CODE`, `APPROVE_CODE` and `ADMIN_CODE` when the address is shared widely.
 
 ## About open access
 

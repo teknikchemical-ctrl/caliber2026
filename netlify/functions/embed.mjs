@@ -1,7 +1,7 @@
 /* Text embeddings for meaning-based search. The page sends batches of record texts; vectors are cached on the server by content hash,
    so the first visitor pays the (free) embedding calls and everyone else reuses them. Gemini: batchEmbedContents with 256 dimensions. */
 import { createHash } from "node:crypto";
-import { J, store, clientId, limit, cfg2, bump, statsToday } from "./_lib.mjs";
+import { J, cfgA, store, clientId, limit, cfg2, bump, statsToday } from "./_lib.mjs";
 export const config = { path: "/api/embed" };
 const DIM = 256;
 const h = (m, t) => createHash("sha1").update(m + "|" + t).digest("hex").slice(0, 24);
@@ -9,7 +9,7 @@ const norm = v => { const n = Math.sqrt(v.reduce((a, x) => a + x * x, 0)) || 1; 
 function mockVec(t) { const v = new Array(64).fill(0); for (const w of String(t).toLowerCase().match(/[a-z0-9\-]{3,}/g) || []) { let x = 5381; for (const ch of w) x = ((x << 5) + x + ch.charCodeAt(0)) >>> 0; v[x % 64] += 1; } return norm(v); }
 export default async (req, ctx) => {
   if (req.method !== "POST") return J({ error: "POST only" }, 405);
-  const c = cfg2();
+  const c = await cfgA();
   if (!(c.provider === "mock" || (c.provider === "gemini" && c.key))) return J({ error: "embeddings are not available on this server" }, 503);
   let p; try { p = JSON.parse(await req.text()); } catch { return J({ error: "invalid json" }, 400); }
   const texts = (Array.isArray(p.texts) ? p.texts : []).slice(0, 100).map(t => String(t).slice(0, 3000));

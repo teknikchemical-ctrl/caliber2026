@@ -98,7 +98,7 @@ function intBackend(){const st=DB.stats();return `<div class="pbar" style="margi
  <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;align-items:start"><div class="card"><h3>Chunk record</h3><pre class="code" style="max-height:300px;overflow:auto">${esc(JSON.stringify((()=>{const c=DB.chunks[40];return{chunk_id:c.chunk_id,kind:c.k,record_id:c.id,asset_tag:c.set?S(c.set).tag:null,section:c.sec,title:c.title,body:c.text.slice(0,140)+"...",tags:c.tags,status_code:c.stat,trust:c.trust,occurred_on:c.date_iso,token_count:c.tokens,content_hash:c.hash,acl_roles:c.acl.roles,embedding:null}})(),null,1))}</pre></div><div class="card"><h3>Typed fact record</h3><pre class="code" style="max-height:300px;overflow:auto">${esc(JSON.stringify(FX.ensure().find(f=>f.kind==="setpoint"),null,1))}</pre></div></div>`}
 
 /* ---------- usage and answer quality (from the shared answer log and feedback) ---------- */
-function intUsage(){const Q=STORE.mem.qa||[],now=Date.now(),day=86400000,dk=t=>String(t).slice(0,10),fbs=STORE.mem.fb||[];
+function intUsage(){const Q=STORE.mem.qa||[],now=Date.now(),day=86400000,dk=t=>String(t).slice(0,10),fbs=(STORE.mem.fb||[]).filter(f=>f.kind!=="dq");
  const days=Array.from({length:14},(_,i)=>{const d=new Date(now-(13-i)*day),k=d.toISOString().slice(0,10);return{k,n:Q.filter(q=>dk(q.t)===k).length}});
  const n=Q.length,ai=Q.filter(q=>q.model&&!/local/i.test(q.model)).length,avg=n?Math.round(Q.reduce((a,q)=>a+(q.confidence||0),0)/n):0,low=Q.filter(q=>q.level==="Low"||q.level==="None").length,lat=n?Math.round(Q.reduce((a,q)=>a+(q.latency_ms||0),0)/n):0;
  const by=(f)=>Object.entries(Q.reduce((o,q)=>(o[f(q)]=(o[f(q)]||0)+1,o),{})).sort((a,b)=>b[1]-a[1]).slice(0,8);
