@@ -317,6 +317,18 @@ aside{overflow-y:auto}
 .p3key i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.p3key u{display:inline-block;width:16px;height:4px;border-radius:2px;margin-right:5px;vertical-align:middle}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:700px){.p3stage{height:480px}.p3card{top:auto;bottom:56px;right:8px;left:8px;width:auto}.p3key{display:none}}
+.g3fxb{position:absolute;left:10px;top:10px;max-width:56%;background:rgba(255,255,255,.93);border:1px solid #d5deea;border-radius:10px;padding:6px 10px;font-size:12.5px;line-height:1.45;box-shadow:0 4px 14px rgba(20,40,70,.12);z-index:2}.g3fxb:empty{display:none}
+.simwrap>.gtog{margin:2px 6px 8px}.simwrap .p3stage{border-top:1px solid #d5deea}.sim3 .g3box{margin:0 6px 6px}
+/* P&ID valves and liquid */
+.vb{cursor:pointer}.vb rect{fill:#e8f6ee;stroke:#1a7f4b;stroke-width:1}.vb text{font:700 8px system-ui,sans-serif;fill:#1a7f4b;pointer-events:none}
+.vb.bad rect{fill:#fdeaea;stroke:#c62828}.vb.bad text{fill:#c62828}.vb.warn rect{fill:#fff4e0;stroke:#c77700}.vb.warn text{fill:#c77700}
+.vb:hover rect{filter:drop-shadow(0 0 3px rgba(0,0,0,.35))}
+.pdn.vclosed{animation:none}.pipe.vdead{stroke-dasharray:3 4;opacity:.55}
+.pdn.vmove{animation:vmv .7s ease}@keyframes vmv{0%{filter:drop-shadow(0 0 0 #0b5fd7)}40%{filter:drop-shadow(0 0 6px #0b5fd7)}100%{filter:none}}
+.vliq .vw{fill:#4aa3df;opacity:.38}.vliq .vlv{transition:transform .6s ease}.vliq .vlv path{animation:vwave 3.2s linear infinite}
+@keyframes vwave{from{transform:translateX(0)}to{transform:translateX(-40px)}}
+.vpanel{border:1px solid var(--line,#d9dee5);border-radius:10px;padding:10px;margin-bottom:12px;background:#fafbfd}
+.pdn:hover{filter:drop-shadow(0 0 3px rgba(47,129,247,.45))}
 .pbar{padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;font-size:12.5px;background:var(--panel2)}
 .sheet{background:#fbfbf8;border:1px solid #c9c9c0;border-radius:6px;overflow:auto;max-height:76vh}
 .sheet svg{display:block;font-family:Arial,Helvetica,sans-serif}.sheet text{fill:#111}
@@ -3031,8 +3043,8 @@ function mhTabReport(r){const n=r.n,ks=mhParts(r),lag=(r.t1-r.t0)/36e5,dur=(r.t2
  </div></div>`}
 function mhTabLive(r,dock){const n=r.n,ks=mhParts(r),t=mhFailTag(r),eff=D[n].eff[t]||[],bd=r.bd==="Yes";
  return `<div style="padding:12px 20px 0"><div class="otsbar ${bd?"alarm":""}" style="margin-bottom:10px"><span class="tag ${bd?"bad":"ok"}">${bd?"FAILURE EVENT":"NORMAL"}</span><b>${esc(r.prob||"")}</b><span class="muted">${bd?`Initiating point on P&amp;ID: <b>${t}</b>. The failure sequence is simulated and starts by itself.`:"This was not a breakdown, so the P&ID shows normal operation."}</span><button class="ghost" style="margin-left:auto" onclick="mhLiveStart()">Replay sequence</button></div>
-  <div class="card" style="padding:6px;margin-bottom:12px;background:#fbfbf8"><div class="muted" style="font-size:12px;padding:2px 6px">Process diagram ${esc(S(n).pid.ref)} | live simulation</div>${pidSvgOnly(n)}</div>
-  <div class="mgrid"><div><h3 style="margin-bottom:6px">Equipment drawing: ${r.tag}</h3><div class="gasheet mhhl" style="padding:6px">${gaFig(n,mhGaSvg(n,ks),{hl:ks})}</div></div>
+  ${simFig(n,`<div class="card" style="padding:6px;margin-bottom:12px;background:#fbfbf8"><div class="muted" style="font-size:12px;padding:2px 6px">Process diagram ${esc(S(n).pid.ref)} | live simulation</div>${pidSvgOnly(n)}</div>`,{hl:ks,fx:()=>mhFx(r)})}
+  <div class="mgrid"><div><h3 style="margin-bottom:6px">Equipment drawing: ${r.tag}</h3><div class="gasheet mhhl" style="padding:6px">${gaFig(n,mhGaSvg(n,ks),{hl:ks,fx:()=>mhFx(r),lab3:"3D simulation"})}</div></div>
   <div><h3 style="margin-bottom:6px">Component condition</h3><div class="card" id="mhcond" style="margin-bottom:12px"></div><h3 style="margin-bottom:6px">${bd?"Protective actions":"Interlock coverage"}</h3><div class="card">${eff.length?`<table class="mht">${[...new Set(eff)].map(x=>`<tr><td><b>${x}</b></td><td>${bd?'<span class="tag bad">Tripped / actuated</span>':'<span class="tag">Standby</span>'}</td></tr>`).join("")}</table>`:`<p class="muted" style="font-size:12.5px">${bd?"No interlock action is mapped to this point, so the equipment is simply shown as faulted.":"Interlock actions appear once the failure sequence begins."}</p>`}</div>
   <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap">${dock?(r.wo?`<button class="ghost" onclick="mhOpen('${r.wo}','report')">Work order report</button>`:""):`<button class="ghost" onclick="mhTab('report')">Work order report</button><button class="ghost" onclick="mhTab('period')">Period history</button>`}<button class="ghost" onclick="mhClose();pidGo(${n},-1)">Open P&amp;ID</button><button class="ghost" onclick="mhClose();gaGo(${n},${ks[0]?`'${ks[0]}'`:"null"})">Open drawing</button></div></div></div>
   <div style="height:16px"></div></div>`}
@@ -3157,7 +3169,7 @@ function mhReplay(){const R=MHS.rp;return `<div class="otsbar" style="gap:8px"><
  <label class="muted" style="margin-left:auto">Speed <select onchange="MHS.rp.speed=+this.value"><option value="2" ${R.speed===2?"selected":""}>Slow</option><option value="6" ${R.speed===6?"selected":""}>Normal</option><option value="14" ${R.speed===14?"selected":""}>Fast</option><option value="30" ${R.speed===30?"selected":""}>Very fast</option></select></label>
  <label class="row muted" style="gap:4px"><input type="checkbox" ${R.pauseBd?"checked":""} onchange="MHS.rp.pauseBd=this.checked"> Pause on breakdown</label><label class="muted">Failure view <select onchange="MHS.rp.dock=this.value!=='off';MHS.rp.popup=this.value==='popup';MHS.rp.dockKey='';mhDockSync(true)"><option value="dock" ${R.dock&&!R.popup?"selected":""}>Docked below</option><option value="popup" ${R.popup?"selected":""}>Popup</option><option value="off" ${!R.dock?"selected":""}>Off</option></select></label></div>
  <div class="card" style="padding:8px 12px;margin-bottom:12px"><div class="row between" style="margin-bottom:4px"><b>Event track</b><span class="muted" style="font-size:12px">Red diamonds = breakdowns, dots = other work orders. Select a point or a month to jump to it.</span></div><div id="rptrack">${mhRpTrack()}</div><input id="rpsl" type="range" min="${T0}" max="${T1}" step="${DAY}" value="${R.t}" style="width:100%;margin:4px 0" oninput="MHS.rp.t=+this.value;MHS.rp.dockKey='';mhRpUpd(true)"><div id="rpstrip">${mhStrip(MH,[dstr(R.t).slice(0,7),dstr(R.t).slice(0,7)],mo=>`mhRpJump('${mo}')`,{yearJs:y=>`mhRpJump('${y}-01')`})}</div></div>
- <div class="grid" style="grid-template-columns:1.1fr 1fr;gap:14px;align-items:start"><div class="card"><div class="row between"><h3>Plant status</h3><span class="muted" style="font-size:12px">${R.sel?S(R.sel).tag+" selected":"Select a unit to focus"}</span></div><div id="rpmap">${mhRpMap()}</div><div class="row muted" style="font-size:12px;flex-wrap:wrap"><span><span class="dot" style="background:#1a7f37"></span>Running</span><span><span class="dot" style="background:#0969da"></span>Notified</span><span><span class="dot" style="background:#9a6700"></span>Maintenance</span><span><span class="dot" style="background:#cf222e"></span>Breakdown</span></div></div>
+ <div class="grid" style="grid-template-columns:1.1fr 1fr;gap:14px;align-items:start"><div class="card"><div class="row between"><h3>Plant status</h3><span class="muted" style="font-size:12px">${R.sel?S(R.sel).tag+" selected":"Select a unit to focus"}</span></div>${simPlant(`<div id="rpmap">${mhRpMap()}</div>`,{fn:n=>{const k=mhStat(n,MHS.rp.t)[0];return k==="bd"?"trip":k==="mt"||k==="nt"?"alarm":"ok"},pick:n=>mhRpSel(n),h:520})}<div class="row muted" style="font-size:12px;flex-wrap:wrap"><span><span class="dot" style="background:#1a7f37"></span>Running</span><span><span class="dot" style="background:#0969da"></span>Notified</span><span><span class="dot" style="background:#9a6700"></span>Maintenance</span><span><span class="dot" style="background:#cf222e"></span>Breakdown</span></div></div>
  <div><div id="rpkpi">${mhRpCounters()}</div><div class="card" style="margin-top:10px;padding:4px 8px;overflow:auto"><div id="rpboard">${mhRpBoard()}</div></div></div></div>
  <div id="rpdock" style="margin-top:14px"></div>
  <div id="rpcharts" style="margin-top:14px">${mhRpCharts()}</div>
@@ -3251,6 +3263,70 @@ function ovHero(){OV.vb=[0,0,1900,1070];return `<div class="card" style="padding
  <div id="ovbar" class="pbar" style="margin:6px 16px"></div><div class="row" style="gap:16px;padding:0 16px 8px;flex-wrap:wrap">${Object.entries(SVC).filter(e=>e[0]!=="sig").map(e=>`<span class="row" style="gap:6px;font-size:12px"><i style="width:22px;height:4px;border-radius:2px;background:${e[1][1]}"></i>${e[1][0]}</span>`).join("")}<span class="muted" style="font-size:12px;margin-left:auto">Stream links between units are approximate. Select a tile for its summary.</span></div>
  <div id="ovwrap" style="display:grid;grid-template-columns:minmax(0,1fr) ${OV.sel?"310px":"0px"};gap:0"><div style="padding:0 0 0 0">${ovSvg()}</div><div class="card" id="ovside" style="border:0;border-left:1px solid var(--line);border-radius:0;box-shadow:none;${OV.sel?"":"display:none"}">${ovSide()}</div></div></div>`}
 function ovStart(){clearInterval(OV.timer);if(!$("#ovsvg"))return;ovUpd();OV.timer=setInterval(()=>{if((st.page==="dashboard"||st.page==="scn")&&$("#ovsvg"))ovUpd();else clearInterval(OV.timer)},1500)}
+/* =====================================================================================================
+   P&ID: VALVES THAT OPEN AND CLOSE, LIQUID LEVELS, FLOW THAT STOPS
+   Every operable valve on a P&ID carries a badge (OPEN, CLOSED or percent open). Select the valve and use the panel, press the badge,
+   or double-click the valve to change its position. A closed valve stops the flow in the pipe after it and in the pipes that
+   continue from there. Closing a valve that proves a start permissive (for example XV-1201 and ZSO-1201) trips the item that depends on it,
+   through the same cause and effect logic as the simulator. Interlock trips close their shutdown valves by themselves.
+   Vessels show a liquid level that moves with the level instrument.
+   ===================================================================================================== */
+regMod("pidv","1.0",[],"P&ID valves, levels and flow");
+const VLV={};
+const vIs=n=>{const t=String(n[0]),k=n[1];return(k==="a"&&!/^(PT|TT|FT|LT|PDT|FIT|VT|ST)-/.test(t))||(k==="x"&&/^(XV|HV|BLOCK|BYPASS|SAMPLE|FORCE)/i.test(t))};
+const vKey=(s,i)=>s+":"+i;
+const vDefClosed=n=>/NORMALLY CLOSED/i.test(String(n[6]||""));
+function vClosed(s,i){const nd=D[s].n[i];let L=null;if(P.set===s){try{L=read(nd[0])}catch(e){}}if(L&&L.v==="CLOSED"&&L.s!=="NORMAL")return true;const m=VLV[vKey(s,i)];return m?m==="closed":vDefClosed(nd)}
+const vCtl=n=>/^(FV|LV|PV|TV|TCV|PCV|FY)\b|^FV-|^LV-|^PV-|^TV-/.test(String(n[0]));
+function vPct(s,i){const nd=D[s].n[i];let L=null;try{L=P.set===s?read(nd[0]):null}catch(e){}const m=L&&/(\d+(?:\.\d+)?)\s*% open/.exec(L.v);return m?Math.round(+m[1]):45}
+/* where each pipe passes a valve: index of the pipe, and how far along it the valve sits */
+function vPipes(s){if(D[s]._vp)return D[s]._vp;const out={};D[s].n.forEach((nd,i)=>{if(!vIs(nd))return;const V=[nd[2],nd[3]],hit=[];D[s].p.forEach((p,j)=>{const pts=p[0];let best=null;
+  for(let q=0;q<pts.length-2;q+=2){const ax=pts[q],ay=pts[q+1],bx=pts[q+2],by=pts[q+3],dx=bx-ax,dy=by-ay,L=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((V[0]-ax)*dx+(V[1]-ay)*dy)/L)),px=ax+t*dx,py=ay+t*dy,d=Math.hypot(V[0]-px,V[1]-py);if(d<13&&(!best||d<best.d))best={d,seg:q/2,px,py}}
+  if(best)hit.push({j,seg:best.seg,px:best.px,py:best.py,end:Math.hypot(V[0]-pts[pts.length-2],V[1]-pts[pts.length-1])<15,start:Math.hypot(V[0]-pts[0],V[1]-pts[1])<15})});
+  out[i]=hit});return D[s]._vp=out}
+/* the start permissive that proves this valve: a ZS item with the same number */
+function vProve(s,i){const t=String(D[s].n[i][0]),num=(/(\d{3,5})/.exec(t)||[])[1];if(!num)return null;const z=D[s].n.find(x=>/^ZS/.test(String(x[0]))&&String(x[0]).includes(num)&&x[1]!=="a");return z?z[0]:null}
+function vSet(i,state){const s=P.set,nd=D[s].n[i];if(!nd)return;VLV[vKey(s,i)]=state;D[s].n.forEach((o,k)=>{if(o[0]===nd[0]&&k!==i&&vIs(o)&&!/A\/B/.test(o[0]))VLV[vKey(s,k)]=state});
+ const z=vProve(s,i);if(z){const key=FK(z);if(state==="closed"&&!/^(FV|LV|PV|TV)/.test(nd[0]))LIVE.f[key]=true;else delete LIVE.f[key]}
+ try{audit("Valve operated",nd[0]+" "+state+" on "+S(s).tag)}catch(e){}
+ const g=document.getElementById("n"+i);if(g){g.classList.add("vmove");setTimeout(()=>g.classList.remove("vmove"),700)}try{tick();pUpd()}catch(e){}}
+function vToggle(i,ev){if(ev){ev.stopPropagation();ev.preventDefault()}vSet(i,vClosed(P.set,i)?"open":"closed")}
+function vAuto(i){const s=P.set;delete VLV[vKey(s,i)];const z=vProve(s,i);if(z)delete LIVE.f[FK(z)];try{tick();pUpd()}catch(e){}}
+/* badge on each valve and liquid in each vessel are added when the sheet is drawn */
+{const _ns=nodeSvg;nodeSvg=function(n,i){let s=_ns.apply(this,arguments);const nd=n;
+  if(vIs(nd)){const x=nd[2],y=nd[3],big=/big/.test(nd[7]||"");s=s.replace(/<\/g>$/,`<g class="vb ok" id="vb${i}" transform="translate(${x+(big?20:13)} ${y-(big?30:24)})" onclick="vToggle(${i},event)" ondblclick="event.stopPropagation()"><rect x="-1" y="-9" width="42" height="14" rx="7"/><text x="20" y="1" text-anchor="middle">OPEN</text></g></g>`).replace('<g class="pdn ','<g ondblclick="vToggle('+i+',event)" class="pdn ')}
+  if(nd[1]==="v"||nd[1]==="h"){const[t,k,x,y,w,h,l,o]=nd;let d;if(k==="v"){const a=w/2,r=Math.min(a,34);d=`M${x-a} ${y-h/2+r}A${a} ${r} 0 0 1 ${x+a} ${y-h/2+r}V${y+h/2-r}A${a} ${r} 0 0 1 ${x-a} ${y+h/2-r}z`}else{const r=Math.min(h/2,30);d=`M${x-w/2+r} ${y-h/2}H${x+w/2-r}A${r} ${h/2} 0 0 1 ${x+w/2-r} ${y+h/2}H${x-w/2+r}A${r} ${h/2} 0 0 1 ${x-w/2+r} ${y-h/2}z`}
+   const x0=x-w/2-40,W=w+80,yb=y+h/2,wv=`M${x0} ${y} q ${W/8} -5 ${W/4} 0 t ${W/4} 0 t ${W/4} 0 t ${W/4} 0 t ${W/4} 0 V${yb+4} H${x0} z`;
+   s=s.replace(/<\/g>$/,`<defs><clipPath id="vc${P.set}_${i}"><path d="${d}"/></clipPath></defs><g clip-path="url(#vc${P.set}_${i})" class="vliq" data-i="${i}" data-y="${y}" data-h="${h}"><g class="vlv" transform="translate(0 0)"><path class="vw" d="${wv}"/></g></g></g>`)}
+  return s}}
+/* valve and vessel state on every update */
+function vUpd(){const s=P.set,d=D[s];if(!d)return;const svg=document.getElementById("psvg");if(!svg)return;const pipes=vPipes(s);let dead=new Set(),part={};
+ d.n.forEach((nd,i)=>{if(!vIs(nd))return;const cl=vClosed(s,i),g=document.getElementById("n"+i),b=document.getElementById("vb"+i);if(!g||!b)return;const ctl=vCtl(nd),pct=ctl?vPct(s,i):null;
+  g.classList.toggle("vclosed",cl);const txt=cl?"CLOSED":ctl?pct+"%":"OPEN";const te=b.querySelector("text");if(te.textContent!==txt)te.textContent=txt;b.setAttribute("class","vb "+(cl?"bad":ctl&&pct<5?"warn":"ok"));
+  const w=txt.length*6+10,re=b.querySelector("rect");re.setAttribute("width",w);re.setAttribute("x",20-w/2);
+  if(cl)(pipes[i]||[]).forEach(h=>{if(h.end)return;if(h.start||h.seg===0&&false)dead.add(h.j);else part[h.j]=h})});
+ /* upstream of a closed valve keeps flowing; the rest of the line does not */
+ Object.entries(part).forEach(([j,h])=>{const pts=d.p[j][0];if(h.seg===0&&Math.hypot(pts[0]-h.px,pts[1]-h.py)<4){dead.add(+j);delete part[j];}});
+ let changed=true,guard=0;while(changed&&guard++<6){changed=false;d.p.forEach((p,k)=>{if(dead.has(k))return;const f=[p[0][0],p[0][1]];const isDown=[...dead].some(j=>{const q=d.p[j][0],e=[q[q.length-2],q[q.length-1]];return Math.hypot(e[0]-f[0],e[1]-f[1])<8})||Object.entries(part).some(([j,h])=>{const q=d.p[j][0],e=[q[q.length-2],q[q.length-1]];return Math.hypot(e[0]-f[0],e[1]-f[1])<8});if(isDown){dead.add(k);changed=true}})}
+ d.p.forEach((p,j)=>{const f=document.getElementById("f"+j);if(!f)return;const was=f.dataset.vd;const isDead=dead.has(j),isPart=!!part[j];
+  if(isDead)f.classList.add("off");else if(isPart)f.classList.add("off");else if(was==="1"||was==="2"){if(!(((p[1]||{}).g||[]).some(t=>isF(t)||isE(t)))&&!((p[1]||{}).o&&!(p[1].o.some(t=>isF(t)||isE(t)))))f.classList.remove("off")}
+  f.dataset.vd=isDead?"1":isPart?"2":"";
+  let up=svg.querySelector(`[data-vup="${j}"]`),dn=svg.querySelector(`[data-vdn="${j}"]`);
+  if(isPart){const h=part[j],pts=p[0],a=[];for(let q=0;q<=h.seg;q++)a.push(pts[q*2]+","+pts[q*2+1]);a.push(h.px.toFixed(1)+","+h.py.toFixed(1));const b=[h.px.toFixed(1)+","+h.py.toFixed(1)];for(let q=h.seg+1;q<pts.length/2;q++)b.push(pts[q*2]+","+pts[q*2+1]);
+   if(!up){up=document.createElementNS("http://www.w3.org/2000/svg","polyline");up.setAttribute("class","fl");up.setAttribute("data-vup",j);f.parentNode.insertBefore(up,f.nextSibling);dn=document.createElementNS("http://www.w3.org/2000/svg","polyline");dn.setAttribute("class","pipe vdead");dn.setAttribute("data-vdn",j);f.parentNode.insertBefore(dn,up.nextSibling)}
+   up.setAttribute("points",a.join(" "));dn.setAttribute("points",b.join(" "));up.style.display="";dn.style.display=""}
+  else{if(up)up.style.display="none";if(dn)dn.style.display="none"}
+  const pc=svg.querySelectorAll(".pipe.pc")[j];if(pc)pc.classList.toggle("vdead",isDead)});
+ /* liquid in vessels follows the level instrument */
+ const lv=(()=>{const n=d.n.find(x=>/^(LT|LI|LSHH|LSLL|LIT)/.test(String(x[0])));if(!n)return 55;let L=null;try{L=read(n[0])}catch(e){}const m=L&&/(\d+(?:\.\d+)?)\s*%/.exec(L.v);return m?+m[1]:55})();
+ svg.querySelectorAll(".vliq").forEach(g=>{const h=+g.dataset.h,y=+g.dataset.y,fill=lv/100,top=y+h/2-h*fill,lvg=g.querySelector(".vlv");lvg.setAttribute("transform","translate(0 "+(top-y).toFixed(1)+")")})}
+{const _pu=pUpd;pUpd=function(){_pu.apply(this,arguments);try{vUpd()}catch(e){console.error(e)}}}
+/* valve controls in the side panel */
+{const _pp=pPanel;pPanel=function(){const h=_pp.apply(this,arguments),n=D[P.set].n[P.sel];if(!n||!vIs(n))return h;const i=P.sel,s=P.set,cl=vClosed(s,i),man=VLV[vKey(s,i)],z=vProve(s,i),ctl=vCtl(n);
+  const trip=P.set===s&&(()=>{try{const L=read(n[0]);return L&&L.v==="CLOSED"&&L.s!=="NORMAL"}catch(e){return false}})();
+  return `<div class="vpanel"><div class="row between"><b>Valve ${esc(String(n[0]))}</b><span class="tag ${cl?"bad":"ok"}">${cl?"CLOSED":ctl?vPct(s,i)+" % open":"OPEN"}</span></div>
+  <div class="row" style="gap:6px;margin:8px 0"><button ${!cl?'class="ghost"':""} onclick="vSet(${i},'open')" ${trip?"disabled":""}>Open</button><button ${cl?'class="ghost"':""} onclick="vSet(${i},'closed')">Close</button><button class="ghost" onclick="vAuto(${i})" ${man?"":"disabled"}>Automatic</button></div>
+  <p class="muted" style="font-size:12px;margin:0">${trip?"Closed by the interlock. Reset the trip to reopen it.":cl?"The flow in the pipe after this valve has stopped.":"Close it to stop the flow in the pipe after it."}${z?` It proves ${esc(z)}: closing it ${/^(FV|LV|PV|TV)/.test(n[0])?"does not":"will"} trip the item that needs it.`:""} Double-click the valve or press its badge to toggle.</p></div>`+h}}
 /* ===== Predictive maintenance: Weibull reliability model on the maintenance history, risk ranking, forecast timeline, health trend and recommended interventions ===== */
 const PDM={h:90,beta:1.6,thr:45,sel:0,key:null,cell:null,cache:{},lead:14,mode:"fleet",casc:true};
 const PDML={high:["#cf222e","High"],medium:["#9a6700","Medium"],low:["#1a7f37","Low"]};
@@ -3700,7 +3776,7 @@ function scnUGo(i){const u=SCN.u;if(!u.cur)return;u.t=Math.max(0,Math.min(u.cur.
 function scnUPlay(){const u=SCN.u;if(u.timer){clearInterval(u.timer);u.timer=null}else{if(u.t>=u.cur.phases.length-1)u.t=0;u.timer=setInterval(()=>{if(u.t>=u.cur.phases.length-1){clearInterval(u.timer);u.timer=null;const b=document.getElementById("scnuplay");if(b)b.textContent="Play";return}scnUGo(u.t+1)},2400);scnUGo(u.t)}const b=document.getElementById("scnuplay");if(b)b.textContent=u.timer?"Pause":"Play"}
 function scnUStop(){clearInterval(SCN.u.timer);SCN.u.timer=null;scnClearForce();try{if(P.set){tick();pUpd()}}catch(e){}}
 function scnUnitBlock(sc,opt={}){const n=sc.set,L=sc.links||{};const rel=L.wo?scnOplFor(MH.find(r=>r.wo===L.wo)):[],wos=L.opl?scnWoFor({symptom:L.symptom,cause:"",set:n}):[];
- return `<div class="grid" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;align-items:start"><div><div class="card" style="padding:8px"><div class="row between" style="padding:2px 6px 8px;flex-wrap:wrap;gap:6px"><div><span class="tag acc">${esc(sc.kind)}</span> <b>${esc(sc.title)}</b><div class="muted" style="font-size:12px">${esc(sc.sub)}</div></div><div class="row" style="gap:6px"><button class="ghost" onclick="scnUGo(SCN.u.t-1)">Previous</button><button id="scnuplay" onclick="scnUPlay()" style="min-width:76px">${SCN.u.timer?"Pause":"Play"}</button><button class="ghost" onclick="scnUGo(SCN.u.t+1)">Next</button><button class="ghost" onclick="scnUGo(0)">Restart</button></div></div><div id="scnpid" class="sheet" style="border:0">${pidSvgOnly(n,{keepSel:true})}</div></div></div>
+ return `<div class="grid" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;align-items:start"><div><div class="card" style="padding:8px"><div class="row between" style="padding:2px 6px 8px;flex-wrap:wrap;gap:6px"><div><span class="tag acc">${esc(sc.kind)}</span> <b>${esc(sc.title)}</b><div class="muted" style="font-size:12px">${esc(sc.sub)}</div></div><div class="row" style="gap:6px"><button class="ghost" onclick="scnUGo(SCN.u.t-1)">Previous</button><button id="scnuplay" onclick="scnUPlay()" style="min-width:76px">${SCN.u.timer?"Pause":"Play"}</button><button class="ghost" onclick="scnUGo(SCN.u.t+1)">Next</button><button class="ghost" onclick="scnUGo(0)">Restart</button></div></div>${simFig(n,`<div id="scnpid" class="sheet" style="border:0">${pidSvgOnly(n,{keepSel:true})}</div>`,{fx:()=>scnFx(n)})}</div></div>
  <div><div class="card"><h3 style="margin:0 0 6px">Sequence on the P&ID</h3><div id="scnphases">${scnPhaseList(sc,SCN.u.t)}</div></div>
  <div class="card" style="margin-top:12px"><h3 style="margin:0 0 6px">Linked records</h3>${L.wo?`<div style="font-size:13px;margin-bottom:6px">Work order <a class="alink" onclick="mhOpen('${L.wo}')">${L.wo}</a></div>`:""}${L.opl?`<div style="font-size:13px;margin-bottom:6px">Lesson <a class="alink" onclick="${String(L.opl).startsWith("UK-")?`go('ks');setTimeout(()=>ksOpen('${L.opl}'),50)`:`go('opl',{opl:'${L.opl}'})`}">${esc(L.opl)}</a></div>`:""}
  ${rel.length?`<div class="muted" style="font-size:12px;margin:6px 0 3px">OPL cases that match this failure</div>${rel.map(x=>`<div class="src"><div onclick="scnPickOpl('${x.opl}',${x.idx})"><b>${x.opl}</b> <span class="muted" style="font-size:12px">${Math.round(x.rel*100)} percent</span><div style="font-size:12.5px">${esc(x.text)}</div><span class="alink" style="font-size:12px">Run this OPL scenario on the P&ID</span></div></div>`).join("")}`:""}
@@ -3739,7 +3815,7 @@ function scnPlantUI(){const P_=SCN.p,i=P_.init,res=P_.res||scnRun(),I=res.impact
   <h3 style="margin:14px 0 6px;font-size:13.5px">From predictive maintenance</h3><select onchange="if(this.value)scnFromPdm(this.value)"><option value="">Select a predicted failure</option>${pdmEnts().filter(e=>e.risk>0).sort((a,b)=>b.risk-a.risk).slice(0,8).map(e=>`<option value="${e.id}" ${i.pdm===e.id?"selected":""}>${S(e.n).tag} ${esc(e.key==null?"whole unit":e.name)} (priority ${e.risk})</option>`).join("")}</select>${pe?`<div class="muted" style="font-size:12px;margin-top:6px">Predicted failure of ${esc(pe.name)} on ${S(pe.n).tag}, median ${dstr(pe.p50)}. Treated as a trip of the unit, the worst credible outcome.</div>`:""}</div>`;
  const kp=`<div class="grid" style="grid-template-columns:repeat(4,1fr);gap:10px">${kpiTile(I.tripped,"Units tripped",I.tripped>1?"bad":"")}${kpiTile(I.affected+" of "+K.sets.length,"Units affected")}${kpiTile("about "+I.hours+" h","Combined outage estimate")}${kpiTile(M$(I.cost),"Maintenance cost estimate (IDR)")}</div>`;
  const prev=(()=>{const L=[];const u=pd;if(u.comps[0])L.push(`<li>${S(n).tag}: ${esc(pdmAction(u.comps[0]))}</li>`);res.events.filter(e=>e.kind==="trip"&&e.opl).slice(0,4).forEach(e=>L.push(`<li>${S(e.unit).tag}: follow <a class="alink" onclick="go('opl',{opl:'${e.opl.opl}'})">${e.opl.opl}</a> (${esc(e.opl.title)}) for ${esc(e.tag)}.</li>`));return L.join("")})();
- return `<div class="grid" style="grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start"><div>${ctrl}</div><div>${kp}<div class="card" style="padding:6px;margin-top:12px"><div class="row between" style="padding:4px 8px;flex-wrap:wrap;gap:8px"><div class="row" style="gap:8px"><button id="scnplay" onclick="scnPlay()" style="min-width:76px">${P_.play?"Pause":"Play"}</button><button class="ghost" onclick="SCN.p.t=0;scnApplyPlant()">Restart</button><span class="tag acc" id="scnclock" style="font-size:14px">T+${Math.round(P_.t)} min</span></div><label class="muted">Speed <select onchange="SCN.p.speed=+this.value"><option value="1" ${P_.speed===1?"selected":""}>1 min per step</option><option value="2" ${P_.speed===2?"selected":""}>2 min</option><option value="5" ${P_.speed===5?"selected":""}>5 min</option></select></label></div><input id="scnslider" type="range" min="0" max="${res.end}" step="0.5" value="${P_.t}" style="width:calc(100% - 16px);margin:0 8px" oninput="scnSeek(this.value)"><div class="row muted" style="font-size:11.5px;padding:0 10px 4px;justify-content:space-between"><span>0</span><span>${Math.round(res.end/2)} min</span><span>${res.end} min</span></div>${ovSvg()}</div>
+ return `<div class="grid" style="grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start"><div>${ctrl}</div><div>${kp}<div class="card" style="padding:6px;margin-top:12px"><div class="row between" style="padding:4px 8px;flex-wrap:wrap;gap:8px"><div class="row" style="gap:8px"><button id="scnplay" onclick="scnPlay()" style="min-width:76px">${P_.play?"Pause":"Play"}</button><button class="ghost" onclick="SCN.p.t=0;scnApplyPlant()">Restart</button><span class="tag acc" id="scnclock" style="font-size:14px">T+${Math.round(P_.t)} min</span></div><label class="muted">Speed <select onchange="SCN.p.speed=+this.value"><option value="1" ${P_.speed===1?"selected":""}>1 min per step</option><option value="2" ${P_.speed===2?"selected":""}>2 min</option><option value="5" ${P_.speed===5?"selected":""}>5 min</option></select></label></div><input id="scnslider" type="range" min="0" max="${res.end}" step="0.5" value="${P_.t}" style="width:calc(100% - 16px);margin:0 8px" oninput="scnSeek(this.value)"><div class="row muted" style="font-size:11.5px;padding:0 10px 4px;justify-content:space-between"><span>0</span><span>${Math.round(res.end/2)} min</span><span>${res.end} min</span></div>${simPlant(ovSvg(),{pick:n=>scnPickUnit(n)})}</div>
  <div class="grid" style="grid-template-columns:1.2fr 1fr;gap:14px;margin-top:12px;align-items:start"><div class="card"><h3 style="margin:0 0 6px">Sequence of events</h3><div id="scnlist" style="max-height:520px;overflow:auto">${scnEventList(res,P_.t)}</div></div><div><div class="card"><h3 style="margin:0 0 6px">Preventive actions</h3><ul class="ansl" style="margin:0">${prev||"<li class='muted'>None identified.</li>"}</ul></div><div class="card" style="margin-top:12px"><h3 style="margin:0 0 6px">Notes</h3><p class="muted" style="font-size:12.5px;line-height:1.55;margin:0">Stream links between units are approximate. Each effect is a rule for one stream (supply loss, blocked outlet or utility loss) that pushes an instrument on the affected unit towards its trip. Times are estimates in minutes. OPL guidance is the lesson that names the same tag. History compares breakdowns on connected units within 7 days against what chance would give. There are usually too few events to confirm a link. Hours and cost use the average breakdown downtime and maintenance cost of each unit. The data has no production loss value.</p></div></div></div></div></div>`}
 function scnPage(){const tabs=[["plant","Plant chain reaction"],["unit","OPL and maintenance scenario"],["rules","Assumptions register"]];
  return `${ph("Scenarios","Replay a failure, an OPL case or a work order on the P&ID, and see how a failure on one unit spreads to connected equipment",`<div class="seg">${tabs.map(([k,l])=>`<button class="${SCN.tab===k?"on":""}" onclick="SCN.tab='${k}';if('${k}'==='plant'){scnUStop()}else if('${k}'==='unit'){scnPlantStop()}else{scnPlantStop();scnUStop()};render();if('${k}'==='unit')setTimeout(scnApplyUnit,60)">${l}</button>`).join("")}</div>`)}${SCN.tab==="rules"?scnRulesUI():SCN.tab==="plant"?scnPlantUI():`<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:10px">${K.sets.map(s=>`<span class="chip" style="${s.n===SCN.u.set?"color:var(--acc);border-color:var(--acc)":""}" onclick="SCN.u.set=${s.n};SCN.u.cur=null;scnUStop();render();setTimeout(scnApplyUnit,60)">${s.tag}</span>`).join("")}</div>${scnUnitTab(SCN.u.set)}`}`}
@@ -4794,57 +4870,83 @@ function g3Info(n,k){if(!k)return"";const nz=GA[n]&&GA[n].nz.find(q=>q.m===k),b=
  let live="";if(V&&G.cond!==false){const st0=gState(V.m,V.v),cl=st0==="ok"?"ok":st0==="warn"?"warn":"bad";live=`<div class="g3live"><span class="tag ${cl}">${st0==="ok"?"Normal":st0==="warn"?"Alarm":"Trip"}</span> <b>${V.v.toFixed(V.m[3]<5?1:0)} ${V.m[2]}</b> <span class="muted">${esc(V.m[1])}</span></div>`}
  return `<div class="g3card"><div class="row between"><b>${esc(nz?k+" | "+nz.sv:(k==="M"?"":k+" | ")+b.name)}</b><button class="ghost g3x" onclick="G3.pin=null;this.closest('.g3card').remove()" aria-label="Close">x</button></div>${rows.map(r=>`<div class="g3r"><span>${esc(r[0])}</span><b>${esc(String(r[1]??"n/a"))}</b></div>`).join("")}${live}<div class="g3r"><span>Work orders</span><b>${wo.length}</b></div>${wo.length?`<div class="muted" style="font-size:11.5px;margin-top:2px">Latest ${esc(wo[wo.length-1].wo)}, ${esc((wo[wo.length-1].prob||"").slice(0,58))}</div>`:""}<div class="row" style="gap:6px;margin-top:8px"><button class="ghost" style="padding:2px 9px;font-size:12px" onclick="go('equipment',{set:${n},tab:'ga'});setTimeout(()=>gSel('${k}'),80)">Open in drawing</button><button class="ghost" style="padding:2px 9px;font-size:12px" onclick="go('mnt');MHS.set=${n};setTimeout(()=>mhPartFilter('${k}'),80)">Work orders</button></div></div>`}
 function g3Name(n,k){const nz=GA[n]&&GA[n].nz.find(q=>q.m===k);if(nz)return k+" | "+nz.sv;const b=gBom(n,k);return b?(k==="M"?"":k+" | ")+b.name:k}
-function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!box)return;const o=G3.cfg[id],M=g3Mesh(o.n),svg=box.querySelector("svg");if(!svg)return;
- const W=900,H=500,cy=Math.cos(I.yaw),sy=Math.sin(I.yaw),cp=Math.cos(I.pit),sp=Math.sin(I.pit),D=M.R*3.4,sc=I.zoom*(H*.46)/M.Rf,t=I.t;
- const sel=I.pin||(o.sel?o.sel():null),hl=o.hl||[],heat=o.heat||{},tint=o.tint;
+/* centre and size of one part (all solids that carry its number) */
+function g3KeyC(n,k){const M=g3Mesh(n);M.kc=M.kc||{};if(M.kc[k])return M.kc[k];let fs=M.faces.filter(f=>f.k===k&&!f.in),inner=false;if(!fs.length){fs=M.faces.filter(f=>f.k===k);inner=true}if(!fs.length)return null;
+ const mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];fs.forEach(f=>f.p.forEach(v=>{for(let i=0;i<3;i++){mn[i]=Math.min(mn[i],v[i]);mx[i]=Math.max(mx[i],v[i])}}));
+ return M.kc[k]={inner,c:[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],r:Math.max(mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2])/2}}
+const g3Cl=(v,a,b)=>v<a?a:v>b?b:v;
+function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!box)return;const o=G3.cfg[id],M=g3Mesh(o.n),svg=box.querySelector("svg");if(!svg)return;const mini=!!box.dataset.mini;
+ const W=900,H=500,cy=Math.cos(I.yaw),sy=Math.sin(I.yaw),cp=Math.cos(I.pit),sp=Math.sin(I.pit),D=M.R*3.4,t=I.t,tm=I.clock||0;
+ const fxo=o.fx?o.fx():null,fxs=fxo?fxo.state:"normal",hot=(fxo&&fxo.hot)||[],sel=I.pin||(o.sel?o.sel():null),hl=o.hl||[],heat=o.heat||{},tint=o.tint;
  const rot=v=>{const x=v[0]-M.ctr[0],y=v[1]-M.ctr[1],z=v[2]-M.ctr[2],x1=x*cy+z*sy,z1=-x*sy+z*cy;return[x1,y*cp+z1*sp,-y*sp+z1*cp]};
+ {const kk=sel&&g3KeyC(o.n,sel),xb=box.querySelector('[data-t=xray]');if(kk&&kk.inner&&!I.xray){I.xray=true;I.autoX=true;if(xb)xb.classList.add('on')}else if(!sel&&I.autoX){I.xray=false;I.autoX=false;if(xb)xb.classList.remove('on')}}
+ /* camera eases to the selected part: centred and zoomed, back to the whole machine when nothing is selected */
+ if(sel!==I.focusKey){I.focusKey=sel;I.userMoved=false}
+ if(!I.userMoved&&!mini){let tz=1,tpx=0,tpy=0;const kc=sel&&g3KeyC(o.n,sel);if(kc){tz=g3Cl(M.Rf*.62/Math.max(kc.r,.1),1.3,3.4);const pc=rot(kc.c),sct=tz*(H*.46)/M.Rf,k=D/(D+pc[2]);tpx=-pc[0]*sct*k;tpy=pc[1]*sct*k}
+  const ez=1-Math.pow(.0004,1/60);I.zoom+=(tz-I.zoom)*ez;I.px+=(tpx-I.px)*ez;I.py+=(tpy-I.py)*ez;if(Math.abs(tz-I.zoom)>.004||Math.abs(tpx-I.px)>.4||Math.abs(tpy-I.py)>.4)I.dirty=true}
+ const sc=I.zoom*(H*.46)/M.Rf;
+ const shk=fxs==="trip"?1.6:fxs==="alarm"?.7:0,sdx=shk*Math.sin(tm*47),sdy=shk*Math.cos(tm*39);
  const out=[];
  M.faces.forEach(f=>{if(f.in&&!I.xray)return;const anim=f.anim&&I.run;const pts=f.p.map(v=>rot(anim?g3Anim(f.anim,v,t):v));let nm=f.n;
   if(anim)nm=g3AnimN(f.anim,nm,t);
   const nx=nm[0]*cy+nm[2]*sy,nz1=-nm[0]*sy+nm[2]*cy,ny=nm[1]*cp+nz1*sp,nzz=-nm[1]*sp+nz1*cp;
   if(!(I.xray&&f.sh)&&nzz>=0)return;let zc=0;for(const p of pts)zc+=p[2];zc=zc/pts.length+f.zb;out.push({f,pts,zc,nx,ny,nz:nzz})});
  out.sort((a,b)=>b.zc-a.zc);
- const proj=p=>{const k=D/(D+p[2]);return[W/2+p[0]*sc*k+I.px,H/2-p[1]*sc*k+I.py]},fx=v=>v.toFixed(1);
+ const proj=p=>{const k=D/(D+p[2]);return[W/2+p[0]*sc*k+I.px+sdx,H/2-p[1]*sc*k+I.py+sdy]},fx=v=>v.toFixed(1);
  const L1=[-.5,.72,-.48],L2=[.6,.25,-.5],l1=Math.hypot(...L1),l2=Math.hypot(...L2),Hv=[L1[0]/l1,L1[1]/l1,L1[2]/l1-1],hl_=Math.hypot(...Hv);
  /* ground: shadow and grid */
  const gy=M.ymin,gr=M.R*1.2,step=gr/5;let grid="";
  for(let i=-5;i<=5;i++){const a=proj(rot([M.ctr[0]+i*step,gy,M.ctr[2]-gr])),b=proj(rot([M.ctr[0]+i*step,gy,M.ctr[2]+gr])),c=proj(rot([M.ctr[0]-gr,gy,M.ctr[2]+i*step])),d=proj(rot([M.ctr[0]+gr,gy,M.ctr[2]+i*step]));grid+=`M${fx(a[0])} ${fx(a[1])}L${fx(b[0])} ${fx(b[1])}M${fx(c[0])} ${fx(c[1])}L${fx(d[0])} ${fx(d[1])}`}
  const sh=[];for(let i=0;i<24;i++){const a=i/24*Math.PI*2;sh.push(proj(rot([M.ctr[0]+Math.cos(a)*(M.mx[0]-M.mn[0])*.52,gy,M.ctr[2]+Math.sin(a)*(M.mx[2]-M.mn[2])*.6])))}
- let s=`<path d="${grid}" stroke="#d3dbe6" stroke-width=".7" fill="none"/><polygon points="${sh.map(p=>fx(p[0])+","+fx(p[1])).join(" ")}" fill="#223047" opacity=".16" filter="url(#g3b)"/>`;
- const over=[];
- out.forEach(({f,pts,nx,ny,nz})=>{let c=f.light?(o.light?o.light():[63,185,80]):f.c.slice(0,3);const k=f.k;
+ let s=`<path d="${grid}" stroke="#d3dbe6" stroke-width=".7" fill="none"/><polygon points="${sh.map(p=>fx(p[0])+","+fx(p[1])).join(" ")}" fill="#223047" opacity=".18" filter="url(#g3b)"/>`;
+ const over=[],H0=Math.max(.5,M.mx[1]-M.ymin),dim=!!sel&&!I.xray&&!hl.length,pulse=.5+.5*Math.sin(tm*6);
+ out.forEach(({f,pts,nx,ny,nz})=>{let c=f.light?(o.light?o.light():(fxs==="trip"?[225,60,55]:fxs==="alarm"?[240,170,40]:[63,185,80])):f.c.slice(0,3);const k=f.k;
   const tc=k&&(tint&&tint(k)||heat[k]);if(tc){const q=typeof tc==="string"?g3Parse(tc):tc,a=q[3]==null?.6:q[3];c=c.map((v,i)=>v*(1-a)+q[i]*a)}
+  if(fxs!=="normal"&&!f.light){const base=fxs==="trip"?[225,60,55]:[240,170,40],a=fxs==="trip"?.2:.14;c=c.map((v,i)=>v*(1-a)+base[i]*a);if(k&&hot.includes(k)){const b2=fxs==="trip"?[235,50,45]:[245,160,30],a2=.35+.4*pulse;c=c.map((v,i)=>v*(1-a2)+b2[i]*a2)}}
   const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=(ny*.5+.5),spec=Math.pow(Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),22)*f.m;
-  const lum=.36+.5*d1+.16*d2+.12*hemi,hlOn=k&&hl.includes(k),selOn=k&&k===sel;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.1+26));
-  const r=Math.min(255,c[0]*lum+255*spec*.55),g=Math.min(255,c[1]*lum+255*spec*.55),b=Math.min(255,c[2]*lum+255*spec*.55),fill=`rgb(${r|0},${g|0},${b|0})`,al=I.xray&&f.sh?.18:1;
+  const ao=.86+.14*g3Cl((f.mid[1]-M.ymin)/H0*2.6,0,1),rim=Math.pow(1-Math.abs(nz),3)*(f.sm?.15:.05);
+  const lum=(.36+.5*d1+.16*d2+.12*hemi)*ao+rim,hlOn=k&&hl.includes(k),selOn=k&&k===sel,hov=k&&k===I.hover;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.08+24));else if(hov)c=c.map(v=>Math.min(255,v*1.04+14));
+  const r=Math.min(255,c[0]*lum+255*spec*.55+rim*60),g=Math.min(255,c[1]*lum+255*spec*.55+rim*60),b=Math.min(255,c[2]*lum+255*spec*.55+rim*70),fill=`rgb(${r|0},${g|0},${b|0})`;
+  let al=I.xray&&f.sh?.18:1;if(dim&&!selOn)al=Math.min(al,.26);
   const pp=pts.map(p=>{const q=proj(p);return fx(q[0])+","+fx(q[1])}).join(" ");
   s+=`<polygon points="${pp}" fill="${fill}" fill-opacity="${al}" stroke="${f.sm?fill:"rgba(25,40,65,.5)"}" stroke-opacity="${al}" stroke-width="${f.sm?.7:.6}" stroke-linejoin="round" ${k?`data-k="${k}" style="cursor:pointer"`:""}/>`;
-  if(selOn||hlOn)over.push(`<polygon points="${pp}" fill="none" stroke="${selOn?"#0b5fd7":"#cf222e"}" stroke-width="${selOn?1.5:1.2}" stroke-linejoin="round"${hlOn&&!selOn?' class="g3hl"':""} pointer-events="none"/>`)});
- svg.querySelector(".g3s").innerHTML=s+over.join("");
- const cap=box.querySelector(".g3cap");if(cap&&!I.hover&&!box.dataset.mini)cap.textContent=sel?g3Name(o.n,sel):"Drag to rotate, scroll to zoom, select a part for its details";
- const card=box.querySelector(".g3side");if(card&&I.cardKey!==sel){I.cardKey=sel;card.innerHTML=box.dataset.mini?"":g3Info(o.n,sel)}}
+  if(selOn||hlOn)over.push(`<polygon points="${pp}" fill="none" stroke="${selOn?"#0b5fd7":"#cf222e"}" stroke-width="${selOn?1.7:1.2}" stroke-linejoin="round"${hlOn&&!selOn?' class="g3hl"':""} pointer-events="none"/>`)});
+ let extra="";
+ /* leader line and ring for the selected part */
+ const kc=sel&&g3KeyC(o.n,sel);
+ if(kc&&!mini){const q=proj(rot(kc.c)),r0=Math.max(10,kc.r*sc*D/(D+rot(kc.c)[2])*1.1),cw=box.clientWidth||900,sk=900/cw,cx=W-(262)*sk,cyy=70*sk;
+  extra+=`<circle cx="${fx(q[0])}" cy="${fx(q[1])}" r="${fx(r0+3*pulse)}" fill="none" stroke="#0b5fd7" stroke-width="1.4" stroke-dasharray="4 3" opacity=".8" pointer-events="none"/><circle cx="${fx(q[0])}" cy="${fx(q[1])}" r="3" fill="#0b5fd7" pointer-events="none"/>`;
+  if(box.querySelector(".g3card"))extra+=`<path d="M${fx(q[0])} ${fx(q[1])}L${fx(q[0]+(cx-q[0])*.5)} ${fx(q[1])}L${fx(cx)} ${fx(cyy)}" fill="none" stroke="#0b5fd7" stroke-width="1.1" opacity=".7" pointer-events="none"/>`}
+ /* fault effects: plume of steam and sparks from the failing part */
+ if(fxo&&fxs!=="normal"&&hot.length){const kk=g3KeyC(o.n,hot[0]);if(kk){const q0=rot(kk.c),q=proj(q0),n=fxs==="trip"?16:9;for(let i=0;i<n;i++){const ph=((tm*(fxs==="trip"?.7:.45)+i/n)%1),rx=Math.sin(i*12.9898)*.5,rs=ph*(18+kk.r*sc*.4);
+    const xx=q[0]+rx*40*ph,yy=q[1]-ph*(46+kk.r*sc*.6),rr=3+rs*.5,a=(1-ph)*(fxs==="trip"?.55:.4);
+    extra+=`<circle cx="${fx(xx)}" cy="${fx(yy)}" r="${fx(rr)}" fill="${fxs==="trip"&&i%3===0?"rgba(255,120,60,"+a+")":"rgba(235,240,246,"+a+")"}" pointer-events="none"/>`}}}
+ svg.querySelector(".g3s").innerHTML=s+`<g filter="url(#g3glow)">${over.join("")}</g>`+extra;
+ const cap=box.querySelector(".g3cap");if(cap&&!I.hover&&!mini)cap.textContent=sel?g3Name(o.n,sel):"Drag to rotate, scroll to zoom, select a part for its details";
+ const fb=box.querySelector(".g3fxb");if(fb){const h=fxo&&fxo.text?`<span class="p3st ${fxs==="trip"?"trip":fxs==="alarm"?"alarm":"ok"}">${fxs==="trip"?"Trip":fxs==="alarm"?"Alarm":"Normal"}</span> ${fxo.text}`:"";if(fb.dataset.h!==h){fb.dataset.h=h;fb.innerHTML=h}}
+ const card=box.querySelector(".g3side");if(card&&I.cardKey!==sel){I.cardKey=sel;card.innerHTML=mini?"":g3Info(o.n,sel)}}
 function g3Init(box){const id=box.id,o=G3.cfg[id];if(!o)return;box.setAttribute("data-ok","1");const mini=!!box.dataset.mini;
  box.innerHTML=(mini?"":`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Moving parts</button>':""}<button class="ghost" data-v="reset">Reset</button></div>`)+
- `<div class="g3stage"><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><rect width="900" height="500" fill="url(#g3bg)"/><g class="g3s"></g></svg><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
+ `<div class="g3stage"><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><filter id="g3glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><rect width="900" height="500" fill="url(#g3bg)"/><g class="g3s"></g></svg><div class="g3fxb"></div><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
  const I=G3.inst[id]={yaw:-.62,pit:.34,zoom:mini?1.05:1,px:0,py:0,spin:mini,xray:false,run:true,t:0,drag:null,hover:null,dirty:true,last:performance.now(),pin:null,cardKey:undefined};
  const svg=box.querySelector("svg"),dirty=()=>{I.dirty=true},views={iso:[-.62,.34],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2-.001]};
- box.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==="reset"){I.yaw=-.62;I.pit=.34;I.zoom=1;I.px=I.py=0}else{I.yaw=views[v][0];I.pit=views[v][1]}dirty()});
+ box.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==="reset"){I.yaw=-.62;I.pit=.34;I.zoom=1;I.px=I.py=0;I.userMoved=false}else{I.yaw=views[v][0];I.pit=views[v][1]}dirty()});
  box.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="spin")I.spin=!I.spin;else if(k==="xray")I.xray=!I.xray;else I.run=!I.run;b.classList.toggle("on",k==="spin"?I.spin:k==="xray"?I.xray:I.run);dirty()});
  const keyAt=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.getAttribute&&el.closest&&el.closest("svg")===svg?el.getAttribute("data-k"):null};
  svg.addEventListener("pointerdown",e=>{I.drag={x:e.clientX,y:e.clientY,mv:0,pan:e.shiftKey||e.button===2};try{svg.setPointerCapture(e.pointerId)}catch(_){}});
  svg.addEventListener("contextmenu",e=>e.preventDefault());
  svg.addEventListener("pointermove",e=>{const d=I.drag;if(d){const dx=e.clientX-d.x,dy=e.clientY-d.y;d.mv+=Math.abs(dx)+Math.abs(dy);d.x=e.clientX;d.y=e.clientY;
-   if(d.pan){const r=svg.getBoundingClientRect(),k=900/r.width;I.px+=dx*k;I.py+=dy*k}else{I.yaw+=dx*.008;I.pit=Math.max(-1.5,Math.min(1.5,I.pit+dy*.006))}if(d.mv>5)I.spin=I.spin&&mini?false:I.spin;dirty()}
+   if(d.pan){const r=svg.getBoundingClientRect(),k=900/r.width;I.px+=dx*k;I.py+=dy*k;I.userMoved=true}else{I.yaw+=dx*.008;I.pit=Math.max(-1.5,Math.min(1.5,I.pit+dy*.006))}if(d.mv>5)I.spin=I.spin&&mini?false:I.spin;dirty()}
   else{const k=keyAt(e),cap=box.querySelector(".g3cap");if(k!==I.hover){I.hover=k||null;if(cap)cap.textContent=k?g3Name(o.n,k):(I.pin||(o.sel&&o.sel())?g3Name(o.n,I.pin||o.sel()):"Drag to rotate, scroll to zoom, select a part for its details");svg.style.cursor=k?"pointer":"grab"}}});
  svg.addEventListener("pointerup",e=>{const d=I.drag;I.drag=null;if(d&&d.mv<6&&!d.pan){const k=keyAt(e);if(mini){if(k)go("equipment",{set:o.n,tab:"ga"});return}
    I.pin=k&&k!==I.pin?k:null;if(k&&o.click){try{(typeof o.click==="function"?o.click:window[o.click])(k)}catch(_){}}else if(!k&&o.click&&o.sel&&o.sel()){}dirty()}});
- svg.addEventListener("wheel",e=>{if(mini)return;e.preventDefault();I.zoom=Math.max(.5,Math.min(3.5,I.zoom*(e.deltaY<0?1.1:.9)));dirty()},{passive:false});
- svg.addEventListener("dblclick",()=>{I.zoom=1;I.px=I.py=0;dirty()});
+ svg.addEventListener("wheel",e=>{if(mini)return;e.preventDefault();I.userMoved=true;I.zoom=Math.max(.5,Math.min(3.5,I.zoom*(e.deltaY<0?1.1:.9)));dirty()},{passive:false});
+ svg.addEventListener("dblclick",()=>{I.zoom=1;I.px=I.py=0;I.userMoved=false;I.pin=null;dirty()});
  g3Draw(id)}
 function g3Scan(){document.querySelectorAll(".g3box:not([data-ok])").forEach(b=>{if(!b.hidden&&!b.closest("[hidden]"))g3Init(b)});
  const keep=new Set([...document.querySelectorAll(".g3box")].map(b=>b.id));Object.keys(G3.inst).forEach(id=>{if(!keep.has(id)){delete G3.inst[id];delete G3.cfg[id]}})}
 function g3Loop(now){requestAnimationFrame(g3Loop);Object.keys(G3.inst).forEach(id=>{const I=G3.inst[id],box=document.getElementById(id);if(!box||box.hidden||box.closest("[hidden]"))return;if(now-(I.drawn||0)<33)return;const dt=Math.min(.1,(now-I.last)/1000);I.last=now;
-  if(I.spin&&!I.drag){I.yaw+=dt*.45;I.dirty=true}if(I.run&&(G3M[G3.cfg[id].n]||[]).some(p=>p.anim)){I.t+=dt;I.dirty=true}
+  I.clock=(I.clock||0)+dt;const fo=G3.cfg[id].fx&&G3.cfg[id].fx();if(fo)I.dirty=true;if(I.spin&&!I.drag){I.yaw+=dt*.45;I.dirty=true}if(I.run&&!(fo&&fo.state==='trip')&&(G3M[G3.cfg[id].n]||[]).some(p=>p.anim)){I.t+=dt;I.dirty=true}
   const sel=I.pin||(G3.cfg[id].sel?G3.cfg[id].sel():null);if(sel!==I.lastSel){I.lastSel=sel;I.dirty=true}
   if(I.dirty||now-(I.lt||0)>1500){I.dirty=false;I.lt=now;I.drawn=now;g3Draw(id)}})}
 requestAnimationFrame(g3Loop);
@@ -4853,7 +4955,7 @@ function g3Mode(m){G3.mode=m;try{localStorage.setItem("akp_gmode",m)}catch(e){}
  document.querySelectorAll(".gfig").forEach(f=>{const b=f.querySelector(".g3box"),t=f.querySelector(".g2");if(b)b.hidden=m!=="3d";if(t)t.hidden=m==="3d";f.querySelectorAll(".gtog button").forEach(x=>x.classList.toggle("on",x.dataset.m===m))});g3Scan()}
 /* one switchable figure: svg2d is the existing drawing, o carries sel(), hl[], heat{}, tint(k) and click(k) for the 3D view */
 function gaFig(n,svg2d,o){const id="g3_"+(++G3.seq);G3.cfg[id]=Object.assign({n},o||{});const m=G3.mode;
- return `<div class="gfig"><div class="gtog" role="group" aria-label="Drawing view"><button data-m="2d" class="${m==="2d"?"on":""}" onclick="g3Mode('2d')">2D drawing</button><button data-m="3d" class="${m==="3d"?"on":""}" onclick="g3Mode('3d')">3D model</button></div><div class="g2" ${m==="3d"?"hidden":""}>${svg2d}</div><div class="g3box" id="${id}" ${m==="3d"?"":"hidden"}></div></div>`}
+ return `<div class="gfig"><div class="gtog" role="group" aria-label="Drawing view"><button data-m="2d" class="${m==="2d"?"on":""}" onclick="g3Mode('2d')">2D drawing</button><button data-m="3d" class="${m==="3d"?"on":""}" onclick="g3Mode('3d')">${(o&&o.lab3)||"3D model"}</button></div><div class="g2" ${m==="3d"?"hidden":""}>${svg2d}</div><div class="g3box" id="${id}" ${m==="3d"?"":"hidden"}></div></div>`}
 /* a small turning model for headers; a click opens the drawing */
 function g3Mini(n){const id="g3_"+(++G3.seq);G3.cfg[id]={n};return `<div class="g3box g3mini" id="${id}" data-mini="1" title="Open the equipment drawing"></div>`}
 /* =====================================================================================================
@@ -4865,7 +4967,7 @@ function g3Mini(n){const id="g3_"+(++G3.seq);G3.cfg[id]={n};return `<div class="
    Drawn on a canvas with a small software renderer; the models are the same solids as the equipment drawings.
    ===================================================================================================== */
 regMod("plant3d","1.0",["g3d"],"3D plant layout");
-const P3={built:false,cam:{yaw:-.62,pit:.6,dist:46,tx:0,ty:1.5,tz:0},to:null,sel:0,hover:0,pipe:null,orbit:true,labels:true,flow:true,motion:true,open:true,faces:[],units:{},pipes:[],t:0,dirty:true,cv:null,st:{},hit:[],pend:0,at:0,seq:0};
+const P3={built:false,cam:{yaw:-.62,pit:.6,dist:46,tx:0,ty:1.5,tz:0},to:null,sel:0,hover:0,pipe:null,orbit:true,labels:true,flow:true,motion:true,open:false,faces:[],units:{},pipes:[],t:0,dirty:true,cv:null,st:{},hit:[],pend:0,at:0,seq:0};
 const P3POS={1:[-16.5,-9],2:[-5.5,-9],3:[5.5,-9],4:[16.5,-9],5:[-16.5,9],6:[-5.5,9],7:[5.5,9],8:[16.5,9]};
 const P3SC={1:2.5,2:1.75,3:2.0,4:1.85,5:1.95,6:4.0,7:2.9,8:2.2};
 const P3SKY=[[233,240,248],[203,218,236]],P3GR=[214,220,228];
@@ -4950,7 +5052,7 @@ function p3Frame(now,tick){const cv=P3.cv;if(!cv||!cv.isConnected){P3.cv=null;re
  for(const e of list){const f=e.f,pts=e.pts||f.p,m=pts.length;let ok=true,mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;const xs=e.xs,ys=e.ys;xs.length=m;ys.length=m;
   for(let i=0;i<m;i++){if(!pq(pts[i])){ok=false;break}const X=Q[0],Y=Q[1];xs[i]=X;ys[i]=Y;if(X<mnx)mnx=X;if(X>mxx)mxx=X;if(Y<mny)mny=Y;if(Y>mxy)mxy=Y}
   e.skip=true;if(!ok||mxx<0||mnx>W||mxy<0||mny>H)continue;if(mxx-mnx<.7&&mxy-mny<.7)continue;e.skip=false;
-  const nrm=e.nrm,d1=Math.max(0,(nrm[0]*Ls[0]+nrm[1]*Ls[1]+nrm[2]*Ls[2])),hemi=nrm[1]*.5+.5,spec=Math.pow(Math.max(0,e.nx*Hv[0]+e.ny*Hv[1]+e.nz*Hv[2]),22)*(f.m||.18);let lum=.4+.5*d1+.14*hemi;
+  const nrm=e.nrm,d1=Math.max(0,(nrm[0]*Ls[0]+nrm[1]*Ls[1]+nrm[2]*Ls[2])),hemi=nrm[1]*.5+.5,spec=Math.pow(Math.max(0,e.nx*Hv[0]+e.ny*Hv[1]+e.nz*Hv[2]),22)*(f.m||.18);const rim=Math.pow(1-Math.abs(e.nz),3)*(f.sm?.15:.05),ao=.84+.16*(f.mid[1]>6?1:f.mid[1]/6);let lum=(.4+.5*d1+.14*hemi)*ao+rim;
   const u=f.u,s=u?st[u]:null;let tint=null,lift=0,col=f.c;
   if(f.light){col=P3STC[(s&&s.st)||"ok"];lum=1.1;if(s&&(s.st==="trip"||s.st==="alarm"))lum=.7+.5*Math.abs(Math.sin(t*5))}
   else if(s&&s.st==="trip")tint=[225,60,55,.5];else if(s&&(s.st==="alarm"||s.st==="upset"))tint=[240,170,40,.32];
@@ -4980,17 +5082,17 @@ function p3Frame(now,tick){const cv=P3.cv;if(!cv||!cv.isConnected){P3.cv=null;re
   el.style.display="";el.style.transform="translate("+(q[0]|0)+"px,"+(q[1]|0)+"px) translate(-50%,-100%)";el.style.opacity=foc&&foc!==s.n?.25:1;el.classList.toggle("sel",P3.sel===s.n);el.classList.toggle("full",cam.dist<30||P3.sel===s.n||P3.hover===s.n);el.style.zIndex=1000-Math.round(q[2]);
   if(base){ctx.strokeStyle="rgba(21,94,163,.55)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(base[0],base[1]);ctx.stroke()}});
  P3.frameMs=performance.now()-now}
-function p3State(){K.sets.forEach(s=>{let st="ok";try{st=ovState(s.n)}catch(e){}const u=pdmUnit(s.n),m=perfM(s.n);P3.st[s.n]={st,health:u.health,level:u.level,av:m.k.av,bd:m.k.bd};
+function p3State(){K.sets.forEach(s=>{let st="ok";try{st=P3.stateFn?P3.stateFn(s.n):ovState(s.n)}catch(e){}const u=pdmUnit(s.n),m=perfM(s.n);P3.st[s.n]={st,health:u.health,level:u.level,av:m.k.av,bd:m.k.bd};
   const el=P3.labs&&P3.labs[s.n];if(el){const T={ok:"Running",alarm:"Alarm",trip:"Trip",upset:"Upset"}[st];el.querySelector(".p3st").className="p3st "+st;el.querySelector(".p3st").textContent=T;el.querySelector("small").innerHTML=`Health <b>${u.health}</b> | ${m.k.av.toFixed(2)}% available`}});
  const el=document.getElementById("p3card");if(el&&P3.sel)el.innerHTML=p3Card(P3.sel);else if(el&&P3.pipe)el.innerHTML=p3PipeCard(P3.pipe)}
 /* ---------- interaction ---------- */
 function p3Fly(n,open){const u=P3.units[n];P3.orbit=false;P3.sel=n;P3.focus=n;P3.pipe=null;P3.pend=open?n:0;P3.to={tx:u.x,ty:u.top*.45,tz:u.z,dist:Math.max(13,u.r*5.2),yaw:P3.cam.yaw,pit:.42};p3Panel()}
 function p3Reset(){P3.sel=0;P3.focus=0;P3.pipe=null;P3.pend=0;P3.to={tx:0,ty:1.5,tz:0,dist:46,yaw:P3.cam.yaw,pit:.6};p3Panel()}
-function p3Select(n,fly){if(fly)return p3Fly(n,P3.open);P3.sel=n;P3.focus=0;P3.pipe=null;P3.pend=0;P3.orbit=false;const u=P3.units[n];P3.to={tx:u.x,ty:2,tz:u.z,dist:Math.max(28,P3.cam.dist*.7),yaw:P3.cam.yaw,pit:P3.cam.pit};p3Panel()}
+function p3Select(n,fly){if(P3.onPick){try{P3.onPick(n)}catch(e){}}if(fly)return p3Fly(n,P3.open);P3.sel=n;P3.focus=0;P3.pipe=null;P3.pend=0;P3.orbit=false;const u=P3.units[n];P3.to={tx:u.x,ty:2,tz:u.z,dist:Math.max(28,P3.cam.dist*.7),yaw:P3.cam.yaw,pit:P3.cam.pit};p3Panel()}
 function p3Card(n){const s=S(n),a=P3.st[n]||{st:"ok"},T={ok:"Running",alarm:"Alarm",trip:"Trip active",upset:"Upset from a supply loss"}[a.st];
  return `<div class="row between"><div><span class="tag acc">${esc(s.tag)}</span> <span class="p3st ${a.st}">${T}</span></div><button class="ghost g3x" onclick="p3Reset()" aria-label="Back to the whole plant">Whole plant</button></div><h3 style="margin:8px 0 2px">${esc(s.name)}</h3><div class="muted" style="font-size:12px;margin-bottom:8px">Area ${s.area}, ${esc(s.unit)}</div>
  <div class="p3m"><div><b>${a.health??"n/a"}</b><span>Health index</span></div><div><b>${a.av!=null?a.av.toFixed(2)+"%":"n/a"}</b><span>Availability</span></div><div><b>${a.bd??"n/a"}</b><span>Breakdowns</span></div><div><b>${(a.level||"").toUpperCase()}</b><span>Forecast risk</span></div></div>
- <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px"><button onclick="go('equipment',{set:${n},tab:'overview'})">Open equipment set</button><button class="ghost" onclick="ovTrip(${n});p3State()">${typeof ovState_==="function"&&ovState_(n)?"Clear trip":"Simulate trip"}</button><button class="ghost" onclick="go('equipment',{set:${n},tab:'ga'})">Drawing and 3D</button></div>`}
+ <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px"><button onclick="go('equipment',{set:${n},tab:'overview'})">Open equipment set</button>${P3.stateFn?"":`<button class="ghost" onclick="ovTrip(${n});p3State()">${typeof ovState_==="function"&&ovState_(n)?"Clear trip":"Simulate trip"}</button>`}<button class="ghost" onclick="go('equipment',{set:${n},tab:'ga'})">Drawing and 3D</button></div>`}
 function p3PipeCard(id){const r=P3.routes.find(x=>x.id===id);if(!r)return"";const base=r.base?P3.routes.find(x=>x.id===r.base):r,src=base.from?S(base.from).tag:"Header or tank",dst=base.to.map(t=>S(t).tag).join(", ");
  return `<div class="row between"><span class="tag" style="border-color:${(SVC[r.svc]||SVC.proc)[1]};color:${(SVC[r.svc]||SVC.proc)[1]}">${(SVC[r.svc]||SVC.proc)[0]}</span><button class="ghost g3x" onclick="p3Reset()">Close</button></div><h3 style="margin:8px 0 4px">${esc(r.lab)}</h3><p class="muted" style="font-size:12.5px;margin:0">From <b>${esc(src)}</b> to <b>${esc(dst)}</b>. Stream links are taken from the battery limit notes on the P&amp;IDs; routing in the rack is schematic.</p>`}
 function p3Panel(){const el=document.getElementById("p3card");if(!el)return;el.style.display=(P3.sel||P3.pipe)?"":"none";el.innerHTML=P3.sel?p3Card(P3.sel):P3.pipe?p3PipeCard(P3.pipe):"";
@@ -5020,10 +5122,31 @@ function p3Init(root){if(root.dataset.ok)return;root.dataset.ok="1";p3Build();co
  const id=P3.loop=(P3.loop||0)+1,tick=now=>{if(id!==P3.loop)return;p3Frame(now,tick)};requestAnimationFrame(tick);p3Panel()}
 function p3Scan(){const r=document.getElementById("p3");if(r&&!r.dataset.ok)p3Init(r)}
 {let tm=null;new MutationObserver(()=>{if(!tm)tm=setTimeout(()=>{tm=null;p3Scan()},40)}).observe(document.body,{childList:true,subtree:true})}
-function p3Hero(){return `<div class="card p3" id="p3" style="padding:0;overflow:hidden;margin-top:12px"><div class="p3head"><div><h2 style="margin:0">Plant in 3D</h2><div class="muted" style="font-size:12.5px;margin-top:2px">All eight units as laid out on the plot plan, joined by their process, gas, water, nitrogen and steam lines. Drag to look around. Select a unit to fly to it and open its equipment set.</div></div>
-  <div class="p3tools"><label><input type="checkbox" id="p3o" ${P3.orbit?"checked":""} onchange="P3.orbit=this.checked">Slow turn</label><label><input type="checkbox" ${P3.labels?"checked":""} onchange="P3.labels=this.checked">Labels</label><label><input type="checkbox" ${P3.flow?"checked":""} onchange="P3.flow=this.checked">Flow</label><label><input type="checkbox" ${P3.motion?"checked":""} onchange="P3.motion=this.checked">Moving parts</label><label title="After the camera arrives, open the equipment set"><input type="checkbox" ${P3.open?"checked":""} onchange="P3.open=this.checked">Open set on arrival</label><button class="ghost" onclick="p3Reset()">Whole plant</button></div></div>
+function p3Hero(opt){opt=opt||{};P3.stateFn=opt.fn||null;P3.onPick=opt.pick||null;P3.embed=!!opt.embed;return `<div class="card p3" id="p3" style="padding:0;overflow:hidden;margin-top:${opt.embed?0:12}px"><div class="p3head"><div>${opt.embed?`<h3 style="margin:0">Plant in 3D</h3>`:`<h2 style="margin:0">Plant in 3D</h2><div class="muted" style="font-size:12.5px;margin-top:2px">All eight units as laid out on the plot plan, joined by their process, gas, water, nitrogen and steam lines. Drag to look around. Select a unit to fly to it and see its figures, then open its equipment set from the card.</div>`}</div>
+  <div class="p3tools"><label><input type="checkbox" id="p3o" ${P3.orbit?"checked":""} onchange="P3.orbit=this.checked">Slow turn</label><label><input type="checkbox" ${P3.labels?"checked":""} onchange="P3.labels=this.checked">Labels</label><label><input type="checkbox" ${P3.flow?"checked":""} onchange="P3.flow=this.checked">Flow</label><label><input type="checkbox" ${P3.motion?"checked":""} onchange="P3.motion=this.checked">Moving parts</label><label title="After the camera arrives, open the equipment set without asking"><input type="checkbox" ${P3.open?"checked":""} onchange="P3.open=this.checked">Open set automatically</label><button class="ghost" onclick="p3Reset()">Whole plant</button></div></div>
   <div class="p3chips" role="group" aria-label="Units">${K.sets.map(s=>`<button class="ghost" data-n="${s.n}">${esc(s.tag)}</button>`).join("")}</div>
-  <div class="p3stage"><canvas aria-label="Interactive 3D model of the plant. Use the unit buttons above to move to a unit." style="width:100%;height:100%;display:block;touch-action:none;cursor:grab"></canvas><div class="p3labs"></div><div class="p3card" id="p3card" style="display:none"></div><div class="p3key"><span><i style="background:#1a7f37"></i>Running</span><span><i style="background:#f0aa28"></i>Alarm or upset</span><span><i style="background:#e13c37"></i>Trip</span>${Object.entries(SVC).filter(e=>e[0]!=="sig").map(e=>`<span><u style="background:${e[1][1]}"></u>${e[1][0]}</span>`).join("")}</div></div><div id="p3live" class="sr" aria-live="polite"></div></div>`}
+  <div class="p3stage" style="height:${opt.h||620}px"><canvas aria-label="Interactive 3D model of the plant. Use the unit buttons above to move to a unit." style="width:100%;height:100%;display:block;touch-action:none;cursor:grab"></canvas><div class="p3labs"></div><div class="p3card" id="p3card" style="display:none"></div><div class="p3key"><span><i style="background:#1a7f37"></i>Running</span><span><i style="background:#f0aa28"></i>Alarm or upset</span><span><i style="background:#e13c37"></i>Trip</span>${Object.entries(SVC).filter(e=>e[0]!=="sig").map(e=>`<span><u style="background:${e[1][1]}"></u>${e[1][0]}</span>`).join("")}</div></div><div id="p3live" class="sr" aria-live="polite"></div></div>`}
+/* =====================================================================================================
+   3D VIEWS FOR THE SIMULATIONS
+   The OPL and work order scenarios, the failure view of a work order, the plant chain reaction and the plant replay each get a 3D view
+   next to the P&ID. The 3D model shows the same phase: a failing part pulses, the machine shakes and stops when it trips, steam and
+   sparks rise from the fault, and the banner says what is happening. The choice (P&ID or 3D) is remembered.
+   ===================================================================================================== */
+regMod("sim3d","1.0",["g3d","plant3d"],"3D views for simulations");
+const SIM3={mode:(()=>{try{return localStorage.getItem("akp_sim3")||"pid"}catch(e){return"pid"}})()};
+function simSw(m){SIM3.mode=m;try{localStorage.setItem("akp_sim3",m)}catch(e){}
+ document.querySelectorAll(".simwrap").forEach(w=>{w.querySelectorAll(":scope>.simpid").forEach(x=>x.hidden=m!=="pid");w.querySelectorAll(":scope>.sim3").forEach(x=>x.hidden=m!=="3d");w.querySelectorAll(":scope>.gtog button").forEach(b=>b.classList.toggle("on",b.dataset.m===m))});g3Scan();p3Scan()}
+const simTog=m=>`<div class="gtog" role="group" aria-label="Simulation view"><button data-m="pid" class="${m==="pid"?"on":""}" onclick="simSw('pid')">P&amp;ID</button><button data-m="3d" class="${m==="3d"?"on":""}" onclick="simSw('3d')">3D simulation</button></div>`;
+function simFig(n,pid,o){const id="g3_"+(++G3.seq);G3.cfg[id]=Object.assign({n},o||{});const m=SIM3.mode;
+ return `<div class="simwrap">${simTog(m)}<div class="simpid" ${m==="pid"?"":"hidden"}>${pid}</div><div class="sim3" ${m==="3d"?"":"hidden"}><div class="g3box" id="${id}"></div></div></div>`}
+function simPlant(pid,o){const m=SIM3.mode;return `<div class="simwrap">${simTog(m)}<div class="simpid" ${m==="pid"?"":"hidden"}>${pid}</div><div class="sim3" ${m==="3d"?"":"hidden"}>${p3Hero(Object.assign({embed:true,h:540},o||{}))}</div></div>`}
+/* phase of an OPL or work order scenario */
+function scnFx(n){const u=SCN.u,sc=u&&u.cur;if(!sc)return null;const ph=sc.phases[u.t]||sc.phases[0],state=ph.trip.length?"trip":ph.alarm.length?"alarm":"normal";
+ if(!sc._hot){const pr={n:sc.set,prob:(sc.title||"")+" "+(sc.sub||""),root:sc.phases.map(p=>p.text||"").join(" "),act:"",parts:""};try{sc._hot=mhParts(pr)}catch(e){sc._hot=[]}}
+ return{state,hot:state==="normal"?[]:sc._hot.slice(0,2),text:`<b>${esc(ph.label)}</b>. ${esc((ph.text||"").slice(0,170))}`}}
+/* live failure view of a work order */
+function mhFx(r){const L=typeof MHM!=="undefined"?MHM.lv:null;if(!L||r.bd!=="Yes")return{state:"normal",hot:[],text:esc((r.prob||"").slice(0,120))};
+ const st=gState(L.m,L.h[L.h.length-1]);return{state:L.tripped?"trip":st==="warn"?"alarm":"normal",hot:mhParts(r).slice(0,2),text:L.tripped?`<b>Tripped.</b> ${esc((r.prob||"").slice(0,120))}`:st==="warn"?`<b>Condition rising.</b> ${esc((r.prob||"").slice(0,100))}`:`<b>Running normally.</b> The failure sequence starts in a moment.`}}
 /* =====================================================================================================
    INDONESIAN SUPPORT
    1. Questions written in Bahasa Indonesia are translated word by word into the English terms the records use before the

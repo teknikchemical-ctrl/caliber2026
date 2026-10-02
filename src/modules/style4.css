@@ -213,3 +213,15 @@ aside{overflow-y:auto}
 .p3key i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.p3key u{display:inline-block;width:16px;height:4px;border-radius:2px;margin-right:5px;vertical-align:middle}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:700px){.p3stage{height:480px}.p3card{top:auto;bottom:56px;right:8px;left:8px;width:auto}.p3key{display:none}}
+.g3fxb{position:absolute;left:10px;top:10px;max-width:56%;background:rgba(255,255,255,.93);border:1px solid #d5deea;border-radius:10px;padding:6px 10px;font-size:12.5px;line-height:1.45;box-shadow:0 4px 14px rgba(20,40,70,.12);z-index:2}.g3fxb:empty{display:none}
+.simwrap>.gtog{margin:2px 6px 8px}.simwrap .p3stage{border-top:1px solid #d5deea}.sim3 .g3box{margin:0 6px 6px}
+/* P&ID valves and liquid */
+.vb{cursor:pointer}.vb rect{fill:#e8f6ee;stroke:#1a7f4b;stroke-width:1}.vb text{font:700 8px system-ui,sans-serif;fill:#1a7f4b;pointer-events:none}
+.vb.bad rect{fill:#fdeaea;stroke:#c62828}.vb.bad text{fill:#c62828}.vb.warn rect{fill:#fff4e0;stroke:#c77700}.vb.warn text{fill:#c77700}
+.vb:hover rect{filter:drop-shadow(0 0 3px rgba(0,0,0,.35))}
+.pdn.vclosed{animation:none}.pipe.vdead{stroke-dasharray:3 4;opacity:.55}
+.pdn.vmove{animation:vmv .7s ease}@keyframes vmv{0%{filter:drop-shadow(0 0 0 #2f81f7)}40%{filter:drop-shadow(0 0 6px #2f81f7)}100%{filter:none}}
+.vliq .vw{fill:#4aa3df;opacity:.38}.vliq .vlv{transition:transform .6s ease}.vliq .vlv path{animation:vwave 3.2s linear infinite}
+@keyframes vwave{from{transform:translateX(0)}to{transform:translateX(-40px)}}
+.vpanel{border:1px solid var(--line,#d9dee5);border-radius:10px;padding:10px;margin-bottom:12px;background:#fafbfd}
+.pdn:hover{filter:drop-shadow(0 0 3px rgba(47,129,247,.45))}

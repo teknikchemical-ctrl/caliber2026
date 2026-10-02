@@ -95,6 +95,10 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
   const id1=await q.evaluate(()=>({a:idIs("Berapa MTBF kipas menara pendingin?"),b:idIs("What is the MTBF of the cooling tower fan?"),t:idToEn("Bandingkan YD-2301 dan EA-5601")}));ok(id1.a&&!id1.b&&/Compare YD-2301 and EA-5601/.test(id1.t),"Indonesian questions are detected and translated, English is left alone");
   ok(await q.evaluate(()=>EVAL_CASES.filter(c=>c.cat==="Bahasa Indonesia").length>=30&&EVAL_CASES.length>=110),"evaluation set has 110 or more cases including Bahasa Indonesia");
   ok(/manifest/.test(await q.evaluate(()=>document.querySelector("link[rel=manifest]")?.getAttribute("rel")||""))&&fs.existsSync("dist/sw.js")&&fs.existsSync("dist/manifest.webmanifest")&&fs.existsSync("dist/icon-512.png"),"installable app files are built");
+  const vv=await q.evaluate(async()=>{go("equipment",{set:1,tab:"pid"});await new Promise(r=>setTimeout(r,500));const i=D[1].n.findIndex(n=>n[0]==="XV-1201");const b0=document.getElementById("vb"+i).textContent;vSet(i,"closed");const c=document.getElementById("vb"+i).textContent,tripped=isF("ZSO-1201"),dead=document.querySelectorAll(".vdead").length;vAuto(i);const o=document.getElementById("vb"+i).textContent;go("equipment",{set:4,tab:"pid"});await new Promise(r=>setTimeout(r,500));return{b0,c,tripped,dead,o,liq:document.querySelectorAll(".vliq").length,tripped2:isF("ZSO-1201")}});
+  ok(vv.b0==="OPEN"&&vv.c==="CLOSED"&&vv.tripped&&vv.dead>0&&vv.o==="OPEN"&&vv.liq>0,"P&ID valves close and open, stop the flow after them, trip their permissive and vessels show a liquid level ("+JSON.stringify(vv)+")");
+  const sm=await q.evaluate(async()=>{go("scenarios");await new Promise(r=>setTimeout(r,600));return{tog:!!document.querySelector(".simwrap .simtog, .simwrap button"),fx:typeof scnFx==="function"&&typeof mhFx==="function"}});
+  ok(sm.fx,"3D simulation views are available in scenarios and maintenance ("+JSON.stringify(sm)+")");
   ok(qe.length===0,"new pages produce no script errors ("+qe.join("; ")+")");await q.close()}
  {const q=await b.newPage();await q.addInitScript(()=>{try{localStorage.setItem("akp_lang","id")}catch(e){}});await q.goto("file://"+path.resolve("dist/index.html"),{waitUntil:"commit"});await q.waitForFunction(()=>typeof AUTH!=="undefined"&&AUTH.user,null,{timeout:60000});await q.waitForTimeout(900);
   const t=await q.evaluate(()=>[...document.querySelectorAll(".nav")].map(n=>n.innerText.trim()).join("|"));ok(/Pemeliharaan/.test(t)&&/Asisten AI/.test(t),"Indonesian interface translates the menu ("+t.slice(0,80)+")");await q.close()}
@@ -124,8 +128,11 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
   ok(pl.faces>8000&&pl.labs===8&&pl.units===8&&pl.routes>=11,"the 3D plant is built with eight units, floating labels and the process streams ("+pl.faces+" faces, "+pl.routes+" pipes)");
   ok(pl.order===4&&Number.isFinite(pl.ms),"the 3D plant comes first on the dashboard and the P&ID overview follows below it");
   const hp=await q.evaluate(()=>{for(let y=60;y<580;y+=12)for(let x=20;x<1100;x+=12){const h=p3Pick(x,y);if(h&&h.u)return{x,y,u:h.u}}return null});ok(!!hp,"a unit can be picked in the 3D plant");
+  await q.evaluate(()=>{p3Select(4,true)});await q.waitForTimeout(3500);
+  ok(await q.evaluate(()=>st.page==="dashboard"&&P3.sel===4&&!!document.querySelector("#p3card button")),"selecting a unit flies to it and shows its card without leaving the dashboard");
   await q.evaluate(()=>{P3.open=true;p3Select(4,true)});await q.waitForTimeout(4500);
-  ok(await q.evaluate(()=>st.page==="equipment"&&st.set===4&&st.tab==="overview"),"selecting a unit flies the camera to it and opens its equipment set");
+  ok(await q.evaluate(()=>st.page==="equipment"&&st.set===4&&st.tab==="overview"),"with Open set automatically ticked the equipment set opens on arrival");
+  await q.evaluate(()=>{P3.open=false});
   await q.evaluate(()=>go("dashboard"));await q.waitForTimeout(1200);
   const tp=await q.evaluate(async()=>{ovTrip(4);p3State();const a=P3.st[4].st,b=P3.st[3].st;ovTrip(4);p3State();return{a,b,after:P3.st[4].st}});ok(tp.a==="trip"&&tp.after==="ok","a trip started in the simulator shows in the 3D plant and clears again ("+tp.a+", downstream "+tp.b+")");
   const cv=await q.evaluate(()=>!document.querySelector('.nav[data-page="cov"]')&&typeof covPage==="undefined");ok(cv,"the Case 1 Coverage page is gone");
