@@ -225,3 +225,4 @@ aside{overflow-y:auto}
 @keyframes vwave{from{transform:translateX(0)}to{transform:translateX(-40px)}}
 .vpanel{border:1px solid var(--line,#d9dee5);border-radius:10px;padding:10px;margin-bottom:12px;background:#fafbfd}
 .pdn:hover{filter:drop-shadow(0 0 3px rgba(47,129,247,.45))}
+#rpmap svg{max-height:680px;width:100%;height:auto}

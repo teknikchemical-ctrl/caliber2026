@@ -979,7 +979,7 @@ function simBody(){
    <div class="sctl"><div class="clock" id="simClk">${tfmt(S.t)}<small>simulated time · ${S.ts>=3600?"≈"+F(S.ts/3600,S.ts>=36000?0:1)+" h":S.ts>=60?F(S.ts/60,0)+" min":S.ts+" s"} per second at 1×</small></div>
     <div class="row"><button id="simRun" onclick="oplRun()">${S.out?"Repeat":S.run?"Pause":"Run"}</button><button class="ghost" onclick="oplReset()">Reset</button></div>
     <div class="row spd">${[1,4,16].map(k=>`<button class="ghost ${S.spd===k?"on":""}" onclick="oplSpd(${k})">${k}×</button>`).join("")}<label class="muted" style="font-size:12px;display:flex;gap:5px;align-items:center;margin-left:6px"><input type="checkbox" ${S.hint?"checked":""} onchange="SIMH(this.checked)">Show guidance</label></div></div></div>
-  <div class="smain"><div class="sfig" id="simFig"></div><div class="sside"><div id="simBan"></div><div class="fpl" id="simVals"></div><div class="ilp" id="simIL"></div></div></div>
+  <div class="smain">${typeof oplFig==="function"?oplFig(S):`<div class="sfig" id="simFig"></div>`}<div class="sside"><div id="simBan"></div><div class="fpl" id="simVals"></div><div class="ilp" id="simIL"></div></div></div>
   <div class="slow"><div class="sacts" id="simActs">${actsHTML()}</div><div class="strend" id="simTrend"></div></div>
   <div class="sbot"><div class="sstep" id="simSteps">${stepsHTML()}</div><div class="slog" id="simLog"></div></div>`;
 }
@@ -1071,7 +1071,7 @@ window.oplAct=(g,i)=>{
   repaintStatic();
 };
 window.OPLH.fb=(c,m)=>SIM&&fb(c,m);
-window.OPLT={tick,simInit,sim:()=>SIM,paint,figHTML,valsHTML,trendHTML,actsHTML};
+window.OPLT={vs,tick,simInit,sim:()=>SIM,paint,figHTML,valsHTML,trendHTML,actsHTML};
 
 /* render hook */
 const _render=window.render;

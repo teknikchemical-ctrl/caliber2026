@@ -19,3 +19,11 @@ function scnFx(n){const u=SCN.u,sc=u&&u.cur;if(!sc)return null;const ph=sc.phase
 /* live failure view of a work order */
 function mhFx(r){const L=typeof MHM!=="undefined"?MHM.lv:null;if(!L||r.bd!=="Yes")return{state:"normal",hot:[],text:esc((r.prob||"").slice(0,120))};
  const st=gState(L.m,L.h[L.h.length-1]);return{state:L.tripped?"trip":st==="warn"?"alarm":"normal",hot:mhParts(r).slice(0,2),text:L.tripped?`<b>Tripped.</b> ${esc((r.prob||"").slice(0,120))}`:st==="warn"?`<b>Condition rising.</b> ${esc((r.prob||"").slice(0,100))}`:`<b>Running normally.</b> The failure sequence starts in a moment.`}}
+
+/* the OPL simulator: the live 2D figure and a 3D view of the same equipment, switched from the same control */
+function oplFx(){const S=SIMX.S();if(!S)return null;let st="normal";try{if(S.trip)st="trip";else if(S.E.V.some(d=>OPLT.vs(S,d)!=="ok"))st="alarm"}catch(e){}
+ if(!S._hot){const pr={n:S.n,prob:(S.s.d||"")+" "+(S.o.obj||""),root:"",act:"",parts:""};try{S._hot=mhParts(pr)}catch(e){S._hot=[]}}
+ const stt=S.trip?"Tripped on "+S.trip.tag:st==="alarm"?"Alarm: a process value is outside its normal range":"Operating normally";
+ return{state:st,hot:st==="normal"?[]:S._hot.slice(0,2),text:`<b>${esc(stt)}</b>`}}
+function oplFig(S){const id="g3_opl";G3.cfg[id]={n:S.n,fx:oplFx};const m=SIM3.mode;
+ return `<div class="simwrap sfigw">${simTog(m)}<div class="sfig simpid" id="simFig" ${m==="pid"?"":"hidden"}></div><div class="sim3" ${m==="3d"?"":"hidden"}><div class="g3box" id="${id}"></div></div></div>`}
