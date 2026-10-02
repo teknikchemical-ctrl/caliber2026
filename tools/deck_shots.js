@@ -17,6 +17,7 @@ await p.evaluate(()=>hse3Go('source'));await p.waitForTimeout(1800);await p.scre
 await shot('hazard2d',()=>{HSE.view='2d';HSE.t=50;render()},1500);
 await shot('predict',()=>{PD2.tab='next';PDM.sel=1;go('mnt');MHS.view='pdm';render()},1800);
 await p.evaluate(()=>{const e=[...document.querySelectorAll('h3')].find(h=>/Reliability analysis/.test(h.textContent));e&&e.scrollIntoView()});await p.waitForTimeout(300);await p.screenshot({path:path.join(out,'predict.png')});
+await shot('ready',()=>{P.set=1;LIVE.f[FK('PSLL-1201')]=true;go('equipment',{set:1,tab:'ready'})},1400);await p.evaluate(()=>{delete LIVE.f[FK('PSLL-1201')]});
 await shot('studio',()=>{go('ks')},1200);
 await shot('il',()=>{go('il')},1200);
 await shot('perf',()=>{go('perf')},1500);
