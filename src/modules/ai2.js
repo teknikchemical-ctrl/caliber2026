@@ -23,3 +23,10 @@ AI.tools.failure_modes={description:"Failure modes of the plant or one equipment
   if(/\b(gas cloud|vapou?r cloud|flammable cloud|jet fire|pool fire|loss of containment|lfl|lower flammable|blast|explosion|toxic release|hazard simulat|dispersion)\b/.test(l)||/\b(leak|release|rupture)\b.*\b(distance|reach|spread|how far|zone|cloud)\b/.test(l)){const sc=/jet/.test(l)?"jet":/pool/.test(l)?"pool":"cloud",hm=/\b(10|25|50|100)\s*mm\b/.exec(l),wm=/(\d+(?:\.\d+)?)\s*m\/s/.exec(l);return["hazard_effects",{set:sets.length&&hseKey(sets[0].n)?sets[0].n:(hseKey(set)?set:0),scenario:sc,hole:hm?+hm[1]:50,wind:wm?+wm[1]:0,esd:/shutdown (fails|failed)|esd fails/.test(l)?"fail":/manual/.test(l)?"manual":"auto"}]}
   if(/\b(failure modes?|fmea|rpn|risk priority|most common failure|what usually fails|what fails most|how do(es)? .* fail)\b/.test(l))return["failure_modes",{set:sets.length?set:0}];
   return _r.apply(this,arguments)}}
+
+/* an answer that touches equipment with an open conflict in the source documents says so */
+{const _m=aiMsgHtml;aiMsgHtml=function(id,m,i){const h=_m.apply(this,arguments);if(!m||m.role==="u"||m.live||!m.text)return h;
+  const tags=new Set((String(m.text).replace(/<[^>]+>/g," ").match(/\b[A-Z]{1,5}-?\d{3,5}[A-Z]?\b/g)||[]));(m.sources||[]).forEach(s=>{if(s.set&&S(s.set))tags.add(S(s.set).tag)});
+  const hits=K.issues.filter(x=>/High|Medium/i.test(x.severity||"")&&[...tags].some(t=>(x.issue+" "+x.source+" "+x.suggested_action).includes(t)));
+  if(!hits.length)return h;const note=`<div class="note-warn" style="margin-top:6px"><b>Open document conflict.</b> ${esc(String(hits[0].issue).slice(0,150))}${hits.length>1?` (and ${hits.length-1} more)`:""}. Check the field before acting. <a class="alink" onclick="go('quality')">Open the register</a></div>`;
+  let r=h.replace(/<div id="why-[^"]*"><\/div>/,x=>note+x);if(r===h)r=h.replace(/<div class="src">/,note+'<div class="src">');if(r===h)r=h.replace(/<\/div>$/,note+"</div>");return r}}

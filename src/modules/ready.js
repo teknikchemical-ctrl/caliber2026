@@ -34,8 +34,8 @@ function rdyChecks(n){const s=S(n),il=KIL[n],asof=pdmAsof(),items=[],add=(group,
  /* 5 earlier start-up problems from the work orders */
  MH.filter(r=>r.n===n&&r.t1<=asof&&/start|restart|trip|permissive|prim|cavitat|dry run|airlock/i.test([r.prob,r.root].join(" "))).sort((a,b)=>b.t1-a.t1).slice(0,3).forEach(r=>add("Seen before",`${r.prob}`,"info",`${dstr(r.t1)}. Cause: ${r.root}. What fixed it: ${r.act}.`,{wo:r.wo}));
  /* 6 conflicts in the source documents */
- const iss=K.issues.filter(i=>JSON.stringify(i).includes(s.tag)&&!/^Info/i.test(i.sev||""));
- add("Document conflicts",iss.length?`${iss.length} open conflict${iss.length===1?"":"s"} touch ${s.tag}`:`No open conflict touches ${s.tag}`,iss.length?"warn":"ok",iss.length?"Check the field before relying on these drawings: "+iss.slice(0,2).map(i=>(i.issue||i.title||i.detail||"").toString().slice(0,90)).join(" | "):"",{});
+ const iss=K.issues.filter(i=>JSON.stringify(i).includes(s.tag)&&/High|Medium/i.test(i.severity||""));
+ add("Document conflicts",iss.length?`${iss.length} open conflict${iss.length===1?"":"s"} touch ${s.tag}`:`No open conflict touches ${s.tag}`,iss.length?"warn":"ok",iss.length?"Check the field before relying on these drawings: "+iss.slice(0,2).map(i=>(i.issue||"").toString().slice(0,90)).join(" | "):"",{});
  /* 7 manual checks taken from the lessons' safety notes */
  const o0=K.opl.find(o=>o.set===n&&o.safety&&o.safety.length);if(o0)(o0.safety||[]).slice(1,5).forEach((t,i)=>{const k=n+"|m"+i+"|"+ROLE.user,ok=!!RDY.man[k];add("Field checks",t.replace(/\.$/,""),ok?"ok":"warn",ok?"Confirmed.":"Confirm on site.",{man:k,ok})});
  if(hseKey(n)){const k=n+"|haz|"+ROLE.user,ok=!!RDY.man[k];add("Field checks",`Flammable service (${S(n).fluid}): gas detectors healthy and fire monitors clear`,ok?"ok":"warn",ok?"Confirmed.":"Confirm on site.",{man:k,ok})}

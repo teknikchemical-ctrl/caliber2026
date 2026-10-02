@@ -1,5 +1,5 @@
 """Builds the CALIBER 2026 pitch deck: 7 required slides plus appendix. Run: python3 deck/make_deck.py"""
-import os, sys
+import os, sys, re
 sys.path.insert(0, os.path.dirname(__file__))
 from lib import *
 from pptx.chart.data import CategoryChartData
@@ -10,7 +10,7 @@ IMG = lambda n: os.path.join(HERE, "jpg", n + ".jpg")
 OUT = os.path.join(HERE, "CALIBER2026_Asset_Knowledge_Platform_Deck.pptx")
 
 # ------------------------------------------------------------------ numbers (data from the prototype; assumptions flagged)
-D = dict(docs=98, chunks=407, issues=48, wo=211, bd=31, dt=434, cost=537.8, corr=440.4, corr_share=82, years=1.52, mttr=14.0,
+D = dict(docs=98, chunks=1109, issues=48, wo=211, bd=31, dt=434, cost=537.8, corr=440.4, corr_share=82, years=1.52, mttr=14.0,
          bd_yr=20.4, corr_yr=290.2, found=17, bad=63, rep=8, cm_follow=55, opl=56, steps=280, ts=168, inst=84, il=8, tools=20, evals=128, faces=20916, bt=64)
 A = dict(users=45, search_min=40, days=230, rate=175000, down_h=30.0, onboard=60.0, one_off=1400.0, run=370.0)
 def case(save, mttr_cut, onboard):
@@ -183,7 +183,7 @@ for i, (n, l) in enumerate(tiles):
     x = 7.4 + i * 1.37
     box(s, x, 4.45, 1.3, 0.92, WHITE, MID, [[(n, {"bold": True, "size": 12, "color": NAVY})], [(l, {"size": 8.5, "color": GRAY})]], 9, False, INK, "c", radius=0.08)
 text(s, 7.4, 5.4, 5.45, 1.6, [[("Sensitivity.  ", {"bold": True, "color": NAVY}), f"Low case (half the time saved, half the repair gain): a net loss of IDR {abs(net3(LOW[3]))/1000:.1f} B over 3 years and no payback. High case: payback in {PH:.0f} months."],
-                               [("Assumptions are on slide A8.  ", {"bold": True, "color": NAVY}), f"{A['users']} users, {A['search_min']} min a day looking for information today, IDR {A['rate']:,.0f} per hour, IDR {A['down_h']:.0f} M per downtime hour. Each extra unit costs about IDR 350 M to onboard, so the case improves with scale."],
+                               [("Assumptions are in appendix A9.  ", {"bold": True, "color": NAVY}), f"{A['users']} users, {A['search_min']} min a day looking for information today, IDR {A['rate']:,.0f} per hour, IDR {A['down_h']:.0f} M per downtime hour. Each extra unit costs about IDR 350 M to onboard, so the case improves with scale."],
                                [("Not counted:  ", {"bold": True, "color": NAVY}), "avoided incidents, spare-part savings and knowledge that would otherwise leave with retirees."]], 9, False, INK, space=3)
 notes(s, "Business impact. The left table lists the KPIs with a baseline from the case data wherever one exists, a 12 month target and how each is measured. The chart shows three monetised levers: less time searching, faster fault finding, and shorter ramp-up for new engineers. Costs are one-off IDR 1.4 billion and IDR 370 million a year. Base case pays back in about 21 months. In the low case it does not pay back inside three years, and we say so. The prototype's own risk score ranks units only slightly better than chance, so it stays advisory.")
 
@@ -264,8 +264,11 @@ text(s, 0.5, 5.3, 12, 0.5, "Replace the bracketed fields with the real team deta
 notes(s, "Team. Fill in names, majors, semesters, expertise and contributions as required by the booklet table.")
 
 # ================================================================== appendix
+AN = [0]
 def app_slide(n, title, kicker="Appendix"):
-    s = blank(prs); header(s, n, title, kicker); return s
+    AN[0] += 1
+    title = re.sub(r"^A\d+\s+", "", title)
+    s = blank(prs); header(s, len(prs.slides), f"A{AN[0]}  {title}", kicker); return s
 
 # A1 assistant detail
 s = app_slide(8, "A1  How the AI assistant works, step by step")
@@ -298,6 +301,18 @@ arrow(s, 7.58, 2.12, 8.02, 2.2, BLUE, 1.6)
 arrow(s, 4.82, 3.66, 4.38, 5.0, BLUE, 1.6, True, True)
 text(s, 0.5, 6.0, 12.3, 0.9, [[("Guardrails.  ", {"bold": True, "color": NAVY}), "Retrieved text is treated as data, never as instructions. The model can only call tools on a fixed list. Requests to bypass an interlock are refused. A question outside the plant data is declined. Users can mark an answer wrong and it goes to a reviewer."],
                           [("Human in the loop.  ", {"bold": True, "color": NAVY}), "New knowledge from users or AI extraction is held for approval by an engineer or manager before the assistant may cite it."]], 10.5, False, INK, space=5)
+
+# A2 domain relevance
+s = app_slide(9, "A2  Chemical domain relevance in this unit")
+rows = [["Process reality in the LLDPE unit", "What the hub does", "Where"],
+        ["Hexane feed pump at 16 barg, 80 C: seal leak is a fire and release risk", "A seal work order brings up the API Plan 11 flush lesson (OPL-GA-1201A-01) and the PDI-1201 permissive; the hazard simulator sizes the cloud", "Assistant, lessons, HSE"],
+        ["Start-up needs seal flush, open suction and min-flow valves before the pump may run", "Start-up readiness reads each permissive against the live model and blocks on a latched trip or a closed valve", "Start-up readiness"],
+        ["Catalyst reduction reactor with hydrogen and a high-temperature trip (TSHH-3401, 230 C)", "Interlock library shows cause, effect and vote; the simulator lets an operator see the consequence of a bypass and refuses to advise one", "Interlock library, simulator"],
+        ["Recycle gas compressor: anti-surge valve FV-4502 opens on low flow", "Chain-reaction view shows which units trip next and for how long; failure memory lists earlier surge events", "Scenarios, failure memory"],
+        ["Seal and gasket leaks are the biggest failure mode (12 jobs, 14% found early)", "Ranked by risk priority, with a lesson drafted from the work orders when none exists", "Predictive, Studio"],
+        ["Drawings disagree (valve fail position, tag names, nozzle sizes)", "Conflict register with owner; assistant warns when an answer touches a conflict", "Data quality, assistant"],
+        ["Flammable service next to a control room and muster points", "Gas cloud, jet fire, pool fire and blast on the true-scale plot plan, detectors and the safer walk to muster", "Plot plan hazard simulator"]]
+table(s, 0.5, 1.4, 12.33, [4.2, 6.0, 2.1], rows, 10, rowh=0.62)
 
 # A2 data sources
 s = app_slide(9, "A2  Data sources, purpose and why each one is worth connecting")
