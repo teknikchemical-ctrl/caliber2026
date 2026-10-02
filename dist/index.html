@@ -3272,7 +3272,7 @@ function ovStart(){clearInterval(OV.timer);if(!$("#ovsvg"))return;ovUpd();OV.tim
    Vessels show a liquid level that moves with the level instrument.
    ===================================================================================================== */
 regMod("pidv","1.0",[],"P&ID valves, levels and flow");
-const VLV={};
+const VLV={};let VCN=0;
 const vIs=n=>{const t=String(n[0]),k=n[1];return(k==="a"&&!/^(PT|TT|FT|LT|PDT|FIT|VT|ST)-/.test(t))||(k==="x"&&/^(XV|HV|BLOCK|BYPASS|SAMPLE|FORCE)/i.test(t))};
 const vKey=(s,i)=>s+":"+i;
 const vDefClosed=n=>/NORMALLY CLOSED/i.test(String(n[6]||""));
@@ -3294,14 +3294,14 @@ function vToggle(i,ev){if(ev){ev.stopPropagation();ev.preventDefault()}vSet(i,vC
 function vAuto(i){const s=P.set;delete VLV[vKey(s,i)];const z=vProve(s,i);if(z)delete LIVE.f[FK(z)];try{tick();pUpd()}catch(e){}}
 /* badge on each valve and liquid in each vessel are added when the sheet is drawn */
 {const _ns=nodeSvg;nodeSvg=function(n,i){let s=_ns.apply(this,arguments);const nd=n;
-  if(vIs(nd)){const x=nd[2],y=nd[3],big=/big/.test(nd[7]||"");s=s.replace(/<\/g>$/,`<g class="vb ok" id="vb${i}" transform="translate(${x+(big?20:13)} ${y-(big?30:24)})" onclick="vToggle(${i},event)" ondblclick="event.stopPropagation()"><rect x="-1" y="-9" width="42" height="14" rx="7"/><text x="20" y="1" text-anchor="middle">OPEN</text></g></g>`).replace('<g class="pdn ','<g ondblclick="vToggle('+i+',event)" class="pdn ')}
+  if(vIs(nd)){const x=nd[2],y=nd[3],big=/big/.test(nd[7]||"");s=s.replace(/<\/g>$/,`<g class="vb ok" data-vb="${i}" transform="translate(${x+(big?20:13)} ${y-(big?30:24)})" onclick="vToggle(${i},event)" ondblclick="event.stopPropagation()"><rect x="-1" y="-9" width="42" height="14" rx="7"/><text x="20" y="1" text-anchor="middle">OPEN</text></g></g>`).replace('<g class="pdn ','<g ondblclick="vToggle('+i+',event)" class="pdn ')}
   if(nd[1]==="v"||nd[1]==="h"){const[t,k,x,y,w,h,l,o]=nd;let d;if(k==="v"){const a=w/2,r=Math.min(a,34);d=`M${x-a} ${y-h/2+r}A${a} ${r} 0 0 1 ${x+a} ${y-h/2+r}V${y+h/2-r}A${a} ${r} 0 0 1 ${x-a} ${y+h/2-r}z`}else{const r=Math.min(h/2,30);d=`M${x-w/2+r} ${y-h/2}H${x+w/2-r}A${r} ${h/2} 0 0 1 ${x+w/2-r} ${y+h/2}H${x-w/2+r}A${r} ${h/2} 0 0 1 ${x-w/2+r} ${y-h/2}z`}
    const x0=x-w/2-40,W=w+80,yb=y+h/2,wv=`M${x0} ${y} q ${W/8} -5 ${W/4} 0 t ${W/4} 0 t ${W/4} 0 t ${W/4} 0 t ${W/4} 0 V${yb+4} H${x0} z`;
-   s=s.replace(/<\/g>$/,`<defs><clipPath id="vc${P.set}_${i}"><path d="${d}"/></clipPath></defs><g clip-path="url(#vc${P.set}_${i})" class="vliq" data-i="${i}" data-y="${y}" data-h="${h}"><g class="vlv" transform="translate(0 0)"><path class="vw" d="${wv}"/></g></g></g>`)}
+   s=s.replace(/<\/g>$/,`<defs><clipPath id="vc${P.set}_${i}_${++VCN}"><path d="${d}"/></clipPath></defs><g clip-path="url(#vc${P.set}_${i}_${VCN})" class="vliq" data-i="${i}" data-y="${y}" data-h="${h}"><g class="vlv" transform="translate(0 0)"><path class="vw" d="${wv}"/></g></g></g>`)}
   return s}}
 /* valve and vessel state on every update */
 function vUpd(){const s=P.set,d=D[s];if(!d)return;const svg=document.getElementById("psvg");if(!svg)return;const pipes=vPipes(s);let dead=new Set(),part={};
- d.n.forEach((nd,i)=>{if(!vIs(nd))return;const cl=vClosed(s,i),g=document.getElementById("n"+i),b=document.getElementById("vb"+i);if(!g||!b)return;const ctl=vCtl(nd),pct=ctl?vPct(s,i):null;
+ d.n.forEach((nd,i)=>{if(!vIs(nd))return;const cl=vClosed(s,i),g=document.getElementById("n"+i),b=svg.querySelector(`[data-vb="${i}"]`);if(!g||!b)return;const ctl=vCtl(nd),pct=ctl?vPct(s,i):null;
   g.classList.toggle("vclosed",cl);const txt=cl?"CLOSED":ctl?pct+"%":"OPEN";const te=b.querySelector("text");if(te.textContent!==txt)te.textContent=txt;b.setAttribute("class","vb "+(cl?"bad":ctl&&pct<5?"warn":"ok"));
   const w=txt.length*6+10,re=b.querySelector("rect");re.setAttribute("width",w);re.setAttribute("x",20-w/2);
   if(cl)(pipes[i]||[]).forEach(h=>{if(h.end)return;if(h.start||h.seg===0&&false)dead.add(h.j);else part[h.j]=h})});
