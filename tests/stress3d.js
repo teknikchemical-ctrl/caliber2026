@@ -14,6 +14,6 @@ for(let n=1;n<=8;n++){await p.evaluate(n=>{go("equipment",{set:n,tab:"ga"});g3Mo
   else{await p.mouse.move(x,y);await p.keyboard.down("Shift");await p.mouse.down();await p.mouse.move(x+80,y+40,{steps:3});await p.mouse.up();await p.keyboard.up("Shift")}
  }
  await p.waitForTimeout(300);
- const chk=await p.evaluate(()=>{const svg=document.querySelector(".gfig .g3svg");const pts=[...svg.querySelectorAll("polygon")].slice(0,4000).filter(x=>/NaN|Infinity/.test(x.getAttribute("points")||"")).length;return{pts,polys:svg.querySelectorAll("polygon").length,inst:Object.keys(G3.inst).length,boxes:document.querySelectorAll(".g3box").length}});
+ const chk=await p.evaluate(()=>{const box=document.querySelector(".gfig .g3box"),I=G3.inst[box.id];let cov=0;if(I&&I.pickBuf)for(const v of I.pickBuf.PF)if(v)cov++;return{pts:cov>2000&&Number.isFinite(I.ms)?0:1,cover:cov,ms:Math.round(I.ms),inst:Object.keys(G3.inst).length,boxes:document.querySelectorAll(".g3box").length}});
  if(chk.pts)bad++;console.log(n,JSON.stringify(chk))}
 console.log("bad",bad,"errors",errs.slice(0,6));await b.close();process.exit(bad||errs.length?1:0)})()

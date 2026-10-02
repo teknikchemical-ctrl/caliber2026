@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "python3 build.py",
-    "test": "python3 build.py && node tests/static.js && node tests/regress.js && node tests/stress3d.js && node tests/live.js",
+    "test": "python3 build.py && node tests/static.js && node tests/regress.js && node tests/stress3d.js && node tools/g3bridge.js --check && node tests/live.js",
     "dev": "LOCAL_STORE_DIR=/tmp/akp-dev AI_PROVIDER=mock node tools/devserver.mjs",
     "test:layout": "node tests/layout.js --strict",
     "test:quick": "python3 build.py && node tests/static.js && node tests/regress.js",

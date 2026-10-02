@@ -115,7 +115,7 @@ G3M[1].push(g3B("11",-.5,.15,-.12,1.1,.03,.5,"dark",{r:.03,zb:.2}),g3B("N2",-.68
 G3M[2].push(...[0,1,2,3,4,5].map(i=>{const a=i*Math.PI/3;return g3B("1",0,1.25+Math.cos(a)*.745,Math.sin(a)*.745,3.5,.025,.07,"dark",{r:.01,ry:0,anim:{ax:"x",rate:42,at:[0,1.25,0]}})}),
  ...Array.from({length:28},(_,i)=>{const a=i/28*Math.PI*2;return g3B("4",-.55,1.25+Math.cos(a)*.93,Math.sin(a)*.93,.1,.07,.05,"dark",{r:.005,anim:{ax:"x",rate:42,at:[0,1.25,0]}})}),
  g3C("N1","x",-2.0,2.0,0,.6,.1,"steel",{m:.5}),g3B("N1",-2.35,2.0,0,.26,.26,.26,"blue",{r:.04}),g3C("","y",-1.0,2.0,-.02,.1,.04,"dark"),
- g3B("",0,2.62,-1.2,4.2,.04,.5,"gray",{r:.01}),g3C("","y",-2.1,2.2,-1.2,.82,.02,"gray",{seg:8}),g3C("","y",2.1,2.2,-1.2,.82,.02,"gray",{seg:8}),g3B("",0,2.95,-1.42,4.2,.02,.02,"gray"),...g3Ladder(2.4,.0,2.62,-1.2),
+ g3B("",0,2.62,-1.2,4.2,.04,.5,"gray",{r:.01}),g3C("","y",-2.1,1.31,-1.2,2.62,.026,"gray",{seg:8}),g3C("","y",2.1,1.31,-1.2,2.62,.026,"gray",{seg:8}),g3C("","y",0,1.31,-1.2,2.62,.026,"gray",{seg:8}),g3C("","x",0,.9,-1.2,4.2,.014,"gray",{seg:6}),g3B("",0,2.95,-1.42,4.2,.02,.02,"gray"),...g3Ladder(2.4,.0,2.62,-1.2),
  g3B("6",0,.52,.95,.6,.05,.2,"dark",{r:.02}),g3L(-2.4,1.05,.32),g3C("","y",-.55,1.0,-.95,.5,.015,"steel",{seg:8}));
 /* reactor: gauges, relief tail pipe, hoops on the ladder, thermowell head, nameplate, blinking beacon */
 G3M[3].push(...g3Gauge("N3",.88,3.38,.1,"z"),...g3Gauge("N1",-.86,3.2,.1,"z"),g3C("9","y",.9,3.8,0,.28,.035,"steel",{seg:10}),g3C("9","x",1.05,3.94,0,.3,.035,"steel",{seg:10}),
@@ -180,8 +180,32 @@ function g3Orient(p,f){const q=f.p,u=[q[1][0]-q[0][0],q[1][1]-q[0][1],q[1][2]-q[
   const c=[0,1,2].map(i=>q.reduce((a,b)=>a+b[i],0)/q.length);let off=f.cen;if(p.t==="r"&&p.off){const a=(p.ry||0)*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a);off=[f.cen[0]+p.off[0]*cs+p.off[2]*sn,f.cen[1]+p.off[1],f.cen[2]-p.off[0]*sn+p.off[2]*cs]}
   if(p.t==="c"){const ai=p.ax==="x"?0:p.ax==="y"?1:2,rel=[c[0]-f.cen[0],c[1]-f.cen[1],c[2]-f.cen[2]];if(f.sc===0)rel[ai]=0;off=[c[0]-rel[0],c[1]-rel[1],c[2]-rel[2]]}
   const d=(c[0]-off[0])*nm[0]+(c[1]-off[1])*nm[1]+(c[2]-off[2])*nm[2];if(d<0)nm=nm.map(x=>-x);f.n=nm;f.mid=c}
-function g3Mesh(n,q){const key=n+(q?"q"+q:"");if(G3.mesh[key])return G3.mesh[key];const q0=G3.q;G3.q=q||1;try{const prims=(G3M[n]||[]).concat(g3Extra(G3M[n]||[])),faces=[];
- prims.forEach(p=>{g3Parts(p).forEach(f=>{g3Orient(p,f);faces.push(f)})});
+
+/* Every part must touch the rest of the machine. Surface points of each solid are compared; a group that touches nothing
+   gets a short neck or bracket to the nearest surface, so nothing hangs in the air. */
+function g3BridgeCalc(prims){const H=.05,pts=[],owner=[];
+ prims.forEach((p,pi)=>{g3Parts(p).forEach(f=>{const q=f.p;for(let i=1;i<q.length-1;i++){const a=q[0],b=q[i],c=q[i+1],e=Math.max(Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2]),Math.hypot(c[0]-b[0],c[1]-b[1],c[2]-b[2]),Math.hypot(a[0]-c[0],a[1]-c[1],a[2]-c[2])),m=Math.min(24,Math.max(1,Math.ceil(e/.05)));
+   for(let u=0;u<=m;u++)for(let v=0;v<=m-u;v++){const wa=u/m,wb=v/m,wc=1-wa-wb;pts.push(a[0]*wc+b[0]*wa+c[0]*wb,a[1]*wc+b[1]*wa+c[1]*wb,a[2]*wc+b[2]*wa+c[2]*wb);owner.push(pi)}}})});
+ const N=owner.length,par=prims.map((_,i)=>i),find=x=>{while(par[x]!==x){par[x]=par[par[x]];x=par[x]}return x},grid=new Map(),key=(x,y,z)=>(((x+512)&1023)*1048576)+(((y+512)&1023)<<10)+((z+512)&1023),T=.046;
+ for(let i=0;i<N;i++){const qx=pts[i*3],qy=pts[i*3+1],qz=pts[i*3+2],cx=Math.floor(qx/H),cy=Math.floor(qy/H),cz=Math.floor(qz/H),oi=owner[i];
+  for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(let dz=-1;dz<=1;dz++){const L=grid.get(key(cx+dx,cy+dy,cz+dz));if(L)for(let j=0;j<L.length;j++){const o=L[j];if(owner[o]!==oi&&Math.abs(pts[o*3]-qx)<T&&Math.abs(pts[o*3+1]-qy)<T&&Math.abs(pts[o*3+2]-qz)<T){const a=find(owner[o]),b=find(oi);if(a!==b)par[a]=b}}}
+  const k0=key(cx,cy,cz);let L=grid.get(k0);if(!L)grid.set(k0,L=[]);L.push(i)}
+ const comps={};prims.forEach((p,i)=>{(comps[find(i)]=comps[find(i)]||[]).push(i)});const cl=Object.values(comps);if(cl.length<2)return[];
+ const vol=p=>p.t==="r"?p.w*p.h*p.d:p.t==="c"?p.len*p.r*p.r*3:p.ra*p.rb*p.rb*3,size=c=>c.reduce((a,i)=>a+vol(prims[i]),0);
+ cl.sort((a,b)=>size(b)-size(a));const cid={};cl.forEach((c,ci)=>c.forEach(i=>cid[i]=ci));
+ const cp=cl.map(()=>[]),cmin=cl.map(()=>1e9);let gmin=1e9;
+ for(let i=0;i<N;i++){const c=cid[owner[i]];cp[c].push(i);const y=pts[i*3+1];if(y<cmin[c])cmin[c]=y;if(y<gmin)gmin=y}
+ const sample=(arr,m)=>{const st=Math.max(1,Math.floor(arr.length/m)),r=[];for(let i=0;i<arr.length;i+=st)r.push(arr[i]);return r};
+ let done=sample(cp[0],2500);const out=[];let rest=[];for(let c=1;c<cl.length;c++)if(cmin[c]>=gmin+.06)rest.push(c);
+ while(rest.length){let best=null;
+  rest.forEach(c=>{const A=sample(cp[c],200);for(let i=0;i<A.length;i++){const a=A[i],ax=pts[a*3],ay=pts[a*3+1],az=pts[a*3+2];for(let j=0;j<done.length;j++){const b=done[j],dx=ax-pts[b*3],dy=ay-pts[b*3+1],dz=az-pts[b*3+2],dd=dx*dx+dy*dy+dz*dz;if(!best||dd<best.d)best={d:dd,a,b,c}}}});
+  if(!best)break;
+  const a=best.a,b=best.b,P=[pts[a*3],pts[a*3+1],pts[a*3+2]],Q=[pts[b*3],pts[b*3+1],pts[b*3+2]],dl=[Q[0]-P[0],Q[1]-P[1],Q[2]-P[2]],ax=Math.abs(dl[0])>=Math.abs(dl[1])&&Math.abs(dl[0])>=Math.abs(dl[2])?0:Math.abs(dl[1])>=Math.abs(dl[2])?1:2,len=Math.abs(dl[ax]);
+  if(len>.02){const kk=prims[cl[best.c][0]].k||"",m=[(P[0]+Q[0])/2,(P[1]+Q[1])/2,(P[2]+Q[2])/2],r=Math.min(.035,Math.max(.018,Math.sqrt(best.d)*.1));out.push(g3C(kk,["x","y","z"][ax],m[0],m[1],m[2],len+.03,r,"steel",{seg:10,m:.5,br:1}))}
+  done=done.concat(sample(cp[best.c],600));rest=rest.filter(c=>c!==best.c)}
+ return out}
+function g3Mesh(n,q){const key=n+(q?"q"+q:"");if(G3.mesh[key])return G3.mesh[key];const q0=G3.q;G3.q=q||1;try{let prims=(G3M[n]||[]).concat(g3Extra(G3M[n]||[])),faces=[];if(typeof G3NECK!=="undefined"&&G3NECK[n])prims=prims.concat(G3NECK[n].map(a=>g3C(a[0],a[1],a[2],a[3],a[4],a[5],a[6],"steel",{seg:10,m:.5,br:1})));
+ prims.forEach((p,pi)=>{g3Parts(p).forEach(f=>{g3Orient(p,f);f.pi=pi;faces.push(f)})});
  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];faces.forEach(f=>f.p.forEach(v=>{for(let i=0;i<3;i++){mn[i]=Math.min(mn[i],v[i]);mx[i]=Math.max(mx[i],v[i])}}));
  const ctr=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],Rs=Math.hypot(...[0,1,2].map(i=>(mx[i]-mn[i])/2)),Rf=Math.max((mx[1]-mn[1])/2*1.12,Math.hypot((mx[0]-mn[0])/2,(mx[2]-mn[2])/2)*.78);
  return G3.mesh[key]={faces,ctr,R:Rs,Rf,ymin:mn[1],mn,mx}}finally{G3.q=q0}}
@@ -195,69 +219,19 @@ function g3KeyC(n,k){const M=g3Mesh(n);M.kc=M.kc||{};if(M.kc[k])return M.kc[k];l
  const mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];fs.forEach(f=>f.p.forEach(v=>{for(let i=0;i<3;i++){mn[i]=Math.min(mn[i],v[i]);mx[i]=Math.max(mx[i],v[i])}}));
  return M.kc[k]={inner,c:[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],r:Math.max(mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2])/2}}
 const g3Cl=(v,a,b)=>v<a?a:v>b?b:v;
-function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!box)return;const o=G3.cfg[id],M=g3Mesh(o.n),svg=box.querySelector("svg");if(!svg)return;const mini=!!box.dataset.mini;
- const W=900,H=500,cy=Math.cos(I.yaw),sy=Math.sin(I.yaw),cp=Math.cos(I.pit),sp=Math.sin(I.pit),D=M.R*3.4,t=I.t,tm=I.clock||0;
- const fxo=o.fx?o.fx():null,fxs=fxo?fxo.state:"normal",hot=(fxo&&fxo.hot)||[],sel=I.pin||(o.sel?o.sel():null),hl=o.hl||[],heat=o.heat||{},tint=o.tint;
- const rot=v=>{const x=v[0]-M.ctr[0],y=v[1]-M.ctr[1],z=v[2]-M.ctr[2],x1=x*cy+z*sy,z1=-x*sy+z*cy;return[x1,y*cp+z1*sp,-y*sp+z1*cp]};
- {const kk=sel&&g3KeyC(o.n,sel),xb=box.querySelector('[data-t=xray]');if(kk&&kk.inner&&!I.xray){I.xray=true;I.autoX=true;if(xb)xb.classList.add('on')}else if(!sel&&I.autoX){I.xray=false;I.autoX=false;if(xb)xb.classList.remove('on')}}
- /* camera eases to the selected part: centred and zoomed, back to the whole machine when nothing is selected */
- if(sel!==I.focusKey){I.focusKey=sel;I.userMoved=false}
- if(!I.userMoved&&!mini){let tz=1,tpx=0,tpy=0;const kc=sel&&g3KeyC(o.n,sel);if(kc){tz=g3Cl(M.Rf*.62/Math.max(kc.r,.1),1.3,3.4);const pc=rot(kc.c),sct=tz*(H*.46)/M.Rf,k=D/(D+pc[2]);tpx=-pc[0]*sct*k;tpy=pc[1]*sct*k}
-  const ez=1-Math.pow(.0004,1/60);I.zoom+=(tz-I.zoom)*ez;I.px+=(tpx-I.px)*ez;I.py+=(tpy-I.py)*ez;if(Math.abs(tz-I.zoom)>.004||Math.abs(tpx-I.px)>.4||Math.abs(tpy-I.py)>.4)I.dirty=true}
- const sc=I.zoom*(H*.46)/M.Rf;
- const shk=fxs==="trip"?1.6:fxs==="alarm"?.7:0,sdx=shk*Math.sin(tm*47),sdy=shk*Math.cos(tm*39);
- const out=[];
- M.faces.forEach(f=>{if(f.in&&!I.xray)return;const anim=f.anim&&I.run;const pts=f.p.map(v=>rot(anim?g3Anim(f.anim,v,t):v));let nm=f.n;
-  if(anim)nm=g3AnimN(f.anim,nm,t);
-  const nx=nm[0]*cy+nm[2]*sy,nz1=-nm[0]*sy+nm[2]*cy,ny=nm[1]*cp+nz1*sp,nzz=-nm[1]*sp+nz1*cp;
-  if(!(I.xray&&f.sh)&&nzz>=0)return;let zc=0;for(const p of pts)zc+=p[2];zc=zc/pts.length+f.zb;out.push({f,pts,zc,nx,ny,nz:nzz})});
- out.sort((a,b)=>b.zc-a.zc);
- const proj=p=>{const k=D/(D+p[2]);return[W/2+p[0]*sc*k+I.px+sdx,H/2-p[1]*sc*k+I.py+sdy]},fx=v=>v.toFixed(1);
- const L1=[-.5,.72,-.48],L2=[.6,.25,-.5],l1=Math.hypot(...L1),l2=Math.hypot(...L2),Hv=[L1[0]/l1,L1[1]/l1,L1[2]/l1-1],hl_=Math.hypot(...Hv);
- /* ground: shadow and grid */
- const gy=M.ymin,gr=M.R*1.2,step=gr/5;let grid="";
- for(let i=-5;i<=5;i++){const a=proj(rot([M.ctr[0]+i*step,gy,M.ctr[2]-gr])),b=proj(rot([M.ctr[0]+i*step,gy,M.ctr[2]+gr])),c=proj(rot([M.ctr[0]-gr,gy,M.ctr[2]+i*step])),d=proj(rot([M.ctr[0]+gr,gy,M.ctr[2]+i*step]));grid+=`M${fx(a[0])} ${fx(a[1])}L${fx(b[0])} ${fx(b[1])}M${fx(c[0])} ${fx(c[1])}L${fx(d[0])} ${fx(d[1])}`}
- const sh=[];for(let i=0;i<24;i++){const a=i/24*Math.PI*2;sh.push(proj(rot([M.ctr[0]+Math.cos(a)*(M.mx[0]-M.mn[0])*.52,gy,M.ctr[2]+Math.sin(a)*(M.mx[2]-M.mn[2])*.6])))}
- let s=`<path d="${grid}" stroke="#d3dbe6" stroke-width=".7" fill="none"/><polygon points="${sh.map(p=>fx(p[0])+","+fx(p[1])).join(" ")}" fill="#223047" opacity=".18" filter="url(#g3b)"/>`;
- const over=[],H0=Math.max(.5,M.mx[1]-M.ymin),dim=!!sel&&!I.xray&&!hl.length,pulse=.5+.5*Math.sin(tm*6);
- out.forEach(({f,pts,nx,ny,nz})=>{let c=f.light?(o.light?o.light():(fxs==="trip"?[225,60,55]:fxs==="alarm"?[240,170,40]:[63,185,80])):f.c.slice(0,3);const k=f.k;
-  const tc=k&&(tint&&tint(k)||heat[k]);if(tc){const q=typeof tc==="string"?g3Parse(tc):tc,a=q[3]==null?.6:q[3];c=c.map((v,i)=>v*(1-a)+q[i]*a)}
-  if(fxs!=="normal"&&!f.light){const base=fxs==="trip"?[225,60,55]:[240,170,40],a=fxs==="trip"?.2:.14;c=c.map((v,i)=>v*(1-a)+base[i]*a);if(k&&hot.includes(k)){const b2=fxs==="trip"?[235,50,45]:[245,160,30],a2=.35+.4*pulse;c=c.map((v,i)=>v*(1-a2)+b2[i]*a2)}}
-  const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=(ny*.5+.5),spec=Math.pow(Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),22)*f.m;
-  const ao=.86+.14*g3Cl((f.mid[1]-M.ymin)/H0*2.6,0,1),rim=Math.pow(1-Math.abs(nz),3)*(f.sm?.15:.05);
-  const lum=(.36+.5*d1+.16*d2+.12*hemi)*ao+rim,hlOn=k&&hl.includes(k),selOn=k&&k===sel,hov=k&&k===I.hover;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.08+24));else if(hov)c=c.map(v=>Math.min(255,v*1.04+14));
-  const r=Math.min(255,c[0]*lum+255*spec*.55+rim*60),g=Math.min(255,c[1]*lum+255*spec*.55+rim*60),b=Math.min(255,c[2]*lum+255*spec*.55+rim*70),fill=`rgb(${r|0},${g|0},${b|0})`;
-  let al=I.xray&&f.sh?.18:1;if(dim&&!selOn)al=Math.min(al,.26);
-  const pp=pts.map(p=>{const q=proj(p);return fx(q[0])+","+fx(q[1])}).join(" ");
-  s+=`<polygon points="${pp}" fill="${fill}" fill-opacity="${al}" stroke="${f.sm?fill:"rgba(25,40,65,.5)"}" stroke-opacity="${al}" stroke-width="${f.sm?.7:.6}" stroke-linejoin="round" ${k?`data-k="${k}" style="cursor:pointer"`:""}/>`;
-  if(selOn||hlOn)over.push(`<polygon points="${pp}" fill="none" stroke="${selOn?"#0b5fd7":"#cf222e"}" stroke-width="${selOn?1.7:1.2}" stroke-linejoin="round"${hlOn&&!selOn?' class="g3hl"':""} pointer-events="none"/>`)});
- let extra="";
- /* leader line and ring for the selected part */
- const kc=sel&&g3KeyC(o.n,sel);
- if(kc&&!mini){const q=proj(rot(kc.c)),r0=Math.max(10,kc.r*sc*D/(D+rot(kc.c)[2])*1.1),cw=box.clientWidth||900,sk=900/cw,cx=W-(262)*sk,cyy=70*sk;
-  extra+=`<circle cx="${fx(q[0])}" cy="${fx(q[1])}" r="${fx(r0+3*pulse)}" fill="none" stroke="#0b5fd7" stroke-width="1.4" stroke-dasharray="4 3" opacity=".8" pointer-events="none"/><circle cx="${fx(q[0])}" cy="${fx(q[1])}" r="3" fill="#0b5fd7" pointer-events="none"/>`;
-  if(box.querySelector(".g3card"))extra+=`<path d="M${fx(q[0])} ${fx(q[1])}L${fx(q[0]+(cx-q[0])*.5)} ${fx(q[1])}L${fx(cx)} ${fx(cyy)}" fill="none" stroke="#0b5fd7" stroke-width="1.1" opacity=".7" pointer-events="none"/>`}
- /* fault effects: plume of steam and sparks from the failing part */
- if(fxo&&fxs!=="normal"&&hot.length){const kk=g3KeyC(o.n,hot[0]);if(kk){const q0=rot(kk.c),q=proj(q0),n=fxs==="trip"?16:9;for(let i=0;i<n;i++){const ph=((tm*(fxs==="trip"?.7:.45)+i/n)%1),rx=Math.sin(i*12.9898)*.5,rs=ph*(18+kk.r*sc*.4);
-    const xx=q[0]+rx*40*ph,yy=q[1]-ph*(46+kk.r*sc*.6),rr=3+rs*.5,a=(1-ph)*(fxs==="trip"?.55:.4);
-    extra+=`<circle cx="${fx(xx)}" cy="${fx(yy)}" r="${fx(rr)}" fill="${fxs==="trip"&&i%3===0?"rgba(255,120,60,"+a+")":"rgba(235,240,246,"+a+")"}" pointer-events="none"/>`}}}
- svg.querySelector(".g3s").innerHTML=s+`<g filter="url(#g3glow)">${over.join("")}</g>`+extra;
- const cap=box.querySelector(".g3cap");if(cap&&!I.hover&&!mini)cap.textContent=sel?g3Name(o.n,sel):"Drag to rotate, scroll to zoom, select a part for its details";
- const fb=box.querySelector(".g3fxb");if(fb){const h=fxo&&fxo.text?`<span class="p3st ${fxs==="trip"?"trip":fxs==="alarm"?"alarm":"ok"}">${fxs==="trip"?"Trip":fxs==="alarm"?"Alarm":"Normal"}</span> ${fxo.text}`:"";if(fb.dataset.h!==h){fb.dataset.h=h;fb.innerHTML=h}}
- const card=box.querySelector(".g3side");if(card&&I.cardKey!==sel){I.cardKey=sel;card.innerHTML=mini?"":g3Info(o.n,sel)}}
 function g3Init(box){const id=box.id,o=G3.cfg[id];if(!o)return;box.setAttribute("data-ok","1");const mini=!!box.dataset.mini;
  box.innerHTML=(mini?"":`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Moving parts</button>':""}<button class="ghost" data-v="reset">Reset</button></div>`)+
- `<div class="g3stage"><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><filter id="g3glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><rect width="900" height="500" fill="url(#g3bg)"/><g class="g3s"></g></svg><div class="g3fxb"></div><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
+ `<div class="g3stage"><canvas class="g3cv" width="900" height="500"></canvas><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><filter id="g3glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><g class="g3s"></g></svg><div class="g3fxb"></div><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
  const I=G3.inst[id]={yaw:-.62,pit:.34,zoom:mini?1.05:1,px:0,py:0,spin:mini,xray:false,run:true,t:0,drag:null,hover:null,dirty:true,last:performance.now(),pin:null,cardKey:undefined};
- const svg=box.querySelector("svg"),dirty=()=>{I.dirty=true},views={iso:[-.62,.34],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2-.001]};
+ const svg=box.querySelector("svg"),dirty=()=>{I.dirty=true;I.lastMove=performance.now()},views={iso:[-.62,.34],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2-.001]};
  box.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==="reset"){I.yaw=-.62;I.pit=.34;I.zoom=1;I.px=I.py=0;I.userMoved=false}else{I.yaw=views[v][0];I.pit=views[v][1]}dirty()});
  box.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="spin")I.spin=!I.spin;else if(k==="xray")I.xray=!I.xray;else I.run=!I.run;b.classList.toggle("on",k==="spin"?I.spin:k==="xray"?I.xray:I.run);dirty()});
- const keyAt=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.getAttribute&&el.closest&&el.closest("svg")===svg?el.getAttribute("data-k"):null};
+ const keyAt=e=>{const r=svg.getBoundingClientRect();return g3PickAt(I,(e.clientX-r.left)/r.width*900,(e.clientY-r.top)/r.height*500)};
  svg.addEventListener("pointerdown",e=>{I.drag={x:e.clientX,y:e.clientY,mv:0,pan:e.shiftKey||e.button===2};try{svg.setPointerCapture(e.pointerId)}catch(_){}});
  svg.addEventListener("contextmenu",e=>e.preventDefault());
  svg.addEventListener("pointermove",e=>{const d=I.drag;if(d){const dx=e.clientX-d.x,dy=e.clientY-d.y;d.mv+=Math.abs(dx)+Math.abs(dy);d.x=e.clientX;d.y=e.clientY;
    if(d.pan){const r=svg.getBoundingClientRect(),k=900/r.width;I.px+=dx*k;I.py+=dy*k;I.userMoved=true}else{I.yaw+=dx*.008;I.pit=Math.max(-1.5,Math.min(1.5,I.pit+dy*.006))}if(d.mv>5)I.spin=I.spin&&mini?false:I.spin;dirty()}
-  else{const k=keyAt(e),cap=box.querySelector(".g3cap");if(k!==I.hover){I.hover=k||null;if(cap)cap.textContent=k?g3Name(o.n,k):(I.pin||(o.sel&&o.sel())?g3Name(o.n,I.pin||o.sel()):"Drag to rotate, scroll to zoom, select a part for its details");svg.style.cursor=k?"pointer":"grab"}}});
+  else{const k=keyAt(e),cap=box.querySelector(".g3cap");if(k!==I.hover){I.hover=k||null;I.dirty=true;if(cap)cap.textContent=k?g3Name(o.n,k):(I.pin||(o.sel&&o.sel())?g3Name(o.n,I.pin||o.sel()):"Drag to rotate, scroll to zoom, select a part for its details");svg.style.cursor=k?"pointer":"grab"}}});
  svg.addEventListener("pointerup",e=>{const d=I.drag;I.drag=null;if(d&&d.mv<6&&!d.pan){const k=keyAt(e);if(mini){if(k)go("equipment",{set:o.n,tab:"ga"});return}
    I.pin=k&&k!==I.pin?k:null;if(k&&o.click){try{(typeof o.click==="function"?o.click:window[o.click])(k)}catch(_){}}else if(!k&&o.click&&o.sel&&o.sel()){}dirty()}});
  svg.addEventListener("wheel",e=>{if(mini)return;e.preventDefault();I.userMoved=true;I.zoom=Math.max(.5,Math.min(3.5,I.zoom*(e.deltaY<0?1.1:.9)));dirty()},{passive:false});
@@ -268,6 +242,7 @@ function g3Scan(){document.querySelectorAll(".g3box:not([data-ok])").forEach(b=>
 function g3Loop(now){requestAnimationFrame(g3Loop);Object.keys(G3.inst).forEach(id=>{const I=G3.inst[id],box=document.getElementById(id);if(!box||box.hidden||box.closest("[hidden]"))return;if(now-(I.drawn||0)<33)return;const dt=Math.min(.1,(now-I.last)/1000);I.last=now;
   I.clock=(I.clock||0)+dt;const fo=G3.cfg[id].fx&&G3.cfg[id].fx();if(fo)I.dirty=true;if(I.spin&&!I.drag){I.yaw+=dt*.45;I.dirty=true}if(I.run&&!(fo&&fo.state==='trip')&&(G3M[G3.cfg[id].n]||[]).some(p=>p.anim)){I.t+=dt;I.dirty=true}
   const sel=I.pin||(G3.cfg[id].sel?G3.cfg[id].sel():null);if(sel!==I.lastSel){I.lastSel=sel;I.dirty=true}
+  if(I.needHi&&now-(I.lastMove||0)>320&&!I.drag&&!I.spin&&!((G3M[G3.cfg[id].n]||[]).some(p=>p.anim)&&I.run)){I.needHi=false;I.dirty=true}
   if(I.dirty||now-(I.lt||0)>1500){I.dirty=false;I.lt=now;I.drawn=now;g3Draw(id)}})}
 requestAnimationFrame(g3Loop);
 {let tm=null;new MutationObserver(()=>{if(!tm)tm=setTimeout(()=>{tm=null;g3Scan()},40)}).observe(document.body,{childList:true,subtree:true})}
