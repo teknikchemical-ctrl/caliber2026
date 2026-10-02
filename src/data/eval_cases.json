@@ -1214,5 +1214,47 @@
    "Availability"
   ],
   "tool": "kpi_summary"
+ },
+ {
+  "id": "E125",
+  "cat": "Hazard",
+  "q": "How far would a 50 mm hexane leak at GA-1201A spread with 2 m/s wind?",
+  "must": [
+   "GA-1201A",
+   "flammable limit",
+   "m"
+  ],
+  "tool": "hazard_effects"
+ },
+ {
+  "id": "E126",
+  "cat": "Hazard",
+  "q": "What happens in a jet fire on KC-4501 with a 25 mm hole?",
+  "must": [
+   "KC-4501",
+   "Jet flame",
+   "kW/m"
+  ],
+  "tool": "hazard_effects"
+ },
+ {
+  "id": "E127",
+  "cat": "Reliability",
+  "q": "What are the main failure modes of GA-1201A?",
+  "must": [
+   "GA-1201A",
+   "risk priority"
+  ],
+  "tool": "failure_modes"
+ },
+ {
+  "id": "E128",
+  "cat": "Reliability",
+  "q": "Which failure modes cost the most across the plant?",
+  "must": [
+   "Plant",
+   "risk priority"
+  ],
+  "tool": "failure_modes"
  }
 ]
