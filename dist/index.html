@@ -331,6 +331,18 @@ aside{overflow-y:auto}
 .pdn:hover{filter:drop-shadow(0 0 3px rgba(47,129,247,.45))}
 #rpmap svg{max-height:680px;width:100%;height:auto}
 .g3stage .g3cv{position:absolute;left:0;top:0;width:100%;height:100%;display:block}.g3stage .g3svg{position:relative}
+/* hazard simulator */
+.hsebox h4{margin:14px 0 6px;font-size:13px}.hseform{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:10px 0}.hseform label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#5c6b7b}
+.hseform select,.hseform input[type=range]{width:100%}.hseul{margin:0;padding-left:18px;font-size:12.8px;line-height:1.55}.hseul li{margin-bottom:4px}
+.hsegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.hsegrid>div{background:#f4f7fb;border:1px solid #dde5ef;border-radius:8px;padding:6px 8px}.hsegrid b{display:block;font-size:14px}.hsegrid span{font-size:11px;color:#5c6b7b}
+.hsetl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0}.hsetl input[type=range]{flex:1;min-width:140px}.hsetl b{min-width:48px}.hsetog{margin-left:auto;display:flex;gap:0}
+.hsetog button{border-radius:0;padding:4px 12px;background:#fff;color:#1d2b3d;border:1px solid #c5d0de}.hsetog button:first-child{border-radius:8px 0 0 8px}.hsetog button:last-child{border-radius:0 8px 8px 0;border-left:0}.hsetog button.on{background:#155ea3;color:#fff;border-color:#155ea3}
+.hsecl{animation:hsepl 2.4s ease-in-out infinite}@keyframes hsepl{50%{opacity:.78}}.hsefl{animation:hsefl .5s ease-in-out infinite alternate}@keyframes hsefl{to{opacity:.7}}
+.hse3{position:relative;height:640px;background:#e8eff7;border-radius:8px;overflow:hidden;border:1px solid #d5deea}.hse3 canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.hse3tip{position:absolute;left:10px;bottom:8px;font-size:12px;color:#44566b;background:rgba(255,255,255,.85);padding:3px 8px;border-radius:6px}.hse3k{position:absolute;right:10px;top:10px;background:rgba(255,255,255,.92);border:1px solid #d5deea;border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.7}
+.hse3k i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hsebox{min-width:0}.hsebox .mht td,.hsebox .mht th{white-space:normal;vertical-align:top}.hsebox .mht{width:100%;table-layout:auto}#ppp{min-width:0;overflow:hidden}
+.hse3bar{position:absolute;left:10px;top:10px;display:flex;gap:6px}.hse3bar button{padding:4px 10px;font-size:12px;background:rgba(255,255,255,.94);color:#1d2b3d;border:1px solid #c5d0de;border-radius:8px}
 .pbar{padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;font-size:12.5px;background:var(--panel2)}
 .sheet{background:#fbfbf8;border:1px solid #c9c9c0;border-radius:6px;overflow:auto;max-height:76vh}
 .sheet svg{display:block;font-family:Arial,Helvetica,sans-serif}.sheet text{fill:#111}
@@ -4680,6 +4692,376 @@ AI.tools.spares_outlook={description:"Spare parts that the maintenance history s
   if(/spare|stock|inventory|reorder/.test(l)&&/(due|soon|next|upcoming|expected|reorder|order|need|run out|outlook|forecast)/.test(l))return["spares_outlook",{set:sets.length?set:0}];
   return _r.apply(this,arguments)}}
 {const _s=intUsage;intUsage=function(){return _s()+`<h2 class="h2">Curated evaluation</h2><div class="card" id="evbox">${evHtml()}</div><h2 class="h2">Generated regression audit</h2><div class="card" id="covaud">${covAudit()}</div>`}}
+/* =====================================================================================================
+   HSE HAZARD SIMULATOR
+   Screening models for a loss of containment on the plot plan: release rate through a hole, vapour from the flash and the pool,
+   a Gaussian plume that moves with the wind (with the time lag from the source), jet fire and pool fire radiation, flash fire and
+   vapour cloud explosion overpressure, gas detection and shutdown timing, who and what is inside each zone, and the walk to each
+   muster point. Everything is computed on the real plot plan coordinates (metres), and drawn in 2D on the plot plan and in 3D on the
+   site model. These are screening estimates for training and for ranking scenarios, not a replacement for a consequence study.
+   ===================================================================================================== */
+regMod("hse","1.0",[],"HSE hazard simulator");
+const HSE_F={
+ hexane:{name:"n-Hexane",M:86.2,lfl:1.2,ufl:7.4,hc:44.7e6,rl:659,tb:69,hv:335e3,cp:2300,g:1.06,pv:24000,dense:true,burn:.105,sep:140},
+ ethylene:{name:"Ethylene",M:28.05,lfl:2.7,ufl:36,hc:47.1e6,g:1.24,gas:true,sep:200},
+ hydrogen:{name:"Hydrogen",M:2.016,lfl:4,ufl:75,hc:120e6,g:1.41,gas:true,light:true,sep:100}};
+const HSE_ST={A:"Very unstable (bright sun, light wind)",B:"Unstable (sunny)",C:"Slightly unstable",D:"Neutral (overcast, windy)",E:"Stable (evening)",F:"Very stable (clear calm night)"};
+/* limits used for the zones */
+const HSE_LIM={heat:[[37.5,"Equipment damage, steel loses strength","#7a0f1b"],[12.5,"Fatal in about a minute, ignition of wood","#cf222e"],[4.7,"Pain in about 15 seconds, protective clothing needed","#f08a24"]],
+ blast:[[35,"Serious structural damage","#7a0f1b"],[21,"Heavy damage to buildings, ear drum rupture","#cf222e"],[7,"Windows break, light injury","#f08a24"]]};
+const HSE={sc:"cloud",n:1,hole:50,u:2,st:"D",esd:"auto",ign:-1,t:0,play:false,speed:6,view:"2d",tmax:480,T:null,R:null,seq:0,sel:null,resp:45,inv:null};
+/* ---------- source ---------- */
+const HSE_P={1:[16,80,1500],3:[6,250,60],4:[16,150,600],5:[16,200,2500],6:[8,120,1800],8:[10,120,3000]};
+function hseKey(n){const f=S(n).fluid||"";return/ethylene/i.test(f)?"ethylene":/hexane/i.test(f)?"hexane":/h2|hydrogen/i.test(f)?"hydrogen":null}
+function hseSrc(n){const k=hseKey(n);if(!k)return null;const d=HSE_P[n]||[8,100,800],o=K.opl.find(x=>x.set===n&&/barg/.test(x.dp||""));
+ const P=o&&parseFloat(o.dp)||d[0],T=o&&(/(\d+)\s*degC/.exec(o.dt||"")||[])[1]||d[1];return{n,k,f:HSE_F[k],P:+P,T:+T,inv:HSE.inv||d[2]}}
+const hseUnits=()=>K.sets.filter(s=>hseKey(s.n));
+/* ---------- dispersion ---------- */
+function hseSig(x,st,dense,mass){x=Math.max(x,1);let sy,sz;
+ if(st==="A"||st==="B"){sy=.32*x/Math.sqrt(1+.0004*x);sz=.24*x*Math.sqrt(1+.001*x)}else if(st==="C"){sy=.22*x/Math.sqrt(1+.0004*x);sz=.2*x}
+ else if(st==="D"){sy=.16*x/Math.sqrt(1+.0004*x);sz=.14*x/Math.sqrt(1+.0003*x)}else{sy=.11*x/Math.sqrt(1+.0004*x);sz=.08*x/Math.sqrt(1+.0015*x)}
+ if(dense){sy*=1.35;sz*=.55}
+ const s0=2;return[Math.sqrt(sy*sy+s0*s0),Math.sqrt(sz*sz+s0*s0)]}
+const hseH=(M,x)=>M.f.light?M.Hs+.28*Math.pow(x,.75):M.Hs;
+/* source term over time: gas rate, flash vapour, pool and its evaporation */
+function hseModel(cfg){const src=hseSrc(cfg.n);if(!src)return null;const f=src.f,u=Math.max(1.5,cfg.u),A=Math.PI*Math.pow(cfg.hole/2000,2),Tk=src.T+273.15,P0=src.P*1e5+101325;let Q0,Fv=1;
+ if(f.gas){const g=f.g,k=Math.pow(2/(g+1),(g+1)/(g-1));Q0=.62*A*P0*Math.sqrt(g*(f.M/1000)/(8.314*Tk)*k)}
+ else{Q0=.62*A*Math.sqrt(2*f.rl*src.P*1e5);const F=Math.max(0,f.cp*(Tk-(f.tb+273.15))/f.hv);Fv=Math.min(1,Math.max(.02,2*F))}
+ const M={cfg,src,f,u,st:cfg.st,Q0,Fv,Hs:f.light?1.5:1,dense:!!f.dense&&Q0*Fv>.3,A,T:src.T};
+ /* time to gas detection and to isolation */
+ const dRing=12,sg=hseSig(dRing,cfg.st,M.dense),peakAtRing=(Q0*Fv)/(2*Math.PI*u*sg[0]*sg[1])*(Math.exp(-Math.pow(M.Hs,2)/(2*sg[1]*sg[1]))*2)/(f.M)/.0416*100;
+ M.tDet=peakAtRing>=f.lfl*.2?dRing/u+4:null;
+ const delay=cfg.esd==="auto"?30:cfg.esd==="manual"?240:900;M.tIso=M.tDet==null?(cfg.esd==="auto"?420:cfg.esd==="manual"?420:900):M.tDet+delay;
+ M.tIso=Math.min(M.tIso,Math.max(20,src.inv/Math.max(Q0,.01)));
+ const dt=2,N=Math.ceil(1500/dt)+1,Qt=new Float32Array(N),Qv=new Float32Array(N),PA=new Float32Array(N),PM=new Float32Array(N);let pm=0;
+ const tau=Math.min(150,Math.max(20,.4*src.inv/Math.max(Q0,.01)));
+ for(let i=0;i<N;i++){const t=i*dt;let q=t<M.tIso?Q0:Q0*Math.exp(-(t-M.tIso)/tau);if(q<Q0*.003)q=0;Qt[i]=q;
+  let ev=0;if(!f.gas){const rain=(1-Fv)*q,area=Math.min(250,Math.max(0,pm/(f.rl*.02))),d=Math.max(1,Math.sqrt(4*area/Math.PI)),E=.0048*Math.pow(u,.78)*Math.pow(d,-.11)*(f.pv*(f.M/1000)/(8.314*303))*Math.pow(2,-.67);ev=Math.min(E*area,pm/dt+rain);
+   pm=Math.max(0,pm+(rain-ev)*dt);PA[i]=Math.min(250,pm/(f.rl*.02));PM[i]=pm}
+  Qv[i]=f.gas?q:Fv*q+ev}
+ M.dt=dt;M.Qt=Qt;M.Qv=Qv;M.PA=PA;M.PM=PM;
+ /* the cloud moves at wind speed, so the source rate at a distance is the rate from x/u seconds earlier */
+ M.qv=(t)=>{if(t<0)return 0;const i=t/dt,a=Math.floor(i);if(a>=N-1)return Qv[N-1];return Qv[a]+(Qv[a+1]-Qv[a])*(i-a)};
+ M.qt=(t)=>t<0?0:Qt[Math.min(N-1,Math.floor(t/dt))];
+ /* concentration as % of the lower flammable limit at downwind x, crosswind y, height z, at time t */
+ M.k=(x,t)=>{if(x<=0)return 0;const q=M.qv(t-x/u);if(q<=0)return 0;const[sy,sz]=hseSig(x,cfg.st,M.dense);return{q,sy,sz,K:q/(2*Math.PI*u*sy*sz)/(f.M)/.0416*100,H:hseH(M,x)}};
+ M.c=(x,y,z,t)=>{const k=M.k(x,t);if(!k)return 0;const g=Math.exp(-Math.pow(z-k.H,2)/(2*k.sz*k.sz))+Math.exp(-Math.pow(z+k.H,2)/(2*k.sz*k.sz));return k.K*g*Math.exp(-y*y/(2*k.sy*k.sy))/f.lfl*100};
+ M.xmax=900;
+ return M}
+/* outline of one concentration level at time t as {x, y half width at height} rows */
+function hseSlices(M,t,lvl,z){const rows=[];for(let x=3;x<=M.xmax;x+=3){const k=M.k(x,t);if(!k)continue;const g=Math.exp(-Math.pow(z-k.H,2)/(2*k.sz*k.sz))+Math.exp(-Math.pow(z+k.H,2)/(2*k.sz*k.sz)),v=k.K*g/M.f.lfl*100;if(v<lvl)continue;rows.push([x,k.sy*Math.sqrt(2*Math.log(v/lvl))])}return rows}
+/* farthest ground distance at which a level is reached, at time t */
+function hseReach(M,t,lvl,z){let r=0;for(let x=3;x<=M.xmax;x+=3){const k=M.k(x,t);if(!k)continue;const g=Math.exp(-Math.pow((z||1.5)-k.H,2)/(2*k.sz*k.sz))+Math.exp(-Math.pow((z||1.5)+k.H,2)/(2*k.sz*k.sz));if(k.K*g/M.f.lfl*100>=lvl)r=x}return r}
+/* mass of vapour inside the flammable range */
+function hseFlamMass(M,t){let m=0;const f=M.f;for(let x=3;x<=M.xmax;x+=3){const k=M.k(x,t);if(!k)continue;const top=k.K*2/f.lfl*100;if(top<100)continue;
+  const cq=k.q/(2*Math.PI*M.u*k.sy*k.sz);for(let z=.25;z<=Math.min(40,k.H+4*k.sz);z+=.5){const g=Math.exp(-Math.pow(z-k.H,2)/(2*k.sz*k.sz))+Math.exp(-Math.pow(z+k.H,2)/(2*k.sz*k.sz)),pk=k.K*g;if(pk<f.lfl)continue;
+   for(let y=0;y<=5*k.sy;y+=Math.max(.5,k.sy/6)){const ph=pk*Math.exp(-y*y/(2*k.sy*k.sy));if(ph>=f.lfl&&ph<=f.ufl)m+=cq*g*Math.exp(-y*y/(2*k.sy*k.sy))*3*.5*Math.max(.5,k.sy/6)*2}}}
+ return m}
+/* ---------- fires and explosions ---------- */
+function hseJet(M,t){const q=M.qt(t),f=M.f,L=Math.min(120,6.5*Math.sqrt(Math.max(q,.01))),qr=.2*q*f.hc;
+ const rr=th=>Math.sqrt(Math.max(0,.8*qr/(4*Math.PI*th*1000)));return{q,L,qr,r:HSE_LIM.heat.map(h=>rr(h[0])),mid:L*.5}}
+function hsePool(M,t){const f=M.f;if(f.gas)return null;const i=Math.min(M.PA.length-1,Math.round(t/M.dt)),area=Math.max(M.PA[i],M.PA[Math.max(0,i-5)],M.PA[Math.min(M.PA.length-1,i+5)]);if(area<1)return null;
+ const D=Math.min(30,Math.sqrt(4*area/Math.PI)),mdot=f.burn*area,H=42*D*Math.pow(f.burn/(1.2*Math.sqrt(9.81*D)),.61),qr=.25*mdot*f.hc;
+ const rr=th=>Math.max(D/2,Math.sqrt(.8*qr/(4*Math.PI*th*1000)));return{area,D,H,mdot,r:HSE_LIM.heat.map(h=>rr(h[0]))}}
+const hsePs=(Z)=>808*(1+Math.pow(Z/4.5,2))/Math.sqrt((1+Math.pow(Z/.048,2))*(1+Math.pow(Z/.32,2))*(1+Math.pow(Z/1.35,2)));
+function hseBlast(M,t,eta){const m=hseFlamMass(M,t),W=Math.max(.01,eta*m*M.f.hc/4.68e6),R=kPa=>{let lo=.5,hi=800;for(let i=0;i<50;i++){const mid=(lo+hi)/2,p=hsePs(mid/Math.cbrt(W))*101.3/1;(p>kPa?lo=mid:hi=mid)}return(lo+hi)/2};
+ return{m,W,eta,r:HSE_LIM.blast.map(b=>R(b[0])),x0:Math.max(5,hseReach(M,t,100,1)*.45)}}
+/* ---------- geometry on the plot plan ---------- */
+const hseDir=()=>{const a=PP.wind*Math.PI/180;return[-Math.sin(a),Math.cos(a)]};
+function hseToPlan(M,x,y){const d=hseDir(),s=POS[M.cfg.n];return[s[0]+d[0]*x-d[1]*y,s[1]+d[1]*x+d[0]*y]}
+function hseFromPlan(M,p){const d=hseDir(),s=POS[M.cfg.n],rx=p[0]-s[0],ry=p[1]-s[1];return[rx*d[0]+ry*d[1],-rx*d[1]+ry*d[0]]}
+/* full run: model plus the events at the chosen times */
+function hseRun(){const cfg={n:HSE.n,hole:HSE.hole,u:HSE.u,st:HSE.st,esd:HSE.esd,sc:HSE.sc};const M=hseModel(cfg);if(!M)return null;
+ const R={M,cfg,t:HSE.t};R.jet=hseJet(M,Math.min(30,M.tIso));R.pool=hsePool(M,HSE.ign>=0?HSE.ign:Math.min(120,M.tIso));
+ R.eta=.03;R.blast=null;R.flash=null;
+ if(HSE.sc==="cloud"&&HSE.ign>=0){R.blast=hseBlast(M,HSE.ign,R.eta);R.flash=hseReach(M,HSE.ign,100,1)}
+ /* receptors */
+ const rec=[],unitsR=K.sets.map(s=>({id:s.tag,p:POS[s.n],kind:"Unit",n:s.n})),extra=[{id:"Control room",p:CRP,kind:"Building"},{id:"Muster point A",p:MUS.A,kind:"Muster"},{id:"Muster point B",p:MUS.B,kind:"Muster"},{id:"Gate 1",p:[110,248],kind:"Gate"},{id:"Gate 2",p:[250,248],kind:"Gate"}];
+ [...unitsR,...extra].forEach(r=>{const q=hseFromPlan(M,r.p);let pk=0;for(let t=0;t<=Math.min(900,M.tIso+300);t+=10){const c=M.c(q[0],q[1],1.5,t);if(c>pk)pk=c}
+  const sameUnit=r.n===cfg.n,dist=Math.hypot(r.p[0]-POS[cfg.n][0],r.p[1]-POS[cfg.n][1]);let flux=0,op=0;
+  if(HSE.sc==="jet"){const c=hseToPlan(M,R.jet.mid,0),dd=Math.max(2,Math.hypot(r.p[0]-c[0],r.p[1]-c[1]));flux=.8*R.jet.qr/(4*Math.PI*dd*dd)/1000}
+  else if(HSE.sc==="pool"&&R.pool){const dd=Math.max(R.pool.D/2,dist);flux=.8*.25*R.pool.mdot*M.f.hc/(4*Math.PI*dd*dd)/1000}
+  if(R.blast){const c=hseToPlan(M,R.blast.x0,0),dd=Math.max(2,Math.hypot(r.p[0]-c[0],r.p[1]-c[1]));op=hsePs(dd/Math.cbrt(R.blast.W))*101.3}
+  rec.push(Object.assign({},r,{dist,pk,flux,op,sameUnit}))});
+ R.rec=rec;return R}
+/* the walk to a muster point, started after the response delay, checked against the cloud over time */
+function hseWalk(R,k,from){const M=R.M,r=ppRoute(from,MUS[k]),L=plen(r),v=2.2,T=Math.ceil(L/v),cum=[0];for(let i=1;i<r.length;i++)cum.push(cum[i-1]+eu(r[i],r[i-1]));let pk=0,s50=0,s100=0,hot=0;
+ for(let t=0;t<=T;t++){const s=Math.min(L,t*v);let i=1;while(i<cum.length-1&&cum[i]<s)i++;const f=cum[i]-cum[i-1]?(s-cum[i-1])/(cum[i]-cum[i-1]):1,p=[r[i-1][0]+(r[i][0]-r[i-1][0])*f,r[i-1][1]+(r[i][1]-r[i-1][1])*f],q=hseFromPlan(M,p),c=M.c(q[0],q[1],1.5,HSE.resp+t);
+  if(c>pk)pk=c;if(c>=50)s50++;if(c>=100)s100++;
+  if(HSE.sc==="jet"){const cc=hseToPlan(M,R.jet.mid,0),dd=Math.max(2,eu(p,cc)),fl=.8*R.jet.qr/(4*Math.PI*dd*dd)/1000;if(fl>4.7)hot++}}
+ return{k,L:Math.round(L),T,pk:Math.round(pk),s50,s100,hot,route:ppDescr(r)}}
+/* ---------- 2D drawing on the plot plan ---------- */
+const hseMap=p=>[PX(p[0]),PY(p[1])];
+function hseOverlay(R,t){if(!R)return"";const M=R.M,cfg=R.cfg,o=[],P=(x,y)=>hseMap(hseToPlan(M,x,y)),poly=(pts,fill,stroke,extra)=>`<polygon points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="${fill}" stroke="${stroke}" stroke-width="1.3" ${extra||""}/>`;
+ const src=hseMap(POS[cfg.n]);
+ /* gas detectors on a ring around the source */
+ o.push(`<circle cx="${src[0]}" cy="${src[1]}" r="${12*PS}" fill="none" stroke="#2e6bd6" stroke-dasharray="2 4" opacity=".55"/>`);
+ for(let i=0;i<8;i++){const a=i*Math.PI/4,x=src[0]+Math.cos(a)*12*PS,y=src[1]+Math.sin(a)*12*PS;o.push(`<rect x="${x-3}" y="${y-3}" width="6" height="6" fill="#2e6bd6" transform="rotate(45 ${x} ${y})"/>`)}
+ if(HSE.sc==="cloud"||HSE.ign>=0&&HSE.sc==="cloud"){
+  [[25,"rgba(246,200,40,.30)","#b8860b"],[50,"rgba(244,140,40,.36)","#c2570c"],[100,"rgba(214,48,39,.46)","#a3151b"]].forEach(([lvl,fill,stroke])=>{const rows=hseSlices(M,t,lvl,1.5);if(rows.length<2)return;
+   const pts=[...rows.map(r=>P(r[0],r[1])),...rows.slice().reverse().map(r=>P(r[0],-r[1]))];o.push(poly(pts,fill,stroke,`class="hsecl"`))});
+  const r100=hseReach(M,t,100,1.5),r50=hseReach(M,t,50,1.5);
+  if(r50>0){const q=P(r50+4,0);o.push(`<text x="${q[0]}" y="${q[1]}" font-size="9.5" font-weight="700" fill="#8a2a00" paint-order="stroke" stroke="#fff" stroke-width="2.6">${Math.round(r50)} m</text>`)}
+  if(HSE.ign>=0&&t>=HSE.ign&&R.blast){const bc=hseMap(hseToPlan(M,R.blast.x0,0)),k=Math.min(1,(t-HSE.ign)/6);
+   R.blast.r.forEach((rad,i)=>{const col=HSE_LIM.blast[i][2];o.push(`<circle cx="${bc[0]}" cy="${bc[1]}" r="${rad*PS*k}" fill="${i===2?"rgba(240,138,36,.07)":"none"}" stroke="${col}" stroke-width="2" ${i===2?'stroke-dasharray="7 4"':""}/>`);
+    if(k>=1)o.push(`<text x="${bc[0]+rad*PS*.71}" y="${bc[1]-rad*PS*.71}" font-size="9" font-weight="700" fill="${col}" paint-order="stroke" stroke="#fff" stroke-width="2.6">${HSE_LIM.blast[i][0]} kPa ${Math.round(rad)} m</text>`)});
+   if(t-HSE.ign<2.5)o.push(`<circle cx="${bc[0]}" cy="${bc[1]}" r="${Math.max(8,(R.flash||10)*PS*.5)}" fill="rgba(255,200,60,.55)"/>`)}
+ }
+ if(HSE.sc==="jet"){const J=R.jet,a=P(0,0),b=P(J.L,0),n=hseDir(),w=J.L*.14*PS,px=-n[1],py=n[0];
+  o.push(`<polygon points="${a[0]},${a[1]} ${(a[0]+b[0])/2+px*w},${(a[1]+b[1])/2+py*w} ${b[0]},${b[1]} ${(a[0]+b[0])/2-px*w},${(a[1]+b[1])/2-py*w}" fill="rgba(255,150,30,.75)" stroke="#d1242f" class="hsefl"/>`);
+  const c=hseMap(hseToPlan(M,J.mid,0));J.r.forEach((r,i)=>o.push(`<circle cx="${c[0]}" cy="${c[1]}" r="${r*PS}" fill="${i===2?"rgba(240,138,36,.07)":"none"}" stroke="${HSE_LIM.heat[i][2]}" stroke-width="2" ${i===2?'stroke-dasharray="7 4"':""}/><text x="${c[0]+r*PS*.71}" y="${c[1]+r*PS*.71}" font-size="9" font-weight="700" fill="${HSE_LIM.heat[i][2]}" paint-order="stroke" stroke="#fff" stroke-width="2.6">${HSE_LIM.heat[i][0]} kW/m² ${Math.round(r)} m</text>`))}
+ if(HSE.sc==="pool"&&R.pool){const Pl=R.pool,c=src;o.push(`<circle cx="${c[0]}" cy="${c[1]}" r="${Pl.D/2*PS}" fill="rgba(255,140,30,.7)" stroke="#d1242f" class="hsefl"/>`);
+  Pl.r.forEach((r,i)=>o.push(`<circle cx="${c[0]}" cy="${c[1]}" r="${r*PS}" fill="${i===2?"rgba(240,138,36,.07)":"none"}" stroke="${HSE_LIM.heat[i][2]}" stroke-width="2" ${i===2?'stroke-dasharray="7 4"':""}/><text x="${c[0]+r*PS*.71}" y="${c[1]+r*PS*.71}" font-size="9" font-weight="700" fill="${HSE_LIM.heat[i][2]}" paint-order="stroke" stroke="#fff" stroke-width="2.6">${HSE_LIM.heat[i][0]} kW/m² ${Math.round(r)} m</text>`))}
+ /* the leak and the wind */
+ o.push(`<g transform="translate(${src[0]} ${src[1]})"><circle r="${8+3*Math.sin(t*5)}" fill="rgba(209,36,47,.25)"/><circle r="4" fill="#d1242f"/></g>`);
+ /* evacuee along the better route */
+ if(R.walk&&t>=HSE.resp){const w=R.walk.best,r=ppRoute(ppAcc(cfg.n),MUS[w.k]),L=plen(r),s=Math.min(L,(t-HSE.resp)*2.2);let acc=0,pos=r[r.length-1];for(let i=1;i<r.length;i++){const d=eu(r[i],r[i-1]);if(acc+d>=s){const f=d?(s-acc)/d:0;pos=[r[i-1][0]+(r[i][0]-r[i-1][0])*f,r[i-1][1]+(r[i][1]-r[i-1][1])*f];break}acc+=d}
+  const q=hseMap(pos);o.push(`<polyline points="${r.map(p=>hseMap(p).join(",")).join(" ")}" fill="none" stroke="#1a7f37" stroke-width="2" stroke-dasharray="5 4" opacity=".8"/><circle cx="${q[0]}" cy="${q[1]}" r="6" fill="#1a7f37" stroke="#fff" stroke-width="2"/>`)}
+ return o.join("")}
+/* ---------- run, redraw, time ---------- */
+function hseCalc(){HSE.R=hseRun();const R=HSE.R;if(!R)return;const from=ppAcc(HSE.n),w=["A","B"].map(k=>hseWalk(R,k,from)),score=x=>x.s100*1000+x.s50*100+x.pk+x.hot*500+x.L*.01;R.walk={A:w[0],B:w[1],best:score(w[0])<=score(w[1])?w[0]:w[1]};
+ /* worst case over the whole event */
+ let r100=0,r50=0,r25=0,tr=0;for(let t=0;t<=Math.min(HSE.tmax,900);t+=10){const a=hseReach(R.M,t,100,1.5),b=hseReach(R.M,t,50,1.5),c=hseReach(R.M,t,25,1.5);if(a>r100)r100=a;if(b>r50)r50=b;if(c>r25){r25=c;tr=t}}
+ R.reach={r100,r50,r25,tmax:tr};const cr=R.rec.find(x=>x.id==="Control room");R.crT=null;if(cr){const q=hseFromPlan(R.M,cr.p);for(let t=0;t<=900;t+=5){if(R.M.c(q[0],q[1],1.5,t)>=25){R.crT=t;break}}}}
+function hseDraw(){const R=HSE.R;if(!R)return;const g=document.getElementById("hseov");if(g)g.innerHTML=hseOverlay(R,HSE.t);const s=document.getElementById("hsedyn");if(s)s.innerHTML=hseDyn();const sl=document.getElementById("hsesl");if(sl)sl.value=HSE.t;const tl=document.getElementById("hsetl");if(tl)tl.textContent=Math.round(HSE.t)+" s";if(typeof hse3Draw==="function"&&HSE.view==="3d")hse3Draw()}
+function hseSet(k,v){HSE[k]=typeof HSE[k]==="number"?+v:v;if(k==="n"){HSE.inv=null}HSE.t=Math.min(HSE.t,HSE.tmax);hseCalc();if(HSE.view!=="3d")ppUpd(true);hsePanelRefresh()}
+function hsePanelRefresh(){const p=document.getElementById("ppp");if(p)p.innerHTML=ppPanel();hseDraw()}
+function hsePlay(){HSE.play=!HSE.play;clearInterval(HSE.timer);if(HSE.play){if(HSE.t>=HSE.tmax)HSE.t=0;HSE.timer=setInterval(()=>{if(!document.getElementById("hsesl")&&!document.getElementById("hse3")){clearInterval(HSE.timer);HSE.play=false;return}HSE.t=Math.min(HSE.tmax,HSE.t+.1*HSE.speed);if(HSE.t>=HSE.tmax){HSE.play=false;clearInterval(HSE.timer);const b=document.getElementById("hseplay");if(b)b.textContent="Replay"}hseDraw()},100)}
+ const b=document.getElementById("hseplay");if(b)b.textContent=HSE.play?"Pause":"Play"}
+function hseSeek(v){HSE.t=+v;hseDraw()}
+function hseIgnite(){HSE.sc="cloud";HSE.ign=Math.round(HSE.t);hseCalc();if(HSE.view!=="3d")ppUpd(true);hsePanelRefresh()}
+function hseClearIgn(){HSE.ign=-1;hseCalc();if(HSE.view!=="3d")ppUpd(true);hsePanelRefresh()}
+function hseView(v){HSE.view=v;render();setTimeout(()=>{if(v==="3d")hse3Init()},30)}
+/* ---------- panel ---------- */
+const hseF=(v,d)=>Number.isFinite(v)?v.toFixed(d==null?0:d):"n/a";
+function hseDyn(){const R=HSE.R;if(!R)return"";const M=R.M,t=HSE.t,r100=hseReach(M,t,100,1.5),r50=hseReach(M,t,50,1.5),r25=hseReach(M,t,25,1.5);let rel=0;for(let i=0;i*M.dt<=t&&i<M.Qt.length;i++)rel+=M.Qt[i]*M.dt;
+ const st=t<M.tIso?"Release running":M.qt(t)>0?"Isolated, line draining":"Release finished";
+ return `<div class="hsegrid"><div><b>${Math.round(t)} s</b><span>time</span></div><div><b>${hseF(rel)} kg</b><span>released so far</span></div><div><b>${r100?r100+" m":"none"}</b><span>cloud above 100% LFL</span></div><div><b>${r50?r50+" m":"none"}</b><span>above 50% LFL</span></div><div><b>${r25?r25+" m":"none"}</b><span>above 25% LFL</span></div><div><b>${st}</b><span>status</span></div></div>`}
+const hseCls=(v,a,b)=>v>=b?"bad":v>=a?"warn":"ok";
+function hseRecRows(R){return R.rec.map(r=>{let tag="ok",txt="No effect expected";
+  if(HSE.sc==="cloud"){if(r.pk>=100){tag="bad";txt=`Inside the flammable cloud (${Math.round(r.pk)}% of LFL)`}else if(r.pk>=25){tag="warn";txt=`Gas reaches it (${Math.round(r.pk)}% of LFL). Ignition risk`}else if(r.pk>=5){txt=`Traces only (${Math.round(r.pk)}% of LFL)`}
+   if(R.blast&&r.op>=7){tag=r.op>=21?"bad":"warn";txt+=`${txt==="No effect expected"?"":". "}Blast ${hseF(r.op,0)} kPa`}}
+  else{if(r.flux>=37.5){tag="bad";txt=`${hseF(r.flux,1)} kW/m². Equipment damage, escalation`}else if(r.flux>=12.5){tag="bad";txt=`${hseF(r.flux,1)} kW/m². Fatal within a minute`}else if(r.flux>=4.7){tag="warn";txt=`${hseF(r.flux,1)} kW/m². Pain within 15 s`}else if(r.flux>=1.6){txt=`${hseF(r.flux,1)} kW/m². Tolerable for long periods`}}
+  return `<tr><td><b>${esc(r.id)}</b><div class="muted" style="font-size:11px">${r.kind}${r.sameUnit?" | source":""}, ${Math.round(r.dist)} m away</div></td><td><span class="tag ${tag}">${esc(txt)}</span></td></tr>`}).join("")}
+function hseActions(R){const M=R.M,a=[],cr=R.rec.find(x=>x.id==="Control room"),mA=R.rec.find(x=>x.id==="Muster point A"),mB=R.rec.find(x=>x.id==="Muster point B"),tag=S(HSE.n).tag;
+ if(M.tDet==null)a.push(`The release is too small for the gas detectors to see at 12 m. Operators would find it by smell or by the leak itself, so check the area on rounds and add detectors closer to ${tag}.`);
+ else a.push(`The detectors alarm about ${Math.round(M.tDet)} s after the leak starts. ${HSE.esd==="auto"?"Shutdown closes the isolation valves "+Math.round(M.tIso-M.tDet)+" s later, at "+Math.round(M.tIso)+" s.":HSE.esd==="manual"?"With manual shutdown the operator closes the valves at about "+Math.round(M.tIso)+" s, after "+hseF(M.Q0*M.tIso)+" kg has gone out.":"With shutdown failed the leak runs until the inventory is gone."}`);
+ if(HSE.sc==="cloud"){if(R.crT!=null)a.push(`Gas reaches the control room air intake at ${R.crT} s. Close the intake dampers and stop ignition sources before then.`);else a.push("Gas does not reach 25% of the LFL at the control room in this wind.");
+  if(mA&&mA.pk>=25&&mB&&mB.pk<25)a.push("Muster point A is in the gas. Send people to muster point B and keep them crosswind of the cloud.");else if(mB&&mB.pk>=25&&mA&&mA.pk<25)a.push("Muster point B is in the gas. Send people to muster point A.");else if(mA&&mA.pk>=25&&mB&&mB.pk>=25)a.push("Both muster points see gas. Move to the gates upwind and call for outside help.");
+  if(R.reach.r50>0)a.push(`Keep ignition sources out of the ${R.reach.r50} m zone. Stop vehicles on the road if it falls inside.`);
+  if(R.blast)a.push(`If the cloud ignites at ${HSE.ign} s about ${hseF(R.blast.m)} kg of vapour is in the flammable range, which equals about ${hseF(R.blast.W,1)} kg of TNT. Blast damage of 21 kPa reaches ${hseF(R.blast.r[1])} m.`)}
+ if(HSE.sc==="jet")a.push(`The flame is about ${hseF(R.jet.L)} m long. Turn the fire monitors on the neighbouring units and keep the area within ${hseF(R.jet.r[1])} m clear of people.`);
+ if(HSE.sc==="pool"&&R.pool)a.push(`The pool is about ${hseF(R.pool.D)} m across and the flame about ${hseF(R.pool.H)} m high. Use foam and cool the nearest vessels.`);
+ if(HSE.sc==="pool"&&!R.pool)a.push("No pool forms in this case, so there is no pool fire. Try a liquid hexane source or a larger hole.");
+ const w=R.walk.best;a.push(`The better walk to a muster point is ${w.k}: ${w.L} m, ${w.T} s, ${w.pk?`peak ${w.pk}% of LFL on the way`:"clear of gas on the way"}.`);return a}
+function hseBarriers(R){const M=R.M,n=HSE.n,xv=(D[n]&&D[n].n.find(x=>/^XV-/.test(String(x[0]))))||null;
+ return [["Gas detection",M.tDet==null?["Does not see this leak","bad"]:["Alarms at "+Math.round(M.tDet)+" s (20% of LFL)","ok"]],
+  ["Shutdown valve"+(xv?" "+xv[0]:""),[HSE.esd==="auto"?"Closes at "+Math.round(M.tIso)+" s":HSE.esd==="manual"?"Operator closes at "+Math.round(M.tIso)+" s":"Failed. Release runs on",HSE.esd==="auto"?"ok":HSE.esd==="manual"?"warn":"bad"]],
+  ["Fire monitors and hydrants",["Fixed monitors beside each flammable unit","ok"]],
+  ["Muster points",[R.rec.find(x=>x.id==="Muster point A").pk>=25&&R.rec.find(x=>x.id==="Muster point B").pk>=25?"Both reached by gas":"At least one is clear",R.rec.find(x=>x.id==="Muster point A").pk>=25&&R.rec.find(x=>x.id==="Muster point B").pk>=25?"bad":"ok"]],
+  ["Control room",[R.crT!=null?"Gas arrives at "+R.crT+" s":"Gas does not arrive",R.crT!=null?"warn":"ok"]]]}
+function hsePanel(){const R=HSE.R,units=hseUnits(),sel=(k,opts,cur)=>`<select onchange="hseSet('${k}',this.value)">${opts.map(([v,l])=>`<option value="${v}" ${String(cur)===String(v)?"selected":""}>${l}</option>`).join("")}</select>`;
+ if(!R)return `<h3>Hazard simulator</h3><p class="muted">Choose a flammable unit.</p>`;
+ const M=R.M,src=M.src,w=R.walk,fireRows=[];
+ const eff=[];
+ eff.push(["Release",`${hseF(M.Q0,1)} kg/s through a ${HSE.hole} mm hole at ${src.P} barg, ${src.T} °C`]);
+ if(!M.f.gas)eff.push(["Flash and pool",`${Math.round(M.Fv*100)}% of the liquid becomes vapour at once; the rest forms a pool`]);
+ eff.push(["Mass out by shutdown",`${hseF(M.Q0*Math.min(M.tIso,src.inv/Math.max(M.Q0,.01)))} kg (inventory ${hseF(src.inv)} kg)`]);
+ if(HSE.sc==="cloud"){eff.push(["Cloud over 100% of LFL",R.reach.r100?`up to ${R.reach.r100} m downwind`:"never"]);eff.push(["Cloud over 50% of LFL",R.reach.r50?`up to ${R.reach.r50} m`:"never"]);eff.push(["Cloud over 25% of LFL",R.reach.r25?`up to ${R.reach.r25} m, reached at ${R.reach.tmax} s`:"never"]);
+  if(R.blast){eff.push(["Ignited at",HSE.ign+" s"]);eff.push(["Vapour in flammable range",hseF(R.blast.m)+" kg"]);R.blast.r.forEach((r,i)=>eff.push([HSE_LIM.blast[i][0]+" kPa",`${hseF(r)} m. ${HSE_LIM.blast[i][1]}`]))}}
+ if(HSE.sc==="jet"){eff.push(["Flame length",hseF(R.jet.L)+" m"]);R.jet.r.forEach((r,i)=>eff.push([HSE_LIM.heat[i][0]+" kW/m²",`${hseF(r)} m. ${HSE_LIM.heat[i][1]}`]))}
+ if(HSE.sc==="pool"&&R.pool){eff.push(["Pool",`${hseF(R.pool.D)} m across, flame ${hseF(R.pool.H)} m high`]);R.pool.r.forEach((r,i)=>eff.push([HSE_LIM.heat[i][0]+" kW/m²",`${hseF(r)} m. ${HSE_LIM.heat[i][1]}`]))}
+ const opl=K.opl.find(o=>o.set===HSE.n);
+ return `<div class="hsebox"><div class="row between"><h3 style="margin:0">Hazard simulator</h3><span class="tag warn">Screening model</span></div>
+ <div class="hseform"><label>What happens${sel("sc",[["cloud","Gas cloud (can be ignited)"],["jet","Jet fire (ignited at once)"],["pool","Pool fire (liquid hexane)"]],HSE.sc)}</label>
+  <label>Where${sel("n",units.map(s=>[s.n,s.tag+" | "+HSE_F[hseKey(s.n)].name]),HSE.n)}</label>
+  <label>Hole size${sel("hole",[[10,"10 mm (small flange leak)"],[25,"25 mm (gasket blowout)"],[50,"50 mm (large leak)"],[100,"100 mm (line rupture)"]],HSE.hole)}</label>
+  <label>Wind speed <b>${HSE.u} m/s</b><input type="range" min="1.5" max="12" step=".5" value="${HSE.u}" onchange="hseSet('u',this.value)"></label>
+  <label>Wind from${sel("wind",[["N",0],["NE",45],["E",90],["SE",135],["S",180],["SW",225],["W",270],["NW",315]].map(([l,a])=>[a,l]),PP.wind).replace("hseSet('wind',this.value)","hseWind(this.value)")}</label>
+  <label>Weather${sel("st",[["B","Sunny day (unstable)"],["D","Overcast (neutral)"],["F","Clear calm night (stable)"]],HSE.st)}</label>
+  <label>Shutdown${sel("esd",[["auto","Automatic on gas alarm"],["manual","Manual, operator acts"],["fail","Fails to close"]],HSE.esd)}</label>
+  <label>Operator reacts after <b>${HSE.resp} s</b><input type="range" min="10" max="180" step="5" value="${HSE.resp}" onchange="hseSet('resp',this.value)"></label></div>
+ ${HSE.sc==="cloud"?`<div class="row" style="gap:6px;margin:8px 0">${HSE.ign>=0?`<span class="tag bad">Ignited at ${HSE.ign} s</span><button class="ghost" onclick="hseClearIgn()">Remove ignition</button>`:`<button onclick="hseIgnite()">Ignite the cloud at ${Math.round(HSE.t)} s</button><span class="muted" style="font-size:12px">Move the time slider first to choose when</span>`}</div>`:""}
+ <div id="hsedyn" class="hsedyn">${hseDyn()}</div>
+ <h4>Effects</h4><table class="mht">${eff.map(e=>`<tr><td style="width:44%">${esc(e[0])}</td><td>${esc(e[1])}</td></tr>`).join("")}</table>
+ <h4>Who and what is affected</h4><table class="mht">${hseRecRows(R)}</table>
+ <h4>Walk to muster</h4><table class="mht"><tr><th>Muster</th><th>Distance</th><th>Time</th><th>Peak gas</th><th>Time above 50%</th></tr>${["A","B"].map(k=>{const x=w[k];return `<tr class="${w.best.k===k?"cur":""}"><td><b>${k}</b>${w.best.k===k?" (better)":""}</td><td>${x.L} m</td><td>${x.T} s</td><td>${x.pk}% of LFL</td><td>${x.s50?`<span class="tag bad">${x.s50} s</span>`:'<span class="tag ok">none</span>'}</td></tr>`}).join("")}</table>
+ <h4>Barriers in this case</h4><table class="mht">${hseBarriers(R).map(b=>`<tr><td>${esc(b[0])}</td><td><span class="tag ${b[1][1]}">${esc(b[1][0])}</span></td></tr>`).join("")}</table>
+ <h4>What to do</h4><ul class="hseul">${hseActions(R).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ ${opl?`<h4>From the one point lesson</h4><p class="muted" style="font-size:12.5px;margin:0">${esc(opl.no)}: ${esc((opl.safety||[])[0]||"")} <a class="alink" onclick="go('opl',{opl:'${opl.no}'})">Open the lesson</a></p>`:""}
+ <p class="muted" style="font-size:11.5px;margin:8px 0 0">Gaussian plume for an industrial site, orifice flow, Burgess pool burning rate, point-source flame radiation and a TNT equivalent blast. The cloud is treated as passing over the units without being blocked. Use it to compare cases, and take real decisions from a consequence study.</p></div>`}
+
+function hseWind(v){PP.wind=+v;hseCalc();if(HSE.view!=="3d")ppUpd(true);hsePanelRefresh()}
+/* ---------- plot plan page: the hazard simulator replaces the old release drill ---------- */
+const hseMapHTML=()=>PP.mode==="hazard"&&HSE.view==="3d"?`<div id="hse3" class="hse3"><canvas></canvas><div class="hse3k"></div><div class="hse3tip">Drag to look around, scroll to zoom, right-drag to move</div></div>`:mapSvg(0,{full:true});
+const hseTL=()=>`<div class="hsetl"><button id="hseplay" onclick="hsePlay()">${HSE.play?"Pause":HSE.t>=HSE.tmax?"Replay":"Play"}</button><input id="hsesl" type="range" min="0" max="${HSE.tmax}" step="1" value="${HSE.t}" oninput="hseSeek(this.value)" aria-label="Time since the leak started"><b id="hsetl">${Math.round(HSE.t)} s</b><label class="muted">Speed <select onchange="HSE.speed=+this.value">${[[2,"slow"],[6,"normal"],[15,"fast"]].map(([v,l])=>`<option value="${v}" ${HSE.speed===v?"selected":""}>${l}</option>`).join("")}</select></label><span class="hsetog"><button class="${HSE.view==="2d"?"on":""}" onclick="hseView('2d')">2D plan</button><button class="${HSE.view==="3d"?"on":""}" onclick="hseView('3d')">3D site</button></span></div>`;
+function ppUpd(full){const p=$("#ppp");if(p)p.innerHTML=ppPanel();const t=$("#pptask");if(t)t.innerHTML=ppTaskBar();if(full){const m=$("#ppmap");if(m&&!(PP.mode==="hazard"&&HSE.view==="3d"&&m.querySelector("#hse3"))){m.innerHTML=hseMapHTML();if(PP.mode==="hazard"&&HSE.view==="3d")setTimeout(hse3Init,0)}}aiSetCtx("pp",ppCtx());
+ const a=$("#ppat");if(a)a.textContent=PP.at;if(PP.mode==="hazard")hseDraw()}
+const _ppPanel=ppPanel;ppPanel=function(){return PP.mode==="hazard"?(HSE.R?hsePanel():(hseCalc(),hsePanel())):_ppPanel()};
+const _mapSvg=mapSvg;mapSvg=function(sel,opt){let s=_mapSvg.apply(this,arguments);if(opt&&opt.full&&PP.mode==="hazard"&&HSE.R)s=s.replace('<g id="ppcloud"></g>',`<g id="hseov">${hseOverlay(HSE.R,HSE.t)}</g><g id="ppcloud"></g>`);return s};
+function ppBody(){const M=[["explore","Site overview"],["hazard","Hazard simulator"]],LY=[["areas","Areas"],["heat","Heat map"],["haz","Hazard zones"],["esc","Muster and gates"],["fire","Fire protection"],["walk","Walkways"]];
+ if(PP.mode==="release")PP.mode="hazard";if(PP.mode==="hazard"&&!HSE.R)hseCalc();
+ return `<div class="split" style="grid-template-columns:minmax(0,1fr) 380px"><div class="card" style="min-width:0"><div class="row between" style="margin-bottom:8px"><h3>Plot plan | LLDPE unit <span class="tag">TJC-LLD-PP-XXXX</span></h3><span class="row" style="gap:4px">${M.map(([k,l])=>`<button class="${PP.mode===k?"":"ghost"}" style="padding:5px 11px;font-size:12.5px" onclick="PP.mode='${k}';ppUpd(true);render()">${l}</button>`).join("")}</span></div>
+  <div id="pptask">${ppTaskBar()}</div>
+  ${PP.mode==="hazard"?hseTL():`<div class="chips" style="margin:8px 0 6px;align-items:center">${LY.map(([k,l])=>`<span class="chip" style="${PP.L[k]?"color:var(--acc);border-color:var(--acc)":""}" onclick="PP.L['${k}']=PP.L['${k}']?0:1;ppUpd(true);render()">${l}</span>`).join("")}<span style="margin-left:auto" class="row"><button class="ghost" style="padding:3px 10px" onclick="ppZoom(1.25)">-</button><button class="ghost" style="padding:3px 10px" onclick="ppZoom(0)">Fit</button><button class="ghost" style="padding:3px 10px" onclick="ppZoom(.8)">+</button>${PP.L.heat?modeSel():""}</span></div>`}
+  <div id="ppmap">${hseMapHTML()}</div>
+  <div class="row muted" style="font-size:12px;margin-top:6px"><span>${PP.mode==="hazard"?"Zones are drawn on the real plot plan in metres. Yellow, orange and red show 25%, 50% and 100% of the lower flammable limit":"Footprints to scale (E x N, metres). Drag to pan, scroll to zoom"}</span><span>The overlay layers are approximate</span></div></div>
+  <div><div class="card" id="ppp">${ppPanel()}</div>${aiPanel("pp",ppCtx())}</div></div>`}
+const _ppTaskBar=ppTaskBar;ppTaskBar=function(){if(PP.mode!=="hazard")return _ppTaskBar();return `<div class="otsbar"><span class="tag warn">Hazard simulator</span><span class="muted">${HSE.R?S(HSE.n).tag+" | "+HSE.R.M.f.name+" | "+({cloud:"gas cloud",jet:"jet fire",pool:"pool fire"})[HSE.sc]:"choose a source"}</span><span class="muted" style="margin-left:auto">Wind ${HSE.u} m/s from ${ppWindName(PP.wind)}</span></div>`};
+/* leaving the page stops the clock */
+
+/* =====================================================================================================
+   3D SITE VIEW FOR THE HAZARD SIMULATOR
+   The plot plan in true scale: units, pipe rack, control room, roads, muster points and fire protection, drawn with the same
+   depth-buffered renderer as the equipment models. The gas cloud is a volume: nested shells for 25, 50 and 100 per cent of the lower
+   flammable limit grow and drift with the wind, with soft puffs inside. Flames, heat zones and blast waves are drawn in the same space,
+   so a cloud passes behind a tank and in front of a building the way it would on site.
+   ===================================================================================================== */
+regMod("hse3d","1.0",["g3r","hse"],"3D site view");
+const H3={built:false,cam:{yaw:.0,pit:.66,dist:175,tx:180,ty:2,tz:178},to:null,sel:0,drag:null};
+const H3_EL={1:0,2:6,3:0,4:0,5:0,6:3,7:12,8:4.5};
+function hse3Build(){if(H3.built)return;const faces=[];let pi=0,cur="";
+ const add=(prims,tf,rn)=>{prims.forEach(p=>{g3Parts(p).forEach(f=>{g3Orient(p,f);faces.push({p:f.p.map(tf),n:rn?rn(f.n):f.n,mid:tf(f.mid),c:f.c,m:f.m,sm:f.sm,k:cur,pi,light:f.light,sc:f.sc})});pi++})};
+ const id=v=>v,B=(x,y,z,w,h,d,c,o)=>g3B("",x,y,z,w,h,d,c,o),C=(ax,x,y,z,l,r,c,o)=>g3C("",ax,x,y,z,l,r,c,o);
+ /* ground, boundary kerb, road, pipe rack */
+ add([B(180,-.2,180,330,.4,330,"#d9e0ea")],id);
+ add([B(180,.25,102,160,.5,.5,"amber"),B(180,.25,246,160,.5,.5,"amber"),B(100,.25,174,.5,.5,144,"amber"),B(260,.25,174,.5,.5,144,"amber")],id);
+ add([B(180,.05,238,160,.1,8,"dark",{r:.1}),...Array.from({length:16},(_,i)=>B(104+i*10,.11,238,4,.02,.3,"white"))],id);
+ const rack=[];for(let e=100;e<=260;e+=10){[164.6,171.4].forEach(n=>rack.push(C("y",e,3,n,6,.16,"dark")));rack.push(B(e,4.3,168,.3,.25,7.2,"dark",{r:.03}),B(e,6,168,.3,.25,7.2,"dark",{r:.03}))}
+ rack.push(B(180,4.3,164.6,160,.2,.2,"steel"),B(180,4.3,171.4,160,.2,.2,"steel"),B(180,6,164.6,160,.2,.2,"steel"),B(180,6,171.4,160,.2,.2,"steel"),B(180,6.15,168,160,.06,5.6,"gray"));
+ [[4.7,166,"#4f86c9"],[4.7,168,"#6fb883"],[4.7,170,"#cc5f58"],[6.5,167,"#cfa84e"],[6.5,169,"#7fbbe6"]].forEach(([y,n,c])=>rack.push(C("x",180,y,n,160,.32,c,{seg:12,m:.4})));
+ add(rack,id);
+ /* control room, hydrants, muster points */
+ add([B(103,2.1,186,8,4.2,14,"white",{r:.3,m:.1}),B(103,4.35,186,8.4,.3,14.4,"steel"),...[-4,-1.3,1.4,4].map(z=>B(107.05,2.4,186+z,.08,1.1,2,"blue"))],id);
+ [120,150,180,210,240].forEach(e=>add([C("y",e,.5,236,1,.22,"red",{seg:10}),C("x",e,.8,236,.5,.1,"red",{seg:8})],id));
+ Object.values(MUS).forEach(([e,n])=>add([C("y",e,.12,n,.25,3.2,"green",{seg:28}),C("y",e,3.2,n,6.4,.08,"gray",{seg:8}),B(e+.9,5.6,n,1.8,1.1,.05,"green")],id));
+ /* units at their footprint, on a deck where the drawing gives an elevation */
+ K.sets.forEach(s=>{const n=s.n,Mx=g3Mesh(n,.5),[E,N]=POS[n],[fw,fl]=ppFP(n),dx=Mx.mx[0]-Mx.mn[0],dz=Mx.mx[2]-Mx.mn[2],rot90=(fw<fl)!==(dx<dz),sc=Math.max(.5,Math.min(Math.sqrt(fw*fl/(dx*dz))*.95,Math.min(fw/(rot90?dz:dx),fl/(rot90?dx:dz))*1.3)),el=H3_EL[n]||0,cx=(Mx.mn[0]+Mx.mx[0])/2,cz=(Mx.mn[2]+Mx.mx[2])/2,cs=rot90?0:1,sn=rot90?1:0;
+  const tf=v=>{const x=v[0]-cx,z=v[2]-cz;return[E+sc*(cs*x+sn*z),el+sc*(v[1]-Mx.ymin)+.05,N+sc*(-sn*x+cs*z)]},rn=m=>[cs*m[0]+sn*m[2],m[1],-sn*m[0]+cs*m[2]];
+  cur="U"+n;const prims=[];Mx.faces.forEach(f=>{if(f.in)return;faces.push({p:f.p.map(tf),n:rn(f.n),mid:tf(f.mid),c:f.c,m:f.m,sm:f.sm,k:cur,pi:pi+(f.pi||0)%4096,light:f.light,sc:f.sc})});pi+=4100;
+  H3.units=H3.units||{};H3.units[n]={x:E,z:N,top:el+sc*(Mx.mx[1]-Mx.ymin)+.5,r:Math.max(fw,fl)/2+2};
+  cur="";if(el>0){const w=fw+1.2,l=fl+1.2;add([B(E,el-.15,N,w,.3,l,"steel",{r:.05}),...[[-1,-1],[1,-1],[-1,1],[1,1]].map(([a,b])=>C("y",E+a*w/2*.9,el/2,N+b*l/2*.9,el,.14,"dark",{seg:10})),B(E,el/2,N+l/2*.9,w*.9,.1,.1,"dark"),B(E,el/2,N-l/2*.9,w*.9,.1,.1,"dark")],id)}
+  /* pipe from the unit to the rack */
+  const up=N<168,rn_=up?164.6:171.4;add([C("z",E,el+.6,(N+rn_)/2,Math.abs(rn_-N),.13,"#8d6bd1",{seg:8}),C("y",E,(el+.6+4.7)/2,rn_,Math.abs(4.7-el-.6),.13,"#8d6bd1",{seg:8})],id)});
+ /* pack into typed arrays with smooth normals */
+ const M3={faces};faces.forEach(f=>{f.zb=0});H3.faces=faces;const pk=H3.pk=g3Pack(M3);
+ const nF=faces.length,fr=new Float32Array(nF),fg=new Float32Array(nF),fb=new Float32Array(nF),fm=new Float32Array(nF),fao=new Float32Array(nF),frim=new Float32Array(nF);
+ faces.forEach((f,i)=>{fr[i]=f.c[0];fg[i]=f.c[1];fb[i]=f.c[2];fm[i]=f.m||.18;fao[i]=1;frim[i]=f.sm?.12:.04});
+ H3.fr=fr;H3.fg=fg;H3.fb=fb;H3.fm=fm;H3.fao=fao;H3.frim=frim;H3.base=faces.map(f=>f.c.slice(0,3));H3.built=true}
+/* ---------- camera and projection ---------- */
+function hse3Cam(PW,PH){const c=H3.cam,cy=Math.cos(c.yaw),sy=Math.sin(c.yaw),cp=Math.cos(c.pit),sp=Math.sin(c.pit),F=PH*.95;
+ return{c,cy,sy,cp,sp,F,PW,PH,v:p=>{const x=p[0]-c.tx,y=p[1]-c.ty,z=p[2]-c.tz,x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp+z1*sp,z2=-y*sp+z1*cp,d=c.dist+z2;return d<1?null:[PW/2+x1*F/d,PH/2-y2*F/d,d]}}}
+/* static scene: depth buffer, colours, outlines, distance haze. Redone only when the camera moves or a unit is selected. */
+function hse3Static(K3,B){const pk=H3.pk,nF=pk.nF,V=pk.V,{c,cy,sy,cp,sp,F,PW,PH}=K3,off=pk.off,F_=H3.faces;
+ let SX=H3.SX,SY=H3.SY,SW=H3.SW,NX=H3.NX,NY=H3.NY,NZ=H3.NZ;if(!SX||SX.length!==V){SX=H3.SX=new Float32Array(V);SY=H3.SY=new Float32Array(V);SW=H3.SW=new Float32Array(V);NX=H3.NX=new Float32Array(V);NY=H3.NY=new Float32Array(V);NZ=H3.NZ=new Float32Array(V)}
+ B.W.fill(0);B.F.fill(0);B.img32=B.img32||new Uint32Array(B.img.data.buffer);B.img32.fill(0);
+ for(let j=0;j<V;j++){const x=pk.vx[j]-c.tx,y=pk.vy[j]-c.ty,z=pk.vz[j]-c.tz,x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp+z1*sp,z2=-y*sp+z1*cp,d=c.dist+z2;SW[j]=d<1?0:1/d;SX[j]=PW/2+x1*F/Math.max(d,1);SY[j]=PH/2-y2*F/Math.max(d,1);
+  const nz1=-pk.nx[j]*sy+pk.nz[j]*cy;NX[j]=pk.nx[j]*cy+pk.nz[j]*sy;NY[j]=pk.ny[j]*cp+nz1*sp;NZ[j]=-pk.ny[j]*sp+nz1*cp}
+ const S=g3Shader(H3.fr,H3.fg,H3.fb,H3.fm,H3.fao,H3.frim);let drawn=0;
+ for(let i=0;i<nF;i++){const f=F_[i],a0=off[i],a1=off[i+1];let ok=true;for(let j=a0;j<a1;j++)if(SW[j]===0){ok=false;break}if(!ok)continue;
+  const n=f.n,nz1=-n[0]*sy+n[2]*cy,nx=n[0]*cy+n[2]*sy,ny=n[1]*cp+nz1*sp,nzz=-n[1]*sp+nz1*cp,m=f.mid,x=m[0]-c.tx,y=m[1]-c.ty,z=m[2]-c.tz,x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp+z1*sp,z2=-y*sp+z1*cp,d=c.dist+z2;
+  if(nx*x1+ny*y2+nzz*d>=0)continue;
+  let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;for(let j=a0;j<a1;j++){const X=SX[j],Y=SY[j];if(X<mnx)mnx=X;if(X>mxx)mxx=X;if(Y<mny)mny=Y;if(Y>mxy)mxy=Y}if(mxx<0||mnx>PW||mxy<0||mny>PH)continue;if(mxx-mnx<.6&&mxy-mny<.6)continue;
+  drawn++;for(let j=1;j<a1-a0-1;j++){const u=a0,v=a0+j,w=a0+j+1;g3Tri(B,S,SX[u],SY[u],SW[u],SX[v],SY[v],SW[v],SX[w],SY[w],SW[w],[NX[u],NY[u],NZ[u]],[NX[v],NY[v],NZ[v]],[NX[w],NY[w],NZ[w]],i,0)}}
+ const img32=B.img32,Wb=B.W,Fb=B.F,Nb=B.N,n=PW*PH,fog0=c.dist*.8,fog1=c.dist*3.2,sky=[226,234,244];
+ for(let p=0;p<n;p++){const fi=Fb[p]-1;if(fi<0)continue;const o3=p*3;S.shade(fi,Nb[o3],Nb[o3+1],Nb[o3+2]);let r=S.sr,g=S.sg,b=S.sb;const d=1/Wb[p];if(d>fog0){const f=Math.min(.55,(d-fog0)/(fog1-fog0));r+=(sky[0]-r)*f;g+=(sky[1]-g)*f;b+=(sky[2]-b)*f}img32[p]=0xff000000|((b|0)<<16)|((g|0)<<8)|(r|0)}
+ g3Outline(B,pk.fpi,PW,PH,PW/900);B.base=B.base&&B.base.length===n?B.base:new Uint32Array(n);B.base.set(img32);H3.drawn=drawn}
+/* ---------- hazard geometry, drawn each frame ---------- */
+const H3_RAD=(a,b,c)=>[a,b,c];
+function hse3Hazard(R,t,K3,B,out){const M=R.M,v=K3.v,tris=[],tri=(a,b,c,col,al)=>{const A=v(a),Bq=v(b),C=v(c);if(!A||!Bq||!C)return;tris.push([A,Bq,C,col,al,A[2]+Bq[2]+C[2]])};
+ const W=(x,y,z)=>{const p=hseToPlan(M,x,y);return[p[0],z,p[1]]};
+ const ring=(pts,col,al)=>{for(let i=1;i<pts.length-1;i++)tri(pts[0],pts[i],pts[i+1],col,al)};
+ const disc=(cx,cz,r,y,col,al,n)=>{n=n||40;const p=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2;p.push([cx+Math.cos(a)*r,y,cz+Math.sin(a)*r])}ring(p,col,al)};
+ const annulus=(cx,cz,r0,r1,y,col,al)=>{const n=48;for(let i=0;i<n;i++){const a=i/n*Math.PI*2,b=(i+1)/n*Math.PI*2,p0=[cx+Math.cos(a)*r0,y,cz+Math.sin(a)*r0],p1=[cx+Math.cos(a)*r1,y,cz+Math.sin(a)*r1],q0=[cx+Math.cos(b)*r0,y,cz+Math.sin(b)*r0],q1=[cx+Math.cos(b)*r1,y,cz+Math.sin(b)*r1];tri(p0,p1,q1,col,al);tri(p0,q1,q0,col,al)}};
+ const src=POS[M.cfg.n],burnt=HSE.ign>=0&&t>=HSE.ign+7&&HSE.sc==="cloud";
+ /* gas cloud: nested shells */
+ if(HSE.sc==="cloud"&&!burnt){const flash=HSE.ign>=0&&t>=HSE.ign&&t<HSE.ign+7,fl=flash?.5+.5*Math.sin(t*40):0;
+  [[25,[246,205,50],.17],[50,[244,145,40],.24],[100,flash?[255,230,110]:[214,48,39],.34]].forEach(([lvl,col,al])=>{
+   const rows=[];for(let x=3;x<=M.xmax;x+=Math.max(3,Math.round(hseReach(M,t,lvl,1.5)/22)||3)){const k=M.k(x,t);if(!k)continue;let zt=0;for(let z=0;z<=60;z+=.25){const g=Math.exp(-Math.pow(z-k.H,2)/(2*k.sz*k.sz))+Math.exp(-Math.pow(z+k.H,2)/(2*k.sz*k.sz));if(k.K*g/M.f.lfl*100>=lvl)zt=z}
+    if(zt<=0&&k.K*2/M.f.lfl*100<lvl)continue;const NZ=7,ringp=[];const ys=zz=>{const g=Math.exp(-Math.pow(zz-k.H,2)/(2*k.sz*k.sz))+Math.exp(-Math.pow(zz+k.H,2)/(2*k.sz*k.sz)),vv=k.K*g/M.f.lfl*100;return vv>lvl?k.sy*Math.sqrt(2*Math.log(vv/lvl)):0};
+    const zs=[];for(let j=0;j<NZ;j++){const zz=Math.max(.05,zt*Math.pow(j/(NZ-1),1.4));zs.push(zz)}
+    const L=[],Rr=[];zs.forEach(zz=>{const y=ys(zz);L.push(W(x,-y,zz));Rr.push(W(x,y,zz))});rows.push(L.concat(Rr.reverse()))}
+   for(let i=0;i+1<rows.length;i++){const a=rows[i],b=rows[i+1];for(let j=0;j<a.length;j++){const j2=(j+1)%a.length;tri(a[j],b[j],b[j2],col,al+fl*.15);tri(a[j],b[j2],a[j2],col,al+fl*.15)}}
+   if(rows.length){const a=rows[0];ring(a,col,al*.8);const z=rows[rows.length-1];ring(z,col,al*.8)}
+   const gr=hseSlices(M,t,lvl,1.5);if(gr.length>1)ring([...gr.map(r=>W(r[0],r[1],.1)),...gr.slice().reverse().map(r=>W(r[0],-r[1],.1))],col,al*.9)})}
+ /* jet flame */
+ const flame=(len,wid,al)=>{const n=12,st=8,fl=1+.06*Math.sin(t*26)+.04*Math.sin(t*41);const rows=[];for(let s=0;s<=st;s++){const q=s/st,x=len*fl*q,r=wid*Math.sin(Math.PI*Math.pow(q,.7))*(.9+.1*Math.sin(t*30+s)),row=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2;row.push(W(x,Math.cos(a)*r,1.4+Math.sin(a)*r))}rows.push(row)}
+  for(let s=0;s<st;s++)for(let i=0;i<n;i++){const j=(i+1)%n;tri(rows[s][i],rows[s+1][i],rows[s+1][j],[255,150,30],al);tri(rows[s][i],rows[s+1][j],rows[s][j],[255,150,30],al)}
+  const core=[];for(let s=0;s<=st;s++){const q=s/st,x=len*fl*.62*q,r=wid*.5*Math.sin(Math.PI*Math.pow(q,.8)),row=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2;row.push(W(x,Math.cos(a)*r,1.4+Math.sin(a)*r))}core.push(row)}
+  for(let s=0;s<st;s++)for(let i=0;i<n;i++){const j=(i+1)%n;tri(core[s][i],core[s+1][i],core[s+1][j],[255,235,120],al*1.1);tri(core[s][i],core[s+1][j],core[s][j],[255,235,120],al*1.1)}};
+ const sp=W(0,0,0);
+ if(HSE.sc==="jet"){const J=R.jet,c=hseToPlan(M,J.mid,0);flame(J.L,J.L*.13,.5);J.r.forEach((r,i)=>{annulus(c[0],c[1],i===0?0:J.r[i-1],r,.12,i===0?[122,15,27]:i===1?[207,34,46]:[240,138,36],.14+.04*(2-i))})}
+ if(HSE.sc==="pool"&&R.pool){const P=R.pool;[[1,[255,140,30],.45],[.62,[255,215,90],.55]].forEach(([k,col,al])=>{const n=28,hh=P.H*(.9+.1*Math.sin(t*14))*k,rows=[];for(let s=0;s<=6;s++){const q=s/6,r=P.D/2*k*(1-.55*q)*(1+.05*Math.sin(t*20+s*2)),row=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2;row.push([src[0]+Math.cos(a)*r,q*hh+.1,src[1]+Math.sin(a)*r])}rows.push(row)}
+   for(let s=0;s<6;s++)for(let i=0;i<n;i++){const j=(i+1)%n;tri(rows[s][i],rows[s+1][i],rows[s+1][j],col,al);tri(rows[s][i],rows[s+1][j],rows[s][j],col,al)}});
+   P.r.forEach((r,i)=>annulus(src[0],src[1],i===0?P.D/2:P.r[i-1],r,.12,i===0?[122,15,27]:i===1?[207,34,46]:[240,138,36],.14+.04*(2-i)))}
+ /* the fire that follows ignition while the leak is still running */
+ if(HSE.sc==="cloud"&&HSE.ign>=0&&t>=HSE.ign&&M.qt(t)>0){const q=M.qt(t),L=Math.min(80,6.5*Math.sqrt(q));flame(L,L*.12,.5)}
+ /* blast wave */
+ if(R.blast&&t>=HSE.ign){const k=Math.min(1,(t-HSE.ign)/6),bc=hseToPlan(M,R.blast.x0,0);R.blast.r.forEach((r,i)=>{annulus(bc[0],bc[1],Math.max(0,r*k-1.2),r*k,.2,i===0?[122,15,27]:i===1?[207,34,46]:[240,138,36],.55)});
+  const dome=R.blast.r[2]*k;if(k<1){const n=24,m=8;for(let a=0;a<m;a++)for(let i=0;i<n;i++){const p=a/m*Math.PI/2,p2=(a+1)/m*Math.PI/2,t0=i/n*Math.PI*2,t1=(i+1)/n*Math.PI*2,f=(pp,tt)=>[bc[0]+Math.cos(tt)*Math.cos(pp)*dome,Math.sin(pp)*dome*.6,bc[1]+Math.sin(tt)*Math.cos(pp)*dome];tri(f(p,t0),f(p2,t0),f(p2,t1),[255,200,120],.07);tri(f(p,t0),f(p2,t1),f(p,t1),[255,200,120],.07)}}
+  if(t-HSE.ign<2.5)disc(bc[0],bc[1],Math.max(4,R.flash*.4)*(1+(t-HSE.ign)),.5,[255,220,100],.5,24)}
+ /* sort the see-through faces back to front and draw them in front of what the scene already holds */
+ tris.sort((a,b)=>b[5]-a[5]);const S2={fa:null,sr:0,sg:0,sb:0,shade(fi){const q=tris[fi];this.sr=q[3][0];this.sg=q[3][1];this.sb=q[3][2]}};S2.fa=new Float32Array(tris.length);tris.forEach((q,i)=>S2.fa[i]=Math.min(.9,q[4]));
+ const nrm=[0,0,-1];B.PW=B.PW&&B.PW.length===B.W.length?B.PW:new Float32Array(B.W.length);
+ tris.forEach((q,i)=>{const A=q[0],Bq=q[1],C=q[2];g3Tri(B,S2,A[0],A[1],1/A[2],Bq[0],Bq[1],1/Bq[2],C[0],C[1],1/C[2],nrm,nrm,nrm,i,1)});
+ out.tris=tris.length}
+/* ---------- soft puffs, markers and labels on top of the shells ---------- */
+function hse3Overlay(R,t,K3,B,ctx){const M=R.M,v=K3.v,PW=K3.PW,hidden=(p)=>{const x=p[0]|0,y=p[1]|0;if(x<0||y<0||x>=PW||y>=K3.PH)return true;const w=B.W[y*PW+x];return w>0&&1/w<p[2]-2};
+ const burnt=HSE.ign>=0&&t>=HSE.ign+7&&HSE.sc==="cloud";
+ /* puffs inside the cloud */
+ if(HSE.sc==="cloud"&&!burnt){const reach=hseReach(M,t,25,1.5)||0;if(reach>0){let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+   for(let i=0;i<260;i++){const u1=rnd(),u2=rnd(),u3=rnd(),u4=rnd(),x=reach*Math.pow(u1,.75)+2*Math.sin(t*.9+i),k=M.k(x,t);if(!k)continue;const gy=Math.sqrt(-2*Math.log(u2+1e-6))*Math.cos(6.283*u3)*k.sy*.8,gz=Math.abs(k.H+Math.sqrt(-2*Math.log(u4+1e-6))*Math.cos(6.283*u2)*k.sz*.8);
+    const cc=M.c(x,gy,gz,t);if(cc<12)continue;const pl=hseToPlan(M,x+Math.sin(t*.6+i*1.7)*1.5,gy+Math.cos(t*.5+i)*1.2),p=v([pl[0],gz,pl[1]]);if(!p||hidden(p))continue;
+    const r=(2.6+k.sz*.35)*K3.F/p[2],col=cc>=100?"214,48,39":cc>=50?"244,145,40":"246,205,50",g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],r);g.addColorStop(0,"rgba("+col+","+Math.min(.16,.05+cc/900)+")");g.addColorStop(1,"rgba("+col+",0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(p[0],p[1],r,0,7);ctx.fill()}}}
+ /* smoke from fires */
+ const smoke=(base,n,up,spread,dark)=>{let seed=3;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647},dir=hseDir();for(let i=0;i<n;i++){const age=((t*.35+i/n)%1),h=up*age+2,drift=age*age*18*HSE.u,j=(rnd()-.5)*spread*age,pl=[base[0]+dir[0]*drift+dir[1]*j,base[1]+dir[1]*drift-dir[0]*j],p=v([pl[0],h,pl[1]]);if(!p||hidden(p))continue;const r=(2+age*7)*K3.F/p[2],g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],r);g.addColorStop(0,"rgba("+dark+","+(.22*(1-age))+")");g.addColorStop(1,"rgba("+dark+",0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(p[0],p[1],r,0,7);ctx.fill()}};
+ if(HSE.sc==="pool"&&R.pool)smoke(POS[M.cfg.n],40,R.pool.H*2.2,8,"60,60,66");
+ if(HSE.sc==="jet")smoke(hseToPlan(M,R.jet.L*.6,0),26,R.jet.L*.9,5,"70,70,76");
+ /* gas detectors */
+ for(let i=0;i<8;i++){const a=i*Math.PI/4,pl=[POS[M.cfg.n][0]+Math.cos(a)*12,POS[M.cfg.n][1]+Math.sin(a)*12],p=v([pl[0],2.2,pl[1]]);if(!p||hidden(p))continue;const s=Math.max(3,.7*K3.F/p[2]);ctx.fillStyle="#2e6bd6";ctx.strokeStyle="#fff";ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(p[0],p[1]-s);ctx.lineTo(p[0]+s,p[1]);ctx.lineTo(p[0],p[1]+s);ctx.lineTo(p[0]-s,p[1]);ctx.closePath();ctx.fill();ctx.stroke()}
+ /* leak point */
+ {const p=v([POS[M.cfg.n][0],1.4,POS[M.cfg.n][1]]);if(p){const r=(5+2*Math.sin(t*6))*K3.F/p[2]*.2;ctx.fillStyle="rgba(209,36,47,.3)";ctx.beginPath();ctx.arc(p[0],p[1],r*1.8,0,7);ctx.fill();ctx.fillStyle="#d1242f";ctx.beginPath();ctx.arc(p[0],p[1],Math.max(3,r*.7),0,7);ctx.fill()}}
+ /* walker */
+ if(R.walk&&t>=HSE.resp){const w=R.walk.best,r=ppRoute(ppAcc(M.cfg.n),MUS[w.k]),L=plen(r),s=Math.min(L,(t-HSE.resp)*2.2);let acc=0,pos=r[r.length-1];for(let i=1;i<r.length;i++){const d=eu(r[i],r[i-1]);if(acc+d>=s){const f=d?(s-acc)/d:0;pos=[r[i-1][0]+(r[i][0]-r[i-1][0])*f,r[i-1][1]+(r[i][1]-r[i-1][1])*f];break}acc+=d}
+  ctx.strokeStyle="rgba(26,127,55,.9)";ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();let st=false;r.forEach(q=>{const p=v([q[0],.3,q[1]]);if(!p)return;st?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);st=true});ctx.stroke();ctx.setLineDash([]);
+  const p=v([pos[0],1.2,pos[1]]);if(p){ctx.fillStyle="#1a7f37";ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.beginPath();ctx.arc(p[0],p[1],Math.max(4,1.2*K3.F/p[2]),0,7);ctx.fill();ctx.stroke()}}
+ /* wind arrow on the ground upwind of the source */
+ {const d=hseDir(),s=POS[M.cfg.n],a=[s[0]-d[0]*30,0.4,s[1]-d[1]*30],b=[s[0]-d[0]*14,0.4,s[1]-d[1]*14],pa=v(a),pb=v(b);if(pa&&pb){ctx.strokeStyle="#0b5fd7";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(pa[0],pa[1]);ctx.lineTo(pb[0],pb[1]);ctx.stroke();const ang=Math.atan2(pb[1]-pa[1],pb[0]-pa[0]);ctx.fillStyle="#0b5fd7";ctx.beginPath();ctx.moveTo(pb[0]+Math.cos(ang)*10,pb[1]+Math.sin(ang)*10);ctx.lineTo(pb[0]+Math.cos(ang+2.5)*9,pb[1]+Math.sin(ang+2.5)*9);ctx.lineTo(pb[0]+Math.cos(ang-2.5)*9,pb[1]+Math.sin(ang-2.5)*9);ctx.fill();ctx.font="600 12px system-ui,sans-serif";ctx.textAlign="center";ctx.fillStyle="#1d4f9c";ctx.fillText(HSE.u+" m/s",pa[0],pa[1]-8)}}
+ /* unit labels */
+ ctx.font="600 12px system-ui,sans-serif";ctx.textAlign="center";
+ K.sets.forEach(s=>{const u=H3.units[s.n],p=v([u.x,u.top+2.5,u.z]);if(!p)return;const src=s.n===M.cfg.n,on=H3.sel===s.n,txt=s.tag,w=ctx.measureText(txt).width+14;ctx.fillStyle=src?"#d1242f":on?"#155ea3":"rgba(255,255,255,.94)";ctx.strokeStyle=src?"#d1242f":"#25324a";ctx.lineWidth=1;ctx.beginPath();ctx.roundRect?ctx.roundRect(p[0]-w/2,p[1]-10,w,19,9):ctx.rect(p[0]-w/2,p[1]-10,w,19);ctx.fill();ctx.stroke();ctx.fillStyle=src||on?"#fff":"#1d2b3d";ctx.fillText(txt,p[0],p[1]+4)});
+ const cr=v([103,6,186]);if(cr){ctx.fillStyle="rgba(255,255,255,.94)";ctx.strokeStyle="#25324a";const w=ctx.measureText("Control room").width+14;ctx.beginPath();ctx.roundRect?ctx.roundRect(cr[0]-w/2,cr[1]-10,w,19,9):ctx.rect(cr[0]-w/2,cr[1]-10,w,19);ctx.fill();ctx.stroke();ctx.fillStyle="#1d2b3d";ctx.fillText("Control room",cr[0],cr[1]+4)}
+ Object.entries(MUS).forEach(([k,pp])=>{const p=v([pp[0],8,pp[1]]);if(!p)return;ctx.fillStyle="#1a7f37";const w=ctx.measureText("Muster "+k).width+14;ctx.beginPath();ctx.roundRect?ctx.roundRect(p[0]-w/2,p[1]-10,w,19,9):ctx.rect(p[0]-w/2,p[1]-10,w,19);ctx.fill();ctx.fillStyle="#fff";ctx.fillText("Muster "+k,p[0],p[1]+4)})}
+/* ---------- frame ---------- */
+function hse3Draw(){const root=document.getElementById("hse3");if(!root||!HSE.R||!root.dataset.ok)return;hse3Build();const cv=root.querySelector("canvas"),cw=root.clientWidth||900,ch=root.clientHeight||560,dpr=Math.min(2,window.devicePixelRatio||1),now=performance.now();
+ if(H3.busy)return;H3.busy=true;try{const moving=H3.drag||now-(H3.lastMove||0)<260,PW0=Math.round(Math.min(1500,cw*dpr*(moving?.8:1.1))),PH0=Math.round(PW0*ch/cw);const PW=PW0,PH=PH0;if(cv.width!==PW||cv.height!==PH){cv.width=PW;cv.height=PH;H3.key=null}
+  const B=g3Buf("hse3",PW,PH),K3=hse3Cam(PW,PH),c=H3.cam,key=[PW,PH,c.yaw.toFixed(4),c.pit.toFixed(4),c.dist.toFixed(2),c.tx.toFixed(2),c.ty,c.tz.toFixed(2),H3.sel].join("|");
+  if(H3.key!==key){const t0=performance.now();H3.sel!==H3.selDone&&hse3Tint();hse3Static(K3,B);H3.key=key;H3.selDone=H3.sel;H3.statMs=performance.now()-t0}
+  B.img32.set(B.base);const out={};const tt=HSE.t,clock=now/1000;const R=HSE.R;
+  const save=HSE.t;HSE.t=tt;hse3Hazard(R,tt+clock*0,K3,B,out);
+  const ctx=cv.getContext("2d");const g=ctx.createLinearGradient(0,0,0,PH);g.addColorStop(0,"#bcd0e8");g.addColorStop(.5,"#e2eaf4");g.addColorStop(1,"#eef2f7");ctx.fillStyle=g;ctx.fillRect(0,0,PW,PH);
+  let oc=B.oc;if(!oc||oc.width!==PW||oc.height!==PH){oc=B.oc=document.createElement("canvas");oc.width=PW;oc.height=PH}oc.getContext("2d").putImageData(B.img,0,0);ctx.drawImage(oc,0,0);
+  hse3Overlay(R,tt,K3,B,ctx);H3.ms=performance.now()-now;H3.tris=out.tris;
+  const k=root.querySelector(".hse3k");if(k){const h=hse3Key();if(k.dataset.h!==h){k.dataset.h=h;k.innerHTML=h}}
+ }finally{H3.busy=false}}
+function hse3Tint(){const faces=H3.faces;faces.forEach((f,i)=>{const sel=f.k==="U"+H3.sel,src=f.k==="U"+HSE.n,b=H3.base[i],a=sel?.28:src?.18:0,tc=sel?[40,120,220]:[220,60,50];H3.fr[i]=b[0]*(1-a)+(a?tc[0]*a:0);H3.fg[i]=b[1]*(1-a)+(a?tc[1]*a:0);H3.fb[i]=b[2]*(1-a)+(a?tc[2]*a:0)})}
+function hse3Key(){const R=HSE.R;let h=`<b>${S(HSE.n).tag}</b> leaking<br>`;if(HSE.sc==="cloud")h+=`<i style="background:rgba(246,205,50,.7)"></i>25% LFL<br><i style="background:rgba(244,145,40,.8)"></i>50% LFL<br><i style="background:rgba(214,48,39,.85)"></i>100% LFL (burns or explodes)`;else h+=`<i style="background:rgba(240,138,36,.8)"></i>4.7 kW/m²<br><i style="background:rgba(207,34,46,.8)"></i>12.5 kW/m²<br><i style="background:rgba(122,15,27,.9)"></i>37.5 kW/m²`;if(R&&R.blast)h+=`<br><i style="background:rgba(207,34,46,.9)"></i>Blast 7, 21, 35 kPa`;return h+`<br><i style="background:#2e6bd6"></i>Gas detector<br><i style="background:#1a7f37"></i>Walk to muster`}
+/* ---------- controls ---------- */
+function hse3Go(v){const c=H3.cam,s=POS[HSE.n],T=v==="site"?{yaw:0,pit:.66,dist:175,tx:180,ty:2,tz:178}:v==="source"?{yaw:-.55,pit:.5,dist:80,tx:s[0]+14,ty:3,tz:s[1]+14}:v==="top"?{yaw:0,pit:1.5,dist:250,tx:180,ty:0,tz:176}:{yaw:.9,pit:.35,dist:70,tx:s[0],ty:6,tz:s[1]};H3.to=T;H3.lastMove=performance.now();H3.anim=H3.anim||requestAnimationFrame(hse3Tween)}
+function hse3Tween(){H3.anim=0;if(!H3.to)return;const c=H3.cam,T=H3.to,k=.16;let dy=T.yaw-c.yaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));c.yaw+=dy*k;["pit","dist","tx","ty","tz"].forEach(a=>c[a]+=(T[a]-c[a])*k);H3.lastMove=performance.now();hse3Draw();if(Math.abs(dy)>.004||["pit","dist","tx","tz"].some(a=>Math.abs(T[a]-c[a])>(a==="pit"?.004:.2)))H3.anim=requestAnimationFrame(hse3Tween);else H3.to=null}
+function hse3Init(){const root=document.getElementById("hse3");if(!root||root.dataset.ok)return;root.dataset.ok="1";hse3Build();const cv=root.querySelector("canvas");
+ const bar=document.createElement("div");bar.className="hse3bar";bar.innerHTML=`<button onclick="hse3Go('site')">Whole site</button><button onclick="hse3Go('source')">Leak</button><button onclick="hse3Go('top')">From above</button><button onclick="hse3Go('side')">Side</button>`;root.appendChild(bar);
+ let down=null;const ptr=new Map();
+ cv.addEventListener("pointerdown",e=>{down={x:e.clientX,y:e.clientY,mv:0,pan:e.shiftKey||e.button===2};H3.drag=true;H3.to=null;try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+ cv.addEventListener("contextmenu",e=>e.preventDefault());
+ cv.addEventListener("pointermove",e=>{if(!down)return;const dx=e.clientX-down.x,dy=e.clientY-down.y;down.mv+=Math.abs(dx)+Math.abs(dy);down.x=e.clientX;down.y=e.clientY;const c=H3.cam,r=cv.getBoundingClientRect();
+  if(down.pan){const k=c.dist/(r.height*.95);c.tx-=(dx*Math.cos(c.yaw)+dy*Math.sin(c.yaw)*1.3)*k;c.tz-=(dx*Math.sin(c.yaw)-dy*Math.cos(c.yaw)*1.3)*k}else{c.yaw+=dx*.006;c.pit=Math.max(.08,Math.min(1.5,c.pit+dy*.005))}H3.lastMove=performance.now();hse3Draw()});
+ cv.addEventListener("pointerup",e=>{const d=down;down=null;H3.drag=false;if(d&&d.mv<6&&!d.pan){const r=cv.getBoundingClientRect(),B=g3Buf("hse3",cv.width,cv.height),x=Math.round((e.clientX-r.left)/r.width*cv.width),y=Math.round((e.clientY-r.top)/r.height*cv.height),f=B.F[y*cv.width+x]-1;
+   if(f>=0){const k=H3.pk.fk[f],name=k>=0?H3.pk.keys[k]:"";if(/^U\d$/.test(name)){const n=+name.slice(1);H3.sel=n;if(hseKey(n)&&n!==HSE.n)hseSet("n",n);else{hsePanelRefresh()}}else H3.sel=0}else H3.sel=0;H3.lastMove=0;hse3Draw()}else{H3.lastMove=performance.now();setTimeout(hse3Draw,300)}});
+ cv.addEventListener("wheel",e=>{e.preventDefault();H3.to=null;H3.cam.dist=Math.max(14,Math.min(420,H3.cam.dist*(e.deltaY<0?.9:1.1)));H3.lastMove=performance.now();hse3Draw();clearTimeout(H3.wt);H3.wt=setTimeout(hse3Draw,320)},{passive:false});
+ cv.addEventListener("dblclick",()=>hse3Go("site"));
+ clearInterval(H3.timer);H3.timer=setInterval(()=>{const r=document.getElementById("hse3");if(!r){clearInterval(H3.timer);return}if(document.hidden)return;hse3Draw()},90);hse3Draw()}
+{let tm=null;new MutationObserver(()=>{if(!tm)tm=setTimeout(()=>{tm=null;const r=document.getElementById("hse3");if(r&&!r.dataset.ok)hse3Init()},40)}).observe(document.body,{childList:true,subtree:true})}
 /* generated by tools/g3bridge.js: necks that join otherwise floating parts of the 3D models */
 const G3NECK={"1":[],"2":[["","y",-0.419,0.55,-0.922,0.13,0.018],["3","x",2.175,0.88,-0.135,0.16,0.018],["","z",-2.413,1.149,0.203,0.169,0.018],["3","y",-2.398,0.92,0.268,0.21,0.018],["N4","y",2.049,1.756,0.019,0.218,0.019],["","z",-0.564,0.855,-1.124,0.163,0.019],["6","x",-0.398,0.608,0.803,0.234,0.026],["","x",2.259,1.756,-1.213,0.301,0.027],["","y",-1.748,2.79,-1.41,0.33,0.03]],"3":[["9","y",0.863,3.625,0.019,0.1,0.018]],"4":[["N4","x",2.06,1.028,-0.251,0.13,0.018],["N6","x",0.387,0.423,0.719,0.15,0.018],["11","x",0.597,0.302,0.733,0.149,0.018],["","y",0.901,0.795,0.793,0.12,0.018],["10","z",-0.616,0.925,0.326,0.181,0.019]],"5":[["N3","y",1.249,1.815,0.016,0.1,0.018],["11","y",1.324,0.356,-0.022,0.142,0.018],["","y",0.02,0.435,-0.264,0.18,0.018]],"6":[["9","x",0.379,0.888,0.028,0.108,0.018]],"7":[["","z",-0.318,0.044,1.341,0.112,0.018]],"8":[["7","x",-0.25,1.151,0.213,0.09,0.018],["9","y",0.704,2.185,-0.014,0.16,0.018],["","x",0.022,2.003,-0.005,0.174,0.018],["","z",0.106,1.985,-0.207,0.217,0.022]]};
 /* =====================================================================================================
@@ -4981,6 +5363,21 @@ function g3Tri(B,S,ax,ay,aw,bx,by,bw,cx,cy,cw,na,nb,nc,fi,mode){
     const a=S.fa[fi],p=img32[idx],pa=(p>>>24)/255,da=a+pa*(1-a);
     if(pa===0){img32[idx]=((a*255)<<24)|(S.sb<<16)|(S.sg<<8)|S.sr}
     else{const ia=1-a,r=(S.sr*a+(p&255)*ia)|0,g=(S.sg*a+((p>>>8)&255)*ia)|0,b=(S.sb*a+((p>>>16)&255)*ia)|0;img32[idx]=((da*255)<<24)|(b<<16)|(g<<8)|r}}}}}
+
+/* shading of one surface point: three lights, hemisphere, rim and a tight highlight. The arrays hold each face's colour, gloss, height shade and rim strength. */
+function g3Shader(fr,fg,fb,fm,fao,frim){const L1=[-.5,.72,-.48],L2=[.6,.25,-.5],l1=Math.hypot(...L1),l2=Math.hypot(...L2),Hv=[L1[0]/l1,L1[1]/l1,L1[2]/l1-1],hl_=Math.hypot(...Hv);
+ return{fa:null,sr:0,sg:0,sb:0,shade(fi,nx,ny,nz){let l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;nx/=l;ny/=l;nz/=l;if(nz>0){nx=-nx;ny=-ny;nz=-nz}
+   const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=ny*.5+.5;
+   const x=Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),x2=x*x,x4=x2*x2,x8=x4*x4,spec=x8*x8*x4*x2*fm[fi];
+   const az=1-Math.abs(nz),rim=az*az*az*frim[fi],lum=(.36+.5*d1+.16*d2+.12*hemi)*fao[fi]+rim,sx=255*spec*.55+rim*60;
+   const r=fr[fi]*lum+sx,g=fg[fi]*lum+sx,b=fb[fi]*lum+sx+rim*10;this.sr=r>255?255:r|0;this.sg=g>255?255:g|0;this.sb=b>255?255:b|0}}}
+/* dark outlines from the buffers: silhouette, boundary between parts and sharp creases */
+function g3Outline(B,pi_,PW,PH,q){const Fb=B.F,Nb=B.N,img32=B.img32,Wp=PW,st=Math.max(1,Math.round(q*.75));
+ for(let y=st;y<PH-st;y++){for(let x=st;x<Wp-st;x++){const p=y*Wp+x,f0=Fb[p];if(f0===0)continue;const fl=Fb[p-st],fr_=Fb[p+st],fu=Fb[p-st*Wp],fd=Fb[p+st*Wp];let dk=1;
+   if(fl===0||fr_===0||fu===0||fd===0)dk=.5;
+   else{const a=pi_[f0-1];if((fl!==f0&&pi_[fl-1]!==a)||(fr_!==f0&&pi_[fr_-1]!==a)||(fu!==f0&&pi_[fu-1]!==a)||(fd!==f0&&pi_[fd-1]!==a))dk=.62;
+    else if(fr_!==f0||fd!==f0){const o1=p*3,o2=(fr_!==f0?p+st:p+st*Wp)*3,dt=(Nb[o1]*Nb[o2]+Nb[o1+1]*Nb[o2+1]+Nb[o1+2]*Nb[o2+2])/16129;if(dt<.8)dk=.82}}
+   if(dk<1){const c=img32[p];img32[p]=0xff000000|(((c>>>16&255)*dk)<<16)|(((c>>>8&255)*dk)<<8)|((c&255)*dk)}}}}
 /* draw one frame of a viewer */
 function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!box)return;const o=G3.cfg[id],M=g3Mesh(o.n),svg=box.querySelector("svg"),cv=box.querySelector("canvas.g3cv");if(!svg||!cv)return;const mini=!!box.dataset.mini,t0=performance.now();
  const W=900,H=500,cy=Math.cos(I.yaw),sy=Math.sin(I.yaw),cp=Math.cos(I.pit),sp=Math.sin(I.pit),D=M.R*3.4,t=I.t,tm=I.clock||0;
@@ -5022,13 +5419,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
   const hlOn=k&&hl.includes(k),hov=k&&k===I.hover;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.08+24));else if(hov)c=c.map(v=>Math.min(255,v*1.05+16));if(!f.light)cmemo.set(f.c,c)}
   fr[i]=c[0];fg[i]=c[1];fb[i]=c[2];fm[i]=f.m;fao[i]=.86+.14*g3Cl((f.mid[1]-M.ymin)/H0*2.6,0,1);frim[i]=f.sm?.15:.05;
   tris.push(i)}
- /* shading */
- const L1=[-.5,.72,-.48],L2=[.6,.25,-.5],l1=Math.hypot(...L1),l2=Math.hypot(...L2),Hv=[L1[0]/l1,L1[1]/l1,L1[2]/l1-1],hl_=Math.hypot(...Hv);
- const S={fa,sr:0,sg:0,sb:0,shade(fi,nx,ny,nz){let l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;nx/=l;ny/=l;nz/=l;if(nz>0){nx=-nx;ny=-ny;nz=-nz}
-   const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=ny*.5+.5;
-   const x=Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),x2=x*x,x4=x2*x2,x8=x4*x4,spec=x8*x8*x4*x2*fm[fi];
-   const az=1-Math.abs(nz),rim=az*az*az*frim[fi],lum=(.36+.5*d1+.16*d2+.12*hemi)*fao[fi]+rim,sx=255*spec*.55+rim*60;
-   const r=fr[fi]*lum+sx,g=fg[fi]*lum+sx,b=fb[fi]*lum+sx+rim*10;this.sr=r>255?255:r|0;this.sg=g>255?255:g|0;this.sb=b>255?255:b|0}};
+ const S=g3Shader(fr,fg,fb,fm,fao,frim);S.fa=fa;
  /* triangles: opaque ones into the buffers first */
  const trans=[];
  const nrm=(j)=>[NX[j],NY[j],NZ[j]];
@@ -5037,13 +5428,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  /* deferred shading of the nearest surface at every pixel */
  const img32=B.img32,Wb=B.W,Fb=B.F,Nb=B.N;let cover=0;
  for(let p=0;p<n;p++){const fi=Fb[p]-1;if(fi<0)continue;cover++;const o3=p*3;S.shade(fi,Nb[o3],Nb[o3+1],Nb[o3+2]);img32[p]=0xff000000|(S.sb<<16)|(S.sg<<8)|S.sr}
- /* outline from the buffers: silhouette, boundary between parts, and sharp creases */
- {const Wp=PW,st=Math.max(1,Math.round(q*.75)),pi_=pk.fpi;
-  for(let y=st;y<PH-st;y++){for(let x=st;x<Wp-st;x++){const p=y*Wp+x,f0=Fb[p];if(f0===0)continue;const fl=Fb[p-st],fr_=Fb[p+st],fu=Fb[p-st*Wp],fd=Fb[p+st*Wp];let dk=1;
-    if(fl===0||fr_===0||fu===0||fd===0)dk=.5;
-    else{const a=pi_[f0-1];if((fl!==f0&&pi_[fl-1]!==a)||(fr_!==f0&&pi_[fr_-1]!==a)||(fu!==f0&&pi_[fu-1]!==a)||(fd!==f0&&pi_[fd-1]!==a))dk=.62;
-     else if(fr_!==f0||fd!==f0){const o1=p*3,o2=(fr_!==f0?p+st:p+st*Wp)*3,dt=(Nb[o1]*Nb[o2]+Nb[o1+1]*Nb[o2+1]+Nb[o1+2]*Nb[o2+2])/16129;if(dt<.8)dk=.82}}
-    if(dk<1){const c=img32[p];img32[p]=0xff000000|(((c>>>16&255)*dk)<<16)|(((c>>>8&255)*dk)<<8)|((c&255)*dk)}}}}
+ g3Outline(B,pk.fpi,PW,PH,q);
  /* see-through faces: the shells in X-ray and the parts that are dimmed around a selected one */
  B.PW.set(Wb);B.PF.set(Fb);
  if(trans.length){const idxs=trans.slice();const key={};idxs.forEach(i=>{let z=0;const a0=off[i],a1=off[i+1];for(let j=a0;j<a1;j++)z+=RZ[j];key[i]=z/(a1-a0)+(F[i].zb||0)});idxs.sort((a,b)=>key[b]-key[a]);

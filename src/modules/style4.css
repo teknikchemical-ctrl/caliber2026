@@ -227,3 +227,15 @@ aside{overflow-y:auto}
 .pdn:hover{filter:drop-shadow(0 0 3px rgba(47,129,247,.45))}
 #rpmap svg{max-height:680px;width:100%;height:auto}
 .g3stage .g3cv{position:absolute;left:0;top:0;width:100%;height:100%;display:block}.g3stage .g3svg{position:relative}
+/* hazard simulator */
+.hsebox h4{margin:14px 0 6px;font-size:13px}.hseform{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:10px 0}.hseform label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#5c6b7b}
+.hseform select,.hseform input[type=range]{width:100%}.hseul{margin:0;padding-left:18px;font-size:12.8px;line-height:1.55}.hseul li{margin-bottom:4px}
+.hsegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.hsegrid>div{background:#f4f7fb;border:1px solid #dde5ef;border-radius:8px;padding:6px 8px}.hsegrid b{display:block;font-size:14px}.hsegrid span{font-size:11px;color:#5c6b7b}
+.hsetl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0}.hsetl input[type=range]{flex:1;min-width:140px}.hsetl b{min-width:48px}.hsetog{margin-left:auto;display:flex;gap:0}
+.hsetog button{border-radius:0;padding:4px 12px;background:#fff;color:#1d2b3d;border:1px solid #c5d0de}.hsetog button:first-child{border-radius:8px 0 0 8px}.hsetog button:last-child{border-radius:0 8px 8px 0;border-left:0}.hsetog button.on{background:#155ea3;color:#fff;border-color:#155ea3}
+.hsecl{animation:hsepl 2.4s ease-in-out infinite}@keyframes hsepl{50%{opacity:.78}}.hsefl{animation:hsefl .5s ease-in-out infinite alternate}@keyframes hsefl{to{opacity:.7}}
+.hse3{position:relative;height:640px;background:#e8eff7;border-radius:8px;overflow:hidden;border:1px solid #d5deea}.hse3 canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.hse3tip{position:absolute;left:10px;bottom:8px;font-size:12px;color:#44566b;background:rgba(255,255,255,.85);padding:3px 8px;border-radius:6px}.hse3k{position:absolute;right:10px;top:10px;background:rgba(255,255,255,.92);border:1px solid #d5deea;border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.7}
+.hse3k i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hsebox{min-width:0}.hsebox .mht td,.hsebox .mht th{white-space:normal;vertical-align:top}.hsebox .mht{width:100%;table-layout:auto}#ppp{min-width:0;overflow:hidden}
+.hse3bar{position:absolute;left:10px;top:10px;display:flex;gap:6px}.hse3bar button{padding:4px 10px;font-size:12px;background:rgba(255,255,255,.94);color:#1d2b3d;border:1px solid #c5d0de;border-radius:8px}

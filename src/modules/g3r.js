@@ -42,6 +42,21 @@ function g3Tri(B,S,ax,ay,aw,bx,by,bw,cx,cy,cw,na,nb,nc,fi,mode){
     const a=S.fa[fi],p=img32[idx],pa=(p>>>24)/255,da=a+pa*(1-a);
     if(pa===0){img32[idx]=((a*255)<<24)|(S.sb<<16)|(S.sg<<8)|S.sr}
     else{const ia=1-a,r=(S.sr*a+(p&255)*ia)|0,g=(S.sg*a+((p>>>8)&255)*ia)|0,b=(S.sb*a+((p>>>16)&255)*ia)|0;img32[idx]=((da*255)<<24)|(b<<16)|(g<<8)|r}}}}}
+
+/* shading of one surface point: three lights, hemisphere, rim and a tight highlight. The arrays hold each face's colour, gloss, height shade and rim strength. */
+function g3Shader(fr,fg,fb,fm,fao,frim){const L1=[-.5,.72,-.48],L2=[.6,.25,-.5],l1=Math.hypot(...L1),l2=Math.hypot(...L2),Hv=[L1[0]/l1,L1[1]/l1,L1[2]/l1-1],hl_=Math.hypot(...Hv);
+ return{fa:null,sr:0,sg:0,sb:0,shade(fi,nx,ny,nz){let l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;nx/=l;ny/=l;nz/=l;if(nz>0){nx=-nx;ny=-ny;nz=-nz}
+   const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=ny*.5+.5;
+   const x=Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),x2=x*x,x4=x2*x2,x8=x4*x4,spec=x8*x8*x4*x2*fm[fi];
+   const az=1-Math.abs(nz),rim=az*az*az*frim[fi],lum=(.36+.5*d1+.16*d2+.12*hemi)*fao[fi]+rim,sx=255*spec*.55+rim*60;
+   const r=fr[fi]*lum+sx,g=fg[fi]*lum+sx,b=fb[fi]*lum+sx+rim*10;this.sr=r>255?255:r|0;this.sg=g>255?255:g|0;this.sb=b>255?255:b|0}}}
+/* dark outlines from the buffers: silhouette, boundary between parts and sharp creases */
+function g3Outline(B,pi_,PW,PH,q){const Fb=B.F,Nb=B.N,img32=B.img32,Wp=PW,st=Math.max(1,Math.round(q*.75));
+ for(let y=st;y<PH-st;y++){for(let x=st;x<Wp-st;x++){const p=y*Wp+x,f0=Fb[p];if(f0===0)continue;const fl=Fb[p-st],fr_=Fb[p+st],fu=Fb[p-st*Wp],fd=Fb[p+st*Wp];let dk=1;
+   if(fl===0||fr_===0||fu===0||fd===0)dk=.5;
+   else{const a=pi_[f0-1];if((fl!==f0&&pi_[fl-1]!==a)||(fr_!==f0&&pi_[fr_-1]!==a)||(fu!==f0&&pi_[fu-1]!==a)||(fd!==f0&&pi_[fd-1]!==a))dk=.62;
+    else if(fr_!==f0||fd!==f0){const o1=p*3,o2=(fr_!==f0?p+st:p+st*Wp)*3,dt=(Nb[o1]*Nb[o2]+Nb[o1+1]*Nb[o2+1]+Nb[o1+2]*Nb[o2+2])/16129;if(dt<.8)dk=.82}}
+   if(dk<1){const c=img32[p];img32[p]=0xff000000|(((c>>>16&255)*dk)<<16)|(((c>>>8&255)*dk)<<8)|((c&255)*dk)}}}}
 /* draw one frame of a viewer */
 function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!box)return;const o=G3.cfg[id],M=g3Mesh(o.n),svg=box.querySelector("svg"),cv=box.querySelector("canvas.g3cv");if(!svg||!cv)return;const mini=!!box.dataset.mini,t0=performance.now();
  const W=900,H=500,cy=Math.cos(I.yaw),sy=Math.sin(I.yaw),cp=Math.cos(I.pit),sp=Math.sin(I.pit),D=M.R*3.4,t=I.t,tm=I.clock||0;
@@ -83,13 +98,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
   const hlOn=k&&hl.includes(k),hov=k&&k===I.hover;if(selOn||hlOn)c=c.map(v=>Math.min(255,v*1.08+24));else if(hov)c=c.map(v=>Math.min(255,v*1.05+16));if(!f.light)cmemo.set(f.c,c)}
   fr[i]=c[0];fg[i]=c[1];fb[i]=c[2];fm[i]=f.m;fao[i]=.86+.14*g3Cl((f.mid[1]-M.ymin)/H0*2.6,0,1);frim[i]=f.sm?.15:.05;
   tris.push(i)}
- /* shading */
- const L1=[-.5,.72,-.48],L2=[.6,.25,-.5],l1=Math.hypot(...L1),l2=Math.hypot(...L2),Hv=[L1[0]/l1,L1[1]/l1,L1[2]/l1-1],hl_=Math.hypot(...Hv);
- const S={fa,sr:0,sg:0,sb:0,shade(fi,nx,ny,nz){let l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;nx/=l;ny/=l;nz/=l;if(nz>0){nx=-nx;ny=-ny;nz=-nz}
-   const d1=Math.max(0,(nx*L1[0]+ny*L1[1]+nz*L1[2])/l1),d2=Math.max(0,(nx*L2[0]+ny*L2[1]+nz*L2[2])/l2),hemi=ny*.5+.5;
-   const x=Math.max(0,(nx*Hv[0]+ny*Hv[1]+nz*Hv[2])/hl_),x2=x*x,x4=x2*x2,x8=x4*x4,spec=x8*x8*x4*x2*fm[fi];
-   const az=1-Math.abs(nz),rim=az*az*az*frim[fi],lum=(.36+.5*d1+.16*d2+.12*hemi)*fao[fi]+rim,sx=255*spec*.55+rim*60;
-   const r=fr[fi]*lum+sx,g=fg[fi]*lum+sx,b=fb[fi]*lum+sx+rim*10;this.sr=r>255?255:r|0;this.sg=g>255?255:g|0;this.sb=b>255?255:b|0}};
+ const S=g3Shader(fr,fg,fb,fm,fao,frim);S.fa=fa;
  /* triangles: opaque ones into the buffers first */
  const trans=[];
  const nrm=(j)=>[NX[j],NY[j],NZ[j]];
@@ -98,13 +107,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  /* deferred shading of the nearest surface at every pixel */
  const img32=B.img32,Wb=B.W,Fb=B.F,Nb=B.N;let cover=0;
  for(let p=0;p<n;p++){const fi=Fb[p]-1;if(fi<0)continue;cover++;const o3=p*3;S.shade(fi,Nb[o3],Nb[o3+1],Nb[o3+2]);img32[p]=0xff000000|(S.sb<<16)|(S.sg<<8)|S.sr}
- /* outline from the buffers: silhouette, boundary between parts, and sharp creases */
- {const Wp=PW,st=Math.max(1,Math.round(q*.75)),pi_=pk.fpi;
-  for(let y=st;y<PH-st;y++){for(let x=st;x<Wp-st;x++){const p=y*Wp+x,f0=Fb[p];if(f0===0)continue;const fl=Fb[p-st],fr_=Fb[p+st],fu=Fb[p-st*Wp],fd=Fb[p+st*Wp];let dk=1;
-    if(fl===0||fr_===0||fu===0||fd===0)dk=.5;
-    else{const a=pi_[f0-1];if((fl!==f0&&pi_[fl-1]!==a)||(fr_!==f0&&pi_[fr_-1]!==a)||(fu!==f0&&pi_[fu-1]!==a)||(fd!==f0&&pi_[fd-1]!==a))dk=.62;
-     else if(fr_!==f0||fd!==f0){const o1=p*3,o2=(fr_!==f0?p+st:p+st*Wp)*3,dt=(Nb[o1]*Nb[o2]+Nb[o1+1]*Nb[o2+1]+Nb[o1+2]*Nb[o2+2])/16129;if(dt<.8)dk=.82}}
-    if(dk<1){const c=img32[p];img32[p]=0xff000000|(((c>>>16&255)*dk)<<16)|(((c>>>8&255)*dk)<<8)|((c&255)*dk)}}}}
+ g3Outline(B,pk.fpi,PW,PH,q);
  /* see-through faces: the shells in X-ray and the parts that are dimmed around a selected one */
  B.PW.set(Wb);B.PF.set(Fb);
  if(trans.length){const idxs=trans.slice();const key={};idxs.forEach(i=>{let z=0;const a0=off[i],a1=off[i+1];for(let j=a0;j<a1;j++)z+=RZ[j];key[i]=z/(a1-a0)+(F[i].zb||0)});idxs.sort((a,b)=>key[b]-key[a]);
