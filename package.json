@@ -3,9 +3,11 @@
   "private": true,
   "scripts": {
     "build": "python3 build.py",
-    "test": "python3 build.py && node tests/regress.js && node tests/live.js",
+    "test": "python3 build.py && node tests/static.js && node tests/regress.js && node tests/live.js",
     "dev": "LOCAL_STORE_DIR=/tmp/akp-dev AI_PROVIDER=mock node tools/devserver.mjs",
-    "test:layout": "node tests/layout.js --strict"
+    "test:layout": "node tests/layout.js --strict",
+    "test:quick": "python3 build.py && node tests/static.js && node tests/regress.js",
+    "test:layout:quick": "node tests/layout.js --quick --strict"
   },
   "devDependencies": {
     "playwright": "^1.45.0"

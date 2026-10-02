@@ -24,7 +24,7 @@ const SCHEMA=[
  {t:"Lesson",key:"id",src:"Knowledge Studio",fields:["id","type","title","text","set","tags","author","status","rev"],links:["Asset","Failure"],count:()=>UKB.items.length},
  {t:"Source",key:"id",src:"Data Ops",fields:["id","system","kind","owner","refresh","records"],links:[],count:()=>8}];
 /* ---------- persistence ---------- */
-const STORE={db:null,mem:{uk:[],audit:[],fb:[],cfg:{},qa:[],evalruns:[]},ok:false,
+const STORE={db:null,mem:{uk:[],audit:[],fb:[],cfg:{},qa:[],evalruns:[],emb:{}},ok:false,
  open(){return new Promise(res=>{try{const r=indexedDB.open("akp_kb",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>{STORE.db=r.result;res(true)};r.onerror=()=>res(false)}catch(e){res(false)}})},
  get(k){return new Promise(res=>{if(!STORE.db){try{res(JSON.parse(localStorage.getItem("akp_"+k)||"null"))}catch(e){res(null)}return}const q=STORE.db.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)})},
  put(k){const v=STORE.mem[k];if(!STORE.db){try{localStorage.setItem("akp_"+k,JSON.stringify(v))}catch(e){STORE.err="Storage is full. Export the knowledge base and remove old items."}return}try{STORE.db.transaction("kv","readwrite").objectStore("kv").put(JSON.parse(JSON.stringify(v)),k)}catch(e){STORE.err=String(e)}},
@@ -94,12 +94,16 @@ const DB={chunks:[],byId:new Map(),byCid:new Map(),rel:[],hasEmb:false,df:new Ma
   const words={dryer:2,heater:5,compressor:4,reactor:3,separator:6,"cooling tower":7,fan:7,accumulator:8,reflux:8,"feed pump":1,"charge pump":1};for(const[w,n]of Object.entries(words))if(l.includes(w))return n;return 0},
  search(q,o={}){DB.ensure();const qt=tok(q,true),qs=new Map();qt.forEach(([t,w])=>qs.set(t,Math.max(qs.get(t)||0,w)));DB.tagsOf(String(q).toUpperCase()).forEach(t=>qs.set(t.toLowerCase(),2.2));
   const set=o.set||0,det=set||DB.detectSet(q),k1=1.4,b=.75,res=[],Q0=[...new Set(tok(q).map(x=>x[0]))],role=ROLE.name,lam=o.qemb&&DB.hasEmb?.35:0;
-  DB.chunks.forEach((c,i)=>{if(o.kinds&&!o.kinds.includes(c.k))return;if(!o.anyRole&&!c.acl.roles.includes(role))return;if(set&&c.set&&c.set!==set&&c.k!=="dq")return;let s=0;const m=DB.tf[i],hits=[];qs.forEach((w,t)=>{const f=m.get(t);if(!f)return;const df=DB.df.get(t)||1,idf=Math.log(1+(DB.N-df+.5)/(df+.5));s+=w*idf*f*(k1+1)/(f+k1*(1-b+b*c.len/DB.avg));hits.push(t)});if(!s)return;
+  DB.chunks.forEach((c,i)=>{if(o.kinds&&!o.kinds.includes(c.k))return;if(!o.anyRole&&!c.acl.roles.includes(role))return;if(set&&c.set&&c.set!==set&&c.k!=="dq")return;let s=0;const m=DB.tf[i],hits=[];qs.forEach((w,t)=>{const f=m.get(t);if(!f)return;const df=DB.df.get(t)||1,idf=Math.log(1+(DB.N-df+.5)/(df+.5));s+=w*idf*f*(k1+1)/(f+k1*(1-b+b*c.len/DB.avg));hits.push(t)});
+   /* meaning-based recall: a record with no shared words can still qualify when its embedding is close to the question */
+   let cs=0;if(lam&&c.emb){cs=DB.cos(o.qemb,c.emb);if(!s&&cs>=DB.EMB_MIN&&!(det&&c.set&&c.set!==det)){s=(cs-DB.EMB_MIN+.05)*40*c.trust*(KIND_PRIOR[c.k]||1);res.push({...c,score:s,hits:[],cov:0,cs,sem:true});return}}
+   if(!s)return;
    s*=c.trust*(KIND_PRIOR[c.k]||1);if(det&&c.set===det)s*=1.45;else if(det&&c.set&&c.set!==det)s*=.7;
    if(role==="Reliability"&&(c.k==="wo"||c.k==="pdm"))s*=1.15;if(role==="Operator"&&(c.k==="opl"||c.k==="il"))s*=1.15;if(role==="HSE"&&(c.k==="il"||c.k==="opl"))s*=1.12;if(role==="Manager"&&c.k==="pdm")s*=1.1;
-   if(lam&&c.emb){const cs=DB.cos(o.qemb,c.emb);s=s*(1-lam)+lam*Math.max(0,cs)*40}
-   res.push({...c,score:s,hits,cov:Q0.length?Q0.filter(t=>m.has(t)).length/Q0.length:1})});
+   if(lam&&c.emb){s=s*(1-lam)+lam*Math.max(0,cs)*40}
+   res.push({...c,score:s,hits,cs,cov:Q0.length?Q0.filter(t=>m.has(t)).length/Q0.length:1})});
   res.sort((a,b)=>b.score-a.score);const top=res[0]?res[0].score:1;res.forEach(r=>{r.rel=r.score/top;r.score=+(r.score).toFixed(2)});const seen={},out=[];for(const r of res){const key=r.id+"|"+r.k;if((seen[key]=(seen[key]||0)+1)>2)continue;out.push(r);if(out.length>=(o.k||6))break}return out},
+ EMB_MIN:.6,
  cos(a,b){let s=0,x=0,y=0;for(let i=0;i<a.length;i++){s+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i]}return s/(Math.sqrt(x*y)||1)},
  async embedAll(fn,batch=32){DB.ensure();const todo=DB.chunks.filter(c=>!c.emb);for(let i=0;i<todo.length;i+=batch){const part=todo.slice(i,i+batch),v=await fn(part.map(c=>c.title+"\n"+c.text));part.forEach((c,j)=>c.emb=v[j])}DB.hasEmb=DB.chunks.some(c=>c.emb);return todo.length},
  facts(o={}){FX.ensure();return FX.rows.filter(f=>(!o.set||f.set===o.set)&&(!o.kind||f.kind===o.kind)&&(!o.name||f.name.toLowerCase().includes(String(o.name).toLowerCase())||f.tag.toLowerCase()===String(o.name).toLowerCase()))},

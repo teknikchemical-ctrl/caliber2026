@@ -69,7 +69,7 @@
   .split{display:grid;grid-template-columns:2fr 1fr;gap:14px}
   .hidden{display:none}
   .back{color:var(--acc);cursor:pointer;margin-bottom:12px;display:inline-block}
-  @media(max-width:900px){aside{display:none}.g4,.split,.opl{grid-template-columns:1fr}main{padding:18px}}
+  @media(max-width:900px){.g4,.split,.opl{grid-template-columns:1fr}main{padding:18px}}
 
   h4{font-size:13px} .tab{white-space:nowrap} .tabs{overflow:auto} .stat b .tag{font-size:14px}
 .pbar{padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;font-size:12.5px;background:var(--panel2)}
@@ -1128,7 +1128,7 @@ function paint(full){
   if(window.fxSim)fxSim(SIM);
 }
 function repaintStatic(){put("simWrap",simBody());paint(true)}
-window.SIMX={SC:()=>SC,init:(n,i)=>simInit(n,i),S:()=>SIM};
+window.SIMX={SC:()=>SC,init:(n,i)=>simInit(n,i),S:()=>SIM,tick:dr=>tick(dr),fig:()=>figHTML()};
 window.oplRun=()=>{if(!SIM)return;if(SIM.out){simInit(SIM.no,SIM.i);SIM.run=true}else SIM.run=!SIM.run;repaintStatic()};
 window.oplReset=()=>{if(!SIM)return;const sp=SIM.spd,h=SIM.hint;simInit(SIM.no,SIM.i);SIM.spd=sp;SIM.hint=h;repaintStatic()};
 window.oplSpd=k=>{if(!SIM)return;SIM.spd=k;repaintStatic()};

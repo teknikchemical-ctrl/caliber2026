@@ -40,3 +40,26 @@ The page works as a plain file and as a Netlify site with a shared database and 
 `node tests/layout.js [--strict]` opens every page, tab and key dialog at 1440, 1100 and 820 px and reports overlapping text, clipped text, content spilling out of its card, labels overlapping inside SVG figures and horizontal page overflow. Run it after any change to markup or styles (`npm run test:layout`).
 
 `src/modules/fx.js` holds two shared helpers. `svgFix` moves small labels inside any SVG figure away from labels they would overlap, and caches the offsets per figure so figures that repaint every animation frame are corrected without measuring again. The motion layer adds ripples around equipment in alarm or trip, a state-aware frame and readings flash in the OPL simulator, and count-up on KPI tiles. Motion is disabled for users who request reduced motion. When adding a CSS class, check that the name is not already used elsewhere (`grep -rn "\.name{" src`), because a duplicate name silently restyles the older component.
+
+## Tests
+
+| Command | What it covers |
+|---|---|
+| `npm test` | build, static checks (duplicate CSS class names and functions), page regression and answer evaluation, simulator smoke test, then the live test (two users, AI adapters, limits, access codes, conflicts, backup, embeddings, offline fallback) |
+| `npm run test:quick` | build, static checks and regression only |
+| `npm run test:layout` | overlap, clipping, spill, SVG label and accessibility audit at 1440, 1100, 820 and 390 px (runs the viewports in parallel) |
+| `npm run test:layout:quick` | the same at 1440 px only |
+
+GitHub Actions runs `npm test` and the quick layout audit on every push (`.github/workflows/ci.yml`).
+
+## Shared database controls
+
+- Optional access codes (`EDIT_CODE`, `APPROVE_CODE`, `ADMIN_CODE`), backup and restore, conflict copies when two people edit the same item, a usage and quality page (Integrations, Usage and quality), diagnostics in Settings, an assumptions register for the chain reaction rules (Scenarios), answer language (English or Bahasa Indonesia), a guided tour and a mobile layout. See `docs/DEPLOY_NETLIFY.md`.
+
+## Known limits
+
+- The plant data (P&IDs, OPLs, datasheets, interlocks, maintenance history) is a snapshot embedded in the page. There is no live connection to the document, maintenance or historian systems.
+- Meaning-based search uses the provider's embeddings; the similarity threshold (`DB.EMB_MIN`) has not been tuned on real questions.
+- Failure forecasts are limited by the data: unit level history does not predict the next breakdown better than the plant average.
+- Access codes are shared secrets, not individual logins.
+- Alerts by email or chat are not included (they need a messaging service).

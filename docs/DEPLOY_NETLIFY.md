@@ -28,6 +28,28 @@ The site is a static page (`dist/index.html`) plus three Netlify Functions in `n
 
 Netlify Blobs needs no setup. It is available to functions on every site.
 
+## Optional settings
+
+| Variable | Effect |
+|---|---|
+| `EDIT_CODE` | When set, every change to the shared database needs this code. Visitors enter it once in Settings, Access codes. Reading stays open. |
+| `APPROVE_CODE` | When set, approving a knowledge item needs this code in addition to the edit code. Use it so only reviewers can make knowledge trusted. |
+| `ADMIN_CODE` | Enables backup, restore and clean-up in Settings, Administration. The admin routes stay disabled while it is unset. |
+| `AI_MODEL_FALLBACK` | Models tried in order when `AI_MODEL` is not available to the key (default `gemini-2.0-flash,gemini-1.5-flash`). |
+| `AI_EMBED_MODEL`, `AI_EMBED_DAILY` | Embedding model for meaning-based search (default `gemini-embedding-001`) and the daily number of new texts allowed (default 4000). |
+
+Settings, Run diagnostics calls `/api/selftest` and reports in plain language whether storage, the key and the model work.
+
+## Functions
+
+| Route | Job |
+|---|---|
+| `POST /api/ai` | answer writer; may return tool calls that the page runs and sends back |
+| `POST /api/embed` | embeddings for meaning-based search, cached on the server by content hash |
+| `/api/kb/*` | shared knowledge store; `GET /api/kb/export` and `POST /api/kb/import` for backup (admin) |
+| `GET /api/health` | status, access flags and today's AI usage |
+| `GET /api/selftest` | diagnostics |
+
 ## How it behaves
 
 - Everyone who opens the URL uses the same shared knowledge. The page polls every 15 seconds, so a knowledge item, an approval, an imported work order or feedback from one person appears for the others within about 15 seconds. Deleting an item removes it everywhere.

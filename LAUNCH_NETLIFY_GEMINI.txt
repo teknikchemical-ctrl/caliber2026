@@ -153,6 +153,22 @@ Answers are slower than expected
    waits for the function to start.
 
 
+OPTIONAL: RESTRICT WHO CAN CHANGE OR APPROVE (still free)
+-----------------------------------------------------------------------------------------
+The site is open by default. If you want a light control, add these variables in Netlify
+(then redeploy):
+   EDIT_CODE      people need this code to save anything to the shared database
+   APPROVE_CODE   people need this code to approve knowledge items (give it to reviewers)
+   ADMIN_CODE     enables backup, restore and clean-up under Settings, Administration
+Everyone can still read and ask questions without a code. Visitors type the codes once in
+Settings, Access codes (stored only in their browser). These codes are a shared secret, not
+individual logins.
+
+Settings also has "Run diagnostics". Use it right after the first deploy: it tells you in
+plain words whether storage works, whether the key is accepted and whether the model name
+exists for your key.
+
+
 THINGS TO KNOW ABOUT AN OPEN, FREE SITE
 -----------------------------------------------------------------------------------------
 * There is no login. Anyone who has the address can read and add knowledge and use the AI,

@@ -7,7 +7,7 @@ const M$=v=>(v/1e6).toFixed(Math.abs(v)>=1e8?0:1)+" M",dstr=t=>{const d=new Date
 function mhReindex(){if(typeof DB!=="undefined"){DB.dirty();try{PDM.cache={}}catch(e){}}MH.forEach(r=>{r.n=K.sets.find(s=>s.tag===r.tag)?.n||0;r.t0=+new Date(r.rd);r.t1=+new Date(r.sd);r.t2=+new Date(r.cd);r.mon=r.rd.slice(0,7);r._p=null});MH.sort((a,b)=>a.t0-b.t0);
  T0=Math.min(...MH.map(r=>r.t0));T1=Math.max(...MH.map(r=>r.t2));PERH=(T1-T0)/36e5;MONS=[];const d=new Date(T0);d.setDate(1);d.setHours(0,0,0,0);while(+d<=T1){MONS.push(d.getFullYear()+"-"+pad2(d.getMonth()+1));d.setMonth(d.getMonth()+1)}if(!MHS.rp.t)MHS.rp.t=T0}
 function mhLoadGen(){try{JSON.parse(localStorage.getItem(GENKEY)||"[]").forEach(r=>MH.push(r))}catch(e){}}
-function mhSaveGen(){try{localStorage.setItem(GENKEY,JSON.stringify(MH.filter(r=>r.gen).map(r=>{const o={...r};["n","t0","t1","t2","mon","_p"].forEach(k=>delete o[k]);return o})))}catch(e){}}
+function mhSaveGen(){try{localStorage.setItem(GENKEY,JSON.stringify(MH.filter(r=>r.gen).map(r=>{const o={...r};["n","t0","t1","t2","mon","_p"].forEach(k=>delete o[k]);return o})))}catch(e){try{toast((typeof SYNC!=="undefined"&&SYNC.state==="online"?"Browser storage is full. Imported work orders stay on the shared server.":"Browser storage is full. Export the knowledge base and remove old items."),"warn")}catch(x){}}}
 mhLoadGen();mhReindex();
 const mhInP=r=>!MHS.p||(r.mon>=MHS.p[0]&&r.mon<=MHS.p[1]);
 const mhSetRows=n=>n?MH.filter(r=>r.n===n):MH;

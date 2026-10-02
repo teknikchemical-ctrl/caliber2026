@@ -23,13 +23,24 @@ const AUDIT=`(()=>{
   const where=(sv.closest("[id]")?sv.closest("[id]").id:"")+"/"+(sv.parentElement.className||"");
   for(let i=0;i<tx.length;i++)for(let j=i+1;j<tx.length;j++){const a=tx[i].r,b=tx[j].r,w=Math.min(a.right,b.right)-Math.max(a.left,b.left),h=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);
    if(w>2&&h>2&&(w*h)/Math.min(a.width*a.height,b.width*b.height)>.18){const k="svg-text "+where+" :: "+tx[i].e.textContent.trim().slice(0,22)+" x "+tx[j].e.textContent.trim().slice(0,22);if(!seen.has(k)){seen.add(k);out.push(k)}}}
-  for(const o of tx){const ins=!(o.r.right<r0.left||o.r.left>r0.right||o.r.bottom<r0.top||o.r.top>r0.bottom);const vis=Math.max(0,Math.min(o.r.right,r0.right)-Math.max(o.r.left,r0.left))/o.r.width,visY=Math.max(0,Math.min(o.r.bottom,r0.bottom)-Math.max(o.r.top,r0.top))/o.r.height;if(ins&&vis*visY<.6&&!thumb&&(o.r.left<r0.left-6||o.r.right>r0.right+6||o.r.top<r0.top-6||o.r.bottom>r0.bottom+6)){const k="svg-clip "+where+" :: "+o.e.textContent.trim().slice(0,30);if(!seen.has(k)){seen.add(k);out.push(k)}}}}
+  for(const o of tx){const ins=!(o.r.right<r0.left||o.r.left>r0.right||o.r.bottom<r0.top||o.r.top>r0.bottom);const vis=Math.max(0,Math.min(o.r.right,r0.right)-Math.max(o.r.left,r0.left))/o.r.width,visY=Math.max(0,Math.min(o.r.bottom,r0.bottom)-Math.max(o.r.top,r0.top))/o.r.height;if(ins&&vis*visY<.4&&!thumb&&(o.r.left<r0.left-6||o.r.right>r0.right+6||o.r.top<r0.top-6||o.r.bottom>r0.bottom+6)){const k="svg-clip "+where+" :: "+o.e.textContent.trim().slice(0,30);if(!seen.has(k)){seen.add(k);out.push(k)}}}}
+ /* accessibility */
+ {const nameOf=e=>(e.getAttribute("aria-label")||e.getAttribute("title")||e.textContent||"").trim()||(e.querySelector("img[alt]")&&e.querySelector("img[alt]").alt)||"";
+  root.querySelectorAll("button,[onclick],a,[role=button],[role=tab]").forEach(e=>{if(!vis(e)||e.closest("svg"))return;
+   if(!nameOf(e)){const k="a11y no-name "+sel(e);if(!seen.has(k)){seen.add(k);out.push(k)}}
+   const native=["BUTTON","A","INPUT","SELECT","TEXTAREA","SUMMARY","LABEL"].includes(e.tagName);if(!native&&e.hasAttribute("onclick")&&!e.hasAttribute("role")&&!e.hasAttribute("tabindex")&&!e.closest("svg")){const k="a11y not-focusable "+sel(e)+" :: "+e.textContent.trim().slice(0,24);if(!seen.has(k)){seen.add(k);out.push(k)}}});
+  root.querySelectorAll("input:not([type=hidden]):not([type=checkbox]):not([type=radio]),select,textarea").forEach(e=>{if(!vis(e))return;const lab=e.getAttribute("aria-label")||e.getAttribute("title")||(e.id&&document.querySelector("label[for='"+e.id+"']"))||e.closest("label")||e.getAttribute("placeholder");if(!lab){const k="a11y unlabeled-field "+sel(e);if(!seen.has(k)){seen.add(k);out.push(k)}}});
+  const ids={};document.querySelectorAll("[id]").forEach(e=>{ids[e.id]=(ids[e.id]||0)+1});Object.entries(ids).forEach(([i,n])=>{if(i&&n>1){const k="a11y duplicate-id "+i;if(!seen.has(k)){seen.add(k);out.push(k+" x"+n)}}});
+  const lum=c=>{const m=c.match(/[\d.]+/g);if(!m)return null;const [r,g,b,a]=m.map(Number);if(a===0)return null;const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)};
+  const bgOf=e=>{for(let p=e;p&&p!==document.documentElement;p=p.parentElement){const c=getComputedStyle(p).backgroundColor;const m=c.match(/[\d.]+/g);if(m&&(m.length<4||+m[3]>.5))return c}return "rgb(255,255,255)"};
+  let cn=0;for(const e of tb){if(cn>2000)break;cn++;const cs=getComputedStyle(e);if(e.disabled||cs.opacity<.9)continue;const fg=lum(cs.color),bg=lum(bgOf(e));if(fg==null||bg==null)continue;const L1=Math.max(fg,bg),L2=Math.min(fg,bg),ratio=(L1+.05)/(L2+.05),fs=parseFloat(cs.fontSize),big=fs>=18||(fs>=14&&parseInt(cs.fontWeight)>=700);if(ratio<(big?3:4.5)){const k="a11y low-contrast "+sel(e)+" "+cs.color+" on "+bgOf(e);if(!seen.has(k)){seen.add(k);out.push(k+" ratio "+ratio.toFixed(1)+" :: "+e.textContent.trim().slice(0,24))}}}}
  if(document.documentElement.scrollWidth>innerWidth+2)out.push("page overflows horizontally by "+(document.documentElement.scrollWidth-innerWidth)+"px");
  return out})()`;
 (async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});let total=0;const all={};
- for(const [W,H] of (process.env.WIDTHS||"1440x900,1100x800,820x900").split(",").map(s=>s.split("x").map(Number))){
+ const QUICK=process.argv.includes("--quick"),VPS=(process.env.WIDTHS||(QUICK?"1440x900":"1440x900,1100x800,820x900,390x844")).split(",").map(s=>s.split("x").map(Number));
+ await Promise.all(VPS.map(async([W,H])=>{
   const p=await b.newPage({viewport:{width:W,height:H}}),errs=[];p.on("pageerror",e=>errs.push(e.message));p.on("dialog",d=>d.accept("t"));
-  await p.goto(FILE);await p.waitForTimeout(900);
+  await p.goto(FILE,{waitUntil:"commit"});await p.waitForFunction(()=>document.readyState==="complete",null,{timeout:60000});await p.waitForTimeout(900);
   const run=async(name,fn)=>{try{if(fn)await p.evaluate(fn);await p.waitForTimeout(800);const r=await p.evaluate(AUDIT);r.forEach(x=>{const k=x;(all[k]=all[k]||new Set()).add(W+" "+name)});total+=r.length}catch(e){errs.push(name+": "+e.message.slice(0,80))}};
   const tabsOf=async()=>p.evaluate(()=>[...document.querySelectorAll("main .tabs > *, main .seg button, main .tab")].map((e,i)=>i));
   const crawl=async(name,fn)=>{await run(name,fn);const n=(await tabsOf()).length;for(let i=0;i<n;i++){await p.evaluate(fn||"0");await p.evaluate(i=>{const t=[...document.querySelectorAll("main .tabs > *, main .seg button, main .tab")][i];if(t)t.click()},i);await run(name+" tab"+i)}};
@@ -40,6 +51,6 @@ const AUDIT=`(()=>{
   await run("opl sim run",`oplRun();`);await p.waitForTimeout(2500);await run("opl sim running");
   await run("work order modal",`go('mnt');mhOpen(MH[5].wo)`);
   await run("settings",`setOpen()`);
-  console.log("viewport",W,"errors",errs.length,errs.slice(0,3));await p.close()}
+  console.log("viewport",W,"errors",errs.length,errs.slice(0,3));await p.close()}));
  const keys=Object.keys(all).sort();console.log("\nlayout findings:",keys.length);keys.forEach(k=>console.log(" -",k,"\n     in:",[...all[k]].slice(0,4).join("; ")));
  await b.close();process.exit(STRICT&&keys.length?1:0)})();

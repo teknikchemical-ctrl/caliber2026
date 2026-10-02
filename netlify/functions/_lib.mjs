@@ -65,3 +65,22 @@ export const cfg = () => ({
   perMin: +process.env.AI_RATE_PER_MIN || 12,
   perDay: +process.env.AI_RATE_PER_DAY || 120
 });
+
+/* Optional access codes. All unset = fully open (default). EDIT_CODE protects every write, APPROVE_CODE protects approving
+   knowledge items, ADMIN_CODE enables backup, restore and bulk removal (admin routes stay disabled while it is unset). */
+export function guard(req, level) {
+  const want = { edit: process.env.EDIT_CODE, approve: process.env.APPROVE_CODE, admin: process.env.ADMIN_CODE }[level];
+  if (level === "admin" && !want) return { ok: false, status: 403, error: "admin routes are disabled: set ADMIN_CODE on the server" };
+  if (!want) return { ok: true };
+  const got = req.headers.get("x-" + level + "-code") || "";
+  if (got.length !== want.length) return { ok: false, status: 401, error: level + " code required", need: level };
+  let d = 0; for (let i = 0; i < want.length; i++) d |= want.charCodeAt(i) ^ got.charCodeAt(i);
+  return d === 0 ? { ok: true } : { ok: false, status: 401, error: level + " code incorrect", need: level };
+}
+export async function bump(name, field, n = 1) {
+  try { const s = await store("rl"), day = new Date().toISOString().slice(0, 10), k = "stats/" + name + "/" + day, r = (await s.get(k)) || {}; r[field] = (r[field] || 0) + n; await s.setJSON(k, r); } catch {}
+}
+export async function statsToday(name) {
+  try { const s = await store("rl"); return (await s.get("stats/" + name + "/" + new Date().toISOString().slice(0, 10))) || {}; } catch { return {}; }
+}
+export const cfg2 = () => ({ ...cfg(), fallbacks: (process.env.AI_MODEL_FALLBACK || "gemini-2.0-flash,gemini-1.5-flash").split(",").map(s => s.trim()).filter(Boolean), embedModel: process.env.AI_EMBED_MODEL || "gemini-embedding-001", embedDaily: +process.env.AI_EMBED_DAILY || 4000 });

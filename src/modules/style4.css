@@ -109,3 +109,30 @@ body.enter .pm>i{transform-origin:bottom;animation:grow .6s cubic-bezier(.2,.8,.
 .pm:hover>i{filter:brightness(1.1)}
 body.enter .pmn .pm:nth-child(1)>i{animation-delay:18ms}body.enter .pmn .pm:nth-child(2)>i{animation-delay:36ms}body.enter .pmn .pm:nth-child(3)>i{animation-delay:54ms}body.enter .pmn .pm:nth-child(4)>i{animation-delay:72ms}body.enter .pmn .pm:nth-child(5)>i{animation-delay:90ms}body.enter .pmn .pm:nth-child(6)>i{animation-delay:108ms}body.enter .pmn .pm:nth-child(7)>i{animation-delay:126ms}body.enter .pmn .pm:nth-child(8)>i{animation-delay:144ms}body.enter .pmn .pm:nth-child(9)>i{animation-delay:162ms}body.enter .pmn .pm:nth-child(10)>i{animation-delay:180ms}body.enter .pmn .pm:nth-child(11)>i{animation-delay:198ms}body.enter .pmn .pm:nth-child(12)>i{animation-delay:216ms}body.enter .pmn .pm:nth-child(13)>i{animation-delay:234ms}body.enter .pmn .pm:nth-child(14)>i{animation-delay:252ms}body.enter .pmn .pm:nth-child(15)>i{animation-delay:270ms}body.enter .pmn .pm:nth-child(16)>i{animation-delay:288ms}body.enter .pmn .pm:nth-child(17)>i{animation-delay:306ms}body.enter .pmn .pm:nth-child(18)>i{animation-delay:324ms}body.enter .pmn .pm:nth-child(19)>i{animation-delay:342ms}body.enter .pmn .pm:nth-child(20)>i{animation-delay:360ms}body.enter .pmn .pm:nth-child(21)>i{animation-delay:378ms}body.enter .pmn .pm:nth-child(22)>i{animation-delay:396ms}body.enter .pmn .pm:nth-child(23)>i{animation-delay:414ms}body.enter .pmn .pm:nth-child(24)>i{animation-delay:432ms}body.enter .pmn .pm:nth-child(25)>i{animation-delay:450ms}body.enter .pmn .pm:nth-child(26)>i{animation-delay:468ms}body.enter .pmn .pm:nth-child(27)>i{animation-delay:486ms}body.enter .pmn .pm:nth-child(28)>i{animation-delay:504ms}body.enter .pmn .pm:nth-child(29)>i{animation-delay:522ms}body.enter .pmn .pm:nth-child(30)>i{animation-delay:540ms}
 .sfig svg text.halo,.gsvg text.halo{paint-order:stroke;stroke:#fff;stroke-width:2.6px;stroke-linejoin:round;stroke-opacity:.9}
+
+#tourcard{position:fixed;right:18px;bottom:18px;width:340px;max-width:calc(100vw - 36px);background:#fff;border:1px solid #9ec1f5;border-radius:12px;padding:14px 16px;box-shadow:0 12px 36px rgba(11,42,74,.25);z-index:70;animation:riseIn .35s ease-out}
+.tour-hl{outline:3px solid #0b5fd7;outline-offset:2px;border-radius:8px;animation:hlp 1.2s ease-in-out infinite}
+/* ---- narrow screens: the menu becomes a drawer and multi-column grids stack ---- */
+#navtoggle{display:none}
+@media(max-width:900px){
+ body{flex-direction:column}
+ aside{position:fixed;left:0;top:0;bottom:0;z-index:60;width:264px;height:100vh;transform:translateX(-102%);transition:transform .25s ease;box-shadow:none;overflow-y:auto}
+ body.nav-open aside{transform:none;box-shadow:0 0 40px rgba(11,42,74,.35)}
+ #navtoggle{display:flex;position:fixed;top:10px;left:10px;z-index:61;width:40px;height:40px;align-items:center;justify-content:center;background:#fff;border:1px solid var(--line);border-radius:10px;cursor:pointer;color:var(--text)}
+ main{padding:60px 14px 24px;width:100%;min-width:0}
+ .split,.smain,.slow,.sbot,.osplit{grid-template-columns:minmax(0,1fr)!important}
+ .grid[style*="grid-template-columns"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .phead{flex-wrap:wrap;gap:8px}
+ .tabs{overflow-x:auto;flex-wrap:nowrap;white-space:nowrap}
+ .modal{max-width:100%!important}.modalbg{padding:10px 6px}
+ #tourcard{left:12px;right:12px;width:auto}
+}
+@media(max-width:600px){
+ .grid[style*="grid-template-columns"]{grid-template-columns:minmax(0,1fr)!important}
+ .grid[style*="repeat(6"],.grid[style*="repeat(4"],.grid[style*="repeat(5"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ h1{font-size:19px}.stat b{font-size:21px}
+ .row.between{gap:8px}
+ .chips{flex-wrap:wrap}
+}
+@media(max-width:900px){aside .brand{padding-left:54px}}
+@media(max-width:900px){.mtabs{overflow-x:auto;flex-wrap:nowrap;white-space:nowrap}.mtabs .tab{flex:none}.mgrid2{grid-template-columns:minmax(0,1fr)!important}select,input:not([type=checkbox]):not([type=radio]):not([type=range]){max-width:100%}label.muted{display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:100%}label.muted select{width:100%}}

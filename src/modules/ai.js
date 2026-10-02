@@ -17,7 +17,7 @@ const AI={cfg:{endpoint:"",remote:false,mock:false,stream:true,model:"",timeout:
 try{Object.assign(AI.cfg,JSON.parse(localStorage.getItem("akp_ai_cfg")||"{}"));if(AI.cfg.endpoint==="/.netlify/functions/ask"){AI.cfg.endpoint="";AI.cfg.remote=false}}catch(e){}
 const aiSaveCfg=()=>{try{localStorage.setItem("akp_ai_cfg",JSON.stringify(AI.cfg))}catch(e){}};
 /* ---------- retrieval: delegated to the data layer (dl.js) ---------- */
-function aiRetrieve(q,scope,kw){return DB.search(q+" "+(kw&&scope?kw:""),{set:scope||0,k:6}).filter(c=>c.rel>=.22&&(c.cov>=.34||DB.tagsOf(String(q).toUpperCase()).length>0))}
+function aiRetrieve(q,scope,kw,qemb){return DB.search(q+" "+(kw&&scope?kw:""),{set:scope||0,k:6,qemb}).filter(c=>c.rel>=.22&&(c.cov>=.34||c.cs>=DB.EMB_MIN||DB.tagsOf(String(q).toUpperCase()).length>0))}
 /* ---------- tools (also published to a remote provider as function-calling schemas) ---------- */
 const aiSet=(q,ctx)=>{const s=aiSets(q);return s[0]||(ctx&&ctx.set)||AI.scope||0};
 const aiWl=r=>`<a class="alink" onclick="mhOpen('${r.wo}')">${r.wo}</a>`;
@@ -139,7 +139,7 @@ const aiPlain=h=>String(h||"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").re
 const aiPause=ms=>new Promise(r=>setTimeout(r,ms));
 async function aiAsk(q,o={}){const ctx=o.ctx||{},scope=o.scope??ctx.set??0,t0=performance.now(),trace=[],step=(s,d)=>{trace.push({s,d,t:Math.round(performance.now()-t0)});if(o.onStep)o.onStep(trace)};
  const it=aiIntent(q);step("Understood the question",`intent ${it.t}${it.sets.length?", equipment "+it.sets.map(n=>S(n).tag).join(", "):""}${it.tags.length?", tags "+it.tags.join(", "):""}`);
- const retrieved=aiRetrieve(q,scope,ctx.kw);step("Retrieved sources",`${retrieved.length} of ${DB.N} chunks, ${DB.stats().sys?Object.keys(DB.stats().sys).length:0} source systems`);if(o.onSources)o.onSources(retrieved);
+ const qv=typeof embQuery==="function"&&DB.hasEmb?await embQuery(q):null,retrieved=aiRetrieve(q,scope,ctx.kw,qv);step("Retrieved sources",`${retrieved.length} of ${DB.N} chunks, ${DB.stats().sys?Object.keys(DB.stats().sys).length:0} source systems`);if(o.onSources)o.onSources(retrieved);
  if(o.pace)await aiPause(o.pace);
  const hist=(o.history||[]).slice(-8).map(m=>({role:m.role,text:aiPlain(m.text)}));
  let payload={question:q,scope:{set:scope},context:{page:ctx.page||"Assistant",set:scope,label:ctx.label||"",selection:ctx.kw||"",role:ROLE.name,intent:it.t},history:hist,retrieved:retrieved.map(c=>({chunk_id:c.chunk_id,id:c.id,k:c.k,title:c.title,sec:c.sec,text:c.text,ver:c.ver,status:c.status,stat:c.stat,date:c.date_iso,score:c.score,rel:+c.rel.toFixed(3),hits:c.hits})),tools:aiToolSchemas(),policy:AI.policy,contract:AI.contract.version};
@@ -147,7 +147,7 @@ async function aiAsk(q,o={}){const ctx=o.ctx||{},scope=o.scope??ctx.set??0,t0=pe
  if(remoteOn){/* run the matched computed tool first: its result is handed to the model as a verified draft; refusals are never rewritten */
   const loc=aiLocal({...payload,retrieved});if(loc.safety){remoteOn=false;step("Safety handler","answered locally, the AI is not asked to rewrite a refusal")}
   else if(loc.tool){draft={tool:loc.tool,text:aiPlain(loc.answer),sources:loc.sources||[]};const seen=new Set(retrieved.map(r=>r.chunk_id||r.id));draft.sources.forEach(s=>{if(!seen.has(s.chunk_id||s.id)&&retrieved.length<12){retrieved.push(s);seen.add(s.chunk_id||s.id)}});payload.retrieved=retrieved.map(c=>({chunk_id:c.chunk_id||c.id,id:c.id,k:c.k,title:c.title,sec:c.sec,text:c.text,ver:c.ver,status:c.status,stat:c.stat,date:c.date_iso,score:c.score,rel:+(c.rel||0).toFixed(3),hits:c.hits}));payload.draft={tool:draft.tool,text:draft.text};step("Computed result",loc.tool+" ready for the AI to explain")}
-  payload.style=(typeof AIP!=="undefined"&&AIP.style)||"concise"}
+  payload.style=(typeof AIP!=="undefined"&&AIP.style)||"concise";payload.lang=(typeof AIP!=="undefined"&&AIP.lang)||"en"}
  if(remoteOn){try{const sg=o.signal;step("Writing the answer with the AI",AI.cfg.mock?"built-in mock":"server side AI");let res=await aiCallProvider(payload,{onToken:o.onToken,signal:sg}),rounds=0;
    while(res.tool_calls&&res.tool_calls.length&&rounds<3){const tr=res.tool_calls.map(c=>{const t=AI.tools[c.name],t1=performance.now();let r=null;try{r=t?t.run(c.args||{}):null}catch(e){r={text:"tool error: "+e.message}}step("Tool "+c.name,JSON.stringify(c.args||{}).slice(0,120)+" in "+Math.round(performance.now()-t1)+" ms");return{name:c.name,args:c.args,result:r?aiPlain(r.text):"unknown tool",sources:r?(r.sources||[]).map(s=>s.chunk_id||s.id):[]}});payload={...payload,tool_results:tr};res=await aiCallProvider(payload,{onToken:o.onToken,signal:sg});rounds++}
    const err=aiValidate(res);if(err.length)throw new Error("Invalid provider response: "+err.join("; "));

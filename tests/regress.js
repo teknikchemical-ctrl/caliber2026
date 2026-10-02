@@ -55,6 +55,12 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
  const wk=await ev(`Object.keys(WK).length`);ok(wk>=8,"wizard registers "+wk+" document kinds");
  const pc=await ev(`typeof pdmCascade(1).tripped`);ok(pc==="number","PdM carries cascade result");
  await ev(`go('scn')`);const ovf2=await ev(`document.documentElement.scrollWidth>innerWidth+2`);ok(!ovf2,"scenario page has no horizontal overflow");
+ /* simulator smoke test: every OPL scenario initialises, runs and draws without errors or invalid numbers */
+ const sm=await ev(`(()=>{const SC=SIMX.SC(),bad=[];let n=0;for(const no of Object.keys(SC))SC[no].forEach((s,i)=>{n++;try{SIMX.init(no,i);const S=SIMX.S();S.run=true;S.spd=16;for(let f=0;f<150;f++){SIMX.tick(.1);if(f%30===0){const h=SIMX.fig();if(/NaN|undefined/.test(h))throw new Error("figure shows NaN or undefined");}}Object.entries(S.V).forEach(([k,v])=>{if(typeof v==="number"&&!isFinite(v))throw new Error("value "+k+" is not finite")})}catch(e){bad.push(no+"#"+i+": "+e.message)}});return{n,bad}})()`);
+ ok(sm&&sm.n>=60&&sm.bad.length===0,"simulator smoke test: "+(sm?sm.n:0)+" scenarios run cleanly");if(sm)sm.bad.slice(0,5).forEach(x=>console.log("    ",x));
+ /* new pages */
+ const nw=await ev(`(()=>{go('int');INT.tab='usage';render();const u=document.querySelector('#app').innerText.includes('Questions per day');go('scn');SCN.tab='rules';render();const r=document.querySelector('#app').innerText.includes('Assumptions')||document.querySelector('#app').innerText.includes('Pending review');SCN.tab='plant';return{u,r,tour:typeof tourStart==='function',rpt:rcDoc('My Title','Sub','<p>x</p>').includes('<h1>My Title</h1>')}})()`);
+ ok(nw&&nw.u,"usage and quality page renders");ok(nw&&nw.r,"assumptions register renders");ok(nw&&nw.tour,"guided tour is available");ok(nw&&nw.rpt,"report headings show the real title");
  /* curated evaluation */
  await ev("evalRun()");await p.waitForFunction("!EV.running",{timeout:180000});const E=await ev("({s:evSummary(),f:EV.res.filter(r=>!r.pass).map(r=>r.id+' '+r.why.join('; '))})");
  ok(E.s.ok/E.s.n>=.9,"curated evaluation passed "+E.s.ok+" of "+E.s.n);E.f.forEach(x=>console.log("    failed:",x));
