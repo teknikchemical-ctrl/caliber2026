@@ -167,7 +167,7 @@ def build_docx(toc_pages=None, out=None):
             if calls and os.path.exists(pj):
                 ok = set(json.load(open(pj))); calls = [c for c in calls if c[0] in ok]
             path, w, h = jpg(img)
-            mh = (maxh * 0.68) if maxh else (130 if h / w > 0.85 else 999)
+            mh = min(max(maxh * 0.68, 105), 125) if maxh else (130 if h / w > 0.85 else 999)
             wcm = CW; hcm = wcm * h / w
             if mh < 999 and hcm > mh / 10: hcm = mh / 10; wcm = hcm * w / h
             if hcm > 20.5: hcm = 20.5; wcm = hcm * w / h

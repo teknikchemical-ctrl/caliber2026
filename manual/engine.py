@@ -169,7 +169,7 @@ def figure_html(b, num, doc):
     _, img, cap, calls, maxh = b
     path, w, h = jpg(img)
     rel = os.path.relpath(path, BLD)
-    mh = (maxh * 0.68) if maxh else (130 if h / w > 0.85 else 999)
+    mh = min(max(maxh * 0.68, 105), 125) if maxh else (130 if h / w > 0.85 else 999)
     style = f"max-height:{mh}mm;" if mh < 999 else ""
     wcss = "" if w / max(h, 1) > 1.0 or not maxh else ""
     leg = ""
