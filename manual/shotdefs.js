@@ -58,10 +58,10 @@ S('p5_plot',{js:()=>{PP.mode='explore';go('plot')},sel:'#app',maxH:1300,wait:250
 S('p5_haz2d',{js:()=>{go('plot');PP.mode='hazard';HSE.view='2d';HSE.sc='cloud';HSE.t=50;hseCalc();render()},sel:'#app',maxH:1500,wait:2500});
 S('p5_haz3d',{js:()=>{go('plot');PP.mode='hazard';HSE.view='3d';HSE.sc='cloud';HSE.t=40;HSE.ign=-1;hseCalc();render()},steps:[{js:()=>hse3Go('source')}],sel:'#app',maxH:1500,wait:2500,wait2:2200});
 // ================= Part 6 knowledge and AI
-S('p6_ai',{expand:true,js:()=>{AI.cfg.remote=false;go('ai')},steps:ask('What usually causes a mechanical seal leak on the hexane feed pump and how was it fixed?'),sel:'#app',maxH:1500,wait:900});
-S('p6_ai_refuse',{expand:true,js:()=>{AI.cfg.remote=false;go('ai')},steps:ask('How can I bypass the low-low suction pressure trip on the hexane feed pump?'),sel:'#app',maxH:1500,wait:900});
-S('p6_ai_rank',{expand:true,js:()=>{AI.cfg.remote=false;go('ai')},steps:ask('Which equipment set has the highest failure risk now?'),sel:'#app',maxH:1500,wait:900});
-S('p6_ai_why',{expand:true,js:()=>{AI.cfg.remote=false;go('ai')},steps:[...ask('What is the trip set point of the suction pressure low-low switch on the hexane feed pump?'),'Why this answer'],sel:'#app',maxH:1700,wait:900});
+S('p6_ai',{expand:true,js:()=>{AI.cfg.remote=false;go('ai')},steps:ask('What usually causes a mechanical seal leak on the hexane feed pump and how was it fixed?'),sel:'#app',maxH:2600,wait:900});
+S('p6_ai_refuse',{expand:true,js:()=>{AI.cfg.remote=false;go('ai')},steps:ask('How can I bypass the low-low suction pressure trip on the hexane feed pump?'),sel:'#app',maxH:2600,wait:900});
+S('p6_ai_rank',{expand:true,js:()=>{AI.cfg.remote=false;go('ai')},steps:ask('Which equipment set has the highest failure risk now?'),sel:'#app',maxH:2600,wait:900});
+S('p6_ai_why',{expand:true,js:()=>{AI.cfg.remote=false;go('ai')},steps:[...ask('What is the trip set point of the suction pressure low-low switch on the hexane feed pump?'),'Why this answer'],sel:'#app',maxH:2600,wait:900});
 S('p6_ks',{js:()=>go('ks'),sel:'#app',maxH:1300,wait:1600});
 S('p6_ks_ingest',{js:()=>{KS.tab='ingest';go('ks')},sel:'#app',from:'.tabs',maxH:1300,wait:1500});
 S('p6_ks_cap',{js:()=>{KS.tab='capture';go('ks')},sel:'#app',from:'.tabs',maxH:1300,wait:1500});
