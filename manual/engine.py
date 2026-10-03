@@ -120,7 +120,7 @@ class Doc:
 CSS = """
 @page { size: A4; margin: 0; }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: Arial, 'Liberation Sans', Helvetica, sans-serif; color: #1B2A3A; font-size: 10pt; line-height: 1.45; }
+body { margin: 0; font-family: Arial, 'Liberation Sans', Helvetica, sans-serif; color: #1B2A3A; font-size: 9.8pt; line-height: 1.42; }
 .page { width: 210mm; height: 297mm; padding: 22mm 20mm 20mm 20mm; position: relative; page-break-after: always; overflow: hidden; }
 .flow-page { width: 210mm; padding: 0; page-break-after: auto; }
 .sheet { padding: 20mm 20mm 22mm 20mm; width: 210mm; }
@@ -169,7 +169,7 @@ def figure_html(b, num, doc):
     _, img, cap, calls, maxh = b
     path, w, h = jpg(img)
     rel = os.path.relpath(path, BLD)
-    mh = (maxh * 0.82) if maxh else (130 if h / w > 0.85 else 999)
+    mh = (maxh * 0.68) if maxh else (130 if h / w > 0.85 else 999)
     style = f"max-height:{mh}mm;" if mh < 999 else ""
     wcss = "" if w / max(h, 1) > 1.0 or not maxh else ""
     leg = ""
