@@ -1,4 +1,5 @@
 """Consulting-style building blocks for the CALIBER deck: action titles, section tracker, panels, stat tiles, pictograms."""
+import re
 from lib import *
 import lib
 from icons import icon
@@ -12,21 +13,27 @@ SECTIONS = ["Background", "Solution", "Impact", "Roadmap", "Conclusion"]
 def pic(s, name, x, y, d, color=BLUE, bg=True):
     s.shapes.add_picture(icon(name, color, bg), Inches(x), Inches(y), Inches(d), Inches(d))
 
-def frame(s, n, title, sub=None, section=None, source=None):
-    """action title with accent bar, subtitle, source line and section tracker"""
-    box(s, 0.35, 0.3, 0.09, 0.66, TEAL, None, None, shape=MSO_SHAPE.RECTANGLE)
-    text(s, 0.55, 0.24, 12.45, 0.8, title, 21, True, NAVY, anchor="m", line=1.0)
-    if sub: text(s, 0.55, 1.02, 12.4, 0.3, sub, 11.5, False, GREY)
-    if source: text(s, 0.35, 6.93, 12.6, 0.24, "Source: " + source, 8, False, GREY)
-    # tracker, like the reference slide
-    x = 7.0
-    for i, t in enumerate(SECTIONS):
+HI = "4FA9CE"   # highlight colour used for key words in titles (as in the reference decks)
+SECTIONS = ["Background", "Solution", "Impact", "Roadmap", "Conclusion"]
+
+def frame(s, n, title, sub=None, section=None, source=None, kicker=None):
+    """title with highlighted key words ({{word}}), kicker, rule, source line, rounded section tabs and page square"""
+    if kicker: text(s, 0.4, 0.12, 8, 0.24, kicker, 10, False, "9AA7B6")
+    parts = re.split(r"(\{\{.*?\}\})", title)
+    runs = [(p_[2:-2], {"color": HI}) if p_.startswith("{{") else (p_, {}) for p_ in parts if p_]
+    text(s, 0.4, 0.34, 11.2, 0.78, [runs], 20, True, NAVY, anchor="m", line=1.0)
+    box(s, 0.4, 1.14, 11.2, 0.02, BLUE, None, None, shape=MSO_SHAPE.RECTANGLE)
+    text(s, 11.7, 0.38, 1.3, 0.5, ["CALIBER 2026", "Case 1"], 9.5, True, NAVY, "r", line=0.95)
+    if sub: text(s, 0.4, 1.17, 12.5, 0.26, sub, 10.5, False, GREY)
+    if source: text(s, 0.4, 6.88, 12.5, 0.2, "Source: " + source, 7.5, False, GREY)
+    # tabs: active tab filled and slightly larger, others outlined
+    x = 0.4
+    for t in SECTIONS:
         on = (t == section)
-        text(s, x, 7.2, 1.15, 0.22, t, 8.5, on, GREEN if on else "9AA7B6", "c")
-        if on: box(s, x + 0.12, 7.19, 0.91, 0.025, GREEN, None, None, shape=MSO_SHAPE.RECTANGLE)
-        x += 1.15
-    text(s, 12.45, 7.2, 0.55, 0.22, str(n), 9, True, NAVY, "r")
-    text(s, 0.35, 7.2, 6, 0.22, "CALIBER 2026  |  Case 1: Manufacturing Knowledge Hub  |  Asset Knowledge Platform", 8, False, "9AA7B6")
+        if on: box(s, x, 7.07, 2.2, 0.38, BLUE, None, [t], 11, True, WHITE, "c", "m", radius=0.16)
+        else: box(s, x, 7.12, 2.2, 0.3, WHITE, BLUE, [t], 10, True, NAVY, "c", "m", radius=0.14, lw=0.9)
+        x += 2.28
+    box(s, 12.5, 7.1, 0.5, 0.34, BLUE, None, [str(n)], 11, True, WHITE, "c", "m", radius=0.04)
 
 def banner(s, x, y, w, label, color=NAVY, h=0.34, size=11.5, align="c"):
     return box(s, x, y, w, h, color, None, [label], size, True, WHITE, align, radius=0.06, margin=0.12)
