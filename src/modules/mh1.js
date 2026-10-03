@@ -12,7 +12,7 @@ mhLoadGen();mhReindex();
 const mhInP=r=>!MHS.p||(r.mon>=MHS.p[0]&&r.mon<=MHS.p[1]);
 const mhSetRows=n=>n?MH.filter(r=>r.n===n):MH;
 const mhAll=()=>mhSetRows(MHS.set).filter(mhInP);
-function mhRows(){const f=MHS.f,q=f.q.toLowerCase(),[k,d]=MHS.sort;let l=mhAll().filter(r=>(!f.type||r.type===f.type)&&(!f.disc||r.disc===f.disc)&&(!f.pri||r.pri===f.pri)&&(!f.bd||(f.bd==="Unknown"?!r.bd:r.bd===f.bd))&&(!MHS.part||mhParts(r).includes(MHS.part))&&(!q||(r.wo+r.tag+r.prob+r.root+r.act+(r.parts||"")).toLowerCase().includes(q)));
+function mhRows(){const f=MHS.f,q=f.q.toLowerCase(),[k,d]=MHS.sort;let l=mhAll().filter(r=>(!f.type||r.type===f.type)&&(!f.disc||r.disc===f.disc)&&(!f.pri||r.pri===f.pri)&&(!f.bd||(f.bd==="Unknown"?!r.bd:r.bd===f.bd))&&(!f.mode||(typeof pd2Mode==="function"&&pd2Bad(r)&&pd2Mode(r)===f.mode))&&(!MHS.part||mhParts(r).includes(MHS.part))&&(!q||(r.wo+r.tag+r.prob+r.root+r.act+(r.parts||"")).toLowerCase().includes(q)));
  return l.sort((a,b)=>{const x=a[k]??"",y=b[k]??"";return(x>y?1:x<y?-1:0)*d||a.t0-b.t0})}
 function mhParts(r){if(r._p)return r._p;const d=GA[r.n];if(!d)return r._p=[];const txt=[r.prob,r.root,r.act,r.parts].join(" ").toLowerCase().replace(/[()]/g," "),sc=d.bom.map((b,i)=>({k:String(i+1),s:gScore(b.name,txt)}));if(d.mot&&/motor|winding|megger/.test(txt))sc.push({k:"M",s:2});
  const mx=Math.max(0,...sc.map(x=>x.s));return r._p=mx>=1?sc.filter(x=>x.s===mx&&d.p.some(p=>p[0]===x.k)).map(x=>x.k).slice(0,2):[]}

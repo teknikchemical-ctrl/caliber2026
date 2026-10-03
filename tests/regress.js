@@ -119,6 +119,11 @@ let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log("FAIL",m)}else console.l
    const tog=simTog("pid",["Plot plan","3D plant"]);MHS.view="replay";go("mnt");await w(300);const lab=typeof mhRpLab==="function"&&typeof mhRpCard==="function";const tg=document.querySelector(".gtog")&&document.querySelector(".gtog").textContent;
    return{n0,n1:S2.placed.length,jobs:S.jobs.length,clash:c&&c.k,far:!!c2,kp:!!kp,tog:/Plot plan/.test(tog),lab,tg}});
   ok(sp.n0>=10&&sp.n1>sp.n0&&sp.clash==="hot"&&sp.kp&&sp.tog&&sp.lab&&/Plot plan/.test(sp.tg||""),"maintenance site plan schedules jobs, flags hot work near an open line, and the replay toggle is named Plot plan / 3D plant ("+JSON.stringify(sp)+")");
+  const rpv=await q.evaluate(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));SIM3.mode="3d";MHS.view="replay";go("mnt");await w(600);const bd=MH.filter(r=>r.bd==="Yes"),bad=[];
+   for(const r of bd){mhRpSeek(r.t1+36e5);mhRpUpd(true);await w(15);if(mhStat(r.n,MHS.rp.t)[0]!=="bd"||P3.st[r.n].st!=="trip")bad.push(r.wo)}
+   MHS.rp.speed=30;MHS.rp.pauseBd=true;mhRpSeek(bd[3].t1-20*864e5);mhRpPlay();let n=0;while(MHS.rp.play&&n++<200)await w(60);const hit=mhActiveBd(MHS.rp.t).length>0&&mhStat(mhActiveBd(MHS.rp.t)[0].n,MHS.rp.t)[0]==="bd";mhRpSeek(T0);
+   return{n:bd.length,bad,paused:!MHS.rp.play,hit}});
+  ok(rpv.n>=20&&!rpv.bad.length&&rpv.paused&&rpv.hit,"plant replay shows the broken unit at every breakdown and pauses on it even at very fast speed ("+JSON.stringify(rpv)+")");
   const pl=await q.evaluate(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));go("dashboard");await w(500);const attn=!!document.querySelector(".plattn");go("equipment",{set:1,tab:"overview"});await w(700);const chip=/Start-up:/.test(document.body.innerText),title=document.title;
    HSE.n=1;HSE.sc="cloud";HSE.ign=-1;hseCalc();const ws=hseWindScan(),wi=hseWorstIgn();hseKeep();hseKeep();const cases=HSE.cases.length;HSE.cases=[];
    PD2.tab="use";const u=pd2Usage();PD2.disc="Mechanical";const mm=pd2Modes(0,pdmAsof()).length;PD2.disc="";const all=pd2Modes(0,pdmAsof()).length;PD2.tab="modes";
