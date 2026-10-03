@@ -36,9 +36,29 @@ print("base", [round(x) for x in BASE], "payback", PB, "net3", round(NB), "roi",
 
 
 prs = new_prs()
-PARTS = [p for p in ["s_main1.py", "s_main2.py", "s_a1.py", "s_a2.py", "s_a3.py", "s_a4.py", "s_a4b.py"] if os.path.exists(os.path.join(HERE, "parts", p))]
+PARTS = [p for p in ["s_main1.py", "s_main2.py", "s_a1.py", "s_a2.py", "s_a3.py"] if os.path.exists(os.path.join(HERE, "parts", p))]
 for part in PARTS:
     p = os.path.join(HERE, "parts", part)
     exec(compile(open(p).read(), p, "exec"), globals())
+# keep ten feature slides in the appendix (original numbers), renumber titles and page numbers
+import re as _re
+KEEP_A = [2, 3, 4, 6, 7, 8, 9, 13, 15, 16]
+ids = list(prs.slides._sldIdLst); drop = []
+for k, sid in enumerate(ids):
+    if k < 7: continue
+    a_no = k - 7 + 1
+    if a_no not in KEEP_A: drop.append(sid)
+for sid in drop:
+    prs.part.drop_rel(sid.rId); prs.slides._sldIdLst.remove(sid)
+for k, sl in enumerate(prs.slides):
+    if k < 7: continue
+    new_no = k - 7 + 1
+    for shp in sl.shapes:
+        if shp.has_text_frame:
+            tf = shp.text_frame
+            if tf.paragraphs and tf.paragraphs[0].runs and _re.match(r"A\d+  ", tf.paragraphs[0].runs[0].text):
+                r0 = tf.paragraphs[0].runs[0]; r0.text = _re.sub(r"^A\d+  ", f"A{new_no}  ", r0.text)
+            elif shp.left is not None and abs(shp.left - Inches(12.5)) < 5000 and tf.text.strip().isdigit():
+                tf.paragraphs[0].runs[0].text = str(k + 1)
 prs.save(OUT)
 print("saved", OUT, os.path.getsize(OUT) // 1024, "KB", len(prs.slides), "slides")

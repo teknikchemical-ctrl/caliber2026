@@ -130,3 +130,9 @@ def hdr(s, x, y, w, label, n=None, color=BLUE, h=0.28, size=9.5):
     """small section heading with optional number, gradient fill"""
     b = box(s, x, y, w, h, color, None, [[((f"{n}.  " if n else "") + label.upper(), {"bold": True, "size": size, "color": WHITE})]], size, True, WHITE, "l", "m", radius=0.1, margin=0.1)
     return grad(b, color, {BLUE: "4FA9CE", TEAL: "4DBBA9", ORANGE: "F0A15B", PURPLE: "9B84DD", NAVY: "27517F", GREEN: "6CC48D", RED: "E88B8B"}.get(color, "4FA9CE"), 0)
+
+def ribbon(s, msg, y=6.28, h=0.54):
+    """conclusion ribbon at the foot of a main slide: two sentences"""
+    b = box(s, 0.4, y, 12.55, h, NAVY, None, None, radius=0.1); grad(b, NAVY, BLUE, 0)
+    box(s, 0.4, y, 1.35, h, HI, None, [[("Conclusion", {"bold": True, "size": 11, "color": NAVY})]], 11, True, NAVY, "c", "m", radius=0.1)
+    text(s, 1.9, y, 10.95, h, msg, 10.5, False, WHITE, anchor="m", line=1.02)

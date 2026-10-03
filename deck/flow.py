@@ -29,7 +29,7 @@ def cell(s, x, cy, title, sub=None, color=BLUE, tsize=10.5, ssize=8.8, maxw=1.9,
     y = cy - h / 2
     paras = [[(title, {"bold": True, "size": tsize, "color": WHITE if solid else NAVY})]]
     if sub: paras += [[(sub, {"size": ssize, "color": "EAF1FA" if solid else INK})]]
-    box(s, x, y, w, h, color if solid else TINT.get(color, LIGHT), color, paras, tsize, False, INK, "c", "m", radius=0.08, lw=1.1, margin=0.06, shape=shape)
+    box(s, x, y, w, h, color if solid else WHITE, color, paras, tsize, False, INK, "c", "m", radius=0.08, lw=1.1, margin=0.06, shape=shape)
     return x, y, w, h
 
 def row(s, cy, x0, x1, items, color=BLUE, tsize=10.5, ssize=8.8, maxw=1.9, minw=0.9, solid_last=False, arrows=True, lab=None):
@@ -49,7 +49,7 @@ def tag(s, x, y, w, h, q, label, color):
     box(s, x, y, w, h, color, None, [[(q, {"bold": True, "size": 15, "color": WHITE})], [(label, {"size": 8.8, "color": "F2F6FA"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.06)
 
 def diamond(s, cx, cy, w, h, label, color=AMBER, size=9):
-    box(s, cx - w / 2, cy - h / 2, w, h, TINT.get(color, LIGHT), color, [label], size, True, NAVY, "c", "m", shape=MSO_SHAPE.DIAMOND, margin=0.02, lw=1.4)
+    box(s, cx - w / 2, cy - h / 2, w, h, WHITE, color, [label], size, True, NAVY, "c", "m", shape=MSO_SHAPE.DIAMOND, margin=0.02, lw=1.4)
 
 def vline(s, x, y1, y2, color=GREY, w=1.5, head=True, dash=False):
     arrow(s, x, y1, x, y2, color, w, head, dash)
