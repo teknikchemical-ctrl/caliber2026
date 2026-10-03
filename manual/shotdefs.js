@@ -14,32 +14,32 @@ S('p3_dash_an',{js:()=>go('dashboard'),steps:['^Analytics$'],sel:'#app',maxH:140
 S('p3_mywork',{js:()=>{AI.cfg.remote=false;go('ai')},steps:[...ask('What is the MTBF of each equipment set?'),{js:()=>go('mywork'),wait:1200}],sel:'#app',maxH:900,wait:900,calls:[[1,'Waiting for my approval'],[2,'Items I wrote'],[3,'My recent questions'],[4,'My recent activity']]});
 S('p3_eqlist',{js:()=>go('equipment'),sel:'#app',maxH:1100,wait:1800});
 for(const [id,tab,extra] of [['overview','overview'],['pid','pid'],['ga','ga'],['perf','perf'],['plot','plot'],['ready','ready'],['docs','docs'],['ds','ds'],['seq','seq'],['opl','opl'],['maint','maint'],['rel','rel']]){
- S('p3_eq_'+id,{arg:tab,js:(tab)=>{G3.mode='2d';go('equipment',{set:4,tab:tab})},sel:'#app',from:'.tabs',maxH:1100,wait:2200});}
+ S('p3_eq_'+id,{arg:tab,js:(tab)=>{G3.mode='2d';go('equipment',{set:4,tab:tab})},sel:'#app',from:'.eqtabs',maxH:1100,wait:2200});}
 S('p3_eq_tabs',{js:()=>go('equipment',{set:4,tab:'overview'}),sel:'#app',maxH:330,wait:1800,calls:[[1,'^Start-up: ',0,4],[2,'^Ask the assistant',0,-8],[3,'^Overview$',0,-12],[4,'^Related assets',0,-12]]});
-S('p3_ga2d',{js:()=>{G3.mode='2d';go('equipment',{set:1,tab:'ga'})},steps:['^Mechanical seal'],sel:'#app',from:'.tabs',maxH:1100,wait:1800,wait2:700,calls:[[1,'^2D drawing$'],[2,'^Component details$']]});
-S('p3_ga3d',{js:()=>{G3.mode='3d';go('equipment',{set:1,tab:'ga'})},steps:[{canvas:{x:.5,y:.55}}],sel:'#app',from:'.tabs',maxH:1100,wait:2500,wait2:900});
-S('p3_ga3d2',{js:()=>{G3.mode='3d';go('equipment',{set:2,tab:'ga'})},steps:[{canvas:{x:.5,y:.5}}],sel:'#app',from:'.tabs',maxH:1100,wait:2500,wait2:900});
-S('p3_pid',{js:()=>go('equipment',{set:4,tab:'pid'}),sel:'#app',from:'.tabs',maxH:1100,wait:2000});
-S('p3_pid_valve',{js:()=>{go('equipment',{set:4,tab:'pid'});setTimeout(()=>{const i=D[4].n.findIndex(n=>/^XV-4501/.test(n[0]));vSet(i,'closed')},1500)},sel:'#app',from:'.tabs',maxH:1100,wait:3200});
+S('p3_ga2d',{js:()=>{G3.mode='2d';go('equipment',{set:1,tab:'ga'})},steps:['^Mechanical seal'],sel:'#app',from:'.eqtabs',maxH:1100,wait:1800,wait2:700,calls:[[1,'^2D drawing$'],[2,'^Component details$']]});
+S('p3_ga3d',{js:()=>{G3.mode='3d';go('equipment',{set:1,tab:'ga'})},steps:[{canvas:{x:.5,y:.55}}],sel:'#app',from:'.eqtabs',maxH:1100,wait:2500,wait2:900});
+S('p3_ga3d2',{js:()=>{G3.mode='3d';go('equipment',{set:2,tab:'ga'})},steps:[{canvas:{x:.5,y:.5}}],sel:'#app',from:'.eqtabs',maxH:1100,wait:2500,wait2:900});
+S('p3_pid',{js:()=>go('equipment',{set:4,tab:'pid'}),sel:'#app',from:'.eqtabs',maxH:1100,wait:2000});
+S('p3_pid_valve',{js:()=>{go('equipment',{set:4,tab:'pid'});setTimeout(()=>{const i=D[4].n.findIndex(n=>/^XV-4501/.test(n[0]));vSet(i,'closed')},1500)},sel:'#app',from:'.eqtabs',maxH:1100,wait:3200});
 S('p3_il',{js:()=>go('il'),sel:'#app',maxH:1250,wait:1800});
 S('p3_il_open',{js:()=>go('il'),steps:['^HEXANE FEED PUMP'],sel:'#app',maxH:1250,wait:1800,wait2:1500});
 S('p3_il_test',{js:()=>go('il'),steps:['^HEXANE FEED PUMP','^Function test'],sel:'#app',maxH:1250,wait:1800,wait2:1800});
-S('p3_ready',{js:()=>{P.set=1;LIVE.f[FK('PSLL-1201')]=true;go('equipment',{set:1,tab:'ready'})},sel:'#app',from:'.tabs',maxH:1100,wait:2000});
-S('p3_ready_go',{js:()=>{go('equipment',{set:6,tab:'ready'})},sel:'#app',from:'.tabs',maxH:1100,wait:2000});
+S('p3_ready',{js:()=>{P.set=1;LIVE.f[FK('PSLL-1201')]=true;go('equipment',{set:1,tab:'ready'})},sel:'#app',from:'.eqtabs',maxH:1100,wait:2000});
+S('p3_ready_go',{js:()=>{go('equipment',{set:6,tab:'ready'})},sel:'#app',from:'.eqtabs',maxH:1100,wait:2000});
 S('p3_docs',{js:()=>go('documents'),sel:'#app',maxH:1250,wait:1500,calls:[[1,'Documents by type'],[2,'Approval status'],[3,'Documents by equipment']]});
 S('p3_docs_open',{js:()=>{go('documents')},steps:[{js:()=>{const e=document.querySelector('#app table tr[onclick], #app [onclick^="openDoc"], #app tr[onclick^="go"]');e&&e.click()}}],sel:'#app',maxH:1250,wait:1500,wait2:1000});
 // ================= Part 4 maintenance and reliability
-S('p4_dash',{js:()=>{MHS.view='dash';go('mnt')},sel:'#app',maxH:1300,wait:2200,calls:[[1,'^All equipment$'],[2,'^Overview$'],[3,'^Reliability report$'],[4,'^Generate records$']]});
-S('p4_table',{js:()=>{MHS.view='table';go('mnt')},sel:'#app',from:'.tabs',maxH:1300,wait:2200});
-S('p4_wo',{js:()=>{MHS.view='table';go('mnt');setTimeout(()=>mhOpen('WO-240002','report'),900)},sel:'viewport',wait:3000});
-S('p4_wo_fail',{js:()=>{MHS.view='table';go('mnt');setTimeout(()=>{const r=MH.filter(x=>x.bd==='Yes')[3];mhOpen(r.wo,'live')},900)},sel:'viewport',wait:3500,wait2:1500});
-S('p4_time',{js:()=>{MHS.view='time';go('mnt')},sel:'#app',from:'.tabs',maxH:1300,wait:2200});
-S('p4_pdm',{js:()=>{PD2.tab='modes';PDM.sel=0;MHS.view='pdm';go('mnt');render()},sel:'#app',from:'.tabs',maxH:1500,wait:2600});
-S('p4_pdm_next',{js:()=>{PD2.tab='next';PDM.sel=1;MHS.view='pdm';go('mnt');render()},sel:'#app',from:'.tabs',maxH:1700,wait:2600});
-S('p4_rel',{js:()=>{PD2.tab='modes';PDM.sel=0;MHS.view='pdm';go('mnt');render()},steps:['^Reliability measures$'],sel:'#app',from:'.tabs',maxH:1700,wait:2400});
-S('p4_replay',{js:()=>{SIM3.mode='3d';MHS.view='replay';go('mnt')},steps:[{js:()=>{const r=MH.filter(x=>x.bd==='Yes')[5];mhRpSeek(r.t1+36e5);mhRpUpd(true)}}],sel:'#app',from:'.tabs',maxH:1700,wait:2600,wait2:2500});
-S('p4_replay2',{js:()=>{SIM3.mode='3d';MHS.view='replay';go('mnt')},steps:[{js:()=>{const r=MH.filter(x=>x.bd==='Yes')[9];mhRpSeek(r.t1+36e5);mhRpUpd(true);document.getElementById('p3')&&document.getElementById('p3').scrollIntoView()}}],sel:'#p3',wait:2600,wait2:3000});
-S('p4_plan',{js:()=>{SIM3.mode='pid';MHS.view='plan';go('mnt');setTimeout(()=>spExample&&spExample(),900)},sel:'#app',from:'.tabs',maxH:1700,wait:3000});
+S('p4_dash',{js:()=>{MHS.set=0;MHS.view='dash';go('mnt')},sel:'#app',maxH:1300,wait:2200,calls:[[1,'^All equipment$'],[2,'^Overview$'],[3,'^Reliability report$'],[4,'^Generate records$']]});
+S('p4_table',{js:()=>{MHS.set=0;MHS.view='table';go('mnt')},sel:'#app',from:'.tabs',maxH:1300,wait:2200});
+S('p4_wo',{vh:1500,js:()=>{MHS.set=0;MHS.view='table';go('mnt');setTimeout(()=>mhOpen('WO-240002','report'),900)},sel:'viewport',wait:3000});
+S('p4_wo_fail',{vh:1500,js:()=>{MHS.set=0;MHS.view='table';go('mnt');setTimeout(()=>{const r=MH.filter(x=>x.bd==='Yes')[3];mhOpen(r.wo,'live')},900)},sel:'viewport',wait:3500,wait2:1500});
+S('p4_time',{js:()=>{MHS.set=0;MHS.view='time';go('mnt')},sel:'#app',from:'.tabs',maxH:1300,wait:2200});
+S('p4_pdm',{js:()=>{MHS.set=0;MHS.view='pdm';go('mnt')},steps:['^Failure modes$'],sel:'#app',from:'.tabs',maxH:1500,wait:2600});
+S('p4_pdm_next',{js:()=>{MHS.set=0;MHS.view='pdm';go('mnt')},steps:['^Next 90 days by mode$'],sel:'#app',from:'.tabs',maxH:1700,wait:2600});
+S('p4_rel',{js:()=>{MHS.set=0;MHS.view='pdm';go('mnt')},steps:['^Reliability measures$'],sel:'#app',from:'.tabs',maxH:1700,wait:2400});
+S('p4_replay',{js:()=>{SIM3.mode='3d';MHS.set=0;MHS.view='replay';go('mnt')},steps:[{js:()=>{const r=MH.filter(x=>x.bd==='Yes')[5];mhRpSeek(r.t1+36e5);mhRpUpd(true)}}],sel:'#app',from:'.tabs',maxH:1700,wait:2600,wait2:2500});
+S('p4_replay2',{js:()=>{SIM3.mode='3d';MHS.set=0;MHS.view='replay';go('mnt')},steps:[{js:()=>{const r=MH.filter(x=>x.bd==='Yes')[9];mhRpSeek(r.t1+36e5);mhRpUpd(true);document.getElementById('p3')&&document.getElementById('p3').scrollIntoView()}}],sel:'#p3',wait:2600,wait2:3000});
+S('p4_plan',{js:()=>{SIM3.mode='pid';MHS.set=0;MHS.view='plan';go('mnt');setTimeout(()=>spExample&&spExample(),900)},sel:'#app',from:'.tabs',maxH:1700,wait:3000});
 S('p4_fm',{js:()=>{FM.q='mechanical seal leak on the hexane feed pump';FM.set=0;go('fm')},steps:['Find similar failures'],sel:'#app',maxH:1600,wait:1500,wait2:1300});
 S('p4_perf',{js:()=>go('perf'),sel:'#app',maxH:1300,wait:2000});
 S('p4_perf_kn',{js:()=>go('perf'),steps:['^Knowledge$'],sel:'#app',from:'.tabs',maxH:1300,wait:1500,wait2:1000});
