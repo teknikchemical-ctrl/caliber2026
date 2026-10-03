@@ -136,3 +136,21 @@ def ribbon(s, msg, y=6.28, h=0.54):
     b = box(s, 0.4, y, 12.55, h, NAVY, None, None, radius=0.1); grad(b, NAVY, BLUE, 0)
     box(s, 0.4, y, 1.35, h, HI, None, [[("Conclusion", {"bold": True, "size": 11, "color": NAVY})]], 11, True, NAVY, "c", "m", radius=0.1)
     text(s, 1.9, y, 10.95, h, msg, 10.5, False, WHITE, anchor="m", line=1.02)
+
+def win(s, name, x, y, w, crop=None, title="Asset Knowledge Platform"):
+    """screenshot inside a browser-style window with a title bar and soft shadow; returns total height"""
+    from PIL import Image
+    import os
+    p = os.path.join(os.path.dirname(__file__), "jpg", name + ".jpg")
+    im = Image.open(p); iw, ih = im.size
+    if crop:
+        c0, c1, c2, c3 = crop; im = im.crop((int(c0 * iw), int(c1 * ih), int(c2 * iw), int(c3 * ih)))
+        p = os.path.join(os.path.dirname(__file__), "jpg", "w_" + name + "_" + "_".join(str(int(c * 100)) for c in crop) + ".jpg"); im.convert("RGB").save(p, quality=86)
+    pw, ph = im.size; ww = w - 0.04; hh = ww * ph / pw; H = hh + 0.3
+    box(s, x + 0.07, y + 0.07, w, H, "C4D0DF", None, None, radius=0.05)
+    box(s, x, y, w, H, WHITE, "9FB2C8", None, radius=0.05, lw=0.9)
+    box(s, x, y, w, 0.28, "E3EAF2", "9FB2C8", None, radius=0.05, lw=0.9)
+    for i, c_ in enumerate(["E8736C", "E9B84C", "5DBB7B"]): box(s, x + 0.1 + i * 0.13, y + 0.09, 0.09, 0.09, c_, None, None, shape=MSO_SHAPE.OVAL)
+    text(s, x + 0.55, y + 0.02, w - 0.7, 0.24, title, 7.5, False, GREY, anchor="m")
+    s.shapes.add_picture(p, Inches(x + 0.02), Inches(y + 0.29), Inches(ww), Inches(hh))
+    return H

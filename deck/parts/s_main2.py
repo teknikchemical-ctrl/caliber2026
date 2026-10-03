@@ -11,47 +11,58 @@ CF = [-A["one_off"], .6 * BASE[3] - A["run"], BASE[3] - A["run"], BASE[3] - A["r
 IRR = _irr(CF); NPV10 = _npv(.10, CF)
 print("irr", round(IRR * 100, 1), "npv10", round(NPV10))
 s = blank(prs)
+from flow import *
 Y1 = .6 * BASE[3] - A["run"]; Y2 = BASE[3] - A["run"]; REM = A["one_off"] - Y1
-frame(s, 4, f"Business Impact: Each Feature Moves a Measured KPI, Worth {{{{IDR {BASE[3]/1000:.1f} B}}}} a Year in the Base Case With a {PB:.0f}-Month Payback",
-      None, "Impact", "Case data: 211 work orders, 31 breakdowns over 1.52 years, MTTR 14.0 h. Assumptions (grey): users, minutes saved, rates, 10% repair-time reduction; Company figures replace them in the pilot", "Impact Assessment and Projection")
-CX = [(0.4, 2.15, "Platform capability"), (2.85, 2.7, "KPI and where the number comes from"), (5.85, 3.65, "Simple calculation"), (9.8, 0.95, "IDR M")]
-for x_, w_, t_ in CX: gbanner(s, x_, 1.28, w_, t_, NAVY, "27517F", 0.28, 9)
-gbanner(s, 11.05, 1.28, 1.9, "Result", GREEN, "6CC48D", 0.28, 9)
-rows4 = [("AI assistant", "engineer finds the procedure, drawing and past case in minutes", BLUE,
-          "Search and verify time per engineer: 40 to 20 min a day", ("Assumption", "pilot logs replace it"),
-          f"{A['users']} users x 20 min x {A['days']} days / 60 = {A['users']*20*A['days']/60:,.0f} h saved; x IDR {A['rate']:,} per h = IDR {BASE[0]:,.0f} M", f"{BASE[0]:,.0f}"),
-         ("Failure memory, predictive checks", "known causes and fixes shown at the fault; repeat jobs flagged", TEAL,
-          f"MTTR {D['mttr']:.1f} h to {D['mttr']*.9:.1f} h (10% less)", ("Case data", "211 WO; 10% assumed"),
-          f"{D['bd_yr']} breakdowns a year (31 in 1.52 yr) x {D['mttr']:.1f} h x 10% = {D['bd_yr']*D['mttr']*.1:.1f} h; x IDR {A['down_h']:.0f} M per downtime hour = IDR {BASE[1]:,.0f} M", f"{BASE[1]:,.0f}"),
-         ("Knowledge Studio, OPL lessons", "new engineers learn from approved lessons and the simulator", PURPLE,
-          "New engineers productive one month sooner", ("Assumption", "HR data replaces it"),
-          f"One month of reduced output for new joiners, set at IDR {BASE[2]:,.0f} M a year", f"{BASE[2]:,.0f}")]
-ys4 = [2.06, 3.04, 4.02]
-for (cap, chg, c_, kpi, (stag, snote), calc, val), cy in zip(rows4, ys4):
-    box(s, 0.4, cy - 0.44, 2.15, 0.88, TINT[c_], c_, [[(cap, {"bold": True, "size": 10.5, "color": NAVY})], [(chg, {"size": 8.5, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.1, margin=0.06)
-    arrow(s, 2.57, cy, 2.83, cy, c_, 1.6)
-    scol = GREEN if stag == "Case data" else GREY
-    box(s, 2.85, cy - 0.44, 2.7, 0.88, WHITE, c_, [[(kpi, {"bold": True, "size": 9.5, "color": NAVY})], [(stag + ": ", {"bold": True, "size": 8.5, "color": scol}), (snote, {"size": 8.5, "color": INK})]], 9, False, INK, "c", "m", radius=0.08, lw=1.1, margin=0.06)
-    arrow(s, 5.57, cy, 5.83, cy, c_, 1.6)
-    box(s, 5.85, cy - 0.44, 3.65, 0.88, WHITE, c_, [[(calc, {"size": 9, "color": INK})]], 9, False, INK, "c", "m", radius=0.08, lw=1.1, margin=0.08)
-    arrow(s, 9.52, cy, 9.78, cy, c_, 1.6)
-    box(s, 9.8, cy - 0.3, 0.95, 0.6, c_, None, [[(val, {"bold": True, "size": 15, "color": WHITE})]], 15, True, WHITE, "c", "m", radius=0.08, margin=0.02)
-for (cap, kpi, calc), cy in zip([("Interlock guard, readiness, hazard view", "Improper executions: counted in the pilot", "Not valued: no case data on cost per incident"), ("Quality register, approvals", f"{D['issues']} conflicts owned, 90% closed", "Not valued: effect shows through the levers above")], [4.74, 5.28]):
-    c_ = RED if "Interlock" in cap else ORANGE
-    box(s, 0.4, cy - 0.22, 2.15, 0.44, TINT[c_], c_, [[(cap, {"bold": True, "size": 9, "color": NAVY})]], 9, False, INK, "c", "m", radius=0.08, lw=1.0, margin=0.05)
-    arrow(s, 2.57, cy, 2.83, cy, c_, 1.4)
-    box(s, 2.85, cy - 0.22, 2.7, 0.44, WHITE, c_, [[(kpi, {"size": 9, "color": INK})]], 9, False, INK, "c", "m", radius=0.08, lw=1.0, margin=0.05)
-    arrow(s, 5.57, cy, 5.83, cy, c_, 1.4)
-    box(s, 5.85, cy - 0.22, 3.65, 0.44, WHITE, c_, [[(calc, {"size": 9, "color": INK})]], 9, False, INK, "c", "m", radius=0.08, lw=1.0, margin=0.05)
-    box(s, 9.8, cy - 0.22, 0.95, 0.44, GREY, None, [[("not valued", {"bold": True, "size": 9, "color": WHITE})]], 9, True, WHITE, "c", "m", radius=0.08, margin=0.02)
-box(s, 10.77, 1.7, 0.03, 2.7, GREEN, None, None, shape=MSO_SHAPE.RECTANGLE)
-for cy in ys4: arrow(s, 10.77, cy, 10.8, cy, GREEN, 1.6, False)
-arrow(s, 10.8, 3.04, 11.05, 3.04, GREEN, 2.0)
-box(s, 11.05, 1.7, 1.9, 3.35, GREEN, None, [[(f"IDR {BASE[3]:,.0f} M", {"bold": True, "size": 15, "color": WHITE})], [("a year in the base case: 604 + 857 + 60", {"size": 8.5, "color": "E4F4EA"})], [("", {"size": 5})], [(f"IRR {IRR*100:.0f}%", {"bold": True, "size": 12, "color": WHITE})], [(f"NPV at 10%: IDR {NPV10/1000:.2f} B", {"size": 9, "color": WHITE})], [(f"Net over 3 years: IDR {NB/1000:.2f} B", {"size": 9, "color": WHITE})], [("", {"size": 5})], [(f"Payback {PB:.0f} months", {"bold": True, "size": 12, "color": WHITE})], [(f"Low IDR {LOW[3]/1000:.1f} B, no payback", {"size": 8.5, "color": "E4F4EA"})], [(f"High IDR {HIGH[3]/1000:.1f} B, {PH:.0f} months", {"size": 8.5, "color": "E4F4EA"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.06)
-box(s, 0.4, 5.62, 12.55, 0.56, TINT[BLUE], None, None, radius=0.06)
-text(s, 0.52, 5.63, 12.3, 0.55, [[("Payback: ", {"bold": True, "color": NAVY}), f"cost is IDR {A['one_off']:,.0f} M one-off and IDR {A['run']:,.0f} M a year. Year 1 net = 60% x {BASE[3]:,.0f} - {A['run']:,.0f} = {Y1:,.0f}; years 2 and 3 net = {BASE[3]:,.0f} - {A['run']:,.0f} = {Y2:,.0f} each. After year 1 the gap is {A['one_off']:,.0f} - {Y1:,.0f} = {REM:,.0f}, and {REM:,.0f} / {Y2:,.0f} x 12 = {REM/Y2*12:.0f} months, so payback is at month {12 + REM/Y2*12:.0f}."]], 9, False, INK, anchor="m", line=1.04)
+frame(s, 4, f"Business Impact: From Today's Baseline to {{{{IDR {BASE[3]/1000:.1f} B}}}} a Year, With Every Input and Its Source Shown",
+      None, "Impact", "Case data: 211 work orders, 31 breakdowns in 1.52 years, MTTR 14.0 h. Grey items are assumptions that Company figures replace in the pilot. IDR = Indonesian rupiah; IRR and NPV over 3 years at 10%", "Impact Assessment and Projection")
+HX = [(0.4, 2.1, "Lever and screen"), (2.75, 2.2, "Baseline today"), (5.2, 2.0, "With the platform"), (7.45, 4.1, "Calculation: inputs multiplied"), (11.85, 1.1, "IDR M a year")]
+for x_, w_, t_ in HX: gbanner(s, x_, 1.26, w_, t_, NAVY, "27517F", 0.27, 9)
+def pill_tag(x_, y_, label, col): pill(s, x_, y_, 0.2 + 0.062 * len(label), label, WHITE, col, 0.2, 7.5, col)
+levers = [("Search time", "AI assistant", "assistant", (0, 0.1, 1, 0.45), BLUE,
+           ("40 min a day", "per engineer on searching and checking sources", "ASSUMPTION", GREY), ("20 min a day", "answers arrive with the source attached"),
+           [(f"{A['users']}", "users", GREY), ("20 min", "saved a day", GREY), (f"{A['days']}", "working days", GREY), ("IDR 175k", "per hour", GREY)], f"{BASE[0]:,.0f}"),
+          ("Repair time", "Failure memory", "fm", (0, 0, 1, 0.6), TEAL,
+           (f"MTTR {D['mttr']:.1f} h", f"{D['bd_yr']} breakdowns a year, 434 h downtime", "CASE DATA", GREEN), (f"MTTR {D['mttr']*.9:.1f} h", "10% less, known causes and fixes at the fault"),
+           [(f"{D['bd_yr']}", "breakdowns a year", GREEN), (f"{D['mttr']:.1f} h", "MTTR today", GREEN), ("10%", "less repair time", GREY), ("IDR 30 M", "per downtime hour", GREY)], f"{BASE[1]:,.0f}"),
+          ("Ramp-up", "Knowledge Studio", "studio", (0, 0, 1, 0.6), PURPLE,
+           ("Not measured", "no baseline for new-engineer ramp-up in the case data", "NO BASELINE", GREY), ("One month sooner", "new engineers learn from approved lessons"),
+           None, f"{BASE[2]:,.0f}")]
+RY4 = [2.08, 3.0, 3.92]
+for (lv, ft, im_, crp, c_, (bt, bs, btag, bcol), (tt, ts), ins, val), cy in zip(levers, RY4):
+    # lever cell with the screen
+    box(s, 0.4, cy - 0.42, 2.1, 0.84, WHITE, c_, None, radius=0.08, lw=1.2)
+    from PIL import Image as _I
+    _p = os.path.join(HERE, "jpg", im_ + ".jpg"); _im = _I.open(_p); _w, _h = _im.size
+    _c = _im.crop((int(crp[0] * _w), int(crp[1] * _h), int(crp[2] * _w), int(crp[3] * _h))); _cp = os.path.join(HERE, "jpg", "lv_" + im_ + ".jpg"); _c.convert("RGB").save(_cp, quality=85)
+    ph_ = 1.0 * _c.size[1] / _c.size[0]
+    pc = s.shapes.add_picture(_cp, Inches(0.46), Inches(cy - ph_ / 2), Inches(1.0), Inches(ph_)); pc.line.color.rgb = rgb(MID); pc.line.width = Pt(0.75)
+    text(s, 1.52, cy - 0.38, 0.97, 0.76, [[(lv, {"bold": True, "size": 10.5, "color": NAVY})], [(ft, {"size": 8.5, "color": c_})]], 10, False, INK, anchor="m", line=1.0)
+    arrow(s, 2.52, cy, 2.73, cy, c_, 1.6)
+    box(s, 2.75, cy - 0.42, 2.2, 0.84, WHITE, bcol, [[(bt, {"bold": True, "size": 10.5, "color": NAVY})], [(bs, {"size": 8.5, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.4, margin=0.06)
+    pill_tag(2.85, cy - 0.52, btag, bcol)
+    arrow(s, 4.97, cy, 5.18, cy, c_, 1.6)
+    box(s, 5.2, cy - 0.42, 2.0, 0.84, TINT[c_], c_, [[(tt, {"bold": True, "size": 10.5, "color": NAVY})], [(ts, {"size": 8.5, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.2, margin=0.06)
+    arrow(s, 7.22, cy, 7.43, cy, c_, 1.6)
+    if ins:
+        xx = 7.45
+        for j, (v_, l_, col) in enumerate(ins):
+            box(s, xx, cy - 0.34, 0.92, 0.68, WHITE, col, [[(v_, {"bold": True, "size": 10.5, "color": NAVY})], [(l_, {"size": 8, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.3, margin=0.03)
+            if j < 3: text(s, xx + 0.92, cy - 0.14, 0.2, 0.28, "x", 12, True, GREY, "c")
+            xx += 1.06
+    else:
+        box(s, 7.45, cy - 0.34, 4.1, 0.68, WHITE, GREY, [[("IDR 60 M a year, assumed", {"bold": True, "size": 10.5, "color": NAVY})], [("kept small; the HR figure replaces it in the pilot", {"size": 8.5, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.3, margin=0.05)
+    arrow(s, 11.58, cy, 11.83, cy, c_, 1.8)
+    box(s, 11.85, cy - 0.3, 1.1, 0.6, c_, None, [[(val, {"bold": True, "size": 16, "color": WHITE})]], 16, True, WHITE, "c", "m", radius=0.08, margin=0.02)
+# money flow
+box(s, 0.4, 4.52, 2.1, 0.62, NAVY, None, [[("Money flow", {"bold": True, "size": 10.5, "color": WHITE})], [(f"{BASE[0]:,.0f} + {BASE[1]:,.0f} + {BASE[2]:,.0f} = {BASE[3]:,.0f} a year", {"size": 8.5, "color": "DCE8F5"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.05)
+arrow(s, 2.52, 4.83, 2.73, 4.83, NAVY, 1.6)
+row(s, 4.83, 2.75, 12.95, [("Invest", f"IDR {A['one_off']:,.0f} M one-off"), ("Year 1", f"60% of value less {A['run']:,.0f} running = {Y1:,.0f}"), ("Year 2", f"{BASE[3]:,.0f} less {A['run']:,.0f} = {Y2:,.0f}"), ("Year 3", f"{BASE[3]:,.0f} less {A['run']:,.0f} = {Y2:,.0f}"), ("Result", f"payback month {12 + REM/Y2*12:.0f}, IRR {IRR*100:.0f}%, NPV IDR {NPV10/1000:.2f} B")], NAVY, tsize=10.5, ssize=8.5, maxw=2.2, solid_last=True)
+text(s, 2.75, 5.2, 10.2, 0.22, f"Payback: after year 1 the gap is {A['one_off']:,.0f} - {Y1:,.0f} = {REM:,.0f}; {REM:,.0f} / {Y2:,.0f} x 12 = {REM/Y2*12:.0f} months into year 2, so month {12 + REM/Y2*12:.0f}.", 8.5, False, GREY)
+# scenarios
+box(s, 0.4, 5.55, 2.1, 0.62, GREY, None, [[("Scenarios", {"bold": True, "size": 10.5, "color": WHITE})], [("same method, other inputs", {"size": 8.5, "color": "EEF1F4"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.05)
+row(s, 5.86, 2.75, 12.95, [("Low case", f"IDR {LOW[3]/1000:.1f} B a year, no payback in 3 years"), ("Base case", f"IDR {BASE[3]/1000:.1f} B a year, payback {PB:.0f} months"), ("High case", f"IDR {HIGH[3]/1000:.1f} B a year, payback {PH:.0f} months"), ("Not valued", "improper executions avoided and conflicts closed")], GREY, tsize=10.5, ssize=8.5, maxw=2.6, arrows=False)
 ribbon(s, f"Value rests on two measurable levers, search time and repair time, and every input is shown so the Company can replace it with its own number. The base case pays back in {PB:.0f} months; the low case does not, and the pilot is designed to find out which case is real.")
-notes(s, "Business impact. Each row runs from a platform capability to a KPI, then to a simple calculation and a value in IDR million. Search time: 45 users saving 20 minutes a day over 230 days is 3,450 hours at IDR 175,000 an hour, which is IDR 604 M. Repair time: 20.4 breakdowns a year at a 14.0 hour MTTR, cut by 10 percent, is 28.6 hours at IDR 30 M per downtime hour, which is IDR 857 M. Ramp-up is set at IDR 60 M. The breakdown rate and MTTR come from the 211 work orders; all other inputs are assumptions. Costs are IDR 1.4 B one-off and 370 M a year. The base case pays back in about 21 months with an IRR near 40 percent; the low case does not pay back in three years.")
+notes(s, "Business impact as a flow. Each row starts from today's baseline, shows what the platform changes, and multiplies the inputs into IDR million. Search time: 45 users saving 20 minutes a day over 230 days is 3,450 hours at IDR 175,000 an hour, which is IDR 604 M; the 40 minute baseline is an assumption. Repair time: 20.4 breakdowns a year at a 14.0 hour MTTR, cut by 10 percent, is 28.6 hours at IDR 30 M per downtime hour, which is IDR 857 M; the breakdown rate and MTTR come from the 211 work orders. Ramp-up is set at IDR 60 M and has no baseline in the case data. Costs are IDR 1.4 B one-off and 370 M a year. The base case pays back in about 21 months with an IRR near 40 percent; the low case does not pay back in three years.")
 
 # ======================================================= 5 FEASIBILITY AND ROADMAP
 s = blank(prs)
@@ -125,14 +136,17 @@ frame(s, 6, "Conclusion: A {{Trusted, Traceable}} Knowledge Hub Turns Scattered 
 pillars = [("CONNECT", "TAGLINK: one governed base", BLUE, [f"{D['docs']} documents and {D['wo']} work orders unified on the equipment tag", f"{D['issues']} conflicts detected and assigned to owners", "Ingestion, quality gates and approval for every record"], "98 to 1", "documents into one governed base"),
            ("ASK", "VERA: answers with evidence", TEAL, ["Source, revision, approval status and confidence on every answer", "Numbers and quotes verified against the cited text", "Safety bypass requests refused with the reason"], f"{D['evals']}/{D['evals']}", "evaluation questions passed"),
            ("ACT", "FORESIGHT, SAFEWORK", ORANGE, ["Failure memory with RCA and lessons at the point of fault", "Risk ranking, readiness, hazard screening and permit-aware planning", "Read-only links to EDMS, AIMS and the digital twin"], f"{D['tools']} tools", "computed from plant records")]
+BL2 = [["98 documents and 211 work orders joined on the equipment tag", "48 conflicts found and given owners"], ["Source, revision, confidence on every answer", "Numbers checked; unsafe bypass refused"], ["Failure memory and risk at the fault", "Read-only links to EDMS, AIMS, twin"]]
+SC2 = [("wizard", (0, 0, 1, 0.9)), ("assistant", (0, 0.05, 1, 0.8)), ("predict", (0, 0, 1, 0.8))]
 for i, (a, b, c_, bl, big, cap) in enumerate(pillars):
     x = 0.35 + i * 4.25
     panel(s, x, 1.5, 4.15, 1.95)
     box(s, x, 1.5, 4.15, 0.48, c_, None, None, shape=MSO_SHAPE.RECTANGLE)
     text(s, x + 0.15, 1.5, 4.0, 0.48, [[(a + "   ", {"bold": True, "size": 14, "color": WHITE}), (b, {"size": 10.5, "color": "EAF2FB"})]], 12, True, WHITE, "l", "m")
-    bullet(s, x + 0.15, 2.04, 3.85, 0.95, bl, 9.3, c_, 2)
-    text(s, x + 0.15, 2.93, 1.7, 0.5, big, 22, True, c_)
-    text(s, x + 1.9, 2.97, 2.2, 0.45, cap, 9, False, GREY, anchor="m", line=1.0)
+    bullet(s, x + 0.12, 2.03, 2.3, 0.8, BL2[i], 9, c_, 2)
+    win(s, SC2[i][0], x + 2.5, 2.06, 1.55, SC2[i][1], "")
+    text(s, x + 0.15, 2.82, 2.3, 0.4, big, 20, True, c_)
+    text(s, x + 0.15, 3.15, 2.3, 0.25, cap, 8.5, False, GREY)
 banner(s, 0.35, 3.52, 12.65, "How the proposal answers the three key questions of the case", NAVY, 0.3, 10.5, "l")
 kq = [("Q1", "Build a structured Industrial Data Ops foundation", "Tag-keyed data model over seven source types; AI-assisted ingestion, quality gates and approval with named owners; conflicts surfaced on day one", "98 documents, 1,109 passages, 48 conflicts registered"),
       ("Q2", "Help engineers find trusted answers faster and reduce improper execution", "Hybrid retrieval, evidence-weighted confidence score, verification of numbers and quotes, refusal of unsafe requests", f"{D['evals']}/{D['evals']} questions passed; 20 min a day saved per engineer (assumption, slide 4)"),
@@ -162,6 +176,9 @@ trows = [["No.", "Name", "Major", "Semester", "Area of expertise", "Contribution
          ["1", "[Name]", "[Computer Science]", "[6]", "[AI and software]", "[Formulated the idea; built the prototype and the AI assistant]"],
          ["2", "[Name]", "[Chemical Engineering]", "[7]", "[Process and reliability]", "[Problem analysis, process content and hazard models]"],
          ["3", "[Name]", "[Industrial Engineering]", "[7]", "[Maintenance and business case]", "[Business impact, KPIs and roadmap]"]]
-table(s, 0.55, 2.2, 12.2, [0.5, 1.8, 2.3, 1.0, 2.5, 4.1], trows, 11, rowh=0.7, header_fill=NAVY)
-text(s, 0.55, 5.3, 12.2, 0.5, "The booklet allows two to three members from the same university. Delete unused rows.", 10.5, False, GREY)
+table(s, 0.55, 2.2, 12.2, [0.5, 1.8, 2.3, 1.0, 2.5, 4.1], trows, 11, rowh=0.52, header_fill=NAVY)
+text(s, 0.55, 4.4, 12.2, 0.3, "The booklet allows two to three members from the same university. Delete unused rows.", 10.5, False, GREY)
+text(s, 0.55, 4.8, 12.2, 0.3, "Screens of the working prototype", 11, True, NAVY)
+for i, (nm, cr, tt) in enumerate([("dash2", (0, 0.1, 1, 0.7), "Dashboard"), ("scn", (0, 0, 1, 0.58), "Scenario on the P&ID"), ("predict", (0, 0, 1, 0.58), "Predictive maintenance"), ("hazard3d", (0, 0, 1, 0.58), "Hazard simulator")]):
+    win(s, nm, 0.55 + i * 3.08, 5.15, 2.95, cr, tt)
 notes(s, "Team. Complete the table as required by the booklet.")

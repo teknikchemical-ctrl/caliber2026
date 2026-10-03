@@ -12,15 +12,11 @@ for i, (n_, l_) in enumerate([("564", "linked records"), ("1,109", "searchable p
     text(s, x, 5.05, 1.55, 0.5, n_, 24, True, "8FD3CC")
     text(s, x, 5.55, 1.55, 0.4, l_, 9.5, False, "B9CBE0")
 text(s, 0.7, 6.3, 6.3, 0.9, [[("Team: ", {"bold": True, "color": "8FD3CC"}), "[Team name]"], [("University: ", {"bold": True, "color": "8FD3CC"}), "[University]    ", ("Supervisor: ", {"bold": True, "color": "8FD3CC"}), "[Supervisor name]"]], 11.5, False, WHITE, space=4)
-box(s, 7.75, 0.7, 5.15, 3.3, WHITE, MID, None, shape=MSO_SHAPE.RECTANGLE)
-image(s, os.path.join(HERE, "jpg", "net.jpg"), 7.8, 0.75, 5.05, 3.2)
-text(s, 7.75, 4.02, 5.15, 0.3, "Knowledge network of the case data: 8 equipment tags and the 556 records that hang on them", 8.5, False, GREY, "c")
-for nm, x, y, w in [("assistant", 7.45, 4.4, 3.2), ("scn", 9.75, 4.9, 3.2)]:
-    h = w * 0.612
-    box(s, x + 0.05, y + 0.05, w, h, "D5DEE9", None, None, shape=MSO_SHAPE.RECTANGLE)
-    image(s, IMG(nm), x, y, w, h)
-text(s, 7.45, 7.0, 5.5, 0.3, "Working prototype on the case baseline data, with a 3-minute demonstration video", 9, False, GREY)
-notes(s, "Cover. Chosen use case: Case 1. The figure is the real knowledge network of the baseline data: eight equipment tags and every document, work order, instrument, lesson, interlock and component linked to them.")
+h1 = win(s, "dash2", 7.45, 0.45, 5.45, (0, 0.1, 1, 0.98), "Dashboard: the plant in 3D")
+h2 = win(s, "pid", 7.45, 4.45, 2.65, (0, 0, 1, 1), "Live P&ID")
+h3 = win(s, "assistant", 10.25, 4.45, 2.65, (0, 0, 1, 1), "AI assistant")
+text(s, 7.45, 7.05, 5.5, 0.3, "Working prototype on the case baseline data, with a 3-minute demonstration video", 9, False, GREY)
+notes(s, "Cover. Chosen use case: Case 1. The three windows are screens of the working prototype: the 3D plant dashboard, the AI assistant with sources and confidence, and the live P&ID.")
 
 # ======================================================= 2 BACKGROUND AND PROBLEM
 s = blank(prs)
