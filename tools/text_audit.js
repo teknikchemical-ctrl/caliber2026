@@ -7,7 +7,7 @@ for(const v of ['dash','table','time','pdm','replay','plan'])V.push(['mnt '+v,`(
 for(const t of ['overview','pid','ga','perf','plot','ready','docs','ds','seq','opl','maint','rel'])V.push(['eq '+t,`()=>go('equipment',{set:4,tab:'${t}'})`]);
 for(const t of ['overview','ingest','capture','library','review','quality','qa','audit'])V.push(['ks '+t,`()=>{KS.tab='${t}';go('ks')}`]);
 for(const t of ['connectors','model','arch','prov','bundle','usage','graph'])V.push(['int '+t,`()=>{INT.tab='${t}';go('int')}`]);
-for(const t of ['trust','feas','road','biz'])V.push(['gov '+t,`()=>{GOV.tab='${t}';go('gov')}`]);
+for(const t of ['controls','feasible','roadmap','biz'])V.push(['gov '+t,`()=>{GOV.tab='${t}';go('gov')}`]);
 for(const t of ['rel','know','spares','tgt'])V.push(['perf '+t,`()=>{PERF.tab='${t}';go('perf')}`]);
 for(const t of [0,1,2])V.push(['scn tab'+t,()=>{go('scn')}]);
 V.push(['opl sheet',()=>go('opl',{opl:K.opl[0].no})],['opl sim',()=>go('opl',{opl:K.opl[0].no,om:'sim',si:0})],['settings',()=>{go('mywork');document.querySelector('[aria-label="Settings"]').click()}],['notif',()=>{go('mywork');document.querySelector('[aria-label="Notifications"]').click()}],['tour',()=>{go('dashboard');document.querySelector('[aria-label="Guided tour"]').click()}]);
