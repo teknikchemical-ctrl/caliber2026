@@ -122,12 +122,12 @@ await until(160);S=0.75;
 // 2:39 ingestion
 await go(()=>{KS.tab='overview';go('ks');window.scrollTo(0,0)});await sleep(600);await cap('Document ingestion: parse, map to the equipment tag, check, then approve.');
 await ck('Ingest documents',{scope:'div',after:900});await ckS('input[placeholder^="For example"]',0,200);await p.keyboard.type('SOP start-up of GA-1201A',{delay:35*K});
-await ckS('textarea',0,200);await p.keyboard.type('1. Confirm suction valve XV-1201A is open.\n2. Confirm seal flush dP above 1.5 bar on PDI-1201.\n3. Reset the interlock SEQ-1201 and start GA-1201A.',{delay:14*K});await sleep(500);
+await ckS('textarea',0,200);await p.keyboard.type('1. Confirm suction valve XV-1201A is open.\n2. Confirm seal flush dP above 1.5 bar on PDI-1201.\n3. Reset the interlock SEQ-1201 and start GA-1201A.',{delay:5*K});await sleep(500);
 await ck('^Add$',{scope:'button',after:900});await snap('ks1');
-for(let i=0;i<5;i++){await ck('^(Next|Create|Finish)$',{scope:'button',after:1300});await snap('ks_n'+i)}
+for(let i=0;i<2;i++){await ck('^(Next|Create|Finish)$',{scope:'button',after:1300});await snap('ks_n'+i)}
 await cap('Quality gates flag conflicts before anything is searchable.');await ck('Quality gates',{scope:'div',after:1500});await ck('Review queue',{scope:'div',after:1200});
 await until(173);S=0.75;
 // end card
-await cap('');await card('<h1>Asset Knowledge Platform</h1><h2>Team Insinyur Jawa</h2><p>Alniko Arya S.  |  Anas Fauzan  |  Rainar Athalla W. P.</p><p>Link, verify and use plant knowledge</p><small>CALIBER 2026 | Case 1: Manufacturing Knowledge Hub</small>');await until(178);
+await cap('');await card('<h1>Asset Knowledge Platform</h1><h2>Team Insinyur Jawa</h2><p>Alniko Arya S.  |  Anas Fauzan  |  Rainar Athalla W. P.</p><p>Link, verify and use plant knowledge</p><small>CALIBER 2026 | Case 1: Manufacturing Knowledge Hub</small>');await sleep(4300/S);
 console.log('END',((Date.now()-TS)/1000).toFixed(1),'misses',JSON.stringify(miss),'errors',JSON.stringify(errs));
 await ctx.close();await b.close();})();
