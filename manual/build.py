@@ -46,7 +46,7 @@ def cover_html():
     return f"""<!doctype html><html><head><meta charset='utf-8'><style>
 @page{{size:A4;margin:0}} *{{box-sizing:border-box}} body{{margin:0;font-family:Arial,'Liberation Sans',sans-serif}}
 .c{{width:210mm;height:297mm;background:linear-gradient(135deg,#0b2a4a,#155ea3);color:#fff;padding:30mm 24mm;display:flex;flex-direction:column;position:relative;overflow:hidden}}
-.tag{{font-size:11pt;letter-spacing:3pt;text-transform:uppercase;color:#8fd3cc;margin-bottom:12mm}}
+.tag{{font-size:10pt;letter-spacing:2pt;text-transform:uppercase;color:#8fd3cc;margin-bottom:12mm}}
 h1{{font-size:42pt;line-height:1.1;margin:0 0 4mm}} h2{{font-size:24pt;font-weight:400;margin:0 0 14mm;color:#dce8f5}}
 h3{{font-size:17pt;color:#8fd3cc;margin:0 0 3mm}} p{{font-size:13pt;margin:1.5mm 0;color:#dce8f5}}
 .shot{{position:absolute;left:24mm;right:24mm;bottom:34mm;border:1mm solid rgba(255,255,255,.35);border-radius:3mm;overflow:hidden;box-shadow:0 3mm 8mm rgba(0,0,0,.35);height:78mm;background:#fff}}
@@ -72,14 +72,14 @@ def front_html():
     hist = "<table class='t'><tr><th>Version</th><th>Date</th><th>Change</th></tr><tr><td>" + VERSION + "</td><td>" + DATE + "</td><td>First issue</td></tr></table>"
     return f"<div class='sheet' style='page-break-after:always'><h1 style='page-break-before:auto'>Document control</h1>{t}<h2>Revision history</h2>{hist}<h2>How to read the figures</h2><p>Each figure is a screenshot of the platform. Orange numbered markers point to the parts of the screen that the legend under the figure describes. Chapters begin with the roles that normally use the page.</p><div class='note tip'><b class='t'>Tip</b>Boxes marked Tip give a faster way to do a task. Boxes marked Caution describe a limit or a risk. Boxes marked Roles describe who can do what.</div></div>"
 
-OVERRIDE = "<style>.sheet{padding:0!important;width:auto!important}.fig .frame{max-width:100%}h1{margin-top:0}</style>"
+OVERRIDE = "<style>@page{size:A4;margin:18mm 18mm 20mm 18mm}.sheet{padding:0!important;width:auto!important}.fig .frame{max-width:100%}h1{margin-top:0}</style>"
 
 def render(htmlfile, pdffile, footer=False):
     js = os.path.join(BLD, "render.js")
     open(js, "w").write("""const {chromium}=require('playwright');(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const p=await b.newPage();
 await p.goto('file://'+process.argv[2],{waitUntil:'load'});await p.waitForTimeout(800);
 const f=process.argv[4]==='1';
-await p.pdf({path:process.argv[3],format:'A4',printBackground:true,preferCSSPageSize:!f,margin:f?{top:'18mm',bottom:'20mm',left:'18mm',right:'18mm'}:{top:'0',bottom:'0',left:'0',right:'0'},displayHeaderFooter:f,headerTemplate:'<span></span>',footerTemplate:'<div style="width:100%;font:8pt Arial;color:#6B7A8C;padding:0 18mm;display:flex;justify-content:space-between"><span>Asset Knowledge Platform | User Manual</span><span>Page <span class="pageNumber"></span></span></div>'});await b.close()})()""")
+await p.pdf({path:process.argv[3],format:'A4',printBackground:true,preferCSSPageSize:true,margin:f?{top:'18mm',bottom:'20mm',left:'18mm',right:'18mm'}:{top:'0',bottom:'0',left:'0',right:'0'},displayHeaderFooter:f,headerTemplate:'<span></span>',footerTemplate:'<div style="width:100%;font:8pt Arial;color:#6B7A8C;padding:0 18mm;display:flex;justify-content:space-between"><span>Asset Knowledge Platform | User Manual</span><span>Page <span class="pageNumber"></span></span></div>'});await b.close()})()""")
     subprocess.run(["node", js, htmlfile, pdffile, "1" if footer else "0"], check=True, cwd=os.path.dirname(HERE))
 
 def pages_of(pdf, doc):
