@@ -2,12 +2,11 @@ const APPURL='file://'+require('path').join(__dirname,'..','knowledge-hub-integr
 const ask=q=>[{sel:'input[placeholder="Ask a question"]'},{type:q},'^Send$',{js:()=>{},wait:3600}];
 module.exports=S=>{
 // ================= Part 2 getting started
-S('p2_login',{url:APPURL+'?login',js:()=>{try{authLogout()}catch(e){};setTimeout(()=>{document.querySelector('.lgacc')&&(document.querySelector('.lgacc').open=true)},300)},sel:'.lgbox',calls:[[1,'^Username$'],[2,'^Password$'],[3,'^Sign in$'],[4,'Demo accounts']],wait:1400});
-S('p2_layout',{js:()=>go('dashboard'),sel:'viewport',wait:2800,calls:[[1,'^Operate$',200,-4],[2,'Search the knowledge base',4,-4],[3,'^Knowledge$',200,-4],[4,'^Admin$',200,-4],[5,'^Needs attention$'],[6,'^Plant in 3D$']]});
-S('p2_search',{js:()=>go('dashboard'),steps:[{key:'Control+k'},{type:'seal flush'}],sel:'#gsmodal > *',wait:600,wait2:1000});
-S('p2_settings',{js:()=>go('dashboard'),steps:[{js:()=>document.querySelector('[aria-label="Settings"]').click()}],sel:'#setbg > *',wait:600,wait2:900,calls:[[1,'^Shared database$'],[2,'^AI assistant$'],[3,'^Report header$'],[4,'^Account$']]});
-S('p2_notif',{js:()=>go('dashboard'),steps:[{js:()=>document.querySelector('[aria-label="Notifications"]').click()}],sel:'#notifbox',wait:600,wait2:800});
-S('p2_tour',{js:()=>go('dashboard'),steps:[{js:()=>document.querySelector('[aria-label="Guided tour"]').click()}],sel:'viewport',wait:600,wait2:900});
+S('p2_layout',{js:()=>go('dashboard'),sel:'viewport',wait:2800,calls:[[1,'^Operate$',178,-6],[2,'Search the knowledge base',-34,0],[3,'^Knowledge$',178,-6],[4,'^Admin$',178,-6],[5,'^Needs attention$',-34,-4],[6,'^Plant in 3D$',-30,0]]});
+S('p2_search',{js:()=>go('mywork'),steps:[{key:'Control+k'},{type:'seal flush'}],sel:'#gsmodal > *',vh:1100,wait:600,wait2:1000});
+S('p2_settings',{js:()=>go('mywork'),steps:[{js:()=>document.querySelector('[aria-label="Settings"]').click()}],sel:'#setbg > *',vh:1500,wait:600,wait2:900});
+S('p2_notif',{js:()=>go('mywork'),steps:[{js:()=>document.querySelector('[aria-label="Notifications"]').click()}],sel:'#notifbox',wait:600,wait2:800});
+S('p2_tour',{js:()=>go('dashboard'),steps:[{js:()=>document.querySelector('[aria-label="Guided tour"]').click()}],rect:{x:640,y:380,width:800,height:520},wait:600,wait2:900});
 // ================= Part 3 daily operations
 S('p3_dash',{js:()=>go('dashboard'),sel:'#app',maxH:900,wait:2800,calls:[[1,'latched trips'],[2,'^Overview$'],[3,'Slow turn',0,-6],[4,'^GA-1201A$'],[5,'^Whole plant$']]});
 S('p3_dash_sel',{js:()=>go('dashboard'),steps:[{js:()=>{}},'^KC-4501$'],sel:'#app',maxH:900,wait:2500,wait2:2500});
@@ -15,25 +14,25 @@ S('p3_dash_an',{js:()=>go('dashboard'),steps:['^Analytics$'],sel:'#app',maxH:140
 S('p3_mywork',{js:()=>go('mywork'),sel:'#app',maxH:900,wait:1200,calls:[[1,'Waiting for my approval'],[2,'Items I wrote'],[3,'My recent questions'],[4,'My recent activity']]});
 S('p3_eqlist',{js:()=>go('equipment'),sel:'#app',maxH:1100,wait:1800});
 for(const [id,tab,extra] of [['overview','overview'],['pid','pid'],['ga','ga'],['perf','perf'],['plot','plot'],['ready','ready'],['docs','docs'],['ds','ds'],['seq','seq'],['opl','opl'],['maint','maint'],['rel','rel']]){
- S('p3_eq_'+id,{js:()=>{G3.mode='2d';go('equipment',{set:4,tab:tab})},sel:'#app',maxH:1250,wait:2200});}
+ S('p3_eq_'+id,{arg:tab,js:(tab)=>{G3.mode='2d';go('equipment',{set:4,tab:tab})},sel:'#app',from:'^Overview$',maxH:1100,wait:2200});}
 S('p3_eq_tabs',{js:()=>go('equipment',{set:4,tab:'overview'}),sel:'#app',maxH:330,wait:1800,calls:[[1,'^Start-up: ',0,4],[2,'^Ask the assistant',0,-8],[3,'^Overview$',0,-12],[4,'^Related assets',0,-12]]});
-S('p3_ga2d',{js:()=>{G3.mode='2d';go('equipment',{set:1,tab:'ga'})},steps:['^Mechanical seal'],sel:'#app',maxH:1150,wait:1800,wait2:700,calls:[[1,'^2D drawing$'],[2,'^Component details$']]});
-S('p3_ga3d',{js:()=>{G3.mode='3d';go('equipment',{set:1,tab:'ga'})},steps:[{canvas:{sel:'.g3 canvas, canvas',x:.45,y:.55}}],sel:'#app',maxH:1150,wait:2500,wait2:900});
-S('p3_ga3d2',{js:()=>{G3.mode='3d';go('equipment',{set:2,tab:'ga'})},steps:[{canvas:{sel:'.g3 canvas, canvas',x:.5,y:.5}}],sel:'#app',maxH:1150,wait:2500,wait2:900});
-S('p3_pid',{js:()=>go('equipment',{set:4,tab:'pid'}),sel:'#app',maxH:1150,wait:2000});
-S('p3_pid_valve',{js:()=>{go('equipment',{set:4,tab:'pid'});setTimeout(()=>{const i=D[4].n.findIndex(n=>/^XV-4501/.test(n[0]));vSet(i,'closed')},1500)},sel:'#app',maxH:1150,wait:3200});
+S('p3_ga2d',{js:()=>{G3.mode='2d';go('equipment',{set:1,tab:'ga'})},steps:['^Mechanical seal'],sel:'#app',from:'^Overview$',maxH:1100,wait:1800,wait2:700,calls:[[1,'^2D drawing$'],[2,'^Component details$']]});
+S('p3_ga3d',{js:()=>{G3.mode='3d';go('equipment',{set:1,tab:'ga'})},steps:[{canvas:{x:.5,y:.55}}],sel:'#app',from:'^Overview$',maxH:1100,wait:2500,wait2:900});
+S('p3_ga3d2',{js:()=>{G3.mode='3d';go('equipment',{set:2,tab:'ga'})},steps:[{canvas:{x:.5,y:.5}}],sel:'#app',from:'^Overview$',maxH:1100,wait:2500,wait2:900});
+S('p3_pid',{js:()=>go('equipment',{set:4,tab:'pid'}),sel:'#app',from:'^Overview$',maxH:1100,wait:2000});
+S('p3_pid_valve',{js:()=>{go('equipment',{set:4,tab:'pid'});setTimeout(()=>{const i=D[4].n.findIndex(n=>/^XV-4501/.test(n[0]));vSet(i,'closed')},1500)},sel:'#app',from:'^Overview$',maxH:1100,wait:3200});
 S('p3_il',{js:()=>go('il'),sel:'#app',maxH:1250,wait:1800});
-S('p3_il_open',{js:()=>{go('il');setTimeout(()=>ilOpen(0),900)},sel:'#app',maxH:1250,wait:2400});
-S('p3_il_test',{js:()=>{go('il');setTimeout(()=>{ilOpen(0);ILS.view='test';render()},900)},sel:'#app',maxH:1250,wait:2800});
-S('p3_ready',{js:()=>{P.set=1;LIVE.f[FK('PSLL-1201')]=true;go('equipment',{set:1,tab:'ready'})},sel:'#app',maxH:1250,wait:2000});
-S('p3_ready_go',{js:()=>{go('equipment',{set:6,tab:'ready'})},sel:'#app',maxH:1250,wait:2000});
+S('p3_il_open',{js:()=>go('il'),steps:['^HEXANE FEED PUMP'],sel:'#app',maxH:1250,wait:1800,wait2:1500});
+S('p3_il_test',{js:()=>go('il'),steps:['^HEXANE FEED PUMP','^Function test'],sel:'#app',maxH:1250,wait:1800,wait2:1800});
+S('p3_ready',{js:()=>{P.set=1;LIVE.f[FK('PSLL-1201')]=true;go('equipment',{set:1,tab:'ready'})},sel:'#app',from:'^Overview$',maxH:1100,wait:2000});
+S('p3_ready_go',{js:()=>{go('equipment',{set:6,tab:'ready'})},sel:'#app',from:'^Overview$',maxH:1100,wait:2000});
 S('p3_docs',{js:()=>go('documents'),sel:'#app',maxH:1250,wait:1500,calls:[[1,'Documents by type'],[2,'Approval status'],[3,'Documents by equipment']]});
 S('p3_docs_open',{js:()=>{go('documents')},steps:[{js:()=>{const e=document.querySelector('#app table tr[onclick], #app [onclick^="openDoc"], #app tr[onclick^="go"]');e&&e.click()}}],sel:'#app',maxH:1250,wait:1500,wait2:1000});
 // ================= Part 4 maintenance and reliability
 S('p4_dash',{js:()=>{MHS.view='dash';go('mnt')},sel:'#app',maxH:1300,wait:2200,calls:[[1,'^All equipment$'],[2,'^Overview$'],[3,'^Reliability report$'],[4,'^Generate records$']]});
 S('p4_table',{js:()=>{MHS.view='table';go('mnt')},sel:'#app',maxH:1300,wait:2200});
 S('p4_wo',{js:()=>{MHS.view='table';go('mnt');setTimeout(()=>mhOpen('WO-240002','report'),900)},sel:'viewport',wait:3000});
-S('p4_wo_fail',{js:()=>{MHS.view='table';go('mnt');setTimeout(()=>mhOpen('WO-240002','live'),900)},steps:['^Failure view'],sel:'viewport',wait:3000,wait2:1500});
+S('p4_wo_fail',{js:()=>{MHS.view='table';go('mnt');setTimeout(()=>{const r=MH.filter(x=>x.bd==='Yes')[3];mhOpen(r.wo,'live')},900)},sel:'viewport',wait:3500,wait2:1500});
 S('p4_time',{js:()=>{MHS.view='time';go('mnt')},sel:'#app',maxH:1300,wait:2200});
 S('p4_pdm',{js:()=>{PD2.tab='modes';PDM.sel=0;MHS.view='pdm';go('mnt');render()},sel:'#app',maxH:1500,wait:2600});
 S('p4_pdm_next',{js:()=>{PD2.tab='next';PDM.sel=1;MHS.view='pdm';go('mnt');render()},sel:'#app',maxH:1700,wait:2600});
@@ -81,4 +80,5 @@ S('p7_rc',{js:()=>go('rc'),sel:'#app',maxH:1500,wait:1800});
 S('p7_rc_prev',{js:()=>go('rc'),steps:['^Preview$'],sel:'viewport',wait:1500,wait2:1500});
 S('p7_gov',{js:()=>go('gov'),sel:'#app',maxH:1500,wait:1800});
 S('p7_gov_rm',{js:()=>go('gov'),steps:['^Roadmap$'],sel:'#app',maxH:1500,wait:1500,wait2:1000});
+S('p2_login',{url:APPURL+'?login',js:()=>{try{authLogout()}catch(e){};setTimeout(()=>{document.querySelector('.lgacc')&&(document.querySelector('.lgacc').open=true)},300)},sel:'.lgbox',calls:[[1,'#lg_u'],[2,'#lg_p'],[3,'.lgbox button[type=submit]'],[4,'.lgacc summary'],[5,'.lgtab']],wait:1400});
 };
