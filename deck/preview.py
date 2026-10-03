@@ -39,6 +39,50 @@ def tf_html(tf, w, h, extra=""):
     body = "".join(para_html(p) for p in tf.paragraphs)
     return f'<div class="tf" style="position:absolute;left:0;top:0;width:{w}px;height:{h}px;display:flex;flex-direction:column;justify-content:{anchor};padding:{mt}px {mr}px {mb}px {ml}px;box-sizing:border-box;overflow:visible;{extra}"><div class="inner">{body}</div></div>'
 
+
+def _fillcol(f, default="#888"):
+    try:
+        if f.type == 1: return "#" + str(f.fore_color.rgb)
+    except Exception: pass
+    return None
+
+def render_chart(sh, x, y, w, h):
+    ch = sh.chart; kind = str(ch.chart_type); cats = [str(c) for c in ch.plots[0].categories]; ser = list(ch.plots[0].series)
+    parts = []; PADL, PADB, PADT = 34, 30, 10
+    if "LINE" in kind:
+        allv = [v for s_ in ser for v in s_.values]; lo, hi = min(allv + [0]), max(allv); span = (hi - lo) or 1
+        X = lambda i: PADL + i * (w - PADL - 8) / max(1, len(cats) - 1); Y = lambda v: PADT + (hi - v) / span * (h - PADT - PADB - 16)
+        for k in range(5):
+            v = lo + span * k / 4; parts.append(f'<line x1="{PADL}" x2="{w-8}" y1="{Y(v)}" y2="{Y(v)}" stroke="#e3e9f0"/><text x="{PADL-4}" y="{Y(v)+3}" font-size="8" text-anchor="end" fill="#555">{v:.1f}</text>')
+        for i, c in enumerate(cats):
+            if c and i % 12 == 0: parts.append(f'<text x="{X(i)}" y="{h-PADB+4}" font-size="8" text-anchor="middle" fill="#555">{c}</text>')
+        for s_ in ser:
+            col = "#" + str(s_.format.line.color.rgb) if s_.format.line.color and s_.format.line.color.type else "#555"
+            pts = " ".join(f"{X(i)},{Y(v)}" for i, v in enumerate(s_.values)); wd = s_.format.line.width.pt if s_.format.line.width else 1.5
+            parts.append(f'<polyline fill="none" stroke="{col}" stroke-width="{wd}" points="{pts}"/>')
+        lx = PADL
+        for s_ in ser:
+            col = "#" + str(s_.format.line.color.rgb); parts.append(f'<text x="{lx}" y="{h-4}" font-size="9" fill="{col}">&#9632; {s_.name}</text>'); lx += 70
+    else:
+        stacked = "STACKED" in kind; n = len(cats); gw = (w - PADL) / n
+        tot = [sum(s_.values[i] for s_ in ser) if stacked else max(s_.values[i] for s_ in ser) for i in range(n)]; mx = max(tot) * 1.15 or 1
+        Yh = lambda v: v / mx * (h - PADT - PADB)
+        for i, c in enumerate(cats):
+            base = 0; bw = gw * (.7 if stacked else .8 / len(ser))
+            for j, s_ in enumerate(ser):
+                v = s_.values[i]; col = None
+                try: col = _fillcol(s_.points[i].format.fill)
+                except Exception: pass
+                col = col or _fillcol(s_.format.fill)
+                bx = PADL + i * gw + gw * (.15 if stacked else .1) + (0 if stacked else j * bw); by = h - PADB - Yh(base + v) if stacked else h - PADB - Yh(v)
+                if col:
+                    parts.append(f'<rect x="{bx}" y="{by}" width="{bw-2}" height="{Yh(v)}" fill="{col}"/>')
+                    if v: parts.append(f'<text x="{bx+bw/2-1}" y="{by+Yh(v)/2+4}" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">{v:,.0f}</text>')
+                if stacked: base += v
+            parts.append(f'<text x="{PADL+i*gw+gw/2}" y="{h-PADB+14}" font-size="9" text-anchor="middle" fill="#333">{html.escape(cats[i])}</text>')
+        parts.append(f'<line x1="{PADL}" x2="{w}" y1="{h-PADB}" y2="{h-PADB}" stroke="#d5e0ec"/>')
+    return f'<svg style="position:absolute;left:{x}px;top:{y}px" width="{w}" height="{h}" font-family="Liberation Sans, Arial">{"".join(parts)}</svg>'
+
 def render_slide(slide, idx):
     out = []; svg = []
     for sh in slide.shapes:
@@ -49,16 +93,7 @@ def render_slide(slide, idx):
             blob = sh.image.blob; mime = sh.image.content_type
             out.append(f'<img src="data:{mime};base64,{base64.b64encode(blob).decode()}" style="position:absolute;left:{x}px;top:{y}px;width:{w}px;height:{h}px;object-fit:cover">')
         elif sh.has_chart if hasattr(sh, "has_chart") else False:
-            ch = sh.chart; cats = list(ch.plots[0].categories); sers = [(s.name, list(s.values), "#" + str(s.format.fill.fore_color.rgb)) for s in ch.plots[0].series]
-            mx = max(max(v) for _, v, _ in sers) or 1; gw = w / len(cats); bw = gw * .8 / len(sers); parts = []
-            for i, c in enumerate(cats):
-                for j, (n, vals, col) in enumerate(sers):
-                    bh = (h - 60) * vals[i] / mx; bx = i * gw + gw * .1 + j * bw
-                    parts.append(f'<rect x="{bx}" y="{h-40-bh}" width="{bw-2}" height="{bh}" fill="{col}"/><text x="{bx+bw/2}" y="{h-44-bh}" font-size="10" text-anchor="middle">{vals[i]:,.0f}</text>')
-                parts.append(f'<text x="{i*gw+gw/2}" y="{h-22}" font-size="11" text-anchor="middle">{html.escape(str(c))}</text>')
-            leg = "".join(f'<tspan fill="{col}">&#9632; </tspan><tspan>{n}   </tspan>' for n, _, col in sers)
-            parts.append(f'<text x="{w/2}" y="{h-4}" font-size="11" text-anchor="middle">{leg}</text>')
-            out.append(f'<svg style="position:absolute;left:{x}px;top:{y}px" width="{w}" height="{h}" font-family="Liberation Sans, Arial">{"".join(parts)}</svg>')
+            out.append(render_chart(sh, x, y, w, h))
         elif sh.has_table if hasattr(sh, "has_table") else False:
             tb = sh.table; rows = []
             for r in tb.rows:
@@ -88,6 +123,9 @@ def render_slide(slide, idx):
                 ast = sh.auto_shape_type
                 if "ROUNDED" in str(ast): rad = min(w, h) * (sh.adjustments[0] if len(sh.adjustments) else .1)
                 elif "DIAMOND" in str(ast): shape = "clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);"
+                elif "OVAL" in str(ast): rad = min(w, h) / 2
+                elif "PENTAGON" in str(ast) and "REGULAR" not in str(ast): shape = "clip-path:polygon(0 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,0 100%);"
+                elif "RIGHT_ARROW" in str(ast): shape = "clip-path:polygon(0 25%,55% 25%,55% 0,100% 50%,55% 100%,55% 75%,0 75%);"
             except Exception: pass
             st = f"position:absolute;left:{x}px;top:{y}px;width:{w}px;height:{h}px;box-sizing:border-box;"
             if fill: st += f"background:{fill};"

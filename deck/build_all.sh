@@ -14,3 +14,4 @@ for f in sorted(os.listdir('deck/img')):
 PY
 python3 deck/make_deck.py
 python3 deck/preview.py deck/CALIBER2026_Asset_Knowledge_Platform_Deck.pptx deck/render
+node deck/pdf.js deck/CALIBER2026_Asset_Knowledge_Platform_Deck.pdf
