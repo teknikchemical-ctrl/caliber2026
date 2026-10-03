@@ -13,7 +13,7 @@ print("irr", round(IRR * 100, 1), "npv10", round(NPV10))
 s = blank(prs)
 frame(s, 4, f"Business Impact: {{{{IDR {BASE[3]/1000:.1f} B}}}} Annual Value in the Base Case, Payback in About {PB:.0f} Months, With the Downside Disclosed",
       "Financial, operational and people benefits with measurable KPIs; hours and rates are assumptions to be replaced by Company figures during the pilot", "Impact",
-      "Case baseline data (work orders, MTTR, breakdowns); assumptions in appendix A16. IDR = Indonesian rupiah; IRR and NPV over 3 years, 10% discount rate", "Impact Assessment and Projection")
+      "Case baseline data (work orders, MTTR, breakdowns); assumptions in appendix A22. IDR = Indonesian rupiah; IRR and NPV over 3 years, 10% discount rate", "Impact Assessment and Projection")
 LX, LW = 0.35, 4.2
 banner(s, LX, 1.5, LW, "Financial assessment", NAVY)
 rows = [["Parameter", "Baseline", "With platform"],
@@ -73,86 +73,93 @@ for tag in ("c:tickLblSkip", "c:tickMarkSkip"):
     e = etree.Element(qn(tag)); e.set("val", "12")
     if _nm is not None: _nm.addprevious(e)
     else: _ax.append(e)
-# right: operational, safety, people
+# right: connection from feature to KPI to value
 RX, RW = 9.15, 3.85
-banner(s, RX, 1.5, RW, "Operational, safety and people impact", NAVY)
-imp = [("Execution quality", "100% of answers carry source, revision, approval status and confidence", "check", BLUE),
-       ("Reliability", f"MTTR down 10%, repeat failures down 30%, early detection from {D['found']*100//(D['found']+D['bad'])}% to 35%", "wrench", TEAL),
-       ("Process safety", "Interlock bypass requests refused; hazard, permit and readiness checks at the point of work", "shield", RED),
-       ("Knowledge retention", f"{D['opl']} approved lessons today, plus 12 each quarter, searchable by asset", "book", PURPLE),
-       ("Data integrity", f"{D['issues']} document conflicts owned; 90% closed within 6 months", "warn", ORANGE),
-       ("Onboarding", "New engineers productive one month sooner (4 hires a year assumed)", "users", GREEN)]
-for i, (t, d, ic, c_) in enumerate(imp):
-    y = 1.9 + i * 0.8
-    panel(s, RX, y, RW, 0.74); pic(s, ic, RX + 0.08, y + 0.17, 0.4, c_)
-    text(s, RX + 0.58, y + 0.03, RW - 0.62, 0.24, t, 9.5, True, NAVY); text(s, RX + 0.58, y + 0.27, RW - 0.62, 0.46, d, 8, False, INK, line=1.0)
-box(s, RX, 6.72, RW, 0.0, WHITE, None, None) if False else None
-text(s, RX, 6.7, RW, 0.2, "", 7)
+banner(s, RX, 1.5, RW, "From feature to KPI to value", NAVY)
+text(s, RX, 1.86, 1.2, 0.2, "FEATURE", 7, True, GREY, "c"); text(s, RX + 1.4, 1.86, 1.4, 0.2, "KPI MOVED", 7, True, GREY, "c"); text(s, RX + 3.05, 1.86, 0.8, 0.2, "IDR M", 7, True, GREY, "c")
+chains = [("AI assistant and verified answers", BLUE, "Time to answer 15 to 3 min", f"{BASE[0]:,.0f}", "clock"),
+          ("Failure memory and predictive checks", TEAL, f"MTTR -10%, repeat failures -30%", f"{BASE[1]:,.0f}", "wrench"),
+          ("Knowledge Studio and OPL lessons", PURPLE, "New engineers productive 1 month sooner", f"{BASE[2]:,.0f}", "book"),
+          ("Interlock guard, readiness, hazard view", RED, "Fewer improper executions", "not valued", "shield"),
+          ("Quality register and approvals", ORANGE, f"{D['issues']} conflicts owned, 90% closed", "not valued", "warn")]
+for i, (f_, c_, k_, v_, ic) in enumerate(chains):
+    y = 2.1 + i * 0.9
+    box(s, RX, y, 1.3, 0.8, TINT[c_], c_, [[(f_, {"bold": True, "size": 7.6, "color": NAVY})]], 8, False, INK, "c", "m", radius=0.07, margin=0.05)
+    arrow(s, RX + 1.3, y + 0.4, RX + 1.45, y + 0.4, c_, 1.6)
+    box(s, RX + 1.45, y, 1.5, 0.8, WHITE, c_, [[(k_, {"size": 7.6, "color": INK})]], 8, False, INK, "c", "m", radius=0.07, margin=0.05)
+    arrow(s, RX + 2.95, y + 0.4, RX + 3.1, y + 0.4, c_, 1.6)
+    box(s, RX + 3.1, y, 0.75, 0.8, c_ if v_ != "not valued" else GREY, None, [[(v_, {"bold": True, "size": 9.5 if v_ != "not valued" else 7, "color": WHITE})]], 9, True, WHITE, "c", "m", radius=0.07, margin=0.02)
+text(s, RX, 6.62, RW, 0.25, f"Total base case IDR {BASE[3]:,.0f} M a year; two levers are left unvalued on purpose", 7.5, True, NAVY, "c")
 notes(s, "Business impact. Left: the financial assessment. Parameters come from the case data where possible (MTTR 14 hours, 8 repeat failures out of 55 corrective jobs); the time to a verified answer is an assumption. The base case gives IDR 1.5 billion of annual value, an internal rate of return of about 40 percent over three years and a payback of about 21 months. The low case does not pay back inside three years, which we show on purpose. Middle: where the value comes from and how cash accumulates. Right: operational, safety and people impact with measurable KPIs. The pilot success gates are 90 percent of answers with an approved source, a median of 3 minutes to an answer, 80 percent of users rating answers useful and zero answers without a source.")
 
 # ======================================================= 5 FEASIBILITY AND ROADMAP
 s = blank(prs)
 frame(s, 5, "Feasibility and Roadmap: {{Read-Only, Advisory}} Deployment in Four Phases With Explicit Decision Gates",
-      "Readiness across technical, operational, legal, cybersecurity, data governance and organisational dimensions, and a phased plan from the November 2026 finals", "Roadmap",
-      "Prototype and architecture notes; dates and budget are proposals for discussion with the Company", "Implementation Plan")
-tiles = [("Technical", "Ready", GREEN, "gear", ["Prototype runs end to end on the case data", "SQL schema and API specification written", "Model provider is replaceable by contract"]),
-         ("Operational", "Ready", GREEN, "factory", ["Advisory only; no write access to DCS", "Local search continues if the model is offline", "Fits existing OPL and work-order routines"]),
-         ("Legal", "Decision needed", AMBER, "book", ["Enterprise AI terms, no training on Company data", "Data held in region (PDP Law)", "Drawing and vendor IP respected"]),
-         ("Cybersecurity", "Planned", BLUE, "lock", ["Hub kept outside the OT zone (IEC 62443)", "Roles, audit trail and secret masking", "Prompt-injection guards and rate limits"]),
-         ("Data governance", "Ready", GREEN, "shield", ["Owner, revision and status on every record", "48 conflicts held in a managed register", "Approval before knowledge is trusted"]),
-         ("Organisation", "Planned", BLUE, "users", ["A champion in each function", "Two-hour role-based training", "Monthly KPI review"])]
-tw = 2.05
-for i, (t, st, c_, ic, bl) in enumerate(tiles):
-    x = 0.35 + i * (tw + 0.07)
-    panel(s, x, 1.5, tw, 1.95)
-    box(s, x, 1.5, tw, 0.06, c_, None, None, shape=MSO_SHAPE.RECTANGLE)
-    pic(s, ic, x + 0.08, 1.64, 0.38, NAVY)
-    text(s, x + 0.55, 1.6, tw - 0.6, 0.26, t, 10.5, True, NAVY)
-    pill(s, x + 0.55, 1.88, 1.1, st, TINT[c_], c_ if c_ != AMBER else ORANGE, 0.2, 7.5)
-    bullet(s, x + 0.08, 2.15, tw - 0.14, 1.3, bl, 8, c_, 2)
-RY = 3.54
-banner(s, 0.35, RY, 12.65, "Implementation roadmap", NAVY, 0.28, 10, "l")
+      None, "Roadmap", "Prototype and architecture notes; dates and budget are proposals for discussion with the Company", "Implementation Plan")
+# readiness matrix
+gbanner(s, 0.35, 1.3, 7.55, "Feasibility: six readiness dimensions", NAVY, "27517F", 0.3, 10)
+hd = [("Dimension", 1.35), ("Status", 0.85), ("In place today", 2.65), ("Still needed", 2.7)]
+hx = 0.35
+for t, w_ in hd:
+    box(s, hx, 1.62, w_ - 0.02, 0.24, "27517F", None, [t], 7.6, True, WHITE, "l", "m", radius=0.03, margin=0.06); hx += w_
+rd = [("Technical", "Ready", GREEN, "gear", "Prototype end to end; SQL schema and API spec; replaceable model contract", "Production database, ingestion queue"),
+      ("Operational", "Ready", GREEN, "factory", "Advisory only; local search if the model is offline; fits OPL and work-order routines", "Shift-team trial, champions per function"),
+      ("Legal", "Decision needed", AMBER, "book", "Drawing and vendor IP respected; data held in region", "Enterprise AI terms with no training on Company data; PDP Law review"),
+      ("Cybersecurity", "Planned", BLUE, "lock", "Roles, audit trail, secret masking, prompt-injection guards, rate limits", "SSO, key vault, hub outside the OT zone (IEC 62443), red-team test"),
+      ("Data governance", "Ready", GREEN, "shield", "Owner, revision and status on every record; 48 conflicts in a managed register", "Named data stewards, refresh rules per source"),
+      ("Organisation", "Planned", BLUE, "users", "Roles and approval workflow built in", "Two-hour role-based training, monthly KPI review, sponsor")]
+for i, (t, st, c_, ic, a1, a2) in enumerate(rd):
+    y = 1.88 + i * 0.46; fill = WHITE if i % 2 else LIGHT
+    box(s, 0.35, y, 7.5, 0.43, fill, MID, None, radius=0.02)
+    pic(s, ic, 0.4, y + 0.07, 0.3, NAVY); text(s, 0.75, y, 0.95, 0.43, t, 8, True, NAVY, anchor="m", line=0.95)
+    pill(s, 1.72, y + 0.1, 0.8, st, TINT[c_], c_ if c_ != AMBER else ORANGE, 0.22, 6.8)
+    text(s, 2.58, y, 2.6, 0.43, a1, 6.7, False, INK, anchor="m", line=0.95); text(s, 5.23, y, 2.6, 0.43, a2, 6.9, False, INK, anchor="m", line=0.95)
+# deployment path
+gbanner(s, 8.05, 1.3, 4.95, "Deployment path and budget", NAVY, "27517F", 0.3, 10)
+dp = [("Prototype today", "Static page, Netlify functions, Blobs, Gemini 2.5 Flash free tier, local fallback", BLUE), ("Pilot (90 days)", "Same stack; read-only EDMS and AIMS adapters, single sign-on, 45 users", TEAL), ("Production", "PostgreSQL with pgvector, ingestion queue, Company-approved model, SIEM export", GREEN)]
+for i, (t, d, c_) in enumerate(dp):
+    y = 1.68 + i * 0.58
+    box(s, 8.05, y, 1.3, 0.5, c_, None, [t], 8, True, WHITE, "c", "m", radius=0.06, margin=0.04); box(s, 9.4, y, 3.6, 0.5, WHITE, c_, [d], 7.2, False, INK, "l", "m", radius=0.06, margin=0.08, lw=1.1)
+    if i < 2: arrow(s, 8.7, y + 0.5, 8.7, y + 0.58, GREY, 1.4)
+text(s, 8.05, 3.46, 4.95, 0.2, f"One-off budget IDR {A['one_off']:,.0f} M; running cost IDR {A['run']:.0f} M a year", 8, True, NAVY)
+bx = 8.05; tot = 1400
+for nm, v, c_ in [("Integration", 650, BLUE), ("Data", 350, TEAL), ("Change", 250, ORANGE), ("Security", 150, RED)]:
+    w_ = 4.95 * v / tot
+    box(s, bx, 3.67, w_ - 0.02, 0.26, c_, None, [f"{nm} {v}"], 7.2, True, WHITE, "c", "m", radius=0.03, margin=0.01); bx += w_
+for i, (r, m) in enumerate([("Wrong answer", "evidence-only drafting, verification, refusals"), ("Poor data quality", "conflict register, named owners"), ("Low adoption", "champions, tools used in daily work"), ("Model cost or outage", "replaceable model, offline fallback")]):
+    x = 8.05 + (i % 2) * 2.5; y = 3.99 + (i // 2) * 0.4
+    box(s, x, y, 2.45, 0.36, TINT[RED], None, [[(r + ": ", {"bold": True, "color": RED}), m]], 6.8, False, INK, "l", "m", radius=0.06, margin=0.06)
+# roadmap
+RY = 4.83
+gbanner(s, 0.35, RY, 12.65, "Implementation roadmap", NAVY, "27517F", 0.26, 9.5, "l")
 qs = ["Q4 26", "Q1 27", "Q2 27", "Q3 27", "Q4 27", "Q1 28", "Q2 28", "Q3 28", "Q4 28"]
 gx0 = 3.0; gw = 10.0; qw = gw / 9
-for i, q in enumerate(qs): box(s, gx0 + i * qw, RY + 0.33, qw - 0.03, 0.22, "27517F" if i % 2 else NAVY, None, [q], 8, True, WHITE, "c", "m", radius=0.04)
+for i, q in enumerate(qs): box(s, gx0 + i * qw, RY + 0.29, qw - 0.03, 0.2, "27517F" if i % 2 else NAVY, None, [q], 7.5, True, WHITE, "c", "m", radius=0.04)
 ph = [("0  Mobilise", 0, 1, GREY, "Finals 4-5 Nov 2026: data access, owners, enterprise AI terms", "Start"),
       ("1  Pilot, LLDPE unit", 1, 1, BLUE, "90-day pilot: 45 users, case data live, success gates", "Pilot"),
       ("2  Connect", 2, 2, TEAL, "EDMS and AIMS adapters, single sign-on, security review, live tag values", "Integrate"),
       ("3  Extend", 4, 3, GREEN, "Predictive and HSE on live data, digital-twin link, units 2 and 3", "Extend"),
       ("4  Scale", 7, 2, PURPLE, "Plant-wide roll-out and continuous improvement", "Scale")]
-y = RY + 0.6
+y = RY + 0.53
 for t, st, ln, c_, d, tag in ph:
-    text(s, 0.4, y, 2.55, 0.28, t, 9.3, True, NAVY, anchor="m")
-    box(s, gx0 + st * qw, y, ln * qw - 0.03, 0.28, c_, None, [tag], 8.3, True, WHITE, "c", "m", radius=0.05, margin=0.05)
-    if st + ln >= 7: text(s, gx0 + st * qw - 6.1, y, 6.0, 0.28, d, 8.3, False, GREY, "r", "m")
-    else: text(s, gx0 + (st + ln) * qw + 0.06, y, 6.2, 0.28, d, 8.3, False, GREY, "l", "m")
-    y += 0.3
+    text(s, 0.4, y, 2.55, 0.24, t, 8.3, True, NAVY, anchor="m")
+    box(s, gx0 + st * qw, y, ln * qw - 0.03, 0.24, c_, None, [tag], 7.8, True, WHITE, "c", "m", radius=0.05, margin=0.03)
+    if st + ln >= 7: text(s, gx0 + st * qw - 6.1, y, 6.0, 0.24, d, 7.6, False, GREY, "r", "m")
+    else: text(s, gx0 + (st + ln) * qw + 0.06, y, 6.2, 0.24, d, 7.6, False, GREY, "l", "m")
+    y += 0.245
 for gq, g, lab in [(2, "G1", "Pilot gates met"), (4, "G2", "Security and integration sign-off"), (7, "G3", "Value review"), (9, "G4", "Scale decision")]:
     gxp = gx0 + gq * qw - 0.03
-    box(s, gxp - 0.1, RY + 2.14, 0.2, 0.2, ORANGE, None, None, shape=MSO_SHAPE.DIAMOND)
-    if gq >= 7: text(s, gxp - 2.3, RY + 2.1, 2.18, 0.28, [[(g + " ", {"bold": True, "color": ORANGE}), lab]], 8, False, INK, "r", "m")
-    else: text(s, gxp + 0.14, RY + 2.1, 2.4, 0.28, [[(g + " ", {"bold": True, "color": ORANGE}), lab]], 8, False, INK, "l", "m")
-text(s, 0.4, RY + 2.1, 2.5, 0.28, "Decision gates", 9.3, True, NAVY, anchor="m")
-# budget and risks
-BY = 6.06
-text(s, 0.4, BY - 0.02, 5.2, 0.2, f"One-off budget, IDR {A['one_off']:,.0f} M", 8.8, True, NAVY)
-parts_ = [("Integration", 650, BLUE), ("Data", 350, TEAL), ("Change", 250, ORANGE), ("Security", 150, RED)]
-bx = 0.4; tot = 1400
-for nm, v, c_ in parts_:
-    w_ = 5.2 * v / tot
-    box(s, bx, BY + 0.2, w_ - 0.02, 0.26, c_, None, [f"{nm} {v}"], 8, True, WHITE, "c", "m", radius=0.03, margin=0.02); bx += w_
-text(s, 0.4, BY + 0.5, 5.2, 0.25, f"Run cost IDR {A['run']:.0f} M a year: hosting, model use, monitoring and half a support role", 7.8, False, GREY)
-risks = [("Wrong answer", "evidence-only drafting, verification, refusal rules"), ("Poor data quality", "conflict register, named owners"), ("Low adoption", "champions, tools used in daily work"), ("Model cost or outage", "replaceable model, offline fallback")]
-for i, (r, m) in enumerate(risks):
-    x = 5.85 + (i % 2) * 3.58; y = BY + (i // 2) * 0.4
-    box(s, x, y, 3.52, 0.36, TINT[RED], None, [[(r + ": ", {"bold": True, "color": RED}), m]], 8, False, INK, "l", "m", radius=0.08, margin=0.08)
-notes(s, "Feasibility. The six tiles are the readiness areas the booklet asks for. Legal needs a decision from the Company on the enterprise AI terms. The roadmap runs from the finals in November 2026 to plant-wide roll-out at the end of 2028 with four decision gates. The one-off budget of IDR 1.4 billion is split across integration, data work, change management and security. The platform is advisory and read-only toward plant systems, which keeps it outside the safety layer.")
+    box(s, gxp - 0.09, RY + 1.79, 0.18, 0.18, ORANGE, None, None, shape=MSO_SHAPE.DIAMOND)
+    if gq >= 7: text(s, gxp - 2.3, RY + 1.75, 2.18, 0.26, [[(g + " ", {"bold": True, "color": ORANGE}), lab]], 7.6, False, INK, "r", "m")
+    else: text(s, gxp + 0.14, RY + 1.75, 2.4, 0.26, [[(g + " ", {"bold": True, "color": ORANGE}), lab]], 7.6, False, INK, "l", "m")
+text(s, 0.4, RY + 1.75, 2.5, 0.26, "Decision gates", 8.3, True, NAVY, anchor="m")
+notes(s, "Feasibility. The matrix covers the readiness areas the booklet asks for. Legal needs a decision from the Company on the enterprise AI terms. The deployment path starts from the prototype stack, moves to a read-only pilot and ends on a production database. The one-off budget of IDR 1.4 billion is split across integration, data work, change management and security. The roadmap runs from the finals in November 2026 to plant-wide roll-out at the end of 2028 with four decision gates.")
 
 # ======================================================= 6 CONCLUSION
 s = blank(prs)
 frame(s, 6, "Conclusion: A {{Trusted, Traceable}} Knowledge Hub Turns Scattered Plant Knowledge Into Faster, Safer and More Reliable Decisions",
       "Summary of the proposal, how it answers the three key questions of the case, and the decision requested", "Conclusion",
-      "Prototype test results (appendix A17) and business case (slide 4, appendix A16)", "Objectives, Key Results and Conclusion")
+      "Prototype test results (appendix A23) and business case (slide 4, appendix A22)", "Objectives, Key Results and Conclusion")
 pillars = [("CONNECT", "TAGLINK: one governed base", BLUE, [f"{D['docs']} documents and {D['wo']} work orders unified on the equipment tag", f"{D['issues']} conflicts detected and assigned to owners", "Ingestion, quality gates and approval for every record"], "98 to 1", "documents into one governed base"),
            ("ASK", "VERA: answers with evidence", TEAL, ["Source, revision, approval status and confidence on every answer", "Numbers and quotes verified against the cited text", "Safety bypass requests refused with the reason"], f"{D['evals']}/{D['evals']}", "evaluation questions passed"),
            ("ACT", "FORESIGHT, SAFEWORK", ORANGE, ["Failure memory with RCA and lessons at the point of fault", "Risk ranking, readiness, hazard screening and permit-aware planning", "Read-only links to EDMS, AIMS and the digital twin"], f"{D['tools']} tools", "computed from plant records")]

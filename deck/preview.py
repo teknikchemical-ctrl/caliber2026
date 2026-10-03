@@ -115,6 +115,8 @@ def render_slide(slide, idx):
             fill = None; line = None; lw = 1; rad = 0; shape = ""
             try:
                 if sh.fill.type == 1: fill = "#" + str(sh.fill.fore_color.rgb)
+                elif sh.fill.type == 3:
+                    gs = sh.fill.gradient_stops; fill = "linear-gradient(90deg,#%s,#%s)" % (str(gs[0].color.rgb), str(gs[-1].color.rgb))
             except Exception: pass
             try:
                 if sh.line.fill.type == 1: line = "#" + str(sh.line.color.rgb); lw = sh.line.width.pt * 96 / 72
@@ -124,6 +126,7 @@ def render_slide(slide, idx):
                 if "ROUNDED" in str(ast): rad = min(w, h) * (sh.adjustments[0] if len(sh.adjustments) else .1)
                 elif "DIAMOND" in str(ast): shape = "clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);"
                 elif "OVAL" in str(ast): rad = min(w, h) / 2
+                elif "CAN" in str(ast) and "CANCEL" not in str(ast): shape = "border-radius:50% / 16px;"
                 elif "PENTAGON" in str(ast) and "REGULAR" not in str(ast): shape = "clip-path:polygon(0 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,0 100%);"
                 elif "RIGHT_ARROW" in str(ast): shape = "clip-path:polygon(0 25%,55% 25%,55% 0,100% 50%,55% 100%,55% 75%,0 75%);"
             except Exception: pass

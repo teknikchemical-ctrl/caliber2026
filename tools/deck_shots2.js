@@ -1,0 +1,26 @@
+/* Extra screenshots for the pitch deck appendix. node tools/deck_shots2.js */
+const {chromium}=require('playwright'),path=require('path'),fs=require('fs');
+const out=path.join(__dirname,'..','deck','img');fs.mkdirSync(out,{recursive:true});
+(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const p=await b.newPage({viewport:{width:1480,height:900},deviceScaleFactor:1});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file://'+path.join(__dirname,'..','knowledge-hub-integrated_BAP5.html'));await p.waitForTimeout(900);
+const shot=async(name,fn,wait)=>{try{await p.evaluate(fn)}catch(e){errs.push(name+': '+e.message)}await p.waitForTimeout(wait||900);await p.screenshot({path:path.join(out,name+'.png')})};
+await shot('scn',()=>{go('scn');scnToPlant(4,'PSLL-4504','trip')},1800);
+await shot('fm',()=>{FM.q='mechanical seal leak on the hexane feed pump';FM.set=0;go('fm')},1200);
+await shot('wizard',()=>{KS.tab='ingest';go('ks')},1200);
+await shot('capture',()=>{KS.tab='capture';go('ks')},1000);
+await shot('rc',()=>{go('rc')},1200);
+await shot('oplsheet',()=>{go('opl',{opl:K.opl[0].no})},1200);
+await shot('docs',()=>{go('documents')},1200);
+await shot('graph',()=>{INT.tab='graph';go('int')},1800);
+await shot('model',()=>{INT.tab='model';go('int')},1200);
+await shot('conn',()=>{INT.tab='conn';go('int')},1200);
+await shot('gov',()=>{GOV.tab='controls';go('gov')},1200);
+await shot('eqover',()=>{go('equipment',{set:4,tab:'overview'})},1500);
+await shot('eqds',()=>{go('equipment',{set:1,tab:'ds'})},1200);
+await shot('eqil',()=>{go('equipment',{set:4,tab:'il'})},1200);
+await shot('mywork',()=>{go('mywork')},1000);
+await shot('plot',()=>{PP.mode='explore';go('plot')},1500);
+await shot('perf2',()=>{PERF.tab='spares';go('perf')},1200);
+await shot('time',()=>{MHS.view='time';go('mnt')},1200);
+await shot('dash2',()=>{go('dashboard');window.scrollTo(0,0)},2200);
+await b.close();console.log('done',errs)})();
