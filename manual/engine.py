@@ -120,7 +120,7 @@ class Doc:
 CSS = """
 @page { size: A4; margin: 0; }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: Arial, 'Liberation Sans', Helvetica, sans-serif; color: #1B2A3A; font-size: 10.4pt; line-height: 1.5; }
+body { margin: 0; font-family: Arial, 'Liberation Sans', Helvetica, sans-serif; color: #1B2A3A; font-size: 10pt; line-height: 1.45; }
 .page { width: 210mm; height: 297mm; padding: 22mm 20mm 20mm 20mm; position: relative; page-break-after: always; overflow: hidden; }
 .flow-page { width: 210mm; padding: 0; page-break-after: auto; }
 .sheet { padding: 20mm 20mm 22mm 20mm; width: 210mm; }
@@ -130,7 +130,7 @@ h1 .num { color: #1560BD; margin-right: 3mm; }
 .roles { margin: 0 0 4mm; font-size: 9pt; color: #6B7A8C; }
 .roles span.chip { display: inline-block; background: #E6EFFB; color: #1560BD; border: 0.3mm solid #1560BD; padding: 0.4mm 2.4mm; border-radius: 3mm; margin-right: 1.5mm; font-weight: 700; }
 .intro { font-size: 11.2pt; color: #0B2A4A; border-left: 1.2mm solid #4FA9CE; padding: 1mm 0 1mm 4mm; margin: 0 0 5mm; }
-h2 { font-size: 13.5pt; color: #0B2A4A; margin: 7mm 0 2.5mm; padding-bottom: 1mm; border-bottom: 0.4mm solid #1560BD; page-break-after: avoid; }
+h2 { font-size: 13pt; color: #0B2A4A; margin: 6mm 0 2.2mm; padding-bottom: 1mm; border-bottom: 0.4mm solid #1560BD; page-break-after: avoid; }
 h2 .n { color: #1560BD; margin-right: 2mm; }
 p { margin: 0 0 3mm; text-align: left; }
 .k { font-family: 'Liberation Mono', monospace; font-size: 9.3pt; background: #F2F6FA; border: 0.2mm solid #D5E0EC; padding: 0 1mm; border-radius: 1mm; }
@@ -144,7 +144,7 @@ ul.bul { margin: 0 0 4mm; padding-left: 6mm; } ul.bul li { margin-bottom: 1.4mm;
 .fig .cap { font-size: 9pt; color: #1560BD; font-weight: 700; margin-top: 2mm; text-align: left; }
 .legend { text-align: left; margin-top: 2mm; display: grid; grid-template-columns: 1fr 1fr; gap: 1.2mm 6mm; font-size: 9.3pt; }
 .legend div { position: relative; padding-left: 7mm; min-height: 5mm; }
-.legend b { position: absolute; left: 0; top: 0; width: 5mm; height: 5mm; border-radius: 50%; background: #E8793A; color: #fff; text-align: center; font-size: 8.5pt; line-height: 5mm; }
+.legend b.n { position: absolute; left: 0; top: 0; width: 5mm; height: 5mm; border-radius: 50%; background: #E8793A; color: #fff; text-align: center; font-size: 8.5pt; line-height: 5mm; }
 .note { border-left: 1.2mm solid #1560BD; background: #F2F6FA; padding: 2.4mm 4mm; margin: 0 0 4mm; border-radius: 0 1.5mm 1.5mm 0; page-break-inside: avoid; font-size: 10pt; }
 .note b.t { display: block; font-size: 8.6pt; letter-spacing: .8pt; text-transform: uppercase; margin-bottom: .6mm; }
 .note.tip { border-color: #2E9E5B; background: #E4F4EA; } .note.tip b.t { color: #2E9E5B; }
@@ -169,7 +169,7 @@ def figure_html(b, num, doc):
     _, img, cap, calls, maxh = b
     path, w, h = jpg(img)
     rel = os.path.relpath(path, BLD)
-    mh = maxh or (150 if h / w > 0.85 else 999)
+    mh = (maxh * 0.82) if maxh else (130 if h / w > 0.85 else 999)
     style = f"max-height:{mh}mm;" if mh < 999 else ""
     wcss = "" if w / max(h, 1) > 1.0 or not maxh else ""
     leg = ""
@@ -179,7 +179,7 @@ def figure_html(b, num, doc):
     elif calls and os.environ.get("MANUAL_STRICT"):
         calls = []
     if calls:
-        leg = "<div class='legend'>" + "".join(f"<div><b>{c[0]}</b>{inline(c[1])}</div>" for c in calls) + "</div>"
+        leg = "<div class='legend'>" + "".join(f"<div><b class='n'>{c[0]}</b>{inline(c[1])}</div>" for c in calls) + "</div>"
     return f"<div class='fig'><div class='frame'><img src='{rel}' style='{style}'></div><div class='cap'>Figure {num}. {inline(cap)}</div>{leg}</div>"
 
 def flow_html(b, num):
@@ -201,7 +201,7 @@ def body_html(doc, pages=None, front=None):
             if part and part != part_seen:
                 toc.append(f"<div class='part'>{html.escape(part)}</div>"); part_seen = part
             toc.append(f"<div class='row c1'><span class='lbl'>{lab}&nbsp;&nbsp;{html.escape(text)}</span><span class='dots'></span><span class='pg'>{pg}</span></div>")
-        else:
+        elif False:
             toc.append(f"<div class='row c2'><span class='lbl'>{lab}&nbsp;&nbsp;{html.escape(text)}</span><span class='dots'></span><span class='pg'>{pg}</span></div>")
     toc.append("</div>")
     out.append("".join(toc))
@@ -214,7 +214,7 @@ def body_html(doc, pages=None, front=None):
             pb = ' class="pb"' if (part != getattr(doc, "_lastpart", None)) else ""
             doc._lastpart = part
             out.append(f"<h1{pb}><span class='marker'>@@H{num}@@</span><span class='num'>{num}</span>{html.escape(title)}</h1>")
-            if part: out.append(f"<div class='partband'>{html.escape(part)}</div>")
+            if part and pb: out.append(f"<div class='partband'>{html.escape(part)}</div>")
             if roles: out.append("<div class='roles'>Used by: " + "".join(f"<span class='chip'>{r}</span>" for r in roles) + "</div>")
             if intro: out.append(f"<div class='intro'>{inline(intro)}</div>")
         elif k == "h2":

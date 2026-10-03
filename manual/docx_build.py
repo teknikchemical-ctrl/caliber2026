@@ -134,7 +134,7 @@ def build_docx(toc_pages=None, out=None):
     pPr = th._p.get_or_add_pPr(); ol = OxmlElement("w:outlineLvl"); ol.set(qn("w:val"), "9"); pPr.append(ol)
     # TOC field with cached entries
     tp = d.add_paragraph(); fld_begin = tp.add_run(); fc = OxmlElement("w:fldChar"); fc.set(qn("w:fldCharType"), "begin"); fld_begin._r.append(fc)
-    r2 = tp.add_run(); it = OxmlElement("w:instrText"); it.set(qn("xml:space"), "preserve"); it.text = ' TOC \\o "1-2" \\h \\z \\u '; r2._r.append(it)
+    r2 = tp.add_run(); it = OxmlElement("w:instrText"); it.set(qn("xml:space"), "preserve"); it.text = ' TOC \\o "1-1" \\h \\z \\u '; r2._r.append(it)
     r3 = tp.add_run(); fc = OxmlElement("w:fldChar"); fc.set(qn("w:fldCharType"), "separate"); r3._r.append(fc)
     part_seen = None; first = True
     def toc_line(label, pagestr, lvl):
@@ -151,7 +151,8 @@ def build_docx(toc_pages=None, out=None):
             rr = pp.add_run(" " + part + " "); rr.bold = True; rr.font.size = Pt(9.5); rr.font.color.rgb = rgb("#FFFFFF"); shade(pp._p.get_or_add_pPr().getparent() if False else pp._p, NAVY) if False else None
             sh = OxmlElement("w:shd"); sh.set(qn("w:val"), "clear"); sh.set(qn("w:color"), "auto"); sh.set(qn("w:fill"), NAVY.lstrip("#")); pp._p.get_or_add_pPr().append(sh)
             part_seen = part
-        label = f"{lab}  {text}" if lvl == 1 else f"{lab}  {text}"
+        if lvl == 2: continue
+        label = f"{lab}  {text}"
         last = toc_line(label, str(toc_pages.get(key, "")), lvl)
     er = last.add_run(); fc = OxmlElement("w:fldChar"); fc.set(qn("w:fldCharType"), "end"); er._r.append(fc)
     # ---------- body
@@ -166,7 +167,7 @@ def build_docx(toc_pages=None, out=None):
             if calls and os.path.exists(pj):
                 ok = set(json.load(open(pj))); calls = [c for c in calls if c[0] in ok]
             path, w, h = jpg(img)
-            mh = (maxh or (150 if h / w > 0.85 else 999))
+            mh = (maxh * 0.82) if maxh else (130 if h / w > 0.85 else 999)
             wcm = CW; hcm = wcm * h / w
             if mh < 999 and hcm > mh / 10: hcm = mh / 10; wcm = hcm * w / h
             if hcm > 20.5: hcm = 20.5; wcm = hcm * w / h
@@ -197,7 +198,7 @@ def build_docx(toc_pages=None, out=None):
         if k == "h1":
             _, num, title, roles, part, intro = b; ch = num; h2n = 0
             hp = d.add_paragraph(f"{num}  {title}"); hp.style = st["Heading 1"]; newpart = (part != getattr(doc, '_lp', None)); doc._lp = part; hp.paragraph_format.page_break_before = newpart; hp.paragraph_format.space_before = Pt(0 if newpart else 16)
-            if part:
+            if part and newpart:
                 pp = d.add_paragraph(); r = pp.add_run(" " + part.upper() + " "); r.font.size = Pt(8.5); r.bold = True; r.font.color.rgb = rgb("#FFFFFF")
                 sh = OxmlElement("w:shd"); sh.set(qn("w:val"), "clear"); sh.set(qn("w:color"), "auto"); sh.set(qn("w:fill"), BLUE.lstrip("#")); pp._p.get_or_add_pPr().append(sh)
             if roles:
