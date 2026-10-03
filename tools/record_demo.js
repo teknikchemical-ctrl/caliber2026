@@ -10,7 +10,7 @@ await p.evaluate(()=>{const css=document.createElement('style');css.textContent=
 const c=document.createElement('div');c.id='vcap';c.className='off';document.body.appendChild(c);const d=document.createElement('div');d.id='vcard';d.className='off';document.body.appendChild(d);const cur=document.createElement('div');cur.id='vcur';document.body.appendChild(cur);
 addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'},true);addEventListener('mousedown',()=>cur.classList.add('dn'),true);addEventListener('mouseup',()=>cur.classList.remove('dn'),true);
 window.cap=t=>{c.textContent=t;c.className=t?'':'off'};window.card=html=>{if(!html){d.className='off';return}d.className='';d.innerHTML=html};
-window.findT=(src,scope)=>{const re=new RegExp(src);let best=null,ba=1e12;for(const e of document.querySelectorAll(scope||'*')){if(e.closest('#vcap,#vcard,#vcur'))continue;const t=(e.textContent||'').trim();if(t.length>90||!re.test(t))continue;const r=e.getBoundingClientRect();if(r.width<6||r.height<6)continue;const cs=getComputedStyle(e);if(cs.visibility==='hidden'||cs.display==='none')continue;if([...e.children].some(ch=>re.test((ch.textContent||'').trim())&&ch.getBoundingClientRect().width>6))continue;const a=r.width*r.height;if(a<ba){ba=a;best=e}}return best}});
+window.closeModals=()=>{document.querySelectorAll('button').forEach(b=>{if(/^Close$/.test(b.textContent.trim())&&b.getBoundingClientRect().width>6)b.click()})};window.findT=(src,scope)=>{const re=new RegExp(src);let best=null,ba=1e12;for(const e of document.querySelectorAll(scope||'*')){if(e.closest('#vcap,#vcard,#vcur'))continue;const t=(e.textContent||'').trim();if(t.length>90||!re.test(t))continue;const r=e.getBoundingClientRect();if(r.width<6||r.height<6)continue;const cs=getComputedStyle(e);if(cs.visibility==='hidden'||cs.display==='none')continue;if([...e.children].some(ch=>re.test((ch.textContent||'').trim())&&ch.getBoundingClientRect().width>6))continue;const a=r.width*r.height;if(a<ba){ba=a;best=e}}return best}});
 let mx=640,my=360;let TS=Date.now();let n=0;
 const ev=(f,a)=>p.evaluate(f,a);
 const cap=async t=>{await ev(t=>cap(t),t);if(DRY&&t){await sleep(500);await p.screenshot({path:`/tmp/dry/${String(++n).padStart(2,'0')}.png`});console.log(n,t.slice(0,60))}};
@@ -23,7 +23,7 @@ const ckAt=async(sel,fx,fy,after)=>{const r=await ev(([sel,fx,fy])=>{const e=doc
 const ckS=async(sel,idx,after)=>{const r=await ev(([sel,idx])=>{const l=[...document.querySelectorAll(sel)].filter(e=>{const b=e.getBoundingClientRect();return b.width>6&&b.height>6});const e=l[idx||0];if(!e)return null;e.scrollIntoView({block:'center',behavior:'instant'});const b=e.getBoundingClientRect();return{x:b.x+b.width/2,y:b.y+b.height/2}},[sel,idx]);if(!r){miss.push(sel);console.log('MISS',sel);return false}await mv(r.x,r.y);await p.mouse.down();await sleep(70);await p.mouse.up();await sleep(after??500);return true};
 const snap=async nm=>{if(DRY){await sleep(300);await p.screenshot({path:`/tmp/dry/${String(++n).padStart(2,'0')}_${nm}.png`})}};
 const scr=(y,ms)=>ev(y=>window.scrollTo({top:y,behavior:'smooth'}),y).then(()=>sleep(ms||700));
-const go=(js)=>ev(js);
+const go=(js)=>ev(()=>closeModals()).then(()=>ev(js));
 const type=async(sel,text,d)=>{await ck(sel,{scope:'input,textarea'}).catch(()=>{});await p.keyboard.type(text,{delay:(d||35)*K})};
 
 // ---- prepare: assistant answers behind the scenes (trimmed away from the final video)
@@ -70,7 +70,7 @@ await go(()=>{const e=[...document.querySelectorAll('*')].find(x=>x.children.len
 await go(()=>{MHS.view='dash';go('mnt');window.scrollTo(0,0)});await sleep(500);await cap('Maintenance: work orders open a failure view on the P&ID.');
 await ck('^Work orders$',{scope:'div',scroll:false,after:900});await ckS('tr[onclick^="mhOpen"]',2,1800);await snap('wo');await ck('^Failure view',{scope:'button,div',scroll:false,after:2600});await snap('wo2');await ck('^Close$',{scope:'button',scroll:false,after:700});
 await go(()=>{window.scrollTo({top:0,behavior:'smooth'})});await sleep(1000);
-await ck('^Timeline$',{scope:'div',scroll:false,after:600});await cap('Timeline of breakdowns by unit and failure mode.');await sleep(1200);await ckS('[onclick*="mhOpen"]',3,1800);await snap('tl');await ck('^Close$',{scope:'button',scroll:false,after:700});
+await ck('^Timeline$',{scope:'div',scroll:false,after:600});await cap('Timeline of breakdowns by unit and failure mode.');await sleep(1200);await ckS('.card svg rect, .card svg path, .card svg circle',12,1800);await snap('tl');await ck('^Close$',{scope:'button',scroll:false,after:700});
 await go(()=>{window.scrollTo({top:0,behavior:'smooth'})});await ck('^Predictive$',{scope:'div',scroll:false,after:700});await cap('Predictive: the chance of each failure mode, with its range.');
 await ck('^YD-2301$',{after:900});await ck('^KC-4501$',{after:900});await ck('^Next 90 days',{after:1200});await snap('pdm');
 await until(83);
@@ -89,11 +89,11 @@ await ck('^P&ID$',{scope:'button',after:900});await ck('^3D view$',{scope:'butto
 await until(115);
 // 1:55 failure memory
 await go(()=>{FM.q='';FM.set=0;go('fm');window.scrollTo(0,0)});await sleep(500);await cap('Failure memory: similar cases, root causes and fixes.');
-await ck('Mechanical seal leak',{scope:'button,span,div',after:900});await ck('Find similar failures',{scope:'button',after:1500});await snap('fm1');await scr(380,1100);await ck('^WO-24',{scope:'a',after:1500});await snap('fm2');
+await ck('Mechanical seal leak',{scope:'button,span,div',after:900});await ck('Find similar failures',{scope:'button',after:1500});await snap('fm1');await scr(380,1100);await ck('^WO-24',{scope:'a',after:1800});await snap('fm2');await ck('^Close$',{scope:'button',scroll:false,after:500});
 await until(123);
 // 2:03 interlocks
 await go(()=>{go('il');window.scrollTo(0,0)});await sleep(500);await cap('Interlock library: cause and effect, voting, proof tests.');
-await ck('^HEXANE FEED PUMP',{scope:'div',after:1700});await snap('il1');await scr(420,1300);await scr(800,1200);await snap('il2');
+await ckS('[onclick^="ilOpen"]',0,1700);await snap('il1');await scr(420,1300);await scr(800,1200);await snap('il2');
 await until(131);
 // 2:11 reliability analysis
 await go(()=>{PD2.tab='modes';PDM.sel=0;MHS.view='pdm';go('mnt');window.scrollTo(0,0)});await sleep(600);
