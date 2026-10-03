@@ -8,10 +8,10 @@ regMod("sim3d","1.0",["g3d","plant3d"],"3D views for simulations");
 const SIM3={mode:(()=>{try{return localStorage.getItem("akp_sim3")||"pid"}catch(e){return"pid"}})()};
 function simSw(m){SIM3.mode=m;try{localStorage.setItem("akp_sim3",m)}catch(e){}
  document.querySelectorAll(".simwrap").forEach(w=>{w.querySelectorAll(":scope>.simpid").forEach(x=>x.hidden=m!=="pid");w.querySelectorAll(":scope>.sim3").forEach(x=>x.hidden=m!=="3d");w.querySelectorAll(":scope>.gtog button").forEach(b=>b.classList.toggle("on",b.dataset.m===m))});g3Scan();p3Scan()}
-const simTog=m=>`<div class="gtog" role="group" aria-label="Simulation view"><button data-m="pid" class="${m==="pid"?"on":""}" onclick="simSw('pid')">P&amp;ID</button><button data-m="3d" class="${m==="3d"?"on":""}" onclick="simSw('3d')">3D simulation</button></div>`;
+const simTog=(m,lb)=>{lb=lb||["P&amp;ID","3D view"];return `<div class="gtog" role="group" aria-label="View"><button data-m="pid" class="${m==="pid"?"on":""}" onclick="simSw('pid')">${lb[0]}</button><button data-m="3d" class="${m==="3d"?"on":""}" onclick="simSw('3d')">${lb[1]}</button></div>`};
 function simFig(n,pid,o){const id="g3_"+(++G3.seq);G3.cfg[id]=Object.assign({n},o||{});const m=SIM3.mode;
  return `<div class="simwrap">${simTog(m)}<div class="simpid" ${m==="pid"?"":"hidden"}>${pid}</div><div class="sim3" ${m==="3d"?"":"hidden"}><div class="g3box" id="${id}"></div></div></div>`}
-function simPlant(pid,o){const m=SIM3.mode;return `<div class="simwrap">${simTog(m)}<div class="simpid" ${m==="pid"?"":"hidden"}>${pid}</div><div class="sim3" ${m==="3d"?"":"hidden"}>${p3Hero(Object.assign({embed:true,h:540},o||{}))}</div></div>`}
+function simPlant(pid,o){const m=SIM3.mode;return `<div class="simwrap">${simTog(m,(o||{}).tog)}<div class="simpid" ${m==="pid"?"":"hidden"}>${pid}</div><div class="sim3" ${m==="3d"?"":"hidden"}>${p3Hero(Object.assign({embed:true,h:540},o||{}))}</div></div>`}
 /* phase of an OPL or work order scenario */
 function scnFx(n){const u=SCN.u,sc=u&&u.cur;if(!sc)return null;const ph=sc.phases[u.t]||sc.phases[0],state=ph.trip.length?"trip":ph.alarm.length?"alarm":"normal";
  if(!sc._hot){const pr={n:sc.set,prob:(sc.title||"")+" "+(sc.sub||""),root:sc.phases.map(p=>p.text||"").join(" "),act:"",parts:""};try{sc._hot=mhParts(pr)}catch(e){sc._hot=[]}}

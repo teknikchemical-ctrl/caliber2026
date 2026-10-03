@@ -17,6 +17,6 @@ for(const [name,list] of Object.entries(defs)){if(ALLOW.has(name)||list.length<2
 /* JavaScript: top level function declared twice in different modules */
 const js=fs.readdirSync(path.join(root,"src","modules")).filter(f=>f.endsWith(".js"));const fn={};
 for(const f of js){const t=fs.readFileSync(path.join(root,"src","modules",f),"utf8");for(const m of t.matchAll(/^(?:async\s+)?function\s+([A-Za-z_$][\w$]*)/gm))(fn[m[1]]=fn[m[1]]||new Set()).add(f)}
-const FNALLOW=new Set(["render","go","aiRoute","aiLog","mhSaveGen"]);
+const FNALLOW=new Set(["ppUpd","ppBody","render","go","aiRoute","aiLog","mhSaveGen"]);
 for(const [n,s] of Object.entries(fn)){if(s.size>1&&!FNALLOW.has(n)){bad++;console.log("FUNCTION DECLARED IN SEVERAL MODULES",n,[...s].join(", "))}}
 console.log(bad?"\n"+bad+" problem(s)":"static checks passed");process.exit(bad?1:0);

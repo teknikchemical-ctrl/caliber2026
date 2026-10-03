@@ -70,8 +70,8 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  const sc=I.zoom*(H*.46)/M.Rf,shk=fxs==="trip"?1.6:fxs==="alarm"?.7:0,sdx=shk*Math.sin(tm*47),sdy=shk*Math.cos(tm*39);
  const proj=p=>{const k=D/(D+p[2]);return[W/2+p[0]*sc*k+I.px+sdx,H/2-p[1]*sc*k+I.py+sdy]},fx=v=>v.toFixed(1);
  /* resolution: modest while moving, high when still */
- const moving=!!I.drag||I.spin||(I.run&&(G3M[o.n]||[]).some(p=>p.anim)&&fxs!=="trip")||now_()-(I.lastMove||0)<300,dpr=Math.min(window.devicePixelRatio||1,2),cw=Math.max(160,box.clientWidth||W),qf=moving?(G3R.slow?1:1.5):(mini?1.6:2.1);
- let PW=Math.round(Math.min(cw*dpr*qf,moving?1400:1900));PW=Math.max(mini?240:360,PW);const PH=Math.round(PW*H/W),q=PW/W;
+ const moving=!!I.drag||I.spin||(I.run&&(G3M[o.n]||[]).some(p=>p.anim)&&fxs!=="trip")||now_()-(I.lastMove||0)<300,dpr=Math.min(window.devicePixelRatio||1,2),cw=Math.max(160,box.clientWidth||W),qs=I.qs||1,qf=(moving?1.25:(mini?1.4:2.0))*(moving?qs:1);
+ let PW=Math.round(Math.min(cw*dpr*qf,moving?1000:(mini?640:1700)));PW=Math.max(mini?220:320,PW);const PH=Math.round(PW*H/W),q=PW/W;
  const B=g3Buf(id,PW,PH),pk=g3Pack(M),F=M.faces,nF=pk.nF,n=PW*PH;
  B.W.fill(0);B.F.fill(0);B.img32=B.img32||new Uint32Array(B.img.data.buffer);B.img32.fill(0);
  /* per-frame transform of every vertex */
@@ -107,7 +107,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  /* deferred shading of the nearest surface at every pixel */
  const img32=B.img32,Wb=B.W,Fb=B.F,Nb=B.N;let cover=0;
  for(let p=0;p<n;p++){const fi=Fb[p]-1;if(fi<0)continue;cover++;const o3=p*3;S.shade(fi,Nb[o3],Nb[o3+1],Nb[o3+2]);img32[p]=0xff000000|(S.sb<<16)|(S.sg<<8)|S.sr}
- g3Outline(B,pk.fpi,PW,PH,q);
+ if(!moving||(I.ms||0)<18)g3Outline(B,pk.fpi,PW,PH,q);
  /* see-through faces: the shells in X-ray and the parts that are dimmed around a selected one */
  B.PW.set(Wb);B.PF.set(Fb);
  if(trans.length){const idxs=trans.slice();const key={};idxs.forEach(i=>{let z=0;const a0=off[i],a1=off[i+1];for(let j=a0;j<a1;j++)z+=RZ[j];key[i]=z/(a1-a0)+(F[i].zb||0)});idxs.sort((a,b)=>key[b]-key[a]);
@@ -144,7 +144,7 @@ function g3Draw(id){const I=G3.inst[id],box=document.getElementById(id);if(!I||!
  const cap=box.querySelector(".g3cap");if(cap&&!I.hover&&!mini)cap.textContent=sel?g3Name(o.n,sel):"Drag to rotate, scroll to zoom, select a part for its details";
  const fbx=box.querySelector(".g3fxb");if(fbx){const h=fxo&&fxo.text?`<span class="p3st ${fxs==="trip"?"trip":fxs==="alarm"?"alarm":"ok"}">${fxs==="trip"?"Trip":fxs==="alarm"?"Alarm":"Normal"}</span> ${fxo.text}`:"";if(fbx.dataset.h!==h){fbx.dataset.h=h;fbx.innerHTML=h}}
  const card=box.querySelector(".g3side");if(card&&I.cardKey!==sel){I.cardKey=sel;card.innerHTML=mini?"":g3Info(o.n,sel)}
- const ms=performance.now()-t0;I.ms=ms;G3R.stat={ms,w:PW,h:PH,cover,tris:tris.length,moving};G3R.slow=ms>38&&moving;
+ const ms=performance.now()-t0;if(moving){I.ms=ms;I.qs=Math.max(.5,Math.min(1,(I.qs||1)*Math.pow(15/Math.max(ms,4),.6)))}else I.msIdle=ms;G3R.stat={ms,w:PW,h:PH,cover,tris:tris.length,moving};G3R.slow=ms>38&&moving;
  if(moving)I.needHi=true}
 function now_(){return performance.now()}
 /* which part is under a point of the 900 by 500 picture */

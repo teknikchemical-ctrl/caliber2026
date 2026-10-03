@@ -139,6 +139,7 @@ function hse3Go(v){const c=H3.cam,s=POS[HSE.n],T=v==="site"?{yaw:0,pit:.66,dist:
 function hse3Tween(){H3.anim=0;if(!H3.to)return;const c=H3.cam,T=H3.to,k=.16;let dy=T.yaw-c.yaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));c.yaw+=dy*k;["pit","dist","tx","ty","tz"].forEach(a=>c[a]+=(T[a]-c[a])*k);H3.lastMove=performance.now();hse3Draw();if(Math.abs(dy)>.004||["pit","dist","tx","tz"].some(a=>Math.abs(T[a]-c[a])>(a==="pit"?.004:.2)))H3.anim=requestAnimationFrame(hse3Tween);else H3.to=null}
 function hse3Init(){const root=document.getElementById("hse3");if(!root||root.dataset.ok)return;root.dataset.ok="1";hse3Build();const cv=root.querySelector("canvas");
  const bar=document.createElement("div");bar.className="hse3bar";bar.innerHTML=`<button onclick="hse3Go('site')">Whole site</button><button onclick="hse3Go('source')">Leak</button><button onclick="hse3Go('top')">From above</button><button onclick="hse3Go('side')">Side</button>`;root.appendChild(bar);
+ try{if(window.IntersectionObserver){const io=new IntersectionObserver(es=>es.forEach(e=>{H3.vis=e.isIntersecting}));io.observe(root)}}catch(e){}
  let down=null;const ptr=new Map();
  cv.addEventListener("pointerdown",e=>{down={x:e.clientX,y:e.clientY,mv:0,pan:e.shiftKey||e.button===2};H3.drag=true;H3.to=null;try{cv.setPointerCapture(e.pointerId)}catch(_){}});
  cv.addEventListener("contextmenu",e=>e.preventDefault());
@@ -148,5 +149,5 @@ function hse3Init(){const root=document.getElementById("hse3");if(!root||root.da
    if(f>=0){const k=H3.pk.fk[f],name=k>=0?H3.pk.keys[k]:"";if(/^U\d$/.test(name)){const n=+name.slice(1);H3.sel=n;if(hseKey(n)&&n!==HSE.n)hseSet("n",n);else{hsePanelRefresh()}}else H3.sel=0}else H3.sel=0;H3.lastMove=0;hse3Draw()}else{H3.lastMove=performance.now();setTimeout(hse3Draw,300)}});
  cv.addEventListener("wheel",e=>{e.preventDefault();H3.to=null;H3.cam.dist=Math.max(14,Math.min(420,H3.cam.dist*(e.deltaY<0?.9:1.1)));H3.lastMove=performance.now();hse3Draw();clearTimeout(H3.wt);H3.wt=setTimeout(hse3Draw,320)},{passive:false});
  cv.addEventListener("dblclick",()=>hse3Go("site"));
- clearInterval(H3.timer);H3.timer=setInterval(()=>{const r=document.getElementById("hse3");if(!r){clearInterval(H3.timer);return}if(document.hidden)return;hse3Draw()},90);hse3Draw()}
+ clearInterval(H3.timer);H3.timer=setInterval(()=>{const r=document.getElementById("hse3");if(!r){clearInterval(H3.timer);return}if(document.hidden||H3.vis===false)return;hse3Draw()},110);hse3Draw()}
 {let tm=null;new MutationObserver(()=>{if(!tm)tm=setTimeout(()=>{tm=null;const r=document.getElementById("hse3");if(r&&!r.dataset.ok)hse3Init()},40)}).observe(document.body,{childList:true,subtree:true})}
