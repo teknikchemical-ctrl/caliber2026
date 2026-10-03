@@ -17,6 +17,7 @@ for(const q of ['What usually causes a mechanical seal leak on the hexane feed p
 await p.evaluate(()=>{go('dashboard');window.scrollTo(0,0)});await sleep(1500);mark('title');
 await card();await sleep(500);
 // 1 dashboard
+await p.evaluate(()=>{const s=document.querySelector('.p3stage');if(s){window.scrollTo(0,s.getBoundingClientRect().top+window.scrollY-60)}});
 await cap('The problem: plant knowledge is scattered. Here every unit sits in one 3D plant, linked by its equipment tag.');await sleep(7000);
 await p.click('button:has-text("KC-4501")').catch(()=>{});await sleep(6500);mark('s1');
 // 2 equipment page
