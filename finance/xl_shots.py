@@ -8,7 +8,7 @@ def main():
     for f in os.listdir(TMP): os.remove(os.path.join(TMP, f))
     subprocess.run(["soffice", "-env:UserInstallation=file:///tmp/claude-0/t/lo_profile3", "--headless", "--convert-to", "pdf", "--outdir", TMP, XLSX], check=True, capture_output=True, timeout=300)
     pdf = os.path.join(TMP, "Business_Impact_Financial_Model.pdf"); r = PdfReader(pdf)
-    keys = {"summary": "Summary of results", "inputs": "All drivers with pessimistic", "casemetrics": "Every figure is a formula on Case_Data", "downtime": "Replaces the earlier flat assumption", "levers": "Annual value of one unit at 100 percent", "costs": "One-off cost shared by all units, one-off cost for each unit",
+    keys = {"summary": "Summary of results", "inputs": "All drivers with pessimistic", "casemetrics": "Every figure is a formula on Case_Data", "downtime": "Replaces the earlier flat assumption", "levers": "Annual value of one unit at 100%", "costs": "One-off cost shared by all units, one-off cost for each unit",
             "cf3": "Cash flow and returns: 3 units", "comp": "Alternatives and positioning", "risks": "Risk register with financial impact", "recon": "Reconciliation to the earlier", "sens": "Sensitivity analysis (3 units", "mc": "Monte Carlo simulation", "market": "Market analysis: Indonesian"}
     pages = {}
     for i, p in enumerate(r.pages):

@@ -32,8 +32,8 @@ def tornado():
         a = npv_for({n: lo}); c = npv_for({n: hi})
         rows.append((lab, unit, lo, hi, a, c, abs(c - a)))
     # extra drivers beyond the scenario ranges
-    extras = [("Salary level (all roles), 30 percent lower or higher", "x", 0.7, 1.3),
-              ("Exchange rate, 10 percent stronger or weaker rupiah", "IDR per USD", 17900 * 0.9, 17900 * 1.1),
+    extras = [("Salary level (all roles), 30% lower or higher", "x", 0.7, 1.3),
+              ("Exchange rate, 10% stronger or weaker rupiah", "IDR per USD", 17900 * 0.9, 17900 * 1.1),
               ("Discount rate, 2 points higher or lower", "points", 0.02, -0.02),
               ("Inflation, 2 points higher or lower", "%", 0.06, 0.02)]
     sal = ["sal_op", "sal_eng", "sal_rel", "sal_hse", "sal_mgr"]; A2 = active(2)
@@ -211,16 +211,16 @@ def add(wb, g):
     header(ws, 4, ["ID", "Risk", "Likelihood", "NPV after shock (IDR M)", "Change vs base (IDR M)", "Shock applied in the model", "Effect on value", "Mitigation", "Early warning KPI"])
     A2 = active(2)
     risks = [
-        ("Low adoption by operators and engineers", "Steady-state adoption falls by 30 percent", "Medium", "Lower search and repair benefits", {"adopt": A2["adopt"] * 0.7}, None, "Role-based onboarding, champions on each shift, usage targets in unit KPIs", "Weekly active users below 60 percent"),
+        ("Low adoption by operators and engineers", "Steady-state adoption falls by 30%", "Medium", "Lower search and repair benefits", {"adopt": A2["adopt"] * 0.7}, None, "Role-based onboarding, champions on each shift, usage targets in unit KPIs", "Weekly active users below 60%"),
         ("Rollout delayed by one year", "Units 2 and 3 go live one year later", "Medium", "Benefits shift right, shared cost is unchanged", {}, [1, 1, 2, 3, 3], "Fixed pilot exit criteria, pre-approved budget for unit 2", "Pilot exit review missed by more than 3 months"),
-        ("One-off cost overrun", "One-off cost 30 percent higher", "Medium", "Higher investment in year 0", {"_oneoff_x": 0.3}, None, "Fixed-scope pilot, contingency, milestone payments", "Spend above 110 percent of plan at any gate"),
-        ("Data quality is worse than expected", "Ingestion effort doubles and benefits fall by 10 percent", "High", "Slower onboarding, less trusted answers", {"ing_d": A2["ing_d"] * 2, "_ben_x": -0.10}, None, "Quality gates, data owners, Data Quality page triage", "Open high-severity data issues above 20"),
-        ("AI service unavailable or withdrawn", "Search time reduction falls by 30 percent", "Low", "Platform falls back to search-only answers", {"s_red": A2["s_red"] * 0.7}, None, "Local fallback, provider contract, no lock-in to one model", "Share of answers served by fallback above 20 percent"),
-        ("Benefit attribution is challenged", "Share credited to the platform falls by 30 percent", "Medium", "Lower repair and repeat failure value", {"attrib": A2["attrib"] * 0.7}, None, "Baseline and control units, pilot measurement plan", "Repair time gain not visible after 6 months"),
+        ("One-off cost overrun", "One-off cost 30% higher", "Medium", "Higher investment in year 0", {"_oneoff_x": 0.3}, None, "Fixed-scope pilot, contingency, milestone payments", "Spend above 110% of plan at any gate"),
+        ("Data quality is worse than expected", "Ingestion effort doubles and benefits fall by 10%", "High", "Slower onboarding, less trusted answers", {"ing_d": A2["ing_d"] * 2, "_ben_x": -0.10}, None, "Quality gates, data owners, Data Quality page triage", "Open high-severity data issues above 20"),
+        ("AI service unavailable or withdrawn", "Search time reduction falls by 30%", "Low", "Platform falls back to search-only answers", {"s_red": A2["s_red"] * 0.7}, None, "Local fallback, provider contract, no lock-in to one model", "Share of answers served by fallback above 20%"),
+        ("Benefit attribution is challenged", "Share credited to the platform falls by 30%", "Medium", "Lower repair and repeat failure value", {"attrib": A2["attrib"] * 0.7}, None, "Baseline and control units, pilot measurement plan", "Repair time gain not visible after 6 months"),
         ("Polyethylene margin downturn", "Contribution margin falls to USD 140 per tonne", "Medium", "Each downtime hour is worth less", {"margin": 140}, None, "Report levers that do not depend on margin separately", "Polyethylene spread below USD 150 per tonne for 2 quarters"),
-        ("Key person leaves the knowledge manager role", "Adoption falls by 15 percent and running cost rises by 10 percent", "Medium", "Approval backlog and slower content growth", {"adopt": A2["adopt"] * 0.85, "_run_x": 0.10}, None, "Two named owners, documented procedures", "Approval queue older than 7 days"),
+        ("Key person leaves the knowledge manager role", "Adoption falls by 15% and running cost rises by 10%", "Medium", "Approval backlog and slower content growth", {"adopt": A2["adopt"] * 0.85, "_run_x": 0.10}, None, "Two named owners, documented procedures", "Approval queue older than 7 days"),
         ("Cybersecurity incident or audit finding", "Extra one-off cost of IDR 300 M", "Low", "Remediation and delay", {"_shared_add": 300}, None, "Security review before go-live, single sign-on, audit trail", "Open critical findings"),
-        ("Data protection or contract constraints", "Connector cost 50 percent higher and security cost doubled", "Low", "More integration and review work", {"conn": A2["conn"] * 1.5, "sec": A2["sec"] * 2}, None, "Early legal review, data classification, residency choice", "Legal sign-off not received before build"),
+        ("Data protection or contract constraints", "Connector cost 50% higher and security cost doubled", "Low", "More integration and review work", {"conn": A2["conn"] * 1.5, "sec": A2["sec"] * 2}, None, "Early legal review, data classification, residency choice", "Legal sign-off not received before build"),
     ]
     RISKS = []
     for i, (rk, shock, lik, eff, ov, ro, mit, kpi) in enumerate(risks):
@@ -254,7 +254,7 @@ def add(wb, g):
         put(ws, r, 4, how, wrap=True, font=f_note); put(ws, r, 5, src, wrap=True, font=f_note); put(ws, r, 6, own); put(ws, r, 7, rev); put(ws, r, 8, lv); ws.row_dimensions[r].height = 30
     r = 5 + len(kp) + 1
     put(ws, r, 1, "Benefits realisation gates", font=f_bold)
-    gates = [("Gate 1: end of pilot (month 6)", "Measured MTTR, search time and adoption replace the assumptions. Continue to unit 2 only if the weighted benefit is at least 70 percent of the Base case."),
+    gates = [("Gate 1: end of pilot (month 6)", "Measured MTTR, search time and adoption replace the assumptions. Continue to unit 2 only if the weighted benefit is at least 70% of the Base case."),
              ("Gate 2: month 12", "Repeat failure share and answer audit results reviewed. Rollout to unit 3 and beyond approved against the sensitivity table."),
              ("Gate 3: month 24", "Full benefit review against the Base case. Update the model, the cost anchor and the rollout plan.")]
     for i, (a, b) in enumerate(gates):
@@ -266,8 +266,8 @@ def add(wb, g):
     header(ws, 4, ["Item", "Earlier slide", "New model", "Change", "What changed and why"])
     old = old_slide()
     rec = [("Users per unit", 45, "=lab_users", M0, "Unchanged: 45 users in five role groups."),
-           ("Search time lever, 1 unit (IDR M a year)", old[1]["val"][0], "=lev_L1*in_adopt", M0, "Loaded cost now built from role salaries, only 60 percent of freed time counts, and adoption is 85 percent."),
-           ("Repair time lever, 1 unit (IDR M a year)", old[1]["val"][1], "=lev_L2*in_adopt", M0, "Downtime value is now built bottom-up. Only 70 percent of the gain is credited and repeat failures are removed first."),
+           ("Search time lever, 1 unit (IDR M a year)", old[1]["val"][0], "=lev_L1*in_adopt", M0, "Loaded cost now built from role salaries, only 60% of freed time counts, and adoption is 85%."),
+           ("Repair time lever, 1 unit (IDR M a year)", old[1]["val"][1], "=lev_L2*in_adopt", M0, "Downtime value is now built bottom-up. Only 70% of the gain is credited and repeat failures are removed first."),
            ("Repeat failure lever, 1 unit (IDR M a year)", 0, "=lev_L3*in_adopt", M0, "New lever, based on the 120-day repeat rate in the work order data."),
            ("Ramp-up lever, 1 unit (IDR M a year)", old[1]["val"][2], "=lev_L4*in_adopt", M0, "Now built from joiners, days saved and loaded cost instead of a flat assumption."),
            ("Total value, 1 unit (IDR M a year)", old[1]["tot"], "=lev_total_adopt", M0, "Sum of the four headline levers at steady-state adoption."),
@@ -313,7 +313,7 @@ def add(wb, g):
         ("Market funnel narrows: total >= serviceable >= obtainable", "=IF(AND(mk_tam_units>=mk_sam_units,mk_sam_units>=mk_som_units),\"OK\",\"CHECK\")", "=mk_sam_units", "between"),
         ("Internal programme is within Chandra Asri unit equivalents", "=IF(mk_internal<=mk_ca_units,\"OK\",\"CHECK\")", "=mk_internal", "=mk_ca_units"),
         ("Top-down and bottom-up serviceable pools within a factor of 10", "=IF(AND(mk_td_usd/mk_sam_usd>0.1,mk_td_usd/mk_sam_usd<10),\"OK\",\"CHECK\")", "=mk_td_usd/mk_sam_usd", "0.1 to 10"),
-        ("Competitor weights add up to 100 percent", "=IF(ABS(Competitors!B13-1)<0.0001,\"OK\",\"CHECK\")", "=Competitors!B13", 1),
+        ("Competitor weights add up to 100%", "=IF(ABS(Competitors!B13-1)<0.0001,\"OK\",\"CHECK\")", "=Competitors!B13", 1),
     ]
     for N in (1, 3, 6, 12):
         o = mir[N]
@@ -338,9 +338,9 @@ def add(wb, g):
            ("Maintenance History (All Equipment).xlsx, Data Set Explanation for Case 1", "211 work orders, breakdown and downtime data, document register", "Provided by the organiser"),
            ("Chemical Engineering: Chandra Asri new polyethylene plant", "Polyethylene capacity 336 kt plus 400 kt", "https://chemengonline.com/chandra-asri-selects-unipol-pe-process-technology-for-new-polyethylene-plant"),
            ("Chandra Asri investor update, HSBC Asia Credit Conference, 12 Jun 2018", "Ethylene capacity, market share of olefins and polymers", "https://webdev.chandra-asri.com/files/attachments/downloads/Presentasi/2018/Investor Update - HSBC Asia Credit Conference, 12 Jun 2018.pdf"),
-           ("IDNFinancials: TPIA net loss soars 105.9 percent in 2024", "Revenue and net loss FY2024", "https://idnfinancials.com/news/53214/tpias-net-loss-soars-105-9-in-2024"),
+           ("IDNFinancials: TPIA net loss soars 105.9% in 2024", "Revenue and net loss FY2024", "https://idnfinancials.com/news/53214/tpias-net-loss-soars-105-9-in-2024"),
            ("PT Chandra Asri Pacific Tbk 2024 Sustainability Report", "Employee numbers", "https://www.sustainabilityreports.com/pt-chandra-asri-pacific/2024/sustainability-report"),
-           ("German-Indonesian Chamber of Commerce and Industry (AHK): demand for plastics expected to increase by 50 percent by 2027", "Polyethylene and polypropylene demand and import share", "https://indonesien.ahk.de/en/infohub_news/demand-for-plastics-expected-to-increase-by-50-by-2027"),
+           ("German-Indonesian Chamber of Commerce and Industry (AHK): demand for plastics expected to increase by 50% by 2027", "Polyethylene and polypropylene demand and import share", "https://indonesien.ahk.de/en/infohub_news/demand-for-plastics-expected-to-increase-by-50-by-2027"),
            ("Argus Media: Indonesia introduces quota to tighten PE and PP imports", "Import quota from 10 March 2024", "https://www.argusmedia.com/en/news-and-insights/latest-market-news/2519542-indonesia-introduces-quota-to-tighten-pe-pp-imports"),
            ("Katadata Databoks: growth and contribution of Indonesia's manufacturing industry strengthened in 2025", "Chemical sector share of GDP; Ministry of Industry export and investment data", "https://databoks.katadata.co.id/en/economics-macro/statistics/6985b350be63f/growth-and-contribution-of-indonesias-manufacturing-industry-strengthened-in-2025"),
            ("Statista Market Insights: Artificial Intelligence, Indonesia", "Indonesia AI market size and growth", "https://es.statista.com/outlook/tmo/artificial-intelligence/indonesia"),
@@ -350,12 +350,12 @@ def add(wb, g):
            ("Siemens: The True Cost of Downtime 2024 (white paper)", "Industrial downtime cost benchmark", "https://www.automation.com/en-us/assets/white-papers/white-paper-true-costs-downtime-2024"),
            ("Reliability Magazine: Industrial downtime cost benchmarks", "Aberdeen Group downtime benchmark and caveats", "https://reliamag.com/maintenance-and-reliability/industrial-downtime-cost-benchmarks/"),
            ("Cottrill Research: survey statistics on time spent searching for information", "McKinsey and IDC search time statistics", "https://cottrillresearch.com/various-survey-statistics-workers-spend-too-much-time-searching-for-information/"),
-           ("Sensemore: reducing unplanned downtime with predictive maintenance", "Reported 30 to 40 percent reduction in unplanned downtime", "https://sensemore.io/reducing-unplanned-downtime-with-predictive-maintenance/"),
+           ("Sensemore: reducing unplanned downtime with predictive maintenance", "Reported 30 to 40% reduction in unplanned downtime", "https://sensemore.io/reducing-unplanned-downtime-with-predictive-maintenance/"),
            ("Chemical Processing: Retirement casts a long shadow", "Ageing workforce and knowledge loss", "https://www.chemicalprocessing.com/articles/2013/retirement-casts-a-long-shadow"),
-           ("IDNFinancials: BI holds benchmark rate at 5.75 percent (September 2026)", "BI Rate", "https://www.idnfinancials.com/news/66412"),
-           ("IDNFinancials: DBS, Indonesia's 10-year yield unlikely to fall below 7 percent", "10-year government bond yield", "https://www.idnfinancials.com/news/66794/dbs-indonesias-10-year-yield-unlikely-to-fall-below-7"),
+           ("IDNFinancials: BI holds benchmark rate at 5.75% (September 2026)", "BI Rate", "https://www.idnfinancials.com/news/66412"),
+           ("IDNFinancials: DBS, Indonesia's 10-year yield unlikely to fall below 7%", "10-year government bond yield", "https://www.idnfinancials.com/news/66794/dbs-indonesias-10-year-yield-unlikely-to-fall-below-7"),
            ("Katadata Databoks: rupiah exchange rate, 25 September 2026", "IDR per USD", "https://databoks.katadata.co.id/en/market/statistics/32ec67c22c32882/rupiah-exchange-rate-weakens-to-idr-179134-per-us-dollar-friday-25-september-2026"),
-           ("PwC Worldwide Tax Summaries: Indonesia, taxes on corporate income", "22 percent corporate income tax", "https://taxsummaries.pwc.com/indonesia/corporate/taxes-on-corporate-income"),
+           ("PwC Worldwide Tax Summaries: Indonesia, taxes on corporate income", "22% corporate income tax", "https://taxsummaries.pwc.com/indonesia/corporate/taxes-on-corporate-income"),
            ("Legal Technology: Microsoft announces pricing for Copilot at USD 30 per user a month", "Generic assistant licence price", "https://legaltechnology.com/microsoft-announces-pricing-for-copilot-at-30-per-user-per-month-unveils-bing-chat-enterprise/"),
            ("Morph: Gemini API pricing (2026)", "AI service list price per million tokens", "https://www.morphllm.com/gemini-api-pricing"),
            ("Polymer Update: LLDPE film prices, Southeast Asia", "Polyethylene price range 2026", "https://www.polymerupdate.com/Prices/SEA/Polymers/LLDPE"),

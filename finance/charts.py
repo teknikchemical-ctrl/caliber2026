@@ -60,7 +60,7 @@ rows = A["SENS"]["rows"][:10]; base = run(2, 3)["npv"]
 fig, ax = plt.subplots(figsize=(6.6, 3.7))
 for i, (lab, unit, lo, hi, a, c, sw) in enumerate(rows[::-1]):
     ax.barh(i, (a - base) / 1000, color=ORANGE, height=0.6); ax.barh(i, (c - base) / 1000, color=BLUE, height=0.6)
-ax.set_yticks(range(len(rows))); SHORT = {"Share of breakdown hours that reduce plant output": "Share of breakdown hours with output loss", "Steady-state share of users who use the platform regularly": "Steady-state adoption", "Salary level (all roles), 30 percent lower or higher": "Salary level, 30 percent lower or higher", "Exchange rate, 10 percent stronger or weaker rupiah": "Exchange rate, 10 percent either way"}
+ax.set_yticks(range(len(rows))); SHORT = {"Share of breakdown hours that reduce plant output": "Share of breakdown hours with output loss", "Steady-state share of users who use the platform regularly": "Steady-state adoption", "Salary level (all roles), 30% lower or higher": "Salary level, 30% lower or higher", "Exchange rate, 10% stronger or weaker rupiah": "Exchange rate, 10% either way"}
 ax.set_yticklabels([SHORT.get(r[0], r[0]) for r in rows[::-1]], fontsize=8)
 ax.axvline(0, color=NAVY, lw=1); ax.set_xlabel("Change in NPV versus base (IDR billion)"); ax.set_title("What moves the 3-unit NPV most (one driver at a time)", loc="left")
 from matplotlib.patches import Patch

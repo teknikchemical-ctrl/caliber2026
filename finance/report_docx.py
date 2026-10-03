@@ -15,6 +15,7 @@ src = src.replace('    br = d.add_paragraph(); br.add_run().add_break(WD_BREAK.P
 a = src.index("    # ---------- back cover"); b = src.index("    d.core_properties.title")
 src = src[:a] + src[b:]
 src = src.replace('{B.TITLE} {B.SUB}', '{B.TITLE}')
+src = src.replace('hp.paragraph_format.page_break_before = newpart', 'hp.paragraph_format.page_break_before = True')
 src = src.replace('os.path.join(HERE, "..", "deck", "manual", "Asset_Knowledge_Platform_User_Manual.docx")', 'os.path.join(HERE, "Business_Impact_and_Financial_Modelling_Report.docx")')
 src = src.replace("HERE = os.path.dirname(__file__)", "HERE = os.path.dirname(os.path.abspath(__file__))")
 src = re.sub(r'if __name__ == "__main__":.*', '', src, flags=re.S)

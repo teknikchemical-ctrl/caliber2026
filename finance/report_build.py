@@ -49,6 +49,7 @@ def main():
     bp = os.path.join(engine.BLD, "body.html"); bpdf = os.path.join(engine.BLD, "body.pdf")
     for it in range(2):
         h = body_html(doc, pages, None).replace("</head>", OVERRIDE + "</head>")
+        h = h.replace("<h1><span class='marker'>", "<h1 class=\"pb\"><span class='marker'>")
         h = h.replace("<h1 style='page-break-before:always'>Table of contents</h1>", "<h1 style='page-break-before:auto;margin-top:0'>Contents</h1>")
         open(bp, "w").write(h); render(bp, bpdf, True); pages = pages_of(bpdf)
         print("pass", it, len(PdfReader(bpdf).pages), "pages, markers", len(pages))

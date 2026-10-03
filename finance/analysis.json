@@ -20,7 +20,7 @@
     1915.4323535456942
    ],
    [
-    "Salary level (all roles), 30 percent lower or higher",
+    "Salary level (all roles), 30% lower or higher",
     "x",
     0.7,
     1.3,
@@ -29,7 +29,7 @@
     1797.7213096860778
    ],
    [
-    "Exchange rate, 10 percent stronger or weaker rupiah",
+    "Exchange rate, 10% stronger or weaker rupiah",
     "IDR per USD",
     16110.0,
     19690.0,
@@ -404,7 +404,7 @@
  "RISKS": [
   [
    "Low adoption by operators and engineers",
-   "Steady-state adoption falls by 30 percent",
+   "Steady-state adoption falls by 30%",
    "Medium",
    254.72572297616455,
    -3065.1297462811654
@@ -418,28 +418,28 @@
   ],
   [
    "One-off cost overrun",
-   "One-off cost 30 percent higher",
+   "One-off cost 30% higher",
    "Medium",
    2550.9142986210154,
    -768.9411706363144
   ],
   [
    "Data quality is worse than expected",
-   "Ingestion effort doubles and benefits fall by 10 percent",
+   "Ingestion effort doubles and benefits fall by 10%",
    "High",
    1825.4667221899304,
    -1494.3887470673994
   ],
   [
    "AI service unavailable or withdrawn",
-   "Search time reduction falls by 30 percent",
+   "Search time reduction falls by 30%",
    "Low",
    2501.284206964152,
    -818.5712622931778
   ],
   [
    "Benefit attribution is challenged",
-   "Share credited to the platform falls by 30 percent",
+   "Share credited to the platform falls by 30%",
    "Medium",
    1187.1851608927398,
    -2132.67030836459
@@ -453,7 +453,7 @@
   ],
   [
    "Key person leaves the knowledge manager role",
-   "Adoption falls by 15 percent and running cost rises by 10 percent",
+   "Adoption falls by 15% and running cost rises by 10%",
    "Medium",
    1353.8799511608624,
    -1965.9755180964673
@@ -467,7 +467,7 @@
   ],
   [
    "Data protection or contract constraints",
-   "Connector cost 50 percent higher and security cost doubled",
+   "Connector cost 50% higher and security cost doubled",
    "Low",
    2917.3554692573293,
    -402.50000000000045
