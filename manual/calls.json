@@ -1,0 +1,1006 @@
+{
+"p3_dash": [
+[
+1,
+"^latched trips$",
+null,
+null
+],
+[
+2,
+"^Overview$",
+null,
+null
+],
+[
+3,
+"Slow turn",
+-4,
+-22
+],
+[
+4,
+"^GA-1201A$",
+null,
+null
+],
+[
+5,
+"^Whole plant$",
+null,
+null
+]
+],
+"p3_dash_an": [
+[
+1,
+"^Equipment sets$",
+null,
+null
+],
+[
+2,
+"^Knowledge base status$",
+null,
+null
+],
+[
+3,
+"^Items requiring attention$",
+null,
+null
+],
+[
+4,
+"^Work orders by type$",
+null,
+null
+],
+[
+5,
+"^Ask the assistant$",
+null,
+null
+]
+],
+"p3_mywork": [
+[
+1,
+"^Waiting for my approval$",
+null,
+null
+],
+[
+2,
+"^Items I wrote$",
+null,
+null
+],
+[
+3,
+"^My recent questions$",
+null,
+null
+],
+[
+4,
+"^My recent activity$",
+null,
+null
+]
+],
+"p3_eq_tabs": [
+[
+1,
+"^Start-up: ",
+0,
+-4
+],
+[
+2,
+"^Ask the assistant about",
+-4,
+-12
+],
+[
+3,
+"^Overview$",
+-4,
+-14
+],
+[
+4,
+"^Related assets",
+-4,
+-14
+]
+],
+"p3_eq_overview": [
+[
+1,
+"^What is on file for",
+0,
+-14
+],
+[
+2,
+"^How it works$",
+null,
+null
+],
+[
+3,
+"^At a glance$",
+null,
+null
+],
+[
+4,
+"^Place in the plant$",
+null,
+null
+],
+[
+5,
+"^Location of",
+null,
+null
+]
+],
+"p3_eq_plot": [
+[
+1,
+"^Site overview$",
+null,
+null
+],
+[
+2,
+"^Areas$",
+-4,
+-14
+],
+[
+3,
+"^Plant grid$",
+null,
+null
+],
+[
+4,
+"^Dispatch operator$",
+null,
+null
+]
+],
+"p3_eq_ds": [
+[
+1,
+"^Open interlock logic$",
+null,
+null
+],
+[
+2,
+"^Cylinder Material$",
+null,
+null
+],
+[
+3,
+"Search this datasheet",
+null,
+null
+],
+[
+4,
+"^Identification$",
+null,
+null
+]
+],
+"p3_ga2d": [
+[
+1,
+"^2D drawing$",
+null,
+null
+],
+[
+2,
+"^Component details$",
+null,
+null
+],
+[
+3,
+"^Live condition$",
+null,
+null
+]
+],
+"p3_ga3d": [
+[
+1,
+"^Isometric$",
+-4,
+-14
+]
+],
+"p3_pid": [
+[
+1,
+"^TJC-LLD-PID-4501",
+0,
+-14
+],
+[
+2,
+"^SIMULATED LIVE DATA$",
+null,
+null
+],
+[
+3,
+"^Fit$",
+null,
+null
+],
+[
+4,
+"^NORMAL$",
+null,
+null
+],
+[
+5,
+"^Select equipment$",
+null,
+null
+]
+],
+"p3_il": [
+[
+1,
+"^Safety instrumented functions$",
+null,
+null
+],
+[
+2,
+"^Voting architecture$",
+null,
+null
+],
+[
+3,
+"^Initiators and final elements by interlock$",
+null,
+null
+],
+[
+4,
+"^Proof test records$",
+null,
+null
+],
+[
+5,
+"Search interlock, tag or cause",
+null,
+null
+],
+[
+6,
+"^HEXANE FEED PUMP",
+null,
+null
+]
+],
+"p3_il_open": [
+[
+1,
+"^Interlock sheet$",
+null,
+null
+],
+[
+2,
+"^2\\. CAUSE AND EFFECT MATRIX",
+null,
+null
+],
+[
+3,
+"^Initiators$",
+null,
+null
+],
+[
+4,
+"^Run function test$",
+null,
+null
+],
+[
+5,
+"^Linked records$",
+null,
+null
+]
+],
+"p3_ready": [
+[
+1,
+"^GO WITH CHECKS$",
+null,
+null
+],
+[
+2,
+"^Start permissives$",
+null,
+null
+],
+[
+3,
+"^Trips and valves$",
+null,
+null
+],
+[
+4,
+"^Recent work$",
+null,
+null
+],
+[
+5,
+"^Decision$",
+null,
+null
+]
+],
+"p3_docs": [
+[
+1,
+"^Documents by type$",
+null,
+null
+],
+[
+2,
+"^Approval status$",
+null,
+null
+],
+[
+3,
+"^Documents by equipment$",
+null,
+null
+]
+],
+"p4_dash": [
+[
+1,
+"^All equipment$",
+null,
+null
+],
+[
+2,
+"^Overview$",
+null,
+null
+],
+[
+3,
+"^Reliability report$",
+null,
+null
+],
+[
+4,
+"^Generate records$",
+null,
+null
+]
+],
+"p4_table": [
+[
+1,
+"^All work types$",
+null,
+null
+],
+[
+2,
+"^Export CSV$",
+null,
+null
+],
+[
+3,
+"^Feed/Charge Pump$",
+null,
+null
+]
+],
+"p4_time": [
+[
+1,
+"^Event timeline$",
+null,
+null
+],
+[
+2,
+"^Plant overview$",
+null,
+null
+],
+[
+3,
+"^Assistant$",
+null,
+null
+]
+],
+"p4_pdm": [
+[
+1,
+"^Export outlook$",
+null,
+null
+],
+[
+2,
+"^Units at high risk$",
+null,
+null
+],
+[
+3,
+"^Data confidence",
+null,
+null
+],
+[
+4,
+"^Risk matrix$",
+null,
+null
+]
+],
+"p4_replay": [
+[
+1,
+"^Play$",
+null,
+null
+],
+[
+2,
+"^Speed$",
+null,
+null
+],
+[
+3,
+"Pause on breakdown",
+null,
+null
+],
+[
+4,
+"^Failure view$",
+null,
+null
+],
+[
+5,
+"^Event track$",
+null,
+null
+],
+[
+6,
+"^3D plant$",
+null,
+null
+]
+],
+"p4_plan": [
+[
+1,
+"^Mechanical crews$",
+null,
+null
+],
+[
+2,
+"^Jobs in the plan$",
+null,
+null
+],
+[
+3,
+"^Schedule by unit$",
+null,
+null
+],
+[
+4,
+"^Site on the day$",
+null,
+null
+]
+],
+"p4_fm": [
+[
+1,
+"^All equipment$",
+null,
+null
+],
+[
+2,
+"Find similar failures",
+null,
+null
+],
+[
+3,
+"Mechanical seal leak on the hexane feed pump",
+null,
+null
+],
+[
+4,
+"^Most frequent root causes",
+null,
+null
+],
+[
+5,
+"^Recommended action",
+null,
+null
+]
+],
+"p4_perf": [
+[
+1,
+"^Whole plant$",
+null,
+null
+],
+[
+2,
+"^Availability",
+null,
+null
+],
+[
+3,
+"^Breakdowns and downtime by month",
+null,
+null
+],
+[
+4,
+"^Equipment compared$",
+null,
+null
+]
+],
+"p5_opl": [
+[
+1,
+"^Lessons by class$",
+null,
+null
+],
+[
+2,
+"^Lessons by discipline$",
+null,
+null
+],
+[
+3,
+"^All equipment sets$",
+null,
+null
+],
+[
+4,
+"^OPL-GA-1201A-01$",
+null,
+null
+],
+[
+5,
+"^Open sheet$",
+null,
+null
+]
+],
+"p5_opl_sheet": [
+[
+1,
+"^OPL sheet$",
+null,
+null
+],
+[
+2,
+"^ONE POINT LESSON",
+null,
+null
+],
+[
+3,
+"^Classification:",
+null,
+null
+]
+],
+"p5_sim2d": [
+[
+1,
+"^Procedure$",
+null,
+null
+],
+[
+2,
+"^Goal:",
+null,
+null
+],
+[
+3,
+"^3D view$",
+null,
+null
+],
+[
+4,
+"^SEQ-1201",
+null,
+null
+],
+[
+5,
+"^Field and panel actions$",
+null,
+null
+]
+],
+"p5_scn": [
+[
+1,
+"^Plant chain reaction$",
+null,
+null
+],
+[
+2,
+"^Initiating event$",
+null,
+null
+],
+[
+3,
+"^Severity$",
+null,
+null
+],
+[
+4,
+"^From predictive maintenance$",
+null,
+null
+]
+],
+"p5_plot": [
+[
+1,
+"^Site overview$",
+null,
+null
+],
+[
+2,
+"^Areas$",
+null,
+null
+],
+[
+3,
+"^CONTROL ROOM$",
+null,
+null
+],
+[
+4,
+"^Walking distance from control room",
+null,
+null
+]
+],
+"p5_haz2d": [
+[
+1,
+"^Screening model$",
+null,
+null
+],
+[
+2,
+"^Hole size$",
+null,
+null
+],
+[
+3,
+"^Shutdown$",
+null,
+null
+],
+[
+4,
+"^Play$",
+null,
+null
+],
+[
+5,
+"^Effects$",
+null,
+null
+],
+[
+6,
+"^Who and what is affected$",
+null,
+null
+]
+],
+"p6_ai": [
+[
+1,
+"^Scope$",
+null,
+null
+],
+[
+2,
+"^What usually causes",
+null,
+null
+],
+[
+3,
+"^Sources for the last answer$",
+null,
+null
+],
+[
+4,
+"^Send$",
+null,
+null
+]
+],
+"p6_ks": [
+[
+1,
+"^Overview$",
+null,
+null
+],
+[
+2,
+"^Indexed knowledge chunks$",
+null,
+null
+],
+[
+3,
+"^Ingest a document$",
+null,
+null
+],
+[
+4,
+"^Backup and transfer$",
+null,
+null
+]
+],
+"p6_ks_ingest": [
+[
+1,
+"^Source$",
+null,
+null
+],
+[
+2,
+"^Upload files$",
+null,
+null
+],
+[
+3,
+"^Paste text or a table$",
+null,
+null
+],
+[
+4,
+"^Let the AI read new documents$",
+null,
+null
+]
+],
+"p6_ks_cap": [
+[
+1,
+"^Tacit knowledge$",
+null,
+null
+],
+[
+2,
+"^Title$",
+null,
+null
+],
+[
+3,
+"^Symptom or situation$",
+null,
+null
+],
+[
+4,
+"^Save and submit for review$",
+null,
+null
+]
+],
+"p6_quality": [
+[
+1,
+"^Issues by severity$",
+null,
+null
+],
+[
+2,
+"^Issues by source$",
+null,
+null
+],
+[
+3,
+"^Export register",
+null,
+null
+],
+[
+4,
+"^Source$",
+null,
+null
+],
+[
+5,
+"^Mark resolved",
+null,
+null
+]
+],
+"p6_int": [
+[
+1,
+"^Connectors$",
+null,
+null
+],
+[
+2,
+"^SIMULATED",
+null,
+null
+],
+[
+3,
+"^EDMS$",
+null,
+null
+],
+[
+4,
+"^Test connection$",
+null,
+null
+],
+[
+5,
+"^Field mapping",
+null,
+null
+]
+],
+"p6_int_graph": [
+[
+1,
+"^Asset$",
+null,
+null
+],
+[
+2,
+"^Each node is a record",
+null,
+null
+]
+],
+"p7_rc": [
+[
+1,
+"^Equipment dossier$",
+null,
+null
+],
+[
+2,
+"^Reliability and downtime report$",
+null,
+null
+],
+[
+3,
+"^Predictive maintenance outlook$",
+null,
+null
+],
+[
+4,
+"^Incident investigation pack$",
+null,
+null
+],
+[
+5,
+"^Preview$",
+null,
+null
+]
+],
+"p7_gov": [
+[
+1,
+"^Trust and controls$",
+null,
+null
+],
+[
+2,
+"^Controls in place$",
+null,
+null
+],
+[
+3,
+"^Area$",
+null,
+null
+]
+]
+}

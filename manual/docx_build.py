@@ -196,7 +196,7 @@ def build_docx(toc_pages=None, out=None):
         k = b[0]
         if k == "h1":
             _, num, title, roles, part, intro = b; ch = num; h2n = 0
-            hp = d.add_paragraph(f"{num}  {title}"); hp.style = st["Heading 1"]; hp.paragraph_format.page_break_before = True
+            hp = d.add_paragraph(f"{num}  {title}"); hp.style = st["Heading 1"]; newpart = (part != getattr(doc, '_lp', None)); doc._lp = part; hp.paragraph_format.page_break_before = newpart; hp.paragraph_format.space_before = Pt(0 if newpart else 16)
             if part:
                 pp = d.add_paragraph(); r = pp.add_run(" " + part.upper() + " "); r.font.size = Pt(8.5); r.bold = True; r.font.color.rgb = rgb("#FFFFFF")
                 sh = OxmlElement("w:shd"); sh.set(qn("w:val"), "clear"); sh.set(qn("w:color"), "auto"); sh.set(qn("w:fill"), BLUE.lstrip("#")); pp._p.get_or_add_pPr().append(sh)

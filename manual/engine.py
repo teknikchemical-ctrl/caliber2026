@@ -124,7 +124,7 @@ body { margin: 0; font-family: Arial, 'Liberation Sans', Helvetica, sans-serif; 
 .page { width: 210mm; height: 297mm; padding: 22mm 20mm 20mm 20mm; position: relative; page-break-after: always; overflow: hidden; }
 .flow-page { width: 210mm; padding: 0; page-break-after: auto; }
 .sheet { padding: 20mm 20mm 22mm 20mm; width: 210mm; }
-h1 { font-size: 22pt; color: #0B2A4A; margin: 0 0 4mm; line-height: 1.2; page-break-before: always; }
+h1 { font-size: 22pt; color: #0B2A4A; margin: 9mm 0 4mm; line-height: 1.2; page-break-after: avoid; } h1.pb { page-break-before: always; margin-top: 0; }
 h1 .num { color: #1560BD; margin-right: 3mm; }
 .partband { font-size: 9pt; letter-spacing: 1.5pt; text-transform: uppercase; color: #fff; background: linear-gradient(90deg,#0B2A4A,#1560BD); padding: 2.2mm 4mm; border-radius: 2mm; margin: 0 0 6mm; }
 .roles { margin: 0 0 4mm; font-size: 9pt; color: #6B7A8C; }
@@ -211,7 +211,9 @@ def body_html(doc, pages=None, front=None):
         k = b[0]
         if k == "h1":
             _, num, title, roles, part, intro = b; ch = num; h2n = 0
-            out.append(f"<h1><span class='marker'>@@H{num}@@</span><span class='num'>{num}</span>{html.escape(title)}</h1>")
+            pb = ' class="pb"' if (part != getattr(doc, "_lastpart", None)) else ""
+            doc._lastpart = part
+            out.append(f"<h1{pb}><span class='marker'>@@H{num}@@</span><span class='num'>{num}</span>{html.escape(title)}</h1>")
             if part: out.append(f"<div class='partband'>{html.escape(part)}</div>")
             if roles: out.append("<div class='roles'>Used by: " + "".join(f"<span class='chip'>{r}</span>" for r in roles) + "</div>")
             if intro: out.append(f"<div class='intro'>{inline(intro)}</div>")
