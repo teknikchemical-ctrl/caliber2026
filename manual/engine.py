@@ -173,8 +173,13 @@ def figure_html(b, num, doc):
     style = f"max-height:{mh}mm;" if mh < 999 else ""
     wcss = "" if w / max(h, 1) > 1.0 or not maxh else ""
     leg = ""
+    pj = os.path.join(IMG, img + ".placed.json")
+    if calls and os.path.exists(pj):
+        ok = set(json.load(open(pj))); calls = [c for c in calls if c[0] in ok]
+    elif calls and os.environ.get("MANUAL_STRICT"):
+        calls = []
     if calls:
-        leg = "<div class='legend'>" + "".join(f"<div><b>{n}</b>{inline(t)}</div>" for n, t in calls) + "</div>"
+        leg = "<div class='legend'>" + "".join(f"<div><b>{c[0]}</b>{inline(c[1])}</div>" for c in calls) + "</div>"
     return f"<div class='fig'><div class='frame'><img src='{rel}' style='{style}'></div><div class='cap'>Figure {num}. {inline(cap)}</div>{leg}</div>"
 
 def flow_html(b, num):
@@ -226,3 +231,12 @@ def body_html(doc, pages=None, front=None):
             out.append(f"<table class='t'><colgroup>{cg}</colgroup><tr>" + "".join(f"<th>{inline(h)}</th>" for h in head) + "</tr>" + "".join("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>" for r in rows) + "</table>")
     out.append("</div>")
     return f"<!doctype html><html><head><meta charset='utf-8'><style>{CSS}</style></head><body>" + "".join(out) + "</body></html>"
+
+
+def collect_calls(doc):
+    out = {}
+    for b in doc.blocks:
+        if b[0] == "fig" and b[3]:
+            l = [[c[0], c[2], c[3] if len(c) > 3 else None, c[4] if len(c) > 4 else None] for c in b[3] if len(c) > 2]
+            if l: out[b[1]] = l
+    return out
