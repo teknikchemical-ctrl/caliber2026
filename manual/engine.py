@@ -90,7 +90,7 @@ def plain(t): return re.sub(r"\*\*(.+?)\*\*", r"\1", re.sub(r"`(.+?)`", r"\1", t
 
 # ---------------------------------------------------------------- images
 _img_cache = {}
-def jpg(img, maxw=1500):
+def jpg(img, maxw=1400):
     """convert a PNG screenshot to a compact JPEG in build/ and return (path, w, h)"""
     if img in _img_cache: return _img_cache[img]
     src = os.path.join(IMG, img + ".png")
@@ -104,7 +104,7 @@ def jpg(img, maxw=1500):
     if y < h - 40:
         im = im.crop((0, 0, w, min(h, y + 28))); w, h = im.size
     if w > maxw: im = im.resize((maxw, int(h * maxw / w)), Image.LANCZOS); w, h = im.size
-    out = os.path.join(BLD, img + ".jpg"); im.save(out, quality=86, optimize=True)
+    out = os.path.join(BLD, img + ".jpg"); im.save(out, quality=80, optimize=True)
     _img_cache[img] = (out, w, h); return _img_cache[img]
 
 # ---------------------------------------------------------------- document model

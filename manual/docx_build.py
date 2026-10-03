@@ -33,6 +33,9 @@ def cell_margins(cell, top=60, bottom=60, left=100, right=100):
 def set_col_widths(table, widths_cm):
     table.autofit = False
     tblPr = table._tbl.tblPr; lay = OxmlElement("w:tblLayout"); lay.set(qn("w:type"), "fixed"); tblPr.append(lay)
+    grid = table._tbl.tblGrid
+    for i, gc in enumerate(grid.findall(qn("w:gridCol"))):
+        if i < len(widths_cm): gc.set(qn("w:w"), str(int(widths_cm[i] * 567)))
     for row in table.rows:
         for i, w in enumerate(widths_cm):
             if i < len(row.cells): row.cells[i].width = Cm(w)
@@ -267,7 +270,8 @@ def find_pages(pdf, doc):
     # body pages are numbered from 1 at the page after the cover
     res = {}
     for lvl, key, lab, text, part in doc.toc:
-        pat = re.compile(r"^\s*" + re.escape(lab) + r"\s+" + re.escape(text) + r"\s*$", re.M)
+        head = re.escape(lab) + r"\s+" + r"\s+".join(re.escape(w) for w in text.split()[:4])
+        pat = re.compile(r"^\s*" + head, re.M)
         hits = [i for i, t in enumerate(texts) if pat.search(t)]
         if hits: res[key] = hits[-1]   # pdf index; body page number = index (cover is index 0)
     return res, len(texts)
