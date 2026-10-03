@@ -36,7 +36,7 @@ print("base", [round(x) for x in BASE], "payback", PB, "net3", round(NB), "roi",
 
 
 prs = new_prs()
-PARTS = [p for p in ["s_main1.py", "s_main2.py", "s_a1.py", "s_a2.py", "s_a3.py"] if os.path.exists(os.path.join(HERE, "parts", p))]
+PARTS = [p for p in ["s_main1.py", "s_main2.py", "s_a1.py", "s_a2.py", "s_a3.py", "s_a4.py", "s_a4b.py"] if os.path.exists(os.path.join(HERE, "parts", p))]
 for part in PARTS:
     p = os.path.join(HERE, "parts", part)
     exec(compile(open(p).read(), p, "exec"), globals())

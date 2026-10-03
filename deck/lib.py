@@ -20,7 +20,7 @@ def blank(prs):
     return prs.slides.add_slide(prs.slide_layouts[6])
 
 def _fmt_run(r,size,bold,color,italic=False):
-    r.font.name=FONT; r.font.size=Pt(size); r.font.bold=bold; r.font.italic=italic; r.font.color.rgb=rgb(color)
+    r.font.name=FONT; r.font.size=Pt(max(size,8)); r.font.bold=bold; r.font.italic=italic; r.font.color.rgb=rgb(color)
 
 def text(slide,x,y,w,h,paras,size=12,bold=False,color=INK,align="l",anchor="t",margin=0.04,line=1.08,space=2):
     """paras: str | list of (str | list of runs). run = str | (str,{bold,color,size,italic})"""

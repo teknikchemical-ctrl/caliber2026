@@ -36,14 +36,14 @@ for i, (nm, c_) in enumerate([("Equipment 8", BLUE), ("Documents 96", GREEN), ("
     box(s, xx, yy + 0.04, 0.1, 0.1, c_, None, None, shape=MSO_SHAPE.OVAL); text(s, xx + 0.12, yy, 0.95, 0.18, nm, 6.8, False, INK)
 finds = [("Analysis", "564 records of 7 types are joined only by the equipment tag. No source system stores those links; the platform builds 624 of them.", BLUE),
          ("Key finding", "Reading the sources together exposes 48 conflicts, for example valve FV-2302 labelled both trips OPEN and trips CLOSED.", RED),
-         ("Tension", "211 work orders describe 63 failures, yet none points to the lesson or procedure that applies. Only 21% of faults were found before they turned corrective.", ORANGE)]
+         ("Tension", "211 work orders and 63 failures, none linked to the lesson that applies. Only 21% of faults found before turning corrective.", ORANGE)]
 for i, (t, d, c_) in enumerate(finds):
-    y = 4.78 + i * 0.68
+    y = 4.7 + i * 0.7
     box(s, LX + 0.08, y, 0.82, 0.22, c_, None, [t], 7.5, True, WHITE, "c", "m", radius=0.11, margin=0.02)
-    box(s, LX + 0.08, y + 0.2, LW - 0.16, 0.45, WHITE, MID, [d], 7.3, False, INK, "l", "m", radius=0.05, margin=0.07)
+    box(s, LX + 0.08, y + 0.2, LW - 0.16, 0.5, WHITE, MID, [d], 8, False, INK, "l", "m", radius=0.05, margin=0.07)
 # top band: context -> core problem -> challenges
 BX = 4.65
-panel(s, BX, 1.3, 8.35, 2.28, "F4F7FB", MID)
+panel(s, BX, 1.3, 8.35, 2.34, "F4F7FB", MID)
 gbanner(s, BX + 0.1, 1.36, 2.1, "Operating context", BLUE, "4FA9CE", 0.24, 8.5)
 ctx = [("net", "Digital agenda", "Data, analytics and AI being built into manufacturing"), ("flame", "Safety-critical", "Continuous, asset-intensive petrochemical operation"), ("users", "Seven functions", "Production, Maintenance, Reliability, Warehouse, Procurement, Energy, HSE")]
 for i, (ic, t, d) in enumerate(ctx):
@@ -57,11 +57,11 @@ text(s, BX + 2.78, 1.78, 2.54, 0.3, "Core problem: improper execution", 10, True
 text(s, BX + 2.78, 2.08, 2.54, 1.35, "Engineers need a correct step, a current drawing or a past lesson during start-up, troubleshooting and maintenance. The answer exists somewhere, but cannot be found fast, cannot be verified, and is not tied to the asset in front of them.", 8, False, INK, "c", line=1.02)
 box(s, BX + 5.5, 1.55, 0.3, 1.8, "B8D3EA", None, None, shape=MSO_SHAPE.RIGHT_ARROW)
 gbanner(s, BX + 5.9, 1.36, 2.35, "Key challenges", RED, "E88B8B", 0.24, 8.5)
-chs = [("net", "Scattered sources", "SOP, datasheet, P&ID, EDMS, AIMS and logs in separate systems"), ("user", "Missing tacit knowledge", "Why a trip occurs stays with senior staff"), ("doc", "Conflicting documents", "Revision and approval not visible at use"), ("link", "Disconnected live data", "Work order, trip and drawing never read together")]
+chs = [("net", "Scattered sources", "Separate systems, no shared tag"), ("user", "Missing tacit knowledge", "Why a trip occurs stays with senior staff"), ("doc", "Conflicting documents", "Revision and approval not visible at use"), ("link", "Disconnected live data", "Work orders, trips, drawings unlinked")]
 for i, (ic, t, d) in enumerate(chs):
-    y = 1.65 + i * 0.47
+    y = 1.64 + i * 0.5
     pic(s, ic, BX + 5.9, y + 0.02, 0.3, RED)
-    text(s, BX + 6.27, y - 0.02, 2.05, 0.2, t, 7.8, True, NAVY); text(s, BX + 6.27, y + 0.15, 2.05, 0.32, d, 6.6, False, INK, line=0.95)
+    text(s, BX + 6.27, y - 0.03, 2.05, 0.2, t, 8.5, True, NAVY); text(s, BX + 6.27, y + 0.15, 2.05, 0.32, d, 8, False, INK, line=0.95)
 # bottom band: stakeholders venn + baseline impact
 gbanner(s, BX, 3.7, 4.2, "Stakeholder alignment", NAVY, "27517F", 0.3, 9.5)
 panel(s, BX, 4.0, 4.2, 2.84, WHITE, MID)
@@ -85,83 +85,37 @@ for i, (n_, l_, c_) in enumerate([("31", "breakdowns", RED), ("434 h", "downtime
     text(s, BX + 6.9, y, 1.4, 0.3, n_, 14 if len(n_) < 7 else 11, True, c_); text(s, BX + 6.9, y + 0.28, 1.4, 0.3, l_, 7, False, GREY, line=0.95)
 text(s, BX + 4.4, 6.1, 3.9, 0.7, [[("Reading: ", {"bold": True, "color": NAVY}), "EA-5601 alone lost 124 h. Where the history is richer than the procedures, the same fault is investigated again."]], 7.4, False, INK, line=1.02)
 notes(s, "Problem analysis. The left figure is the real knowledge network of the baseline data: 8 equipment tags and the documents, work orders, instruments, lessons, interlocks and components connected to them. The links exist only because we built them; no source system stores them. The top band shows the context, the core problem of improper execution and the four challenges named in the case. The bottom band shows who is affected and what the baseline data says: 31 breakdowns, 434 hours of downtime and IDR 538 million of maintenance cost, 82 percent of it corrective.")
-
-# ======================================================= 3 SOLUTION
+# ======================================================= 3 SOLUTION (flowchart)
+from flow import *
 s = blank(prs)
-frame(s, 3, "Solution: {{Asset Knowledge Platform}} Joins Every Plant Source in One Governed Database, Then Answers, Predicts and Plans From It",
+frame(s, 3, "Solution: One {{Governed Knowledge Database}} Fed by Data Operations, Read by Three Engines That Answer, Predict and Plan",
       None, "Solution", "Prototype architecture and counts from the running application; Gemini 2.5 Flash is reached through the serverless proxy (free tier)", "Proposed Solution")
-# left objective column
-LX, LW = 0.35, 2.3
-gbanner(s, LX, 1.3, LW, "Main problem", NAVY, "27517F", 0.3, 9.5)
-panel(s, LX, 1.62, LW, 0.95, TINT[RED], "F0C4C4"); text(s, LX + 0.08, 1.64, 0.8, 0.5, "48", 24, True, RED); text(s, LX + 0.85, 1.7, 1.4, 0.4, "conflicts across 98 documents", 8, True, NAVY, line=0.95)
-text(s, LX + 0.08, 2.1, LW - 0.16, 0.45, "No source engineers can trust at the point of work.", 7.5, False, INK, line=0.98)
-gbanner(s, LX, 2.65, LW, "Objective", NAVY, "27517F", 0.3, 9.5)
-for i, (t, d, c_) in enumerate([("Connect", "all sources on the asset tag", BLUE), ("Verify", "every answer and number", TEAL), ("Act", "on history, risk and hazards", ORANGE)]):
-    y = 3.0 + i * 0.5
-    numdot(s, LX, y + 0.04, i + 1, c_, 0.3, 10); text(s, LX + 0.38, y, LW - 0.4, 0.45, [[(t + ": ", {"bold": True, "color": c_}), d]], 8.3, False, INK, anchor="m", line=0.98)
-gbanner(s, LX, 4.55, LW, "Implications", NAVY, "27517F", 0.3, 9.5)
-for i, (w_, items) in enumerate([("Engineers", [("Search time", "down"), ("Wrong steps", "down")]), ("Plant", [("Availability", "up"), ("Late start-up", "down")])]):
-    y = 4.92 + i * 0.36
-    text(s, LX, y, 0.72, 0.3, w_, 8.3, True, NAVY, anchor="m")
-    for j, (t, dr) in enumerate(items):
-        box(s, LX + 0.72 + j * 0.8, y + 0.02, 0.78, 0.26, TINT[GREEN], None, [[("▲ " if dr == "up" else "▼ ", {"color": GREEN, "size": 7, "bold": True}), (t, {"size": 6.8, "bold": True, "color": INK})]], 7, True, INK, "c", "m", radius=0.13, margin=0.01)
-text(s, LX, 5.7, LW, 1.1, [[("Three key questions of the case", {"bold": True, "color": NAVY})], [("Q1  ", {"bold": True, "color": BLUE}), "Industrial Data Ops foundation"], [("Q2  ", {"bold": True, "color": TEAL}), "Trusted answers, less improper execution"], [("Q3  ", {"bold": True, "color": ORANGE}), "Active use in operations"]], 7.6, False, INK, line=1.02, space=3)
-# diagram columns
-DX = 2.8
-cols = [("Sources", DX, 1.55, BLUE), ("TAGLINK  Data Ops", DX + 1.72, 1.7, BLUE), ("Knowledge database", DX + 3.57, 1.65, GREEN), ("Engines", DX + 5.37, 2.35, TEAL), ("Features and users", DX + 7.87, 2.33, ORANGE)]
-for t, x, w_, c_ in cols: gbanner(s, x, 1.3, w_, t, c_, {BLUE: "4FA9CE", GREEN: "6CC48D", TEAL: "4DBBA9", ORANGE: "F0A15B"}[c_], 0.3, 9)
-srcs = [("doc", "SOP, OPL, tacit notes"), ("list", "Datasheets (8)"), ("net", "P&ID, GA, plot plan"), ("shield", "Interlock C&E"), ("wrench", "Maintenance logs, RCA"), ("gear", "Instrument list (84)"), ("warn", "Incident reports"), ("chart", "Live data: DCS, historian")]
-for i, (ic, t) in enumerate(srcs):
-    y = 1.68 + i * 0.5
-    box(s, DX, y, 1.55, 0.44, WHITE, MID, None, radius=0.06); pic(s, ic, DX + 0.05, y + 0.07, 0.3, BLUE); text(s, DX + 0.4, y, 1.12, 0.44, t, 7.4, True, NAVY, anchor="m", line=0.95)
-box(s, DX, 5.72, 1.55, 0.55, "FFF6E5", "F0C27B", [[("EDMS  AIMS", {"bold": True, "size": 8, "color": ORANGE})], [("Digital twin  Historian", {"size": 7, "color": INK})]], 8, False, INK, "c", "m", radius=0.06, lw=1.0)
-text(s, DX, 6.3, 1.55, 0.3, "systems of record (read-only)", 6.8, False, GREY, "c")
-steps4 = [("Ingest", "parse, classify, extract with Gemini; quote check"), ("Structure", "typed facts and relations on the tag"), ("Check", "rules find conflicts; secrets masked"), ("Approve", "owner, revision, status, role access")]
-for i, (t, d) in enumerate(steps4):
-    y = 1.68 + i * 1.04
-    node(s, DX + 1.72, y, 1.7, 0.92, t, d, TINT[BLUE], BLUE, NAVY, 9, 7)
-    if i < 3: arrow(s, DX + 2.57, y + 0.92, DX + 2.57, y + 1.04, BLUE, 1.5)
-for i in range(4): arrow(s, DX + 1.55, 1.9 + i * 1.3, DX + 1.72, 2.1 + i * 0.95, BLUE, 1.2)
-cyl(s, DX + 3.57, 1.68, 1.65, 0.85, "Passages and index", "1,109 chunks, BM25F, vectors", GREEN)
-cyl(s, DX + 3.57, 2.65, 1.65, 0.85, "Typed facts, relations", "447 facts, 624 links on tag", GREEN)
-cyl(s, DX + 3.57, 3.62, 1.65, 0.85, "Operating records", "211 WO, 56 OPL, 8 interlocks", GREEN)
-cyl(s, DX + 3.57, 4.59, 1.65, 0.85, "Knowledge items", "lessons, drafts, approvals", GREEN)
-cyl(s, DX + 3.57, 5.56, 1.65, 0.85, "Audit, feedback, Q&A log", "shared via Blobs", GREEN)
-arrow(s, DX + 3.42, 3.6, DX + 3.57, 3.6, GREEN, 2.2)
-text(s, DX + 3.2, 6.4, 2.1, 0.3, "browser store + shared store + SQL target", 6.8, False, GREY, "c")
-eng = [("VERA", "Verified answers", "Intent router, BM25F retrieval, Gemini 2.5 Flash drafting with function calling over 20 computed tools, number and quote checks, evidence-weighted confidence", TEAL, ["BM25F", "Gemini 2.5 Flash", "20 tools", "verifier"]),
-       ("FORESIGHT", "Reliability", "Failure memory over work orders, OPL and lessons; failure-mode RPN; gamma-Poisson forecast with ranges; ridge-logistic score validated by rolling backtest", ORANGE, ["RPN", "gamma-Poisson", "ridge-logistic", "Laplace trend"]),
-       ("SAFEWORK", "Hazard, planning", "Orifice release, Gaussian plume, jet and pool fire, blast; permissive-based start-up readiness; permit-aware four-week plan; plant replay", RED, ["Gaussian plume", "Kinney-Graham", "scheduler", "replay"])]
-EX = DX + 5.37
-for i, (n_, t, d, c_, chips) in enumerate(eng):
-    y = 1.68 + i * 1.66
-    panel(s, EX, y, 2.35, 1.56, WHITE, c_, radius=0.08)
-    box(s, EX, y, 2.35, 0.3, c_, None, [[(n_, {"bold": True, "size": 9.5, "color": WHITE}), ("   " + t, {"size": 7.5, "color": "F0F4F8"})]], 9, True, WHITE, "l", "m", radius=0.08, margin=0.1)
-    text(s, EX + 0.08, y + 0.34, 2.2, 0.8, d, 7.2, False, INK, line=1.0)
-    cx_ = EX + 0.08
-    for ch_ in chips:
-        w_ = 0.16 + 0.056 * len(ch_)
-        if cx_ + w_ > EX + 2.3: break
-        pill(s, cx_, y + 1.3, w_, ch_, TINT[c_], c_, 0.19, 6.5); cx_ += w_ + 0.04
-# bus from the database to the three engines
-box(s, DX + 5.27, 2.3, 0.025, 3.3, GREEN, None, None, shape=MSO_SHAPE.RECTANGLE)
-arrow(s, DX + 5.22, 3.8, DX + 5.27, 3.8, GREEN, 2.0, False)
-for i in range(3): arrow(s, DX + 5.27, 2.46 + i * 1.66, EX, 2.46 + i * 1.66, GREEN, 1.4)
-arrow(s, DX + 5.5, 6.68, DX + 4.4, 6.68, GREY, 1.0, True, True)
-text(s, DX + 3.2, 6.69, 3.0, 0.2, "approved lessons, feedback and answers flow back", 6.6, False, GREY, "c")
-FX0 = DX + 7.87
-fe = [("Q2", TEAL, ["AI assistant, source panel", "Hybrid and global search", "Equipment 360, datasheets", "Interlock library, documents"]),
-      ("Q3", ORANGE, ["Failure memory, predictive", "OPL and scenario simulators", "Live P&ID, plant chain reaction", "Reports and KPI pages"]),
-      ("Q3", RED, ["Start-up readiness, hazard", "Site plan and plant replay", "3D plant, equipment drawings", "Notifications, My work"])]
-for i, (q, c_, items) in enumerate(fe):
-    y = 1.68 + i * 1.66
-    panel(s, FX0, y, 2.33, 1.56, WHITE, c_)
-    box(s, FX0, y, 0.34, 1.56, c_, None, [q], 8, True, WHITE, "c", "m", radius=0.06)
-    text(s, FX0 + 0.4, y + 0.08, 1.9, 1.45, [[("■ ", {"color": c_, "size": 6}), t] for t in items], 7.4, False, INK, line=1.0, space=4)
-    arrow(s, EX + 2.35, y + 0.78, FX0, y + 0.78, c_, 1.6)
-# Q1 features sit under the data ops column, roles under the features
-box(s, DX + 1.72, 5.9, 1.7, 0.7, TINT[BLUE], BLUE, [[("Q1", {"bold": True, "color": BLUE, "size": 8}), ("  Ingestion wizard, Knowledge Studio, quality register, approval, audit", {"size": 6.8, "color": INK})]], 7, False, INK, "l", "m", radius=0.07, margin=0.07)
-text(s, FX0, 6.4, 2.33, 0.2, "Roles served", 7, True, NAVY)
-for i, (t, ic) in enumerate([("Operator", "user"), ("Maint.", "wrench"), ("Reliab.", "chart"), ("Eng.", "gear"), ("HSE", "shield"), ("Mgmt", "users")]):
-    pic(s, ic, FX0 + i * 0.39 + 0.05, 6.6, 0.24, NAVY)
-notes(s, "Solution. Left: the main problem, the objective in three verbs and the three key questions. Centre: the system as one connected figure. Sources on the left feed TAGLINK, which ingests with Gemini, structures facts on the equipment tag, checks for conflicts and routes everything through approval. The knowledge database holds passages with a search index, typed facts and relations, operating records, knowledge items and the audit log. Three engines read from it: VERA for verified answers with Gemini 2.5 Flash and 20 computed tools, FORESIGHT for failure memory and reliability, SAFEWORK for hazards, readiness and planning. The features on the right map to Q1, Q2 and Q3. Approved lessons, feedback and answers flow back into the database.")
+X0, X1 = 2.15, 12.95
+def lane(y, h, c_): box(s, 0.4, y, 12.55, h, TINT[c_], None, None, radius=0.05)
+# Q1 lane
+lane(1.3, 1.25, BLUE); tag(s, 0.48, 1.38, 1.5, 1.09, "Q1", "Data foundation (TAGLINK)", BLUE)
+r1 = row(s, 1.925, X0, X1, [("Sources", "SOP, OPL, datasheets, P&ID, interlocks, work orders"), ("Ingest", "parse, classify, Gemini extraction, quote check"), ("Structure", "facts and relations on the equipment tag"), ("Check", "rules find conflicts; secrets masked"), ("Approve", "owner, revision, status, role access")], BLUE, maxw=1.75)
+# database band
+box(s, 0.4, 2.8, 12.55, 0.98, "E4F4EA", None, None, radius=0.05)
+tag(s, 0.48, 2.86, 1.5, 0.86, "DB", "Knowledge database", GREEN)
+dbs = [("Passages", "1,109 chunks, BM25F"), ("Typed facts", "447 facts"), ("Relations", "624 links"), ("Records", "211 WO, 56 OPL, 8 interlocks"), ("Knowledge items", "lessons, drafts, approvals"), ("Audit and Q&A log", "shared store")]
+dx = X0
+for t, sb in dbs:
+    mw, mh = measure(t, sb, 10, 8.6, 1.5, 1.0); mh = 0.8
+    box(s, dx, 2.88, mw + 0.1, 0.82, TINT[GREEN], GREEN, [[(t, {'bold': True, 'size': 10, 'color': NAVY})], [(sb, {'size': 8.6, 'color': INK})]], 10, False, INK, 'c', 'm', shape=MSO_SHAPE.CAN, lw=1.1, margin=0.04); dx += mw + 0.1 + (X1 - X0 - sum(measure(a, b, 10, 8.6, 1.5, 1.0)[0] + 0.1 for a, b in dbs)) / (len(dbs) - 1)
+a_ = r1[-1]; vline(s, a_[0] + a_[2] / 2, a_[1] + a_[3] + 0.03, 2.86, BLUE, 2.0)
+text(s, a_[0] + a_[2] / 2 + 0.08, 2.58, 1.2, 0.2, "approved only", 8, True, BLUE)
+# Q2 lane
+lane(4.05, 1.25, TEAL); tag(s, 0.48, 4.13, 1.5, 1.09, "Q2", "Trusted answers (VERA)", TEAL)
+r2 = row(s, 4.675, X0, X1, [("Question", "engineer, role, equipment"), ("Route", "intent classifier; unsafe bypass refused"), ("Retrieve", "BM25F plus vectors, tag scoped"), ("Compute and draft", "20 tools, Gemini 2.5 Flash"), ("Verify", "numbers and quotes checked"), ("Answer", "sources, confidence 0 to 100")], TEAL, maxw=1.6, solid_last=True)
+b_ = r2[2]; vline(s, b_[0] + b_[2] / 2, 3.74, b_[1] - 0.03, GREEN, 2.0)
+text(s, b_[0] + b_[2] / 2 + 0.06, 3.8, 0.8, 0.2, "reads", 8, True, GREEN)
+# Q3 lane
+lane(5.55, 1.25, ORANGE); tag(s, 0.48, 5.63, 1.5, 1.09, "Q3", "Active use (FORESIGHT, SAFEWORK)", ORANGE)
+r3 = row(s, 6.175, X0, X1 - 0.35, [("Plant event", "work order, alarm, plan"), ("Failure memory", "similar cases, causes, fixes"), ("Predict", "RPN, gamma-Poisson, ridge model"), ("Simulate", "OPL, live P&ID, hazard"), ("Plan", "readiness, site plan, replay"), ("Act and learn", "lesson and feedback")], ORANGE, maxw=1.6, solid_last=True)
+arrow(s, 2.04, 3.78, 2.04, 6.175, GREEN, 1.8, False); arrow(s, 2.04, 6.175, 2.14, 6.175, GREEN, 1.8, True)
+l_ = r3[-1]
+arrow(s, l_[0] + l_[2] + 0.03, 6.175, 12.9, 6.175, GREY, 1.3, False, True)
+arrow(s, 12.9, 6.175, 12.9, 3.3, GREY, 1.3, False, True); arrow(s, 12.9, 3.3, X1 + 0.02, 3.3, GREY, 1.3, True, True)
+text(s, 10.2, 5.33, 2.6, 0.2, "approved lessons and feedback return", 8, False, GREY, "r")
+notes(s, "Solution as one flow. Lane Q1 builds the foundation: sources are ingested, structured on the equipment tag, checked for conflicts and approved before they enter the knowledge database. Lane Q2 answers a question: the intent is routed, passages are retrieved, computed tools and Gemini 2.5 Flash draft the answer, numbers and quotes are verified, and the engineer sees sources and a confidence score. Lane Q3 turns plant events into action: failure memory, prediction, simulation and planning, and every outcome returns to the database as a lesson or feedback.")

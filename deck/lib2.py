@@ -109,7 +109,7 @@ def shot(s, name, x, y, w, marks=(), crop=None, h=None):
 
 def legend(s, x, y, w, items, size=8, gap=0.0, color=ORANGE, lh=None):
     """numbered explanation list matching the callout dots"""
-    yy = y
+    yy = y; size = max(size, 8)
     for n, t in items:
         lines = max(1, int(len(t) * size * 0.0062 / (w - 0.35)) + 1)
         h = lh or (0.06 + lines * size * 0.0175)
