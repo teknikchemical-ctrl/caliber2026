@@ -186,7 +186,7 @@ function dashboard(){
 function setList(){return `<h1>Equipment Knowledge Sets</h1><p class="sub">Each set = P&ID + GA drawing + datasheet + plot plan + interlock logic + OPLs + maintenance history, for one main equipment item</p>
 <div class="grid g3">${K.sets.map(s=>`<div class="card click" onclick="go('equipment',{set:${s.n},tab:'overview'})"><div class="row between"><span class="tag acc">SET ${s.n} · ${s.tag}</span>${tg(s.crit,"bad")}</div>
 <h3 style="margin-top:10px">${s.name}</h3><p class="muted">Area ${s.area} · ${s.unit}</p>
-<div class="row" style="margin-top:12px"><span class="tag">📄 ${docsOf(s.n).length} docs</span><span class="tag">🧩 7 OPL</span><span class="tag">🔧 ${woOf(s.n).length} WO</span><span class="tag">⚡ ${cnt(K.inst,i=>i.set===s.n)} instr.</span></div></div>`).join("")}</div>`}
+<div class="row" style="margin-top:12px"><span class="tag">📄 ${docsOf(s.n).length} documents</span><span class="tag">🧩 ${cnt(K.opl,o=>o.set===s.n)} lessons</span><span class="tag">🔧 ${woOf(s.n).length} work orders</span><span class="tag">⚡ ${cnt(K.inst,i=>i.set===s.n)} instruments</span></div></div>`).join("")}</div>`}
 function setDetail(n){
   const s=S(n),w=woOf(n),tab=st.tab,ins=K.inst.filter(i=>i.set===n),rel=K.assets.filter(a=>a.set===n);
   const tabs=[["overview","Overview"],["pid","P&ID"],["ga","Equipment drawing"],["docs","Documents ("+(docsOf(n).length)+")"],["ds","Equipment data sheet"],["seq","OTS · Interlock simulator"],["opl","OPL (7)"],["maint","Maintenance ("+w.length+")"],["rel","Related assets ("+rel.length+")"]];

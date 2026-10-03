@@ -1,0 +1,10 @@
+// Times the synchronous render cost of each page and view. node tools/profile_pages.js
+const {chromium}=require('playwright'),path=require('path');
+(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const p=await b.newPage({viewport:{width:1440,height:900}});p.setDefaultTimeout(120000);
+const t0=Date.now();await p.goto('file://'+path.join(__dirname,'..','knowledge-hub-integrated_BAP5.html'),{waitUntil:'commit'});
+await p.waitForFunction(()=>window.go&&document.getElementById('app')&&document.getElementById('app').children.length>0);console.log('first render ms',Date.now()-t0);
+const V=[['dashboard',()=>go('dashboard')],['mywork',()=>go('mywork')],['equipment list',()=>go('equipment')],['plot',()=>{PP.mode='explore';go('plot')}],['plot hazard',()=>{PP.mode='hazard';go('plot')}],['mnt dash',()=>{MHS.view='dash';go('mnt')}],['mnt table',()=>{MHS.view='table';go('mnt')}],['mnt time',()=>{MHS.view='time';go('mnt')}],['mnt pdm',()=>{MHS.view='pdm';go('mnt')}],['mnt replay',()=>{MHS.view='replay';go('mnt')}],['mnt plan',()=>{MHS.view='plan';go('mnt')}],['perf',()=>go('perf')],['scn',()=>go('scn')],['il',()=>go('il')],['ai',()=>go('ai')],['ks',()=>go('ks')],['fm',()=>go('fm')],['documents',()=>go('documents')],['opl',()=>go('opl')],['rc',()=>go('rc')],['int',()=>go('int')],['gov',()=>go('gov')],['quality',()=>go('quality')]];
+for(const t of ['overview','pid','ga','perf','plot','ready','docs','ds','seq','opl','maint','rel']) V.push(['eq '+t,()=>go('equipment',{set:4,tab:t})]);
+const out=[];
+for(const [n,f] of V){const r=await p.evaluate(async([f])=>{const fn=eval('('+f+')');const t=performance.now();try{fn()}catch(e){return {err:e.message}}const a=performance.now()-t;await new Promise(r=>setTimeout(r,50));return {ms:Math.round(a)}},[f.toString()]);out.push([n,r.ms??r.err]);await p.waitForTimeout(200)}
+out.sort((a,b)=>(b[1]||0)-(a[1]||0));out.forEach(([n,m])=>console.log(String(m).padStart(6),'ms',n));await b.close()})();
