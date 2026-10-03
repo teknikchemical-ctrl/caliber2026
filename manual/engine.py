@@ -97,6 +97,12 @@ def jpg(img, maxw=1500):
     if not os.path.exists(src):
         raise FileNotFoundError(src)
     im = Image.open(src).convert("RGB"); w, h = im.size
+    # trim empty background at the bottom of the capture
+    import numpy as np
+    a = np.asarray(im).astype(int); bg = a[h - 1, w - 1]; y = h - 1
+    while y > int(h * 0.35) and np.abs(a[y, ::4] - bg).max() < 8: y -= 1
+    if y < h - 40:
+        im = im.crop((0, 0, w, min(h, y + 28))); w, h = im.size
     if w > maxw: im = im.resize((maxw, int(h * maxw / w)), Image.LANCZOS); w, h = im.size
     out = os.path.join(BLD, img + ".jpg"); im.save(out, quality=86, optimize=True)
     _img_cache[img] = (out, w, h); return _img_cache[img]
@@ -138,8 +144,8 @@ ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0 0 4mm; }
 ol.steps li { counter-increment: s; position: relative; padding: 0 0 0 9mm; margin: 0 0 2.4mm; min-height: 6mm; }
 ol.steps li::before { content: counter(s); position: absolute; left: 0; top: 0.2mm; width: 6mm; height: 6mm; border-radius: 50%; background: #1560BD; color: #fff; font-weight: 700; font-size: 9pt; text-align: center; line-height: 6mm; }
 ul.bul { margin: 0 0 4mm; padding-left: 6mm; } ul.bul li { margin-bottom: 1.4mm; }
-.fig { margin: 3mm 0 5mm; page-break-inside: avoid; text-align: center; }
-.fig .frame { border: 0.3mm solid #B9C8DA; border-radius: 1.5mm; padding: 1mm; background: #fff; display: inline-block; max-width: 100%; box-shadow: 0 0.6mm 1.6mm rgba(11,42,74,.12); }
+.fig { margin: 3mm 0 5mm; page-break-inside: avoid; break-inside: avoid; text-align: center; }
+.fig .frame { border: 0.3mm solid #B9C8DA; border-radius: 1.5mm; padding: 1mm; background: #fff; display: table; margin: 0 auto; break-inside: avoid; max-width: 100%; box-shadow: 0 0.6mm 1.6mm rgba(11,42,74,.12); }
 .fig img { display: block; max-width: 100%; margin: 0 auto; }
 .fig .cap { font-size: 9pt; color: #1560BD; font-weight: 700; margin-top: 2mm; text-align: left; }
 .legend { text-align: left; margin-top: 2mm; display: grid; grid-template-columns: 1fr 1fr; gap: 1.2mm 6mm; font-size: 9.3pt; }
