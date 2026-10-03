@@ -12,57 +12,71 @@ IRR = _irr(CF); NPV10 = _npv(.10, CF)
 print("irr", round(IRR * 100, 1), "npv10", round(NPV10))
 s = blank(prs)
 from flow import *
+from pptx.enum.chart import XL_MARKER_STYLE
 Y1 = .6 * BASE[3] - A["run"]; Y2 = BASE[3] - A["run"]; REM = A["one_off"] - Y1
-frame(s, 4, f"Business Impact: From Today's Baseline to {{{{IDR {BASE[3]/1000:.1f} B}}}} a Year, With Every Input and Its Source Shown",
-      None, "Impact", "Case data: 211 work orders, 31 breakdowns in 1.52 years, MTTR 14.0 h. Grey items are assumptions that Company figures replace in the pilot. IDR = Indonesian rupiah; IRR and NPV over 3 years at 10%", "Impact Assessment and Projection")
-HX = [(0.4, 2.1, "Lever and screen"), (2.75, 2.2, "Baseline today"), (5.2, 2.0, "With the platform"), (7.45, 4.1, "Calculation: inputs multiplied"), (11.85, 1.1, "IDR M a year")]
-for x_, w_, t_ in HX: gbanner(s, x_, 1.26, w_, t_, NAVY, "27517F", 0.27, 9)
-def pill_tag(x_, y_, label, col): pill(s, x_, y_, 0.2 + 0.062 * len(label), label, WHITE, col, 0.2, 7.5, col)
-levers = [("Search time", "AI assistant", "assistant", (0, 0.1, 1, 0.45), BLUE,
-           ("40 min a day", "per engineer on searching and checking sources", "ASSUMPTION", GREY), ("20 min a day", "answers arrive with the source attached"),
-           [(f"{A['users']}", "users", GREY), ("20 min", "saved a day", GREY), (f"{A['days']}", "working days", GREY), ("IDR 175k", "per hour", GREY)], f"{BASE[0]:,.0f}"),
-          ("Repair time", "Failure memory", "fm", (0, 0, 1, 0.6), TEAL,
-           (f"MTTR {D['mttr']:.1f} h", f"{D['bd_yr']} breakdowns a year, 434 h downtime", "CASE DATA", GREEN), (f"MTTR {D['mttr']*.9:.1f} h", "10% less, known causes and fixes at the fault"),
-           [(f"{D['bd_yr']}", "breakdowns a year", GREEN), (f"{D['mttr']:.1f} h", "MTTR today", GREEN), ("10%", "less repair time", GREY), ("IDR 30 M", "per downtime hour", GREY)], f"{BASE[1]:,.0f}"),
-          ("Ramp-up", "Knowledge Studio", "studio", (0, 0, 1, 0.6), PURPLE,
-           ("Not measured", "no baseline for new-engineer ramp-up in the case data", "NO BASELINE", GREY), ("One month sooner", "new engineers learn from approved lessons"),
-           None, f"{BASE[2]:,.0f}")]
-RY4 = [2.08, 3.0, 3.92]
-for (lv, ft, im_, crp, c_, (bt, bs, btag, bcol), (tt, ts), ins, val), cy in zip(levers, RY4):
-    # lever cell with the screen
-    box(s, 0.4, cy - 0.42, 2.1, 0.84, WHITE, c_, None, radius=0.08, lw=1.2)
-    from PIL import Image as _I
-    _p = os.path.join(HERE, "jpg", im_ + ".jpg"); _im = _I.open(_p); _w, _h = _im.size
-    _c = _im.crop((int(crp[0] * _w), int(crp[1] * _h), int(crp[2] * _w), int(crp[3] * _h))); _cp = os.path.join(HERE, "jpg", "lv_" + im_ + ".jpg"); _c.convert("RGB").save(_cp, quality=85)
-    ph_ = 1.0 * _c.size[1] / _c.size[0]
-    pc = s.shapes.add_picture(_cp, Inches(0.46), Inches(cy - ph_ / 2), Inches(1.0), Inches(ph_)); pc.line.color.rgb = rgb(MID); pc.line.width = Pt(0.75)
-    text(s, 1.52, cy - 0.38, 0.97, 0.76, [[(lv, {"bold": True, "size": 10.5, "color": NAVY})], [(ft, {"size": 8.5, "color": c_})]], 10, False, INK, anchor="m", line=1.0)
-    arrow(s, 2.52, cy, 2.73, cy, c_, 1.6)
-    box(s, 2.75, cy - 0.42, 2.2, 0.84, WHITE, bcol, [[(bt, {"bold": True, "size": 10.5, "color": NAVY})], [(bs, {"size": 8.5, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.4, margin=0.06)
-    pill_tag(2.85, cy - 0.52, btag, bcol)
-    arrow(s, 4.97, cy, 5.18, cy, c_, 1.6)
-    box(s, 5.2, cy - 0.42, 2.0, 0.84, TINT[c_], c_, [[(tt, {"bold": True, "size": 10.5, "color": NAVY})], [(ts, {"size": 8.5, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.2, margin=0.06)
-    arrow(s, 7.22, cy, 7.43, cy, c_, 1.6)
-    if ins:
-        xx = 7.45
-        for j, (v_, l_, col) in enumerate(ins):
-            box(s, xx, cy - 0.34, 0.92, 0.68, WHITE, col, [[(v_, {"bold": True, "size": 10.5, "color": NAVY})], [(l_, {"size": 8, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.3, margin=0.03)
-            if j < 3: text(s, xx + 0.92, cy - 0.14, 0.2, 0.28, "x", 12, True, GREY, "c")
-            xx += 1.06
-    else:
-        box(s, 7.45, cy - 0.34, 4.1, 0.68, WHITE, GREY, [[("IDR 60 M a year, assumed", {"bold": True, "size": 10.5, "color": NAVY})], [("kept small; the HR figure replaces it in the pilot", {"size": 8.5, "color": INK})]], 10, False, INK, "c", "m", radius=0.08, lw=1.3, margin=0.05)
-    arrow(s, 11.58, cy, 11.83, cy, c_, 1.8)
-    box(s, 11.85, cy - 0.3, 1.1, 0.6, c_, None, [[(val, {"bold": True, "size": 16, "color": WHITE})]], 16, True, WHITE, "c", "m", radius=0.08, margin=0.02)
-# money flow
-box(s, 0.4, 4.52, 2.1, 0.62, NAVY, None, [[("Money flow", {"bold": True, "size": 10.5, "color": WHITE})], [(f"{BASE[0]:,.0f} + {BASE[1]:,.0f} + {BASE[2]:,.0f} = {BASE[3]:,.0f} a year", {"size": 8.5, "color": "DCE8F5"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.05)
-arrow(s, 2.52, 4.83, 2.73, 4.83, NAVY, 1.6)
-row(s, 4.83, 2.75, 12.95, [("Invest", f"IDR {A['one_off']:,.0f} M one-off"), ("Year 1", f"60% of value less {A['run']:,.0f} running = {Y1:,.0f}"), ("Year 2", f"{BASE[3]:,.0f} less {A['run']:,.0f} = {Y2:,.0f}"), ("Year 3", f"{BASE[3]:,.0f} less {A['run']:,.0f} = {Y2:,.0f}"), ("Result", f"payback month {12 + REM/Y2*12:.0f}, IRR {IRR*100:.0f}%, NPV IDR {NPV10/1000:.2f} B")], NAVY, tsize=10.5, ssize=8.5, maxw=2.2, solid_last=True)
-text(s, 2.75, 5.2, 10.2, 0.22, f"Payback: after year 1 the gap is {A['one_off']:,.0f} - {Y1:,.0f} = {REM:,.0f}; {REM:,.0f} / {Y2:,.0f} x 12 = {REM/Y2*12:.0f} months into year 2, so month {12 + REM/Y2*12:.0f}.", 8.5, False, GREY)
-# scenarios
-box(s, 0.4, 5.55, 2.1, 0.62, GREY, None, [[("Scenarios", {"bold": True, "size": 10.5, "color": WHITE})], [("same method, other inputs", {"size": 8.5, "color": "EEF1F4"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.05)
-row(s, 5.86, 2.75, 12.95, [("Low case", f"IDR {LOW[3]/1000:.1f} B a year, no payback in 3 years"), ("Base case", f"IDR {BASE[3]/1000:.1f} B a year, payback {PB:.0f} months"), ("High case", f"IDR {HIGH[3]/1000:.1f} B a year, payback {PH:.0f} months"), ("Not valued", "improper executions avoided and conflicts closed")], GREY, tsize=10.5, ssize=8.5, maxw=2.6, arrows=False)
+frame(s, 4, f"Business Impact: {{{{IDR {BASE[3]/1000:.1f} B}}}} a Year From Three Levers, Paid Back in {PB:.0f} Months in the Base Case",
+      None, "Impact", f"Case data: 211 work orders, MTTR 14.0 h, 20.4 breakdowns a year. Assumptions: search 45 users x 20 min x 230 days x IDR 175k per h; repair 10% less x IDR 30 M per downtime hour; cost IDR {A['one_off']:,.0f} M plus {A['run']:,.0f} M a year", "Impact Assessment and Projection")
+# left: key metrics and the lever flow
+LX = 0.4
+for i, (n_, l_, c_) in enumerate([(f"IDR {BASE[3]/1000:.2f} B", "value a year, base case", GREEN), (f"{PB:.0f} months", "payback", ORANGE), (f"{IRR*100:.0f}%", "internal rate of return", BLUE), (f"IDR {NPV10/1000:.2f} B", "net present value at 10%", PURPLE)]):
+    x = LX + (i % 2) * 2.1; y = 1.28 + (i // 2) * 0.98
+    box(s, x, y, 2.0, 0.92, TINT[c_], c_, [[(n_, {"bold": True, "size": 22, "color": c_})], [(l_, {"size": 9.5, "color": INK})]], 22, False, INK, "c", "m", radius=0.08, lw=1.2, margin=0.04)
+gbanner(s, LX, 3.3, 4.1, "How each lever moves a KPI", NAVY, "27517F", 0.27, 9)
+fl = [("AI assistant", BLUE, "Search time", "40 to 20 min a day", "assumed", BASE[0]), ("Failure memory", TEAL, "Repair time", f"MTTR {D['mttr']:.1f} to {D['mttr']*.9:.1f} h", "case data", BASE[1]), ("Knowledge Studio", PURPLE, "Ramp-up", "one month sooner", "assumed", BASE[2])]
+for i, (f_, c_, k_, d_, src, v_) in enumerate(fl):
+    cy = 3.98 + i * 0.7
+    box(s, LX, cy - 0.31, 1.1, 0.62, WHITE, c_, [[(f_, {"bold": True, "size": 9.5, "color": NAVY})]], 9.5, False, INK, "c", "m", radius=0.08, lw=1.3, margin=0.04)
+    arrow(s, LX + 1.12, cy, LX + 1.3, cy, c_, 1.6)
+    box(s, LX + 1.32, cy - 0.31, 1.85, 0.62, TINT[c_], c_, [[(k_, {"bold": True, "size": 9.5, "color": NAVY})], [(d_, {"size": 9, "color": INK})], [(src, {"size": 8, "color": GREEN if src == "case data" else GREY, "bold": True})]], 9, False, INK, "c", "m", radius=0.08, lw=1.2, margin=0.04)
+    arrow(s, LX + 3.19, cy, LX + 3.3, cy, c_, 1.6)
+    box(s, LX + 3.32, cy - 0.28, 0.78, 0.56, c_, None, [[(f"{v_:,.0f}", {"bold": True, "size": 13, "color": WHITE})], [("IDR M", {"size": 7.5, "color": "F2F6FA"})]], 12, True, WHITE, "c", "m", radius=0.08, margin=0.02)
+text(s, LX, 5.7, 4.1, 0.5, [[("Not valued: ", {"bold": True, "color": GREY}), "avoided improper executions and closed conflicts, so the case is conservative."]], 9, False, INK, line=1.02)
+# middle: charts
+MX, MW = 4.75, 4.15
+gbanner(s, MX, 1.28, MW, "Annual value by lever (IDR M)", NAVY, "27517F", 0.27, 9)
+cd = CategoryChartData(); cd.categories = ["Search time", "Repair time", "Ramp-up", "Total"]
+a_, b_, c3 = BASE[0], BASE[1], BASE[2]
+cd.add_series("base", [0, round(a_), round(a_ + b_), 0]); cd.add_series("value", [round(a_), round(b_), round(c3), round(BASE[3])])
+gf = s.shapes.add_chart(XL_CHART_TYPE.COLUMN_STACKED, Inches(MX), Inches(1.58), Inches(MW), Inches(2.1), cd); ch = gf.chart
+ch.has_legend = False; pl_ = ch.plots[0]; pl_.gap_width = 40; pl_.overlap = 100
+ch.value_axis.visible = False; ch.value_axis.has_major_gridlines = False; ch.value_axis.maximum_scale = BASE[3] * 1.15
+ch.category_axis.tick_labels.font.size = Pt(9); ch.category_axis.tick_labels.font.name = FONT; ch.category_axis.format.line.color.rgb = rgb(MID)
+sb, sv = pl_.series
+sb.format.fill.background(); sb.format.line.fill.background()
+for i, c_ in enumerate([BLUE, TEAL, PURPLE, GREEN]):
+    pt = sv.points[i]; pt.format.fill.solid(); pt.format.fill.fore_color.rgb = rgb(c_)
+sv.data_labels.show_value = True; sv.data_labels.font.size = Pt(11); sv.data_labels.font.bold = True; sv.data_labels.font.name = FONT; sv.data_labels.number_format = '#,##0'; sv.data_labels.number_format_is_linked = False
+sv.data_labels.font.color.rgb = rgb(WHITE); sv.data_labels.position = XL_LABEL_POSITION.CENTER
+gbanner(s, MX, 3.78, MW, "Cumulative net benefit (IDR B), months 0 to 36", NAVY, "27517F", 0.27, 9)
+def cum(total):
+    pts = [-A["one_off"] / 1000]
+    for m in range(1, 37):
+        b = (.6 if m <= 12 else 1.0) * total / 12 - A["run"] / 12
+        pts.append(pts[-1] + b / 1000)
+    return pts
+cd2 = CategoryChartData(); cd2.categories = [str(m) for m in range(0, 37)]
+for nm, sc in [("Low", LOW), ("Base", BASE), ("High", HIGH)]: cd2.add_series(nm, [round(v, 2) for v in cum(sc[3])])
+gf2 = s.shapes.add_chart(XL_CHART_TYPE.LINE, Inches(MX), Inches(4.08), Inches(MW), Inches(2.1), cd2); c2 = gf2.chart
+c2.has_legend = True; c2.legend.position = XL_LEGEND_POSITION.BOTTOM; c2.legend.include_in_layout = False; c2.legend.font.size = Pt(9); c2.legend.font.name = FONT
+for ser, col, w_ in zip(c2.plots[0].series, [GREY, BLUE, GREEN], [1.75, 3.25, 1.75]):
+    ser.format.line.color.rgb = rgb(col); ser.format.line.width = Pt(w_); ser.smooth = False; ser.marker.style = XL_MARKER_STYLE.NONE
+c2.value_axis.tick_labels.font.size = Pt(9); c2.value_axis.tick_labels.font.name = FONT; c2.value_axis.major_gridlines.format.line.color.rgb = rgb("E3E9F0"); c2.value_axis.format.line.fill.background()
+c2.category_axis.tick_labels.font.size = Pt(9); c2.category_axis.tick_labels.font.name = FONT
+_ax = c2.category_axis._element; _nm = _ax.find(qn("c:noMultiLvlLbl"))
+for tag_ in ("c:tickLblSkip", "c:tickMarkSkip"):
+    e = etree.Element(qn(tag_)); e.set("val", "12")
+    if _nm is not None: _nm.addprevious(e)
+    else: _ax.append(e)
+box(s, MX + 1.0, 4.12, 2.6, 0.3, WHITE, None, [[(f"Base case turns positive at month {12 + REM/Y2*12:.0f}", {"bold": True, "size": 8.5, "color": BLUE})]], 8.5, True, BLUE, "c", "m", radius=0.1, margin=0.02)
+# right: the screens behind the levers
+SX, SW = 9.1, 3.85
+gbanner(s, SX, 1.28, SW, "The screens behind the numbers", NAVY, "27517F", 0.27, 9)
+h1 = win(s, "assistant", SX, 1.62, SW, (0, 0.04, 1, 0.74), "AI assistant: source and confidence on every answer")
+numdot(s, SX + 0.12, 1.62 + 0.45, 1, BLUE, 0.26, 9)
+h2 = win(s, "fm", SX, 1.62 + h1 + 0.1, SW, (0, 0, 1, 0.66), "Failure memory: causes and fixes at the fault")
+numdot(s, SX + 0.12, 1.62 + h1 + 0.1 + 0.45, 2, TEAL, 0.26, 9)
 ribbon(s, f"Value rests on two measurable levers, search time and repair time, and every input is shown so the Company can replace it with its own number. The base case pays back in {PB:.0f} months; the low case does not, and the pilot is designed to find out which case is real.")
-notes(s, "Business impact as a flow. Each row starts from today's baseline, shows what the platform changes, and multiplies the inputs into IDR million. Search time: 45 users saving 20 minutes a day over 230 days is 3,450 hours at IDR 175,000 an hour, which is IDR 604 M; the 40 minute baseline is an assumption. Repair time: 20.4 breakdowns a year at a 14.0 hour MTTR, cut by 10 percent, is 28.6 hours at IDR 30 M per downtime hour, which is IDR 857 M; the breakdown rate and MTTR come from the 211 work orders. Ramp-up is set at IDR 60 M and has no baseline in the case data. Costs are IDR 1.4 B one-off and 370 M a year. The base case pays back in about 21 months with an IRR near 40 percent; the low case does not pay back in three years.")
+notes(s, "Business impact. Top left: the four headline numbers. Below: each lever as a short flow from the platform feature to the KPI it moves and the value in IDR million; search time and ramp-up are assumptions, repair time starts from case data (211 work orders, MTTR 14.0 hours). Middle: the value by lever and the cumulative cash line for the low, base and high cases; the base case turns positive at month 21. Right: the screens that deliver the two largest levers. Calculation: search time is 45 users x 20 minutes x 230 days at IDR 175,000 an hour, which is IDR 604 M. Repair time is 20.4 breakdowns a year x 14.0 hours x 10 percent at IDR 30 M per downtime hour, which is IDR 857 M. Ramp-up is set at IDR 60 M. Costs are IDR 1.4 B one-off and 370 M a year.")
 
 # ======================================================= 5 FEASIBILITY AND ROADMAP
 s = blank(prs)
