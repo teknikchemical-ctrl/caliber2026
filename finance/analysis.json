@@ -1,0 +1,823 @@
+{
+ "SENS": {
+  "rows": [
+   [
+    "Share of breakdown hours that reduce plant output",
+    "%",
+    0.17,
+    0.23,
+    2266.3676748071957,
+    4373.343263707462,
+    2106.9755889002663
+   ],
+   [
+    "Contribution margin lost per tonne",
+    "USD per t",
+    190,
+    250,
+    2362.139292484483,
+    4277.571646030177,
+    1915.4323535456942
+   ],
+   [
+    "Salary level (all roles), 30 percent lower or higher",
+    "x",
+    0.7,
+    1.3,
+    2420.994814414291,
+    4218.716124100369,
+    1797.7213096860778
+   ],
+   [
+    "Exchange rate, 10 percent stronger or weaker rupiah",
+    "IDR per USD",
+    16110.0,
+    19690.0,
+    2628.585458342466,
+    4011.1254801721952,
+    1382.540021829729
+   ],
+   [
+    "Reduction in mean time to repair",
+    "%",
+    0.085,
+    0.115,
+    2685.1854524173423,
+    3954.525486097318,
+    1269.340033679976
+   ],
+   [
+    "Steady-state share of users who use the platform regularly",
+    "%",
+    0.8,
+    0.9,
+    2718.849636653181,
+    3920.8613018614815,
+    1202.0116652083007
+   ],
+   [
+    "Share of the gain credited to the platform",
+    "%",
+    0.65,
+    0.75,
+    2812.0768244086184,
+    3827.634114106041,
+    1015.5572896974227
+   ],
+   [
+    "Reduction in repeat failures within 120 days",
+    "%",
+    0.25,
+    0.35,
+    2886.7628475003385,
+    3752.9480910143207,
+    866.1852435139822
+   ],
+   [
+    "Inflation, 2 points higher or lower",
+    "%",
+    0.06,
+    0.02,
+    3737.3114056987893,
+    2927.2936453925095,
+    810.0177603062798
+   ],
+   [
+    "Discount rate, 2 points higher or lower",
+    "points",
+    0.02,
+    -0.02,
+    2960.0806930747694,
+    3714.7000286816747,
+    754.6193356069052
+   ],
+   [
+    "Minutes a day spent finding and checking trusted sources",
+    "min per user",
+    36,
+    44,
+    3046.99838182627,
+    3592.712556688389,
+    545.7141748621193
+   ],
+   [
+    "Reduction in search time with the platform",
+    "%",
+    0.45,
+    0.55,
+    3046.99838182627,
+    3592.712556688389,
+    545.7141748621193
+   ],
+   [
+    "Share of freed time that becomes productive work",
+    "%",
+    0.55,
+    0.65,
+    3060.8389587249467,
+    3578.871979789711,
+    518.0330210647644
+   ],
+   [
+    "Contingency on one-off cost",
+    "%",
+    0.2,
+    0.12,
+    3208.4147198897476,
+    3386.7199188778777,
+    178.3051989881301
+   ],
+   [
+    "Contingency on running cost",
+    "%",
+    0.12,
+    0.08,
+    3241.0535338108057,
+    3398.657404703854,
+    157.60387089304822
+   ],
+   [
+    "New joiners and role changes a year, per unit",
+    "people",
+    5,
+    7,
+    3256.5842605776634,
+    3383.1266779369953,
+    126.54241735933192
+   ],
+   [
+    "Document ingestion, tagging and cleansing",
+    "person-days",
+    55,
+    45,
+    3261.976428648308,
+    3358.4414963300105,
+    96.46506768170275
+   ],
+   [
+    "Platform configuration and hardening",
+    "person-months",
+    9,
+    7.5,
+    3256.60546925733,
+    3351.48046925733,
+    94.875
+   ],
+   [
+    "Working days saved before a joiner is productive",
+    "days",
+    9,
+    11,
+    3281.89274404953,
+    3357.818194465129,
+    75.92545041559924
+   ],
+   [
+    "Cost per connector",
+    "IDR M",
+    110,
+    95,
+    3273.85546925733,
+    3342.85546925733,
+    69.0
+   ],
+   [
+    "Security review and penetration test",
+    "IDR M",
+    170,
+    135,
+    3296.85546925733,
+    3337.10546925733,
+    40.25
+   ]
+  ],
+  "break_even": [
+   [
+    "Share of breakdown hours that reduce output",
+    1,
+    0.2,
+    0.213201905451103
+   ],
+   [
+    "Share of breakdown hours that reduce output",
+    3,
+    0.2,
+    0.10546101758141035
+   ],
+   [
+    "Contribution margin lost per tonne (USD per t)",
+    1,
+    220,
+    234.5220959962133
+   ],
+   [
+    "Contribution margin lost per tonne (USD per t)",
+    3,
+    220,
+    116.00711933955137
+   ],
+   [
+    "Steady-state adoption",
+    1,
+    0.85,
+    0.8885688055526246
+   ],
+   [
+    "Steady-state adoption",
+    3,
+    0.85,
+    0.5738083817862099
+   ],
+   [
+    "Reduction in mean time to repair",
+    1,
+    0.1,
+    0.11095691137693067
+   ],
+   [
+    "Reduction in mean time to repair",
+    3,
+    0.1,
+    0.021537443525688288
+   ],
+   [
+    "Reduction in search time",
+    1,
+    0.5,
+    0.5849531793802483
+   ],
+   [
+    "Reduction in search time",
+    3,
+    0.5,
+    null
+   ],
+   [
+    "Share of the gain credited to the platform",
+    1,
+    0.7,
+    0.7456499644655381
+   ],
+   [
+    "Share of the gain credited to the platform",
+    3,
+    0.7,
+    0.3731001290684002
+   ],
+   [
+    "Multiple of one-off and running cost (1.0 = base)",
+    1,
+    1.0,
+    0.9565944636908137
+   ],
+   [
+    "Multiple of one-off and running cost (1.0 = base)",
+    3,
+    1.0,
+    1.4813307490455827
+   ]
+  ],
+  "sweep": [
+   [
+    1,
+    -205.13323206264,
+    -252.13213993068007,
+    0.07939094919173428,
+    49.85260805380358,
+    1274.8603367373044,
+    1766.2044999999998,
+    0.9565944636908135
+   ],
+   [
+    2,
+    1963.307005788693,
+    1417.717353812041,
+    0.3560492440252675,
+    33.80720682837722,
+    2549.7206734746087,
+    2227.6571799999997,
+    1.330704047709451
+   ],
+   [
+    3,
+    3319.85546925733,
+    2442.256962472394,
+    0.44423873228700195,
+    33.875286565660545,
+    3824.5810102119126,
+    2707.5679671999997,
+    1.4813307490455827
+   ],
+   [
+    4,
+    5488.295707108662,
+    4112.106456215116,
+    0.5654096990720692,
+    30.506202301382036,
+    5099.441346949217,
+    3169.0206471999995,
+    1.676896856412659
+   ],
+   [
+    5,
+    6844.844170577301,
+    5136.646064875471,
+    0.6116776771034951,
+    31.068253618119343,
+    6374.301683686522,
+    3648.9314343999995,
+    1.7547919205750624
+   ],
+   [
+    6,
+    9013.284408428633,
+    6806.49555861819,
+    0.6910383624808107,
+    29.386963881409827,
+    7649.162020423825,
+    4110.3841144,
+    1.8768385151653089
+   ],
+   [
+    7,
+    10369.832871897268,
+    7831.035167278543,
+    0.7215459311246726,
+    29.909133640126395,
+    8924.02235716113,
+    4590.2949016,
+    1.9226000314535976
+   ],
+   [
+    8,
+    12538.273109748601,
+    9500.884661021264,
+    0.7802335803575151,
+    28.82373159902905,
+    10198.882693898435,
+    5051.7475816,
+    2.007043909890913
+   ],
+   [
+    9,
+    13894.821573217236,
+    10525.424269681618,
+    0.8024538147380855,
+    29.276076566089362,
+    11473.74303063574,
+    5531.658368799999,
+    2.036071308870196
+   ],
+   [
+    10,
+    16063.261811068573,
+    12195.273763424339,
+    0.8486312266473457,
+    28.48462707724711,
+    12748.603367373044,
+    5993.1110487999995,
+    2.098579546619192
+   ],
+   [
+    11,
+    17419.81027453721,
+    13219.813372084693,
+    0.8657665944156638,
+    28.877191350069285,
+    14023.463704110345,
+    6473.021836,
+    2.1179199598132774
+   ],
+   [
+    12,
+    19588.250512388542,
+    14889.662865827413,
+    0.9035256131792544,
+    28.25806982179981,
+    15298.32404084765,
+    6934.474516,
+    2.1664448981977977
+   ]
+  ],
+  "first_pos": 2
+ },
+ "RISKS": [
+  [
+   "Low adoption by operators and engineers",
+   "Steady-state adoption falls by 30 percent",
+   "Medium",
+   254.72572297616455,
+   -3065.1297462811654
+  ],
+  [
+   "Rollout delayed by one year",
+   "Units 2 and 3 go live one year later",
+   "Medium",
+   1752.5668857010921,
+   -1567.2885835562377
+  ],
+  [
+   "One-off cost overrun",
+   "One-off cost 30 percent higher",
+   "Medium",
+   2550.9142986210154,
+   -768.9411706363144
+  ],
+  [
+   "Data quality is worse than expected",
+   "Ingestion effort doubles and benefits fall by 10 percent",
+   "High",
+   1825.4667221899304,
+   -1494.3887470673994
+  ],
+  [
+   "AI service unavailable or withdrawn",
+   "Search time reduction falls by 30 percent",
+   "Low",
+   2501.284206964152,
+   -818.5712622931778
+  ],
+  [
+   "Benefit attribution is challenged",
+   "Share credited to the platform falls by 30 percent",
+   "Medium",
+   1187.1851608927398,
+   -2132.67030836459
+  ],
+  [
+   "Polyethylene margin downturn",
+   "Contribution margin falls to USD 140 per tonne",
+   "Medium",
+   765.9456645297353,
+   -2553.9098047275947
+  ],
+  [
+   "Key person leaves the knowledge manager role",
+   "Adoption falls by 15 percent and running cost rises by 10 percent",
+   "Medium",
+   1353.8799511608624,
+   -1965.9755180964673
+  ],
+  [
+   "Cybersecurity incident or audit finding",
+   "Extra one-off cost of IDR 300 M",
+   "Low",
+   3019.8554692573293,
+   -300.00000000000045
+  ],
+  [
+   "Data protection or contract constraints",
+   "Connector cost 50 percent higher and security cost doubled",
+   "Low",
+   2917.3554692573293,
+   -402.50000000000045
+  ],
+  [
+   "Combined stress: low adoption, delay, cost overrun and challenged attribution",
+   "R1, R2, R3 and R6 together",
+   "Low",
+   -2643.00381443281,
+   -5962.85928369014
+  ]
+ ],
+ "MC": {
+  "Mean|1": -646.6053506833658,
+  "Mean|3": 2443.143390061133,
+  "Mean|6": 6027.878907319498,
+  "Mean|12": 11780.475452486944,
+  "Standard deviation|1": 1223.3303080670848,
+  "Standard deviation|3": 2758.7502689328494,
+  "Standard deviation|6": 4653.965556419838,
+  "Standard deviation|12": 7892.0255367778855,
+  "5th percentile|1": -2356.289022713724,
+  "5th percentile|3": -1417.6596311801422,
+  "5th percentile|6": -484.07461943050873,
+  "5th percentile|12": 706.7531454538067,
+  "10th percentile|1": -2055.3970224646564,
+  "10th percentile|3": -723.0613676677385,
+  "10th percentile|6": 695.6677004688388,
+  "10th percentile|12": 2740.9136247478696,
+  "25th percentile|1": -1524.921181498309,
+  "25th percentile|3": 471.12840526424196,
+  "25th percentile|6": 2700.517196283933,
+  "25th percentile|12": 6137.691629216551,
+  "Median|1": -811.1442278027432,
+  "Median|3": 2066.3629348948516,
+  "Median|6": 5398.198512425002,
+  "Median|12": 10697.047069453412,
+  "75th percentile|1": 65.28648037330187,
+  "75th percentile|3": 4045.390551076089,
+  "75th percentile|6": 8745.445491591536,
+  "75th percentile|12": 16389.467847527278,
+  "90th percentile|1": 986.3939836327392,
+  "90th percentile|3": 6134.102595238148,
+  "90th percentile|6": 12272.740177657648,
+  "90th percentile|12": 22336.255307765205,
+  "95th percentile|1": 1631.0093925197134,
+  "95th percentile|3": 7588.385838851275,
+  "95th percentile|6": 14692.299759399059,
+  "95th percentile|12": 26561.447257181604,
+  "Probability that NPV is positive|1": 0.2658,
+  "Probability that NPV is positive|3": 0.8166,
+  "Probability that NPV is positive|6": 0.933,
+  "Probability that NPV is positive|12": 0.9662
+ },
+ "hist": {
+  "lo": -2707.326836952105,
+  "w": 709.1670157452003,
+  "counts": [
+   106,
+   180,
+   279,
+   436,
+   528,
+   579,
+   551,
+   509,
+   391,
+   343,
+   281,
+   222,
+   186,
+   118,
+   87,
+   72,
+   44,
+   28,
+   16,
+   44
+  ]
+ },
+ "params": [
+  [
+   "s_base",
+   "Minutes a day spent finding and checking trusted sources",
+   "min per user",
+   27.5,
+   40,
+   52.5,
+   30,
+   50
+  ],
+  [
+   "s_red",
+   "Reduction in search time with the platform",
+   "%",
+   0.25,
+   0.5,
+   0.625,
+   0.3,
+   0.6
+  ],
+  [
+   "conv",
+   "Share of freed time that becomes productive work",
+   "%",
+   0.41250000000000003,
+   0.6,
+   0.7875,
+   0.45,
+   0.75
+  ],
+  [
+   "adopt",
+   "Steady-state share of users who use the platform regularly",
+   "%",
+   0.6000000000000001,
+   0.85,
+   0.9375,
+   0.65,
+   0.92
+  ],
+  [
+   "joiners",
+   "New joiners and role changes a year, per unit",
+   "people",
+   3.5,
+   6,
+   8.5,
+   4,
+   8
+  ],
+  [
+   "d_saved",
+   "Working days saved before a joiner is productive",
+   "days",
+   3.75,
+   10,
+   16.25,
+   5,
+   15
+  ],
+  [
+   "mttr_red",
+   "Reduction in mean time to repair",
+   "%",
+   0.037500000000000006,
+   0.1,
+   0.16249999999999998,
+   0.05,
+   0.15
+  ],
+  [
+   "attrib",
+   "Share of the gain credited to the platform",
+   "%",
+   0.45,
+   0.7,
+   0.8875,
+   0.5,
+   0.85
+  ],
+  [
+   "rep_red",
+   "Reduction in repeat failures within 120 days",
+   "%",
+   0.11249999999999999,
+   0.3,
+   0.42500000000000004,
+   0.15,
+   0.4
+  ],
+  [
+   "margin",
+   "Contribution margin lost per tonne",
+   "USD per t",
+   120.0,
+   220,
+   345.0,
+   140,
+   320
+  ],
+  [
+   "loss",
+   "Share of breakdown hours that reduce plant output",
+   "%",
+   0.09999999999999999,
+   0.2,
+   0.32499999999999996,
+   0.12,
+   0.3
+  ],
+  [
+   "pm",
+   "Platform configuration and hardening",
+   "person-months",
+   6.75,
+   8,
+   10.5,
+   7,
+   10
+  ],
+  [
+   "conn",
+   "Cost per connector",
+   "IDR M",
+   87.5,
+   100,
+   125.0,
+   90,
+   120
+  ],
+  [
+   "sec",
+   "Security review and penetration test",
+   "IDR M",
+   112.5,
+   150,
+   212.5,
+   120,
+   200
+  ],
+  [
+   "cont",
+   "Contingency on one-off cost",
+   "%",
+   0.08750000000000001,
+   0.15,
+   0.275,
+   0.1,
+   0.25
+  ],
+  [
+   "ing_d",
+   "Document ingestion, tagging and cleansing",
+   "person-days",
+   37.75,
+   49,
+   62.75,
+   40,
+   60
+  ],
+  [
+   "r_cont",
+   "Contingency on running cost",
+   "%",
+   0.075,
+   0.1,
+   0.16249999999999998,
+   0.08,
+   0.15
+  ]
+ ],
+ "old": {
+  "1": {
+   "val": [
+    603.75,
+    856.8,
+    60.0
+   ],
+   "tot": 1520.55,
+   "one": 1400,
+   "run": 370,
+   "pb": 20.945321802616142,
+   "net3": 1443.4299999999998
+  },
+  "3": {
+   "val": [
+    1811.25,
+    2570.3999999999996,
+    180.0
+   ],
+   "tot": 4561.65,
+   "one": 2100,
+   "run": 610,
+   "pb": 11.847728480152705,
+   "net3": 7930.289999999999
+  },
+  "6": {
+   "val": [
+    3622.5,
+    5140.799999999999,
+    360.0
+   ],
+   "tot": 9123.3,
+   "one": 3150,
+   "run": 970,
+   "pb": 8.39257723169286,
+   "net3": 17660.579999999998
+  }
+ },
+ "base": {
+  "1": {
+   "npv": -205.13323206264,
+   "npv_at": -252.13213993068007,
+   "irr": 0.07939094919173428,
+   "pb": 49.85260805380358,
+   "dpb": null,
+   "steady": 1274.8603367373044,
+   "bcr": 0.9565944636908135,
+   "roi": 0.0950589963640052,
+   "oneoff": 1766.2044999999998,
+   "pvb": 4520.836068291917,
+   "pvc": 4725.969300354558,
+   "run5": 731.1383904,
+   "upside": 196.82123999999996
+  },
+  "3": {
+   "npv": 3319.85546925733,
+   "npv_at": 2442.256962472394,
+   "irr": 0.44423873228700195,
+   "pb": 33.875286565660545,
+   "dpb": 37.818272081699945,
+   "steady": 3824.5810102119126,
+   "bcr": 1.4813307490455827,
+   "roi": 0.7091628960899039,
+   "oneoff": 2707.5679671999997,
+   "pvb": 10217.09915427055,
+   "pvc": 6897.243685013222,
+   "run5": 1243.0151712000002,
+   "upside": 590.4637199999999
+  },
+  "6": {
+   "npv": 7445.995824872395,
+   "npv_at": 5560.237951469318,
+   "irr": 0.6236964827425735,
+   "pb": 32.19909030185759,
+   "dpb": 35.50855463721839,
+   "steady": 7457.93296991323,
+   "bcr": 1.7600946470977525,
+   "roi": 1.0108764025473023,
+   "oneoff": 4148.038653088,
+   "pvb": 17242.13878325689,
+   "pvc": 9796.142958384495,
+   "run5": 2010.8303424,
+   "upside": 1151.4042539999998
+  },
+  "12": {
+   "npv": 14130.987952546284,
+   "npv_at": 10549.942322314291,
+   "irr": 0.7719687687590009,
+   "pb": 33.741278656393575,
+   "dpb": 36.41972985401222,
+   "steady": 14533.407838805271,
+   "bcr": 1.9351590005398767,
+   "roi": 1.1822059573177266,
+   "oneoff": 7066.634563551999,
+   "pvb": 29241.774401041486,
+   "pvc": 15110.7864484952,
+   "run5": 3546.4606848000003,
+   "upside": 2243.7621359999994
+  }
+ }
+}
