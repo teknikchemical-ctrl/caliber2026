@@ -82,7 +82,7 @@ cx_ = 1.85
 for lb, c_ in [("Gemini 2.5 Flash", PURPLE), ("BM25F and vector search", TEAL), ("IndexedDB browser app", BLUE), ("Netlify Functions and Blobs", BLUE), ("PostgreSQL, pgvector (target)", GREY)]:
     w_ = fchip(s, cx_ + (len(lb) * 8.5 * 0.0083 + 0.26) / 2, 1.85, lb, c_, 8.5, 0.26); cx_ += w_ + 0.1
 # panel A: plant inputs and data operations
-ptitle(s, 0.4, 2.1, 6.05, "A. Plant inputs and data operations (key question 1)", BLUE)
+ptitle(s, 0.4, 2.1, 6.05, "Q1  Industrial Data Ops foundation: connect scattered plant knowledge", BLUE)
 box(s, 0.4, 2.4, 6.05, 3.12, "F4F8FD", None, None, radius=0.04)
 ins = ["SOPs and OPLs", "P&IDs and plot plan", "Datasheets, instrument list", "Interlock cause and effect", "Work orders and RCA", "Live data (read-only)"]
 for i, lb in enumerate(ins):
@@ -101,7 +101,7 @@ for i, (t_, d_) in enumerate([("Passages and index", "1,109 passages"), ("Facts 
     box(s, 4.82, cy - 0.4, 1.55, 0.8, TINT[GREEN], GREEN, [[(t_, {"bold": True, "size": 9, "color": NAVY})], [(d_, {"size": 8, "color": INK})]], 9, False, INK, "c", "m", shape=MSO_SHAPE.CAN, lw=1.2, margin=0.03)
     arrow(s, 4.58, cy, 4.8, cy, GREEN, 1.5)
 # panel B: AI algorithm
-ptitle(s, 6.6, 2.1, 6.35, "B. AI algorithm: from question to checked answer (key question 2)", TEAL)
+ptitle(s, 6.6, 2.1, 6.35, "Q2  AI finds trusted information faster and reduces improper execution", TEAL)
 box(s, 6.6, 2.4, 6.35, 3.12, "F2FAF8", None, None, radius=0.04)
 R1, R2 = 2.92, 4.1
 x_r = 12.85
@@ -138,7 +138,7 @@ for pct, nm, c_ in [(45, "Question words found", TEAL), (22, "Best match", BLUE)
     bx_ += w_
 text(s, 6.7, 5.33, 6.15, 0.2, "Question words found 45, best match 22, approval status 15, source agreement 10, number of sources 8", 8, False, GREY)
 # bottom strip: active use
-box(s, 0.4, 5.64, 1.9, 0.54, ORANGE, None, [[("Active use", {"bold": True, "size": 10, "color": WHITE})], [("Key question 3", {"size": 8.5, "color": "FFF3E6"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.04)
+box(s, 0.4, 5.64, 1.9, 0.54, ORANGE, None, [[("Q3  Active use", {"bold": True, "size": 10, "color": WHITE})], [("Reliability, troubleshooting", {"size": 8, "color": "FFF3E6"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.04)
 feat = [("Failure memory", "Similar cases and fixes"), ("Predictive maintenance", "Risk, forecast, plan"), ("OPL simulator", "Practise the lessons"), ("Live P&ID, interlocks", "Trips and permissives"), ("Start-up readiness", "Go or no-go check"), ("Hazard and site plan", "Release, permits, replay")]
 fw = (12.95 - 2.5 - 5 * 0.12) / 6
 for i, (t_, d_) in enumerate(feat):

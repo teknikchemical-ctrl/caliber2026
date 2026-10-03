@@ -4,7 +4,7 @@ from pptx.enum.chart import XL_MARKER_STYLE
 
 # ---------------------------------------------------------------- 4 AI assistant flowchart
 s = blank(prs)
-frame(s, 4, "AI assistant: every question is {{routed to a computed function}} first, and the language model only words the verified result",
+frame(s, 4, "Solution: every question is {{routed to a computed function}} first, and the language model only words the verified result",
       None, "Solution", "Prototype assistant (intent router, retrieval index, 20 registered tools) and the Netlify function /api/ai. Tool names are the ones registered in the application", "Proposed solution (continued)")
 ptitle(s, 0.4, 1.26, 2.15, "User", BLUE)
 for i, r_ in enumerate(["Operator", "Maintenance engineer", "Reliability engineer", "HSE engineer", "Plant manager"]):
@@ -44,7 +44,7 @@ flab(s, 10.97, 4.5, "Yes", GREEN, 0.4)
 arrow(s, 10.9, 4.55, 10.9, 4.65, GREY, 1.5)
 fbox(s, 11.3, 4.88, 3.3, 0.45, "Answer with sources and confidence", None, GREEN, solid=True, tsize=9.3)
 # worked example
-box(s, 0.4, 5.22, 1.55, 0.96, NAVY, None, [[("Worked example", {"bold": True, "size": 10, "color": WHITE})], [("From the prototype", {"size": 8.5, "color": "DCE8F5"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.05)
+box(s, 0.4, 5.22, 1.55, 0.96, NAVY, None, [[("Worked example", {"bold": True, "size": 10, "color": WHITE})], [("Q2, from the prototype", {"size": 8.5, "color": "DCE8F5"})]], 10, False, WHITE, "c", "m", radius=0.08, margin=0.05)
 ex = [(1.9, "Question", "Seal leak on pump GA-1201A", TEAL, False), (1.55, "Intent", "Diagnosis from history", TEAL, False), (1.45, "Function", "failure_memory", ORANGE, False), (3.3, "Result", "10 similar failures. Most supported fix, in 7 cases: replace the seal cartridge, clean the flush orifice, verify PDI-1201.", ORANGE, False), (1.95, "Answer", "High confidence, 80%. Four sources, including WO-240002.", GREEN, True)]
 gap = (12.95 - 2.1 - sum(e[0] for e in ex)) / 4; xx = 2.1
 for i, (w_, t_, d_, c_, sol) in enumerate(ex):
@@ -209,15 +209,15 @@ for i, (t_, c_, bl) in enumerate(cols7):
         for k, (n_, l_) in enumerate([(f"IDR {BASE[3]/1000:.1f} B", "Value a year for one unit, base case"), (f"{PB:.0f} months", "Payback for one unit"), (f"IDR {S3['tot']/1000:.1f} B", "Value a year at three units"), ("20 min", "Saved per engineer each day (assumed)")]):
             xx = x + 0.1 + (k % 2) * 2.0; yy = 1.7 + (k // 2) * 1.05
             box(s, xx, yy, 1.95, 0.98, TINT[GREEN], GREEN, [[(n_, {"bold": True, "size": 15, "color": GREEN})], [(l_, {"size": 8.5, "color": INK})]], 15, False, INK, "c", "m", radius=0.08, lw=1.1, margin=0.05)
-ptitle(s, 0.4, 4.05, 12.55, "How the proposal answers the three key questions of the case", NAVY, 0.28)
-kq = [("1", "Industrial Data Ops foundation", "Checked ingestion linked by equipment tag: 98 documents, 1,109 passages, and 48 conflicts placed in a register.", BLUE),
-      ("2", "Trusted answers and fewer improper executions", "Cited answers, figure checks and refusal of unsafe requests: 128 of 128 test questions passed.", TEAL),
-      ("3", "Active use in operations", "Read-only links to EDMS and AIMS, failure memory, a 64-forecast backtest, start-up readiness and site planning.", ORANGE)]
+ptitle(s, 0.4, 4.02, 12.55, "Key questions of the case, and how the proposal answers each", NAVY, 0.28)
+kq = [("1", "How can the Company build a structured Industrial Data Ops foundation to connect scattered plant knowledge sources?", "Build a connected knowledge foundation. Checked ingestion links 98 documents and 211 work orders by equipment tag, places 48 conflicts in a register and requires an owner's approval.", BLUE),
+      ("2", "How can AI help engineers find trusted technical information faster and reduce the risk of improper execution?", "Improve search, Q&A and answer verification. Answers carry cited sources and a confidence score, figures are checked, and unsafe requests are refused (128 of 128 test questions passed).", TEAL),
+      ("3", "How can the Manufacturing Knowledge Hub be integrated with operational systems to support reliability, troubleshooting and continuous improvement?", "Active knowledge for decisions. Read-only links to EDMS and AIMS feed failure memory, a backtested forecast, start-up readiness and site planning.", ORANGE)]
 for i, (q, a, b, c_) in enumerate(kq):
-    y = 4.38 + i * 0.44
-    box(s, 0.4, y, 12.55, 0.4, WHITE if i % 2 else LIGHT, MID, None, radius=0.05, lw=0.8)
-    numdot(s, 0.48, y + 0.06, q, c_, 0.28, 9)
-    text(s, 0.88, y, 3.4, 0.4, a, 9.5, True, NAVY, anchor="m", line=0.95); text(s, 4.35, y, 8.5, 0.4, b, 9.3, False, INK, anchor="m", line=0.95)
+    y = 4.34 + i * 0.46
+    box(s, 0.4, y, 12.55, 0.43, WHITE if i % 2 else LIGHT, MID, None, radius=0.05, lw=0.8)
+    numdot(s, 0.48, y + 0.075, q, c_, 0.28, 9)
+    text(s, 0.85, y, 5.3, 0.43, a, 8.6, True, NAVY, anchor="m", line=0.92); text(s, 6.2, y, 6.7, 0.43, b, 8.5, False, INK, anchor="m", line=0.92)
 box(s, 0.4, 5.74, 3.2, 0.44, GREEN, None, [[("Decision requested: a 90-day pilot", {"bold": True, "size": 10, "color": WHITE})]], 10, True, WHITE, "c", "m", radius=0.08, margin=0.05)
 for i, (w_, d_) in enumerate([("Weeks 1 to 2", "Agree data access, owners and AI terms."), ("Weeks 3 to 6", "Load the LLDPE unit and train 45 users."), ("Weeks 7 to 12", "Measure against the gates, then decide.")]):
     x = 3.78 + i * 3.06
