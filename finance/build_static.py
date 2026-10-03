@@ -207,8 +207,8 @@ def add(wb, g):
     # ================================================================= Risks
     ws = wb["Risks"]; ws.sheet_view.showGridLines = False
     title(ws, "Risk register with financial impact (3 units, Base)", "NPV impact is computed by shocking the Base scenario in the Python replica. Grey cells are static.")
-    widths(ws, [5, 34, 42, 12, 46, 16, 16, 44, 26])
-    header(ws, 4, ["ID", "Risk", "Shock applied in the model", "Likelihood", "Effect on value", "NPV after shock (IDR M)", "Change vs base (IDR M)", "Mitigation", "Early warning KPI"])
+    widths(ws, [5, 40, 12, 17, 17, 46, 46, 50, 34])
+    header(ws, 4, ["ID", "Risk", "Likelihood", "NPV after shock (IDR M)", "Change vs base (IDR M)", "Shock applied in the model", "Effect on value", "Mitigation", "Early warning KPI"])
     A2 = active(2)
     risks = [
         ("Low adoption by operators and engineers", "Steady-state adoption falls by 30 percent", "Medium", "Lower search and repair benefits", {"adopt": A2["adopt"] * 0.7}, None, "Role-based onboarding, champions on each shift, usage targets in unit KPIs", "Weekly active users below 60 percent"),
@@ -225,13 +225,13 @@ def add(wb, g):
     RISKS = []
     for i, (rk, shock, lik, eff, ov, ro, mit, kpi) in enumerate(risks):
         r = 5 + i; o = run(2, 3, ov, rollout=ro) if ro else run(2, 3, ov); RISKS.append((rk, shock, lik, o["npv"], o["npv"] - base_run["npv"]))
-        put(ws, r, 1, f"R{i+1}"); put(ws, r, 2, rk, wrap=True); put(ws, r, 3, shock, wrap=True); put(ws, r, 4, lik, al="center"); put(ws, r, 5, eff, wrap=True)
-        put(ws, r, 6, o["npv"], fmt=M0, fill=fill_static); put(ws, r, 7, f"=F{r}-Sensitivity!$B$4", fmt=M0); put(ws, r, 8, mit, wrap=True, font=f_note); put(ws, r, 9, kpi, wrap=True, font=f_note)
-        ws.row_dimensions[r].height = 42
+        put(ws, r, 1, f"R{i+1}"); put(ws, r, 2, rk, wrap=True); put(ws, r, 3, lik, al="center"); put(ws, r, 4, o["npv"], fmt=M0, fill=fill_static); put(ws, r, 5, f"=D{r}-Sensitivity!$B$4", fmt=M0)
+        put(ws, r, 6, shock, wrap=True); put(ws, r, 7, eff, wrap=True); put(ws, r, 8, mit, wrap=True, font=f_note); put(ws, r, 9, kpi, wrap=True, font=f_note)
+        ws.row_dimensions[r].height = 30
     r = 5 + len(risks) + 1
     # combined stress
     o = run(2, 3, {"adopt": A2["adopt"] * 0.7, "_oneoff_x": 0.3, "attrib": A2["attrib"] * 0.7}, rollout=[1, 1, 2, 3, 3])
-    put(ws, r, 2, "Combined stress: R1, R2, R3 and R6 together", font=f_bold); put(ws, r, 6, o["npv"], fmt=M0, fill=fill_static); put(ws, r, 7, f"=F{r}-Sensitivity!$B$4", fmt=M0)
+    put(ws, r, 2, "Combined stress: R1, R2, R3 and R6 together", font=f_bold); put(ws, r, 4, o["npv"], fmt=M0, fill=fill_static); put(ws, r, 5, f"=D{r}-Sensitivity!$B$4", fmt=M0)
     RISKS.append(("Combined stress: low adoption, delay, cost overrun and challenged attribution", "R1, R2, R3 and R6 together", "Low", o["npv"], o["npv"] - base_run["npv"]))
     # ================================================================= KPIs
     ws = wb["KPIs"]; ws.sheet_view.showGridLines = False

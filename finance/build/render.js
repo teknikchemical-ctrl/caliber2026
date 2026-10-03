@@ -1,0 +1,3 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const p=await b.newPage();
+await p.goto('file://'+process.argv[2],{waitUntil:'load'});await p.waitForTimeout(800);const f=process.argv[4]==='1';
+await p.pdf({path:process.argv[3],format:'A4',printBackground:true,preferCSSPageSize:true,margin:{top:'0',bottom:'0',left:'0',right:'0'},displayHeaderFooter:f,headerTemplate:'<span></span>',footerTemplate:'<div style="width:100%;font:7.5pt Arial;color:#6B7A8C;padding:0 17mm;display:flex;justify-content:space-between"><span>Business Impact and Financial Modelling Report | Asset Knowledge Platform</span><span>Page <span class="pageNumber"></span></span></div>'});await b.close()})()

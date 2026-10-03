@@ -137,7 +137,7 @@ def cr(col): return f"Case_Data!${col}${R0}:${col}${Rn}"
 # ======================================================================= Case_Metrics
 ws = wb.create_sheet("Case_Metrics"); CMs = ws
 title(ws, "Case metrics", "Every figure is a formula on Case_Data. These are the only values taken directly from the case data in the business impact model.")
-widths(ws, [4, 58, 18, 70])
+widths(ws, [3, 52, 14, 52])
 header(ws, 4, ["", "Metric", "Value", "Definition"])
 mrows = [
  ("cm_start", "History start (first report date)", f"=MIN({cr('B')})", DT, "Earliest work order report date."),
@@ -213,7 +213,7 @@ ws.merge_cells("A17:F17"); ws.row_dimensions[17].height = 40
 # ======================================================================= Downtime_Value
 ws = wb.create_sheet("Downtime_Value")
 title(ws, "Value of one hour of unit downtime", "Replaces the earlier flat assumption of IDR 30 M an hour with a bottom-up calculation from plant capacity and margin.")
-widths(ws, [58, 18, 16, 70])
+widths(ws, [46, 12, 14, 52, 14, 14])
 header(ws, 4, ["Step", "Value", "Unit", "Basis"])
 steps = [("Unit capacity", "=in_cap_kt", "kt a year", M0, "Chandra Asri existing polyethylene plant, used as a proxy for the LLDPE unit."),
          ("Operating hours a year", "=in_op_hours", "hours", M0, "Assumption."),
@@ -244,7 +244,7 @@ for c in "CDEF": ws.column_dimensions[c].width = 14
 # ======================================================================= Levers
 ws = wb.create_sheet("Levers"); LV = ws
 title(ws, "Value levers per unit", "Annual value of one unit at 100 percent adoption, in IDR M at year 0 prices. Adoption, rollout and escalation are applied on the cash flow sheets.")
-widths(ws, [62, 16, 16, 18, 66])
+widths(ws, [54, 12, 10, 12, 58])
 header(ws, 4, ["Calculation step", "Value", "Unit", "Evidence", "Basis"])
 L = []   # (label, formula, unit, fmt, evidence, basis, name)
 def lev(label, f, unit, fm, ev, basis, nm=None, bold=False): L.append((label, f, unit, fm, ev, basis, nm, bold))
@@ -298,7 +298,7 @@ CELLS["lev_rows_end"] = r
 # ======================================================================= Costs
 ws = wb.create_sheet("Costs"); CS = ws
 title(ws, "Cost model", "One-off cost shared by all units, one-off cost for each unit, and running cost. IDR M at year 0 prices.")
-widths(ws, [60, 16, 16, 70])
+widths(ws, [50, 12, 11, 54])
 header(ws, 4, ["Item", "Value (IDR M)", "Unit", "Basis"])
 C = []
 def cl(label, f, unit, fm, basis, nm=None, bold=False): C.append((label, f, unit, fm, basis, nm, bold))
