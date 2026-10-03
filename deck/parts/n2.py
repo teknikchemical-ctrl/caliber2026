@@ -54,80 +54,7 @@ for i, (w_, t_, d_, c_, sol) in enumerate(ex):
 ribbon(s, "The assistant decides what to compute and what to retrieve before the language model sees anything. Gemini only words the result, and a figure that cannot be found in a cited source lowers the confidence score.")
 notes(s, "AI assistant. The user asks a question in the browser. The assistant detects the intent, applies a safety guard that refuses requests to bypass a trip, retrieves evidence with the BM25F index and chooses a function. Twenty computed tools in four groups produce figures with their source records. Gemini 2.5 Flash, called through the Netlify function on the free tier, only words the result. A check compares every figure and quote with the cited sources; if one is missing, the confidence score is lowered. If the model is unavailable the local draft is shown. The worked example is a real answer from the prototype: ten similar seal failures on GA-1201A, the most supported fix in 7 cases, high confidence 80 percent.")
 
-# ---------------------------------------------------------------- 5 business impact at industrial scale
-s = blank(prs)
-def scen(N):
-    val = [BASE[0] * N, BASE[1] * N, BASE[2] * N]; tot = sum(val)
-    one = 1050 + 350 * N; run = 370 + 120 * (N - 1)
-    y1 = .6 * tot - run; y2 = tot - run
-    pb = one / y1 * 12 if one <= y1 else 12 + (one - y1) / y2 * 12
-    return dict(N=N, val=val, tot=tot, one=one, run=run, y1=y1, y2=y2, pb=pb, net3=-one + y1 + 2 * y2)
-SC = [scen(1), scen(3), scen(6)]
-S3 = SC[1]
-frame(s, 5, f"Business impact: at three units the platform could return about {{{{IDR {S3['tot']/1000:.1f} B}}}} a year and pay back in about {S3['pb']:.0f} months",
-      None, "Impact", "Base inputs: 211 work orders (20.4 breakdowns a year, MTTR 14.0 h). All other inputs are assumptions or estimates, listed in the left panel, that the pilot replaces with Company data", "Impact assessment and projection")
-for i, (n_, l_, c_) in enumerate([(f"IDR {S3['tot']/1000:.1f} B", "Value a year at 3 units", GREEN), (f"{S3['pb']:.0f} months", "Payback at 3 units", ORANGE), (f"IDR {S3['net3']/1000:.1f} B", "Net benefit over 3 years", BLUE)]):
-    box(s, 0.4 + i * 1.4, 1.26, 1.34, 0.8, TINT[c_], c_, [[(n_, {"bold": True, "size": 14, "color": c_})], [(l_, {"size": 8, "color": INK})]], 14, False, INK, "c", "m", radius=0.08, lw=1.2, margin=0.03)
-rows5 = [["", "1 unit (pilot)", "3 units", "6 units"],
-         ["Users", "45", "135", "270"],
-         ["Value a year (IDR M)"] + [f"{x['tot']:,.0f}" for x in SC],
-         ["One-off cost (IDR M)"] + [f"{x['one']:,.0f}" for x in SC],
-         ["Running cost a year"] + [f"{x['run']:,.0f}" for x in SC],
-         ["Payback"] + [f"{x['pb']:.0f} months" for x in SC],
-         ["Net over 3 years"] + [f"{x['net3']:,.0f}" for x in SC]]
-table(s, 0.4, 2.12, 4.2, [1.55, 0.95, 0.85, 0.85], rows5, 9, rowh=0.29, header_fill=NAVY, bold_first=True)
-srcs5 = [("CASE DATA", GREEN, "20.4 breakdowns a year and a 14.0 h MTTR, from the 211 work orders."),
-         ("ASSUMED", GREY, "20 min saved per user a day, 230 days, IDR 175,000 per hour, IDR 30 M per downtime hour, 10% shorter repairs, IDR 60 M ramp-up."),
-         ("ESTIMATE", BLUE, "Pilot cost of IDR 1,400 M one-off and 370 M a year (slide 6)."),
-         ("SCALING", PURPLE, "Each added unit matches the LLDPE unit. Shared cost IDR 1,050 M, data work 350 M per unit, support 120 M a year per added unit.")]
-hs = [0.36, 0.58, 0.36, 0.58]; yy = 4.22
-for (tg, c_, d_), h_ in zip(srcs5, hs):
-    box(s, 0.4, yy, 4.2, h_, WHITE, MID, None, radius=0.05, lw=0.8)
-    pill(s, 0.46, yy + (h_ - 0.22) / 2, 0.82, tg, TINT.get(c_, LIGHT), c_, 0.22, 7.5)
-    text(s, 1.34, yy, 3.24, h_, d_, 8.2, False, INK, anchor="m", line=0.95)
-    yy += h_ + 0.04
-# middle: charts
-ptitle(s, 4.8, 1.26, 4.1, "Annual value by lever (IDR M)", NAVY)
-cd = CategoryChartData(); cd.categories = ["1 unit", "3 units", "6 units"]
-for k, nm in enumerate(["Search time", "Repair time", "Ramp-up"]): cd.add_series(nm, [round(x["val"][k]) for x in SC])
-gf = s.shapes.add_chart(XL_CHART_TYPE.COLUMN_STACKED, Inches(4.8), Inches(1.56), Inches(4.1), Inches(2.2), cd); ch = gf.chart
-ch.has_legend = True; ch.legend.position = XL_LEGEND_POSITION.BOTTOM; ch.legend.include_in_layout = False; ch.legend.font.size = Pt(9); ch.legend.font.name = FONT
-ch.plots[0].gap_width = 45; ch.plots[0].overlap = 100; ch.value_axis.visible = False; ch.value_axis.has_major_gridlines = False
-ch.category_axis.tick_labels.font.size = Pt(9.5); ch.category_axis.tick_labels.font.name = FONT
-for ser, c_ in zip(ch.plots[0].series, [BLUE, TEAL, PURPLE]):
-    ser.format.fill.solid(); ser.format.fill.fore_color.rgb = rgb(c_)
-    if c_ != PURPLE:
-        ser.data_labels.show_value = True; ser.data_labels.font.size = Pt(9); ser.data_labels.font.bold = True; ser.data_labels.font.name = FONT; ser.data_labels.font.color.rgb = rgb(WHITE); ser.data_labels.number_format = '#,##0'; ser.data_labels.number_format_is_linked = False
-ptitle(s, 4.8, 3.86, 4.1, "Cumulative net benefit (IDR M), months 0 to 36", NAVY)
-def cumn(x):
-    pts = [-x["one"]]
-    for m in range(1, 37): pts.append(pts[-1] + ((x["y1"] if m <= 12 else x["y2"]) / 12))
-    return pts
-cd2 = CategoryChartData(); cd2.categories = [str(m) for m in range(0, 37)]
-for nm, x in zip(["1 unit", "3 units", "6 units"], SC): cd2.add_series(nm, [round(v) for v in cumn(x)])
-gf2 = s.shapes.add_chart(XL_CHART_TYPE.LINE, Inches(4.8), Inches(4.16), Inches(4.1), Inches(2.02), cd2); c2 = gf2.chart
-c2.has_legend = True; c2.legend.position = XL_LEGEND_POSITION.BOTTOM; c2.legend.include_in_layout = False; c2.legend.font.size = Pt(9); c2.legend.font.name = FONT
-for ser, col, w_ in zip(c2.plots[0].series, [GREY, BLUE, GREEN], [1.75, 2.75, 2.75]):
-    ser.format.line.color.rgb = rgb(col); ser.format.line.width = Pt(w_); ser.smooth = False; ser.marker.style = XL_MARKER_STYLE.NONE
-c2.value_axis.tick_labels.number_format = '#,##0'; c2.value_axis.tick_labels.number_format_is_linked = False; c2.value_axis.tick_labels.font.size = Pt(8.5); c2.value_axis.tick_labels.font.name = FONT; c2.value_axis.major_gridlines.format.line.color.rgb = rgb("E3E9F0"); c2.value_axis.format.line.fill.background()
-c2.category_axis.tick_labels.font.size = Pt(8.5); c2.category_axis.tick_labels.font.name = FONT
-_ax = c2.category_axis._element; _nm = _ax.find(qn("c:noMultiLvlLbl"))
-for tag_ in ("c:tickLblSkip", "c:tickMarkSkip"):
-    e = etree.Element(qn(tag_)); e.set("val", "12")
-    if _nm is not None: _nm.addprevious(e)
-    else: _ax.append(e)
-# right: success metrics
-ptitle(s, 9.1, 1.26, 3.85, "KPIs and success metrics", NAVY)
-rows5b = [["KPI", "Baseline", "Target", "Measured by"],
-          ["Time searching and checking sources", "40 min a day (assumed)", "20 min a day", "Usage log and user survey"],
-          ["Mean time to repair", "14.0 h", "12.6 h (10% lower)", "Work-order closure dates"],
-          ["Repeat failures within 120 days", "8 of 55 jobs", "30% fewer", "Failure memory report"],
-          ["Answers with an approved source", "Not measured", "At least 90%", "Answer audit log"],
-          ["Median time to a cited answer", "About 15 min (assumed)", "3 min or less", "Timed pilot tasks"],
-          ["Users who rate answers useful", "Not measured", "At least 80%", "Feedback buttons in the app"]]
-table(s, 9.1, 1.58, 3.85, [1.35, 0.95, 0.8, 0.95], rows5b, 8, rowh=0.66, header_fill=NAVY, bold_first=True)
-ribbon(s, "Value grows with each unit while the shared platform cost stays fixed, so payback shortens from about 21 months for the pilot unit to about 12 months for three units. All scaling inputs are planning assumptions, and the pilot replaces them with measured Company data.")
-notes(s, "Business impact at industrial scale. The pilot unit has 45 users and a base-case value of IDR 1.52 B a year: search time 604 M, repair time 857 M and ramp-up 60 M. The scale scenarios assume that each added unit matches the LLDPE unit, with a shared platform cost of IDR 1,050 M, data work of IDR 350 M per unit and extra support of IDR 120 M a year per added unit. Under these assumptions three units return about IDR 4.6 B a year and pay back in about 12 months, and six units return about IDR 9.1 B. Calculations: search time is 45 users x 20 minutes x 230 days at IDR 175,000 an hour; repair time is 20.4 breakdowns x 14.0 hours x 10 percent at IDR 30 M per downtime hour. Only the breakdown rate and MTTR come from the case data. The table on the right lists the KPIs, targets and how each will be measured in the pilot.")
+exec(compile(open(os.path.join(HERE, "parts", "bi_slide.py")).read(), "bi_slide.py", "exec"), globals())
 
 # ---------------------------------------------------------------- 6 feasibility and roadmap
 s = blank(prs)
@@ -158,13 +85,14 @@ for i, (t_, c_, d_) in enumerate(dp):
     arrow(s, 9.07, cy, 9.2, cy, c_, 1.5)
     box(s, 9.22, cy - 0.22, 3.73, 0.44, WHITE, c_, [[(d_, {"size": 8, "color": INK})]], 8.3, False, INK, "l", "m", radius=0.08, lw=1.2, margin=0.08)
     if i < 2: arrow(s, 8.4, cy + 0.22, 8.4, cy + 0.28, GREY, 1.4)
-text(s, 7.75, 3.12, 5.2, 0.22, f"One-off budget of IDR {A['one_off']:,.0f} M and a running cost of IDR {A['run']:.0f} M a year", 9, True, NAVY)
+text(s, 7.75, 3.12, 5.2, 0.22, f"One-off budget of IDR {PILOT_ONE:,.0f} M and a running cost of IDR {PILOT_RUN:,.0f} M a year", 9, True, NAVY)
 bx = 7.75
-for nm, v, c_ in [("Integration", 650, BLUE), ("Data", 350, TEAL), ("Change", 250, ORANGE), ("Security", 150, RED)]:
-    w_ = 5.2 * v / 1400
-    box(s, bx, 3.38, w_ - 0.03, 0.26, c_, None, [[(f"{nm} {v}" if v >= 250 else str(v), {"bold": True, "size": 8.5, "color": WHITE})]], 8.5, True, WHITE, "c", "m", radius=0.03, margin=0.0)
+_seg = [("Integration", (440 + 400) * (1 + FIN.active(2)["cont"]), BLUE), ("Data", (147 + 144) * (1 + FIN.active(2)["cont"]), TEAL), ("Change", (100 + 60 + 34.8 + 60) * (1 + FIN.active(2)["cont"]), ORANGE), ("Security", 150 * (1 + FIN.active(2)["cont"]), RED)]
+for nm, v, c_ in _seg:
+    w_ = 5.2 * v / PILOT_ONE
+    box(s, bx, 3.38, w_ - 0.03, 0.26, c_, None, [[(f"{nm} {v:,.0f}" if v >= 250 else f"{v:,.0f}", {"bold": True, "size": 8.5, "color": WHITE})]], 8.5, True, WHITE, "c", "m", radius=0.03, margin=0.0)
     bx += w_
-text(s, 7.75, 3.67, 5.2, 0.34, "Integration covers EDMS, AIMS and historian adapters. Data covers cleanup and stewards. Change covers training and champions. The last 150 is security: single sign-on, key vault and a penetration test.", 8, False, INK, line=0.95)
+text(s, 7.75, 3.67, 5.2, 0.34, "Integration: set-up and four connectors. Data: cleanup and knowledge capture. Change: governance, training and tests. Security: review, sign-on and penetration test. Includes 15% contingency.", 8, False, INK, line=0.95)
 text(s, 7.75, 4.0, 5.2, 0.34, [[("Main risks and controls: ", {"bold": True, "color": RED}), "wrong answers (cited evidence and checks), poor data (conflict register), low adoption (champions), model outage (local fallback)."]], 8, False, INK, line=0.95)
 # roadmap
 RY = 4.4
@@ -190,7 +118,7 @@ for gq, g, lb in [(2, "G1", "Pilot gates met"), (4, "G2", "Security and integrat
     if gq >= 7: text(s, gxp - 2.4, y - 0.01, 2.3, 0.22, [[(g + " ", {"bold": True, "color": ORANGE}), lb]], 8, False, INK, "r", "m")
     else: text(s, gxp + 0.12, y - 0.01, 2.5, 0.22, [[(g + " ", {"bold": True, "color": ORANGE}), lb]], 8, False, INK, "l", "m")
 text(s, 0.45, y - 0.01, 2.4, 0.22, "Decision gates", 8.5, True, NAVY, anchor="m")
-ribbon(s, "The pilot needs only the existing stack and read-only exports from EDMS and AIMS. Four decision gates let the Company stop or continue at each step, and the pilot itself needs a one-off budget of IDR 1.4 B.")
+ribbon(s, f"The pilot needs only the existing stack and read-only exports from EDMS and AIMS. Four decision gates let the Company stop or continue at each step, and the pilot itself needs a one-off budget of IDR {PILOT_ONE/1000:.1f} B.")
 notes(s, "Feasibility. The matrix covers the readiness areas required by the booklet. Legal needs a decision from the Company on enterprise AI terms. The deployment path starts from the prototype stack, moves to a read-only pilot with 45 users and then to a production setup with PostgreSQL and a Company-approved model. The one-off budget of IDR 1,400 M is split into integration 650, data 350, change management 250 and security 150, with a running cost of IDR 370 M a year. The roadmap has four decision gates: pilot gates met, security and integration sign-off, value review and scale decision.")
 
 # ---------------------------------------------------------------- 7 conclusion
@@ -206,7 +134,7 @@ for i, (t_, c_, bl) in enumerate(cols7):
     box(s, x, 1.6, 4.15, 2.3, WHITE, c_, None, radius=0.05, lw=1.2)
     if bl: bullet(s, x + 0.12, 1.72, 3.9, 2.1, bl, 10.5, c_, 8)
     else:
-        for k, (n_, l_) in enumerate([(f"IDR {BASE[3]/1000:.1f} B", "Value a year for one unit, base case"), (f"{PB:.0f} months", "Payback for one unit"), (f"IDR {S3['tot']/1000:.1f} B", "Value a year at three units"), ("20 min", "Saved per engineer each day (assumed)")]):
+        for k, (n_, l_) in enumerate([(f"IDR {F1['steady']/1000:.1f} B", "Value a year for one unit, base case"), (f"IDR {FR['steady']/1000:.1f} B", "Value a year at three units"), (f"IDR {FR['npv']/1000:.1f} B", "Net present value at three units"), (f"{FR['pb']:.0f} months", "Payback at three units")]):
             xx = x + 0.1 + (k % 2) * 2.0; yy = 1.7 + (k // 2) * 1.05
             box(s, xx, yy, 1.95, 0.98, TINT[GREEN], GREEN, [[(n_, {"bold": True, "size": 15, "color": GREEN})], [(l_, {"size": 8.5, "color": INK})]], 15, False, INK, "c", "m", radius=0.08, lw=1.1, margin=0.05)
 ptitle(s, 0.4, 4.02, 12.55, "Key questions of the case, and how the proposal answers each", NAVY, 0.28)
