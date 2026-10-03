@@ -184,14 +184,19 @@ def build_docx(toc_pages=None, out=None):
         add_runs(cp, cap, 9, BLUE, True)
         if calls:
             cp.paragraph_format.keep_with_next = True
-            rows = (len(calls) + 1) // 2
-            lt = d.add_table(rows=rows, cols=4); set_col_widths(lt, [0.8, 7.9, 0.8, 7.9])
-            for i, cl in enumerate(calls):
-                rr, cc = i % rows, (i // rows) * 2
-                nc = lt.cell(rr, cc); nc.text = ""; q = nc.paragraphs[0]; q.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                x = q.add_run(str(cl[0])); x.bold = True; x.font.size = Pt(8.5); x.font.color.rgb = rgb("#FFFFFF"); shade(nc._tc, ORANGE); cell_margins(nc, 20, 20, 20, 20)
-                tc = lt.cell(rr, cc + 1); tc.text = ""; add_runs(tc.paragraphs[0], cl[1], 9); tc.paragraphs[0].paragraph_format.space_after = Pt(1); cell_margins(tc, 20, 20, 80, 40)
-            for row in lt.rows: no_split_row(row)
+            half = (len(calls) + 1) // 2
+            lt = d.add_table(rows=1, cols=2); set_col_widths(lt, [8.7, 8.7])
+            for ci, part_ in enumerate((calls[:half], calls[half:])):
+                cell = lt.cell(0, ci); cell.text = ""; cell_margins(cell, 20, 20, 40, 80)
+                first_p = True
+                for cl in part_:
+                    q = cell.paragraphs[0] if first_p else cell.add_paragraph(); first_p = False
+                    q.paragraph_format.space_after = Pt(3); q.paragraph_format.left_indent = Mm(6); q.paragraph_format.first_line_indent = Mm(-6)
+                    x = q.add_run(f" {cl[0]} "); x.bold = True; x.font.size = Pt(8.5); x.font.color.rgb = rgb("#FFFFFF")
+                    sh = OxmlElement("w:shd"); sh.set(qn("w:val"), "clear"); sh.set(qn("w:color"), "auto"); sh.set(qn("w:fill"), ORANGE.lstrip("#")); x._r.get_or_add_rPr().append(sh)
+                    q.add_run("  ")
+                    add_runs(q, cl[1], 9)
+            no_split_row(lt.rows[0])
         else:
             pass
         sp = d.add_paragraph(); sp.paragraph_format.space_after = Pt(4); sp.paragraph_format.line_spacing = 0.6

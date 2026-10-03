@@ -101,6 +101,8 @@ def build_pdf():
         render(out_html, os.path.join(BLD, "body.pdf"), True)
         pages = pages_of(os.path.join(BLD, "body.pdf"), doc)
         print("pass", it, "pages", len(PdfReader(os.path.join(BLD, "body.pdf")).pages), "markers", len(pages))
+    h = re.sub(r"<span class='marker'>@@[A-Z0-9.]+@@</span>", "", h)
+    open(out_html, "w").write(h); render(out_html, os.path.join(BLD, "body.pdf"), True)
     open(os.path.join(BLD, "cover.html"), "w").write(cover_html()); render(os.path.join(BLD, "cover.html"), os.path.join(BLD, "cover.pdf"))
     open(os.path.join(BLD, "back.html"), "w").write(back_html()); render(os.path.join(BLD, "back.html"), os.path.join(BLD, "back.pdf"))
     w = PdfWriter()
