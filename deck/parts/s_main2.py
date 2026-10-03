@@ -14,7 +14,7 @@ s = blank(prs)
 from flow import *
 from pptx.enum.chart import XL_MARKER_STYLE
 Y1 = .6 * BASE[3] - A["run"]; Y2 = BASE[3] - A["run"]; REM = A["one_off"] - Y1
-frame(s, 4, f"Business Impact: {{{{IDR {BASE[3]/1000:.1f} B}}}} a Year From Three Levers, Paid Back in {PB:.0f} Months in the Base Case",
+frame(s, 5, f"Business Impact: {{{{IDR {BASE[3]/1000:.1f} B}}}} a Year From Three Levers, Paid Back in {PB:.0f} Months in the Base Case",
       None, "Impact", f"Case data: 211 work orders, MTTR 14.0 h, 20.4 breakdowns a year. Assumptions: search 45 users x 20 min x 230 days x IDR 175k per h; repair 10% less x IDR 30 M per downtime hour; cost IDR {A['one_off']:,.0f} M plus {A['run']:,.0f} M a year", "Impact Assessment and Projection")
 # left: key metrics and the lever flow
 LX = 0.4
@@ -68,19 +68,31 @@ for tag_ in ("c:tickLblSkip", "c:tickMarkSkip"):
     if _nm is not None: _nm.addprevious(e)
     else: _ax.append(e)
 box(s, MX + 1.0, 4.12, 2.6, 0.3, WHITE, None, [[(f"Base case turns positive at month {12 + REM/Y2*12:.0f}", {"bold": True, "size": 8.5, "color": BLUE})]], 8.5, True, BLUE, "c", "m", radius=0.1, margin=0.02)
-# right: the screens behind the levers
+# right: where each number comes from
 SX, SW = 9.1, 3.85
-gbanner(s, SX, 1.28, SW, "The screens behind the numbers", NAVY, "27517F", 0.27, 9)
-h1 = win(s, "assistant", SX, 1.62, SW, (0, 0.04, 1, 0.74), "AI assistant: source and confidence on every answer")
-numdot(s, SX + 0.12, 1.62 + 0.45, 1, BLUE, 0.26, 9)
-h2 = win(s, "fm", SX, 1.62 + h1 + 0.1, SW, (0, 0, 1, 0.66), "Failure memory: causes and fixes at the fault")
-numdot(s, SX + 0.12, 1.62 + h1 + 0.1 + 0.45, 2, TEAL, 0.26, 9)
+gbanner(s, SX, 1.28, SW, "Where each number comes from", NAVY, "27517F", 0.27, 9)
+srcs = [("20.4 breakdowns a year", "31 breakdowns in 1.52 years, work-order log", "CASE", GREEN),
+        ("14.0 h repair time (MTTR)", "mean of the 211 work orders", "CASE", GREEN),
+        ("40 to 20 min a day", "search time per engineer; pilot logs replace it", "ASSUMED", GREY),
+        ("45 users, 230 days", "pilot size (slide 6) and working days", "ASSUMED", GREY),
+        ("IDR 175k per hour", "engineer cost rate; Company HR figure replaces it", "ASSUMED", GREY),
+        ("IDR 30 M per downtime hour", "Company finance figure replaces it", "ASSUMED", GREY),
+        ("10% less repair time", "conservative; the pilot measures it first", "ASSUMED", GREY),
+        ("IDR 60 M ramp-up", "no baseline in the case data", "ASSUMED", GREY),
+        ("IDR 1,400 M + 370 M a year", "budget on slide 6: integration, data, change, security", "ESTIMATE", BLUE)]
+for i, (n_, d_, tg, c_) in enumerate(srcs):
+    y = 1.6 + i * 0.5
+    box(s, SX, y, SW, 0.46, WHITE, MID, None, radius=0.06, lw=0.9)
+    box(s, SX, y, 0.07, 0.46, c_, None, None, shape=MSO_SHAPE.RECTANGLE)
+    text(s, SX + 0.14, y + 0.01, 2.85, 0.22, n_, 9, True, NAVY, anchor="m")
+    text(s, SX + 0.14, y + 0.22, 2.85, 0.22, d_, 8, False, INK, anchor="m")
+    pill(s, SX + 3.02, y + 0.12, 0.78, tg, TINT.get(c_, LIGHT), c_, 0.22, 7.5)
 ribbon(s, f"Value rests on two measurable levers, search time and repair time, and every input is shown so the Company can replace it with its own number. The base case pays back in {PB:.0f} months; the low case does not, and the pilot is designed to find out which case is real.")
 notes(s, "Business impact. Top left: the four headline numbers. Below: each lever as a short flow from the platform feature to the KPI it moves and the value in IDR million; search time and ramp-up are assumptions, repair time starts from case data (211 work orders, MTTR 14.0 hours). Middle: the value by lever and the cumulative cash line for the low, base and high cases; the base case turns positive at month 21. Right: the screens that deliver the two largest levers. Calculation: search time is 45 users x 20 minutes x 230 days at IDR 175,000 an hour, which is IDR 604 M. Repair time is 20.4 breakdowns a year x 14.0 hours x 10 percent at IDR 30 M per downtime hour, which is IDR 857 M. Ramp-up is set at IDR 60 M. Costs are IDR 1.4 B one-off and 370 M a year.")
 
 # ======================================================= 5 FEASIBILITY AND ROADMAP
 s = blank(prs)
-frame(s, 5, "Feasibility and Roadmap: {{Read-Only, Advisory}} Deployment in Four Phases With Explicit Decision Gates",
+frame(s, 6, "Feasibility and Roadmap: {{Read-Only, Advisory}} Deployment in Four Phases With Explicit Decision Gates",
       None, "Roadmap", "Prototype and architecture notes; dates and budget are proposals for discussion with the Company", "Implementation Plan")
 # readiness matrix
 gbanner(s, 0.35, 1.3, 7.55, "Feasibility: six readiness dimensions", NAVY, "27517F", 0.3, 10)
@@ -144,9 +156,9 @@ notes(s, "Feasibility. The matrix covers the readiness areas the booklet asks fo
 
 # ======================================================= 6 CONCLUSION
 s = blank(prs)
-frame(s, 6, "Conclusion: A {{Trusted, Traceable}} Knowledge Hub Turns Scattered Plant Knowledge Into Faster, Safer and More Reliable Decisions",
+frame(s, 7, "Conclusion: A {{Trusted, Traceable}} Knowledge Hub Turns Scattered Plant Knowledge Into Faster, Safer and More Reliable Decisions",
       "Summary of the proposal, how it answers the three key questions of the case, and the decision requested", "Conclusion",
-      "Prototype test results (128 of 128 evaluation questions, static, regression and layout checks) and the business case on slide 4", "Objectives, Key Results and Conclusion")
+      "Prototype test results (128 of 128 evaluation questions, static, regression and layout checks) and the business case on slide 5", "Objectives, Key Results and Conclusion")
 pillars = [("CONNECT", "TAGLINK: one governed base", BLUE, [f"{D['docs']} documents and {D['wo']} work orders unified on the equipment tag", f"{D['issues']} conflicts detected and assigned to owners", "Ingestion, quality gates and approval for every record"], "98 to 1", "documents into one governed base"),
            ("ASK", "VERA: answers with evidence", TEAL, ["Source, revision, approval status and confidence on every answer", "Numbers and quotes verified against the cited text", "Safety bypass requests refused with the reason"], f"{D['evals']}/{D['evals']}", "evaluation questions passed"),
            ("ACT", "FORESIGHT, SAFEWORK", ORANGE, ["Failure memory with RCA and lessons at the point of fault", "Risk ranking, readiness, hazard screening and permit-aware planning", "Read-only links to EDMS, AIMS and the digital twin"], f"{D['tools']} tools", "computed from plant records")]
@@ -163,7 +175,7 @@ for i, (a, b, c_, bl, big, cap) in enumerate(pillars):
     text(s, x + 0.15, 3.15, 2.3, 0.25, cap, 8.5, False, GREY)
 banner(s, 0.35, 3.52, 12.65, "How the proposal answers the three key questions of the case", NAVY, 0.3, 10.5, "l")
 kq = [("Q1", "Build a structured Industrial Data Ops foundation", "Tag-keyed data model over seven source types; AI-assisted ingestion, quality gates and approval with named owners; conflicts surfaced on day one", "98 documents, 1,109 passages, 48 conflicts registered"),
-      ("Q2", "Help engineers find trusted answers faster and reduce improper execution", "Hybrid retrieval, evidence-weighted confidence score, verification of numbers and quotes, refusal of unsafe requests", f"{D['evals']}/{D['evals']} questions passed; 20 min a day saved per engineer (assumption, slide 4)"),
+      ("Q2", "Help engineers find trusted answers faster and reduce improper execution", "Hybrid retrieval, evidence-weighted confidence score, verification of numbers and quotes, refusal of unsafe requests", f"{D['evals']}/{D['evals']} questions passed; 20 min a day saved per engineer (assumption, slide 5)"),
       ("Q3", "Integrate with operational systems for reliability and improvement", "Read-only EDMS, AIMS, historian and twin links; failure memory, backtested reliability analytics, readiness, hazard screening and site planning", f"{D['bt']}-forecast backtest; {D['tools']} computed tools")]
 for i, (q, a, b, c_) in enumerate(kq):
     y = 3.88 + i * 0.6
@@ -184,7 +196,7 @@ notes(s, "Conclusion. Three pillars map to the three key questions. The ask is a
 
 # ======================================================= 7 TEAM
 s = blank(prs)
-frame(s, 7, "Team Profile", "Team name, university, supervisor and members (replace the bracketed fields before submission)", None, None)
+frame(s, 8, "Team Profile", "Team name, university, supervisor and members (replace the bracketed fields before submission)", None, None)
 text(s, 0.55, 1.6, 12.2, 0.4, [[("Team name: ", {"bold": True, "color": NAVY}), "[Team name]        ", ("University: ", {"bold": True, "color": NAVY}), "[University]        ", ("Supervisor: ", {"bold": True, "color": NAVY}), "[Supervisor name]"]], 13)
 trows = [["No.", "Name", "Major", "Semester", "Area of expertise", "Contribution to the proposal"],
          ["1", "[Name]", "[Computer Science]", "[6]", "[AI and software]", "[Formulated the idea; built the prototype and the AI assistant]"],

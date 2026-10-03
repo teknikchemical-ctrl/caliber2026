@@ -159,8 +159,8 @@ for i, (a, b, c_) in enumerate(pr):
     y = 1.86 + i * 0.5
     box(s, 10.05, y, 0.09, 0.46, c_, None, None, shape=MSO_SHAPE.RECTANGLE); text(s, 10.2, y - 0.01, 2.8, 0.2, a, 7.8, True, NAVY); text(s, 10.2, y + 0.18, 2.8, 0.3, b, 6.7, False, GREY, line=0.95)
 banner(s, 10.05, 5.42, 2.95, "Why this is safe to run on free tier", GREEN, 0.28, 8.5)
-text(s, 10.08, 5.72, 2.9, 1.1, "Key stays on the server. Limits protect the quota. Gemini only words evidence already retrieved or computed, so a failed call costs an answer style, not correctness; the local engine still answers.", 7.2, False, INK, line=1.0)
-box(s, 0.35, 6.25, 9.5, 0.55, TINT[PURPLE], None, [[("Output contract: ", {"bold": True, "color": PURPLE}), "answer text, cited source numbers, confidence 0 to 100, needs_verification, refused. Free-tier quotas apply to the Gemini key; the proxy adds its own per-visitor limits so one user cannot exhaust them. The model can be replaced by any provider that implements the same contract."]], 7.6, False, INK, "l", "m", radius=0.06, margin=0.1)
+text(s, 10.08, 5.72, 2.9, 1.1, "The key stays on the server and per-visitor limits protect the quota; a failed call costs style, not correctness.", 7.2, False, INK, line=1.0)
+ribbon(s, "The model only words evidence the platform has already retrieved or computed, and every figure is checked against a source before display. If the free-tier key is missing or the quota is spent, the local verified answer still appears, so the assistant degrades in style, not in correctness.")
 
 # ---------- A4 assistant: intents, tools, confidence
 s = app_slide("The Assistant: {{Intent Routing, Twenty Computed Tools}} and an Evidence-Weighted Confidence Score", "Counts, rankings and forecasts are calculated from records; Gemini is used to word the result and to answer open questions from retrieved passages",

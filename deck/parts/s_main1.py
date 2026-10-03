@@ -1,87 +1,70 @@
 # ======================================================= 1 COVER
+from flow import *
 s = blank(prs)
 box(s, 0, 0, 13.333, 7.5, "F4F7FB", None, None, shape=MSO_SHAPE.RECTANGLE)
-lp = box(s, 0, 0, 7.2, 7.5, NAVY, None, None, shape=MSO_SHAPE.RECTANGLE); grad(lp, "0B2A4A", "123F6B", 90)
+lp = box(s, 0, 0, 6.75, 7.5, NAVY, None, None, shape=MSO_SHAPE.RECTANGLE); grad(lp, "0B2A4A", "123F6B", 90)
 box(s, 0, 0, 0.18, 7.5, TEAL, None, None, shape=MSO_SHAPE.RECTANGLE)
-text(s, 0.7, 0.65, 6.3, 0.3, "CALIBER 2026  |  BUSINESS PROPOSAL  |  PRELIMINARY STAGE", 10.5, True, "8FD3CC")
-text(s, 0.7, 1.3, 6.4, 1.6, ["Asset Knowledge", "Platform"], 46, True, WHITE, line=1.0)
-text(s, 0.7, 2.95, 6.1, 1.2, "A manufacturing knowledge hub for the LLDPE unit: one governed database behind a Gemini-powered assistant, with live P&ID, OPL simulation, failure memory and predictive maintenance on the same asset tags.", 14, False, "DCE8F5", line=1.15)
-chip(s, 0.7, 4.3, 5.9, 0.5, "Chosen use case: Case 1, Manufacturing Knowledge Hub", "1E4C7A", WHITE, 11.5, True)
-for i, (n_, l_) in enumerate([("564", "linked records"), ("1,109", "searchable passages"), ("20", "computed AI tools"), ("128/128", "evaluation questions passed")]):
-    x = 0.7 + i * 1.62
-    text(s, x, 5.05, 1.55, 0.5, n_, 24, True, "8FD3CC")
-    text(s, x, 5.55, 1.55, 0.4, l_, 9.5, False, "B9CBE0")
-text(s, 0.7, 6.3, 6.3, 0.9, [[("Team: ", {"bold": True, "color": "8FD3CC"}), "[Team name]"], [("University: ", {"bold": True, "color": "8FD3CC"}), "[University]    ", ("Supervisor: ", {"bold": True, "color": "8FD3CC"}), "[Supervisor name]"]], 11.5, False, WHITE, space=4)
-h1 = win(s, "dash2", 7.45, 0.45, 5.45, (0, 0.1, 1, 0.98), "Dashboard: the plant in 3D")
-h2 = win(s, "pid", 7.45, 4.45, 2.65, (0, 0, 1, 1), "Live P&ID")
-h3 = win(s, "assistant", 10.25, 4.45, 2.65, (0, 0, 1, 1), "AI assistant")
-text(s, 7.45, 7.05, 5.5, 0.3, "Working prototype on the case baseline data, with a 3-minute demonstration video", 9, False, GREY)
-notes(s, "Cover. Chosen use case: Case 1. The three windows are screens of the working prototype: the 3D plant dashboard, the AI assistant with sources and confidence, and the live P&ID.")
+text(s, 0.7, 0.55, 6.0, 0.3, "CALIBER 2026  |  BUSINESS PROPOSAL  |  PRELIMINARY STAGE", 10, True, "8FD3CC")
+text(s, 0.7, 1.05, 5.9, 1.7, ["Asset Knowledge", "Platform"], 46, True, WHITE, line=1.0)
+text(s, 0.7, 2.75, 5.8, 0.9, "One governed knowledge base for the LLDPE unit that answers, predicts and plans from the same equipment tags.", 14, False, "DCE8F5", line=1.12)
+for i, (a_, b_, c_) in enumerate([("CONNECT", "TAGLINK data operations", BLUE), ("ASK", "VERA verified answers", TEAL), ("ACT", "FORESIGHT, SAFEWORK", ORANGE)]):
+    x = 0.7 + i * 1.95
+    box(s, x, 3.85, 1.85, 0.34, c_, None, [[(a_, {"bold": True, "size": 11, "color": WHITE})]], 11, True, WHITE, "c", "m", radius=0.17)
+    text(s, x, 4.22, 1.85, 0.3, b_, 8.8, False, "B9CBE0", "c")
+for i, (n_, l_) in enumerate([("564", "linked records"), ("1,109", "searchable passages"), ("20", "computed AI tools"), ("128/128", "questions passed")]):
+    x = 0.7 + (i % 2) * 2.9; y = 4.75 + (i // 2) * 0.82
+    box(s, x, y, 2.75, 0.72, "1A4676", None, None, radius=0.08)
+    text(s, x + 0.12, y + 0.04, 1.3, 0.64, n_, 22, True, "8FD3CC", anchor="m")
+    text(s, x + 1.4, y + 0.04, 1.3, 0.64, l_, 9.5, False, "DCE8F5", anchor="m", line=1.0)
+text(s, 0.7, 6.5, 5.8, 0.25, "Chosen use case: Case 1, Manufacturing Knowledge Hub", 10.5, True, WHITE)
+text(s, 0.7, 6.8, 5.9, 0.5, [[("Team: ", {"bold": True, "color": "8FD3CC"}), "[Team name]   ", ("University: ", {"bold": True, "color": "8FD3CC"}), "[University]   ", ("Supervisor: ", {"bold": True, "color": "8FD3CC"}), "[Supervisor]"]], 9.5, False, WHITE)
+h1 = win(s, "dash2", 7.05, 0.45, 5.85, (0, 0.1, 1, 0.98), "Dashboard: the LLDPE plant in 3D, every unit selectable")
+h2 = win(s, "pid", 7.05, 4.6, 2.85, (0, 0, 1, 0.9), "Live P&ID: valves, flow and trips")
+h3 = win(s, "assistant", 10.05, 4.6, 2.85, (0, 0.04, 1, 0.9), "AI assistant: sources and confidence")
+text(s, 7.05, 7.12, 5.9, 0.25, "Working prototype on the case baseline data, with a 3-minute demonstration video", 9, False, GREY)
+notes(s, "Cover. Chosen use case: Case 1. The three windows are screens of the working prototype: the 3D plant dashboard, the live P&ID and the AI assistant with sources and confidence.")
 
 # ======================================================= 2 BACKGROUND AND PROBLEM
 s = blank(prs)
 frame(s, 2, "Problem Analysis: the {{Knowledge Gap}} Between What the Plant Records and What Engineers Can Use at the Point of Work",
-      None, "Background", "CALIBER 2026 case book (Case 1); baseline data analysed in the prototype: 8 equipment sets, LLDPE unit, June 2024 to December 2025", "Problem Identification")
-# left panel: network + findings
-LX, LW = 0.35, 4.15
-hb = gbanner(s, LX, 1.3, LW, "Knowledge landscape of the baseline data", NAVY, "27517F", 0.34, 10.5)
-panel(s, LX, 1.66, LW, 4.54, "EAF3FA", "BFD6EA")
-image(s, os.path.join(HERE, "jpg", "net.jpg"), LX + 0.3, 1.7, 3.55, 2.25, border=False)
-for i, (nm, c_) in enumerate([("Equipment 8", BLUE), ("Documents 96", GREEN), ("Work orders 211", ORANGE), ("Instruments 84", PURPLE), ("OPL 56", AMBER), ("Components 19", TEAL), ("Interlocks 8", RED)]):
-    xx = LX + 0.08 + (i % 4) * 1.0; yy = 3.98 + (i // 4) * 0.2
-    box(s, xx, yy + 0.04, 0.1, 0.1, c_, None, None, shape=MSO_SHAPE.OVAL); text(s, xx + 0.12, yy, 0.95, 0.18, nm, 6.8, False, INK)
-finds = [("Analysis", "564 records of 7 types are joined only by the equipment tag. No source system stores those links; the platform builds 624 of them.", BLUE),
-         ("Key finding", "Reading the sources together exposes 48 conflicts, for example valve FV-2302 labelled both trips OPEN and trips CLOSED.", RED),
-         ("Tension", "211 work orders and 63 failures, none linked to the lesson that applies. Only 21% of faults found before turning corrective.", ORANGE)]
-for i, (t, d, c_) in enumerate(finds):
-    y = 4.4 + i * 0.6
-    box(s, LX + 0.08, y, 0.82, 0.2, c_, None, [t], 8, True, WHITE, "c", "m", radius=0.11, margin=0.02)
-    box(s, LX + 0.08, y + 0.18, LW - 0.16, 0.42, WHITE, MID, [d], 8, False, INK, "l", "m", radius=0.05, margin=0.07)
-# top band: context -> core problem -> challenges
-BX = 4.65
-panel(s, BX, 1.3, 8.35, 2.34, "F4F7FB", MID)
-gbanner(s, BX + 0.1, 1.36, 2.1, "Operating context", BLUE, "4FA9CE", 0.24, 8.5)
-ctx = [("net", "Digital agenda", "Industry 4.0 award and a digital twin at Cilegon (public sources)"), ("flame", "Safety-critical", "Continuous, asset-intensive petrochemical operation"), ("users", "Seven functions", "Production, Maintenance, Reliability, Warehouse, Procurement, Energy, HSE")]
-for i, (ic, t, d) in enumerate(ctx):
-    y = 1.66 + i * 0.6
-    pic(s, ic, BX + 0.1, y + 0.04, 0.38, TEAL)
-    text(s, BX + 0.55, y, 1.7, 0.2, t, 8, True, NAVY); text(s, BX + 0.55, y + 0.19, 1.7, 0.4, d, 6.9, False, INK, line=0.98)
-box(s, BX + 2.3, 1.55, 0.3, 1.8, "B8D3EA", None, None, shape=MSO_SHAPE.RIGHT_ARROW)
-cp = box(s, BX + 2.7, 1.38, 2.7, 2.1, WHITE, RED, None, radius=0.1, lw=1.5)
-pic(s, "warn", BX + 3.88, 1.42, 0.34, RED)
-text(s, BX + 2.78, 1.78, 2.54, 0.3, "Core problem: improper execution", 10, True, RED, "c")
-text(s, BX + 2.78, 2.08, 2.54, 1.35, "Engineers need a correct step, a current drawing or a past lesson during start-up, troubleshooting and maintenance. The answer exists somewhere, but cannot be found fast, cannot be verified, and is not tied to the asset in front of them.", 8, False, INK, "c", line=1.02)
-box(s, BX + 5.5, 1.55, 0.3, 1.8, "B8D3EA", None, None, shape=MSO_SHAPE.RIGHT_ARROW)
-gbanner(s, BX + 5.9, 1.36, 2.35, "Key challenges", RED, "E88B8B", 0.24, 8.5)
-chs = [("net", "Scattered sources", "Separate systems, no shared tag"), ("user", "Missing tacit knowledge", "Why a trip occurs stays with senior staff"), ("doc", "Conflicting documents", "Revision and approval not visible at use"), ("link", "Disconnected live data", "Work orders, trips, drawings unlinked")]
-for i, (ic, t, d) in enumerate(chs):
-    y = 1.64 + i * 0.5
-    pic(s, ic, BX + 5.9, y + 0.02, 0.3, RED)
-    text(s, BX + 6.27, y - 0.03, 2.05, 0.2, t, 8.5, True, NAVY); text(s, BX + 6.27, y + 0.15, 2.05, 0.32, d, 8, False, INK, line=0.95)
-# bottom band: stakeholders venn + baseline impact
-gbanner(s, BX, 3.7, 4.2, "Stakeholder alignment", NAVY, "27517F", 0.3, 9.5)
-panel(s, BX, 4.0, 4.2, 2.2, WHITE, MID)
-for cx, cy, c_ in [(BX + 1.0, 4.55, BLUE), (BX + 1.95, 4.55, TEAL), (BX + 1.48, 5.1, ORANGE)]:
-    ov = box(s, cx - 0.5, cy - 0.5, 1.0, 1.0, c_, None, None, shape=MSO_SHAPE.OVAL)
-    sp = ov._element.spPr; sf = sp.find(qn("a:solidFill")); clr = sf[0]; al = etree.SubElement(clr, qn("a:alpha")); al.set("val", "32000")
-text(s, BX + 0.2, 4.35, 0.85, 0.4, ["Operations", "Production"], 8, True, NAVY, "c", line=0.95); text(s, BX + 1.85, 4.35, 0.95, 0.4, ["Maintenance", "Reliability"], 8, True, NAVY, "c", line=0.95); text(s, BX + 1.0, 5.6, 0.95, 0.4, ["Process eng.", "and HSE"], 8, True, NAVY, "c", line=0.95)
-box(s, BX + 1.0, 4.8, 0.96, 0.4, "0B2A4A", None, ["One trusted source"], 6.8, True, WHITE, "c", "m", radius=0.2, margin=0.03)
-text(s, BX + 2.95, 4.05, 1.22, 2.1, [[("Needs", {"bold": True, "color": NAVY})], "The exact step and set point at the valve", [("", {})], "History, lessons, spares", [("", {})], "Limits, hazards, permits", [("", {})], "Audit and revision trail"], 7, False, INK, line=1.0)
-gbanner(s, BX + 4.35, 3.7, 4.0, "Baseline impact", ORANGE, "F0A15B", 0.3, 9.5)
-panel(s, BX + 4.35, 4.0, 4.0, 2.2, WHITE, MID)
-cdp = CategoryChartData(); cdp.categories = ["GA", "YD", "DC", "KC", "EA", "LV", "CT", "FA"]; cdp.add_series("Downtime h", [7, 69, 60, 38, 124, 21, 46, 70])
-gf = s.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(BX + 4.4), Inches(4.28), Inches(2.45), Inches(1.35), cdp); ch = gf.chart
-ch.has_legend = False; ch.plots[0].gap_width = 40; ch.value_axis.visible = False; ch.value_axis.has_major_gridlines = False
-ch.category_axis.tick_labels.font.size = Pt(7); ch.category_axis.tick_labels.font.name = FONT
-ser = ch.plots[0].series[0]; ser.format.fill.solid(); ser.format.fill.fore_color.rgb = rgb(ORANGE)
-ser.data_labels.show_value = True; ser.data_labels.font.size = Pt(7); ser.data_labels.font.name = FONT; ser.data_labels.position = XL_LABEL_POSITION.OUTSIDE_END
-text(s, BX + 4.4, 4.03, 2.45, 0.25, "Breakdown downtime by unit, hours", 7.5, True, NAVY)
-for i, (n_, l_, c_) in enumerate([("31", "breakdowns", RED), ("434 h", "downtime", RED), ("IDR 538 M", "maintenance, 82% corrective", ORANGE)]):
-    y = 4.05 + i * 0.68
-    text(s, BX + 6.9, y, 1.4, 0.3, n_, 14 if len(n_) < 7 else 11, True, c_); text(s, BX + 6.9, y + 0.28, 1.4, 0.3, l_, 7, False, GREY, line=0.95)
-text(s, BX + 4.4, 5.64, 2.45, 0.55, [[("Reading: ", {"bold": True, "color": NAVY}), "EA-5601 alone lost 124 h; the same fault is investigated again."]], 7.4, False, INK, line=1.02)
+      None, "Background", "CALIBER 2026 case book (Case 1); baseline data analysed in the prototype: 8 equipment sets, LLDPE unit, June 2024 to December 2025. Chandra Asri context: public Industry 4.0 and digital-twin releases", "Problem Identification")
+# row 1: problem tree, causes -> core problem -> effects
+gbanner(s, 0.4, 1.26, 4.55, "Root causes", NAVY, "27517F", 0.27, 9.5)
+causes = [("Scattered sources", "SOP, P&ID, EDMS, AIMS, logs in separate systems"), ("Missing tacit knowledge", "why a trip occurs stays with senior staff"), ("Conflicting documents", "revision and approval not visible at use"), ("Disconnected live data", "work orders, trips and drawings are unlinked")]
+for i, (t_, d_) in enumerate(causes):
+    cy = 1.82 + i * 0.5
+    box(s, 0.4, cy - 0.22, 4.55, 0.44, WHITE, BLUE, [[(t_ + "  ", {"bold": True, "size": 9.5, "color": NAVY}), (d_, {"size": 8.5, "color": INK})]], 9, False, INK, "l", "m", radius=0.08, lw=1.1, margin=0.1)
+arrow(s, 4.97, 2.57, 5.3, 2.57, RED, 2.0)
+gbanner(s, 5.32, 1.26, 3.0, "Core problem", RED, "E88B8B", 0.27, 9.5)
+box(s, 5.32, 1.62, 3.0, 1.9, TINT[RED], RED, [[("Improper execution", {"bold": True, "size": 15, "color": RED})], [("", {"size": 4})], [("a wrong step, an outdated drawing or a missed lesson at the point of work", {"size": 10, "color": INK})]], 12, False, INK, "c", "m", radius=0.1, lw=1.6, margin=0.12)
+pic(s, "warn", 6.6, 1.68, 0.4, RED)
+arrow(s, 8.34, 2.57, 8.67, 2.57, RED, 2.0)
+gbanner(s, 8.7, 1.26, 4.25, "Effects in the baseline data", ORANGE, "F0A15B", 0.27, 9.5)
+effs = [(f"{D['rep']} of {D['cm_follow']}", "corrective jobs repeat within 120 days"), (f"{D['dt']} h", f"downtime in {D['bd']} breakdowns, IDR {D['cost']:.0f} M maintenance cost"), ("21%", "of faults found before they turned corrective")]
+for i, (n_, d_) in enumerate(effs):
+    cy = 1.92 + i * 0.64
+    box(s, 8.7, cy - 0.27, 1.3, 0.54, ORANGE, None, [[(n_, {"bold": True, "size": 15, "color": WHITE})]], 15, True, WHITE, "c", "m", radius=0.08, margin=0.02)
+    box(s, 10.0, cy - 0.27, 2.95, 0.54, WHITE, ORANGE, [[(d_, {"size": 9.5, "color": INK})]], 9.5, False, INK, "l", "m", radius=0.08, lw=1.1, margin=0.1)
+# row 2: evidence from the data
+gbanner(s, 0.4, 3.72, 3.0, "The knowledge network", NAVY, "27517F", 0.27, 9.5)
+image(s, os.path.join(HERE, "jpg", "net.jpg"), 0.45, 4.05, 2.9, 2.08, border=False)
+gbanner(s, 3.6, 3.72, 3.9, "What the data shows", NAVY, "27517F", 0.27, 9.5)
+tiles = [("564", "records of 7 types joined only by the equipment tag", BLUE), ("624", "relations the platform has to build; no source stores them", TEAL), (f"{D['issues']}", "document conflicts, e.g. FV-2302 trips OPEN and CLOSED", RED), (f"{D['bad']}", f"failures in {D['wo']} work orders, none linked to a lesson", ORANGE)]
+for i, (n_, l_, c_) in enumerate(tiles):
+    x = 3.6 + (i % 2) * 1.98; y = 4.05 + (i // 2) * 1.05
+    box(s, x, y, 1.92, 0.98, TINT[c_], c_, [[(n_, {"bold": True, "size": 20, "color": c_})], [(l_, {"size": 8.5, "color": INK})]], 20, False, INK, "c", "m", radius=0.08, lw=1.2, margin=0.05)
+gbanner(s, 7.7, 3.72, 5.25, "Breakdown downtime by unit, hours", ORANGE, "F0A15B", 0.27, 9.5)
+cdp = CategoryChartData(); cdp.categories = ["GA-1201A", "YD-2301", "DC-3401A", "KC-4501", "EA-5601", "LV-6701", "CT-7801", "FA-8901"]; cdp.add_series("Downtime h", [7, 69, 60, 38, 124, 21, 46, 70])
+gf = s.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(7.7), Inches(4.02), Inches(5.25), Inches(2.15), cdp); ch = gf.chart
+ch.has_legend = False; ch.plots[0].gap_width = 35; ch.value_axis.visible = False; ch.value_axis.has_major_gridlines = False
+ch.category_axis.tick_labels.font.size = Pt(8.5); ch.category_axis.tick_labels.font.name = FONT
+ser = ch.plots[0].series[0]
+for i in range(8):
+    pt = ser.points[i]; pt.format.fill.solid(); pt.format.fill.fore_color.rgb = rgb(RED if i == 4 else ORANGE)
+ser.data_labels.show_value = True; ser.data_labels.font.size = Pt(10); ser.data_labels.font.bold = True; ser.data_labels.font.name = FONT; ser.data_labels.position = XL_LABEL_POSITION.OUTSIDE_END
 ribbon(s, "The plant already records what engineers need, but no system joins it to the asset at the point of work. That gap, not missing data, is what causes improper execution and repeat failures.")
-notes(s, "Problem analysis. The left figure is the real knowledge network of the baseline data: 8 equipment tags and the documents, work orders, instruments, lessons, interlocks and components connected to them. The links exist only because we built them; no source system stores them. The top band shows the context, the core problem of improper execution and the four challenges named in the case. The bottom band shows who is affected and what the baseline data says: 31 breakdowns, 434 hours of downtime and IDR 538 million of maintenance cost, 82 percent of it corrective.")
+notes(s, "Problem analysis as a tree. Four root causes lead to one core problem, improper execution, which shows up in the baseline data as repeat failures (8 of 55 corrective jobs), 434 hours of breakdown downtime and only 21 percent of faults found early. The lower row is the evidence: the real knowledge network of the case data, the four numbers that describe it, and downtime by unit, where EA-5601 alone lost 124 hours. Context: Chandra Asri is already running an Industry 4.0 programme and a digital twin of the Cilegon complex, according to public releases; this proposal adds the knowledge layer around it.")
+
 # ======================================================= 3 SOLUTION (data flow and decision flow)
 from flow import *
 def mixrow(s, cy, x0, x1, items, color, dw=0.98, dh=0.92, maxw=1.15):

@@ -40,25 +40,34 @@ PARTS = [p for p in ["s_main1.py", "s_main2.py", "s_a1.py", "s_a2.py", "s_a3.py"
 for part in PARTS:
     p = os.path.join(HERE, "parts", part)
     exec(compile(open(p).read(), p, "exec"), globals())
-# keep ten feature slides in the appendix (original numbers), renumber titles and page numbers
+# AI layer slide (A3) moves into the main sequence as slide 4; ten feature slides stay in the appendix
 import re as _re
-KEEP_A = [2, 3, 4, 6, 7, 8, 9, 13, 15, 16]
-ids = list(prs.slides._sldIdLst); drop = []
+KEEP_A = [2, 4, 5, 6, 7, 8, 9, 13, 15, 16]
+lst = prs.slides._sldIdLst; ids = list(lst)
+ai = ids[7 + 3 - 1]
 for k, sid in enumerate(ids):
     if k < 7: continue
-    a_no = k - 7 + 1
-    if a_no not in KEEP_A: drop.append(sid)
-for sid in drop:
-    prs.part.drop_rel(sid.rId); prs.slides._sldIdLst.remove(sid)
+    if (k - 7 + 1) not in KEEP_A and sid is not ai:
+        prs.part.drop_rel(sid.rId); lst.remove(sid)
+lst.remove(ai); lst.insert(3, ai)
 for k, sl in enumerate(prs.slides):
-    if k < 7: continue
-    new_no = k - 7 + 1
+    new_no = k - 8 + 1
     for shp in sl.shapes:
-        if shp.has_text_frame:
-            tf = shp.text_frame
-            if tf.paragraphs and tf.paragraphs[0].runs and _re.match(r"A\d+  ", tf.paragraphs[0].runs[0].text):
-                r0 = tf.paragraphs[0].runs[0]; r0.text = _re.sub(r"^A\d+  ", f"A{new_no}  ", r0.text)
-            elif shp.left is not None and abs(shp.left - Inches(12.5)) < 5000 and tf.text.strip().isdigit():
-                tf.paragraphs[0].runs[0].text = str(k + 1)
+        if not shp.has_text_frame: continue
+        tf = shp.text_frame
+        if tf.paragraphs and tf.paragraphs[0].runs:
+            r0 = tf.paragraphs[0].runs[0]
+            if k == 3 and _re.match(r"A\d+  ", r0.text): r0.text = _re.sub(r"^A\d+  ", "", r0.text)
+            elif k >= 8 and _re.match(r"A\d+  ", r0.text): r0.text = _re.sub(r"^A\d+  ", f"A{new_no}  ", r0.text)
+            elif k == 3 and r0.text == "Appendix": r0.text = "Proposed Solution"
+        if k >= 8 or k == 3:
+            if shp.left is not None and abs(shp.left - Inches(12.5)) < 5000 and tf.text.strip().isdigit(): tf.paragraphs[0].runs[0].text = str(k + 1)
+    if k == 3:
+        for shp in sl.shapes:
+            if shp.has_text_frame and shp.text_frame.text.strip() == "Solution" and shp.top > Inches(7.0):
+                shp.top = Inches(7.07); shp.height = Inches(0.38)
+                shp.fill.solid(); shp.fill.fore_color.rgb = rgb(BLUE); shp.line.fill.background()
+                for p_ in shp.text_frame.paragraphs:
+                    for r_ in p_.runs: r_.font.size = Pt(11); r_.font.color.rgb = rgb(WHITE)
 prs.save(OUT)
 print("saved", OUT, os.path.getsize(OUT) // 1024, "KB", len(prs.slides), "slides")
