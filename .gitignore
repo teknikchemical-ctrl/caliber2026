@@ -1,3 +1,4 @@
 node_modules/
 __pycache__/
 netlify-drop/
+deck/video/raw/
