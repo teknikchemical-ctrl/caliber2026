@@ -85,8 +85,9 @@ If the build stops because python3 isn't found, add  PYTHON_VERSION = 3.11  and 
 finished page is also in the repository as dist/index.html, so another way out is to clear the
 Build command, keep the publish directory as dist, and redeploy.
 
-Deploy from GitHub, not by dragging a folder in. The shared database and the AI are Netlify
-Functions, which need the full build.
+This GitHub route is the most reliable one. A quicker alternative is dropping AKP-netlify-drop.zip
+(unzipped) on https://app.netlify.com/drop, described in DEPLOY_AND_CONNECT_AI.txt. If the footer then says
+"Local only", the dropped folder did not carry the functions, so use this GitHub route instead.
 
 
 SIGNING IN
