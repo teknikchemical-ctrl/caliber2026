@@ -6,7 +6,7 @@ const {chromium}=require('playwright'),path=require('path');
 const file=path.resolve(process.argv.find(a=>/\.html$/.test(a))||path.join(__dirname,'..','dist','index.html'));
 const minEval=+((process.argv.find(a=>a.startsWith('--min-eval='))||'--min-eval=70').split('=')[1]);
 let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log('FAIL',m)}else console.log('ok  ',m)};
-(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const p=await b.newPage({viewport:{width:1440,height:900}});p.setDefaultTimeout(240000);
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});const p=await b.newPage({viewport:{width:1440,height:900}});p.setDefaultTimeout(240000);
 const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/ERR_FILE_NOT_FOUND/.test(m.text()))errs.push(m.text())});
 await p.goto('file://'+file,{waitUntil:'commit'});await p.waitForFunction(()=>window.go&&document.getElementById('app')&&document.getElementById('app').children.length>0,null,{timeout:120000});await p.waitForTimeout(500);
 const info=await p.evaluate(()=>({sets:K.sets.map(s=>({n:s.n,tag:s.tag,name:s.name})),title:CASE.title,wo:MH.length,ev:EVAL_CASES.length}));

@@ -21,3 +21,10 @@ jobs:
         run: npm test
       - name: Layout and accessibility audit (1440 px)
         run: npm run test:layout:quick
+      - name: "Case packs - validate, build and smoke test every case"
+        run: |
+          for c in lldpe mock-cdu _template; do
+            python3 tools/pack_validate.py $c
+            BUILD_OUT=/tmp/case-$c python3 build.py $c
+            node tests/smoke_case.js /tmp/case-$c/index.html
+          done

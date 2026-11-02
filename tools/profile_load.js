@@ -1,6 +1,6 @@
 // Profiles the initial load of the app with the Chrome CPU profiler. node tools/profile_load.js [out.json]
 const {chromium}=require('playwright'),path=require('path'),fs=require('fs');
-(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const ctx=await b.newContext({viewport:{width:1440,height:900}});const p=await ctx.newPage();
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});const ctx=await b.newContext({viewport:{width:1440,height:900}});const p=await ctx.newPage();
 const cdp=await ctx.newCDPSession(p);await cdp.send('Profiler.enable');await cdp.send('Profiler.setSamplingInterval',{interval:500});await cdp.send('Profiler.start');
 const t0=Date.now();await p.goto('file://'+path.join(__dirname,'..','knowledge-hub-integrated_BAP5.html'),{waitUntil:'commit'});
 await p.waitForFunction(()=>window.go&&document.getElementById('app')&&document.getElementById('app').children.length>0,null,{timeout:180000});const t1=Date.now();

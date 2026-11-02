@@ -1,6 +1,6 @@
 // Dumps all visible page text (every page, tab and view) to a JSON map. node tools/text_audit.js out.json
 const {chromium}=require('playwright'),path=require('path'),fs=require('fs');
-(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const p=await b.newPage({viewport:{width:1440,height:900}});p.setDefaultTimeout(120000);
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});const p=await b.newPage({viewport:{width:1440,height:900}});p.setDefaultTimeout(120000);
 await p.goto('file://'+path.resolve(process.argv[3]||path.join(__dirname,'..','knowledge-hub-integrated_BAP5.html')),{waitUntil:'commit'});await p.waitForFunction(()=>window.go&&document.getElementById('app')&&document.getElementById('app').children.length>0);
 const V=[['dashboard',()=>go('dashboard')],['dash analytics',()=>{go('dashboard');clickText('Analytics')}],['mywork',()=>go('mywork')],['equipment',()=>go('equipment')],['plot',()=>{PP.mode='explore';go('plot')}],['hazard',()=>{PP.mode='hazard';go('plot')}],['perf',()=>go('perf')],['scn',()=>go('scn')],['il',()=>go('il')],['ai',()=>go('ai')],['fm',()=>go('fm')],['documents',()=>go('documents')],['opl',()=>go('opl')],['rc',()=>go('rc')],['quality',()=>go('quality')]];
 for(const v of ['dash','table','time','pdm','replay','plan'])V.push(['mnt '+v,`()=>{MHS.view='${v}';go('mnt')}`]);

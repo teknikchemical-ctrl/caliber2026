@@ -6,12 +6,13 @@ One HTML file, assembled from the files in `src/` by `build.py`. Edit the source
 
 | Path | Contents |
 |---|---|
-| `src/base.html` | The original shell, the baseline data (documents, instruments, interlocks, OPLs) and the OPL simulator |
+| `src/base.html` | The shell and the OPL simulator. The plant data it used to hold is now in the case pack |
+| `cases/<id>/` | One plant: data (`kb.json`, `dsil.json`, `ga.json`, `mh.json`, `eval_cases.json`, `case.json`) and optional hand-drawn geometry in `geo/`. See `docs/CASE_PACKS.md` |
 | `src/modules/*.js` | Feature modules, joined in the order listed in `build.py` |
 | `src/modules/style*.css` | Styles |
-| `src/data/` | Maintenance history, evaluation questions, SQL schema, prompt template |
+| `src/data/` | Equipment class library (`eqclass.json`), SQL schema, prompt template |
 | `netlify/functions/` | The server side: `ai`, `kb`, `embed`, `health`, `selftest` |
-| `tools/` | Theme and wording clean-up, local dev server |
+| `tools/` | Theme and wording clean-up, local dev server, case pack tools (`pack_validate.py`, `pack_build.py`, `pack_import_mh.py`, `pdf_pages.sh`), crawlers and profilers |
 | `tests/` | Static checks, regression, live test, layout audit |
 | `docs/` | These notes and the backend specs |
 
@@ -23,7 +24,7 @@ User knowledge goes through Draft, In review, Approved, Superseded, Rejected. Ev
 
 **Assistant** (`ai.js`, `intent.js`). `intent.js` works out what is being asked (bypass request, consequence, comparison, ranking, history, procedure, chain reaction and so on). Counts, rankings, forecasts and similar are calculated in the browser, not by the model. With an AI connected, the calculated result and the retrieved records go to `/api/ai`, and the model writes the answer. The page then checks every number and citation against the records. A request to bypass a protection is always answered by the built-in rule, never by the model.
 
-**Views.** P&ID engine (`pid2.js`, `pidx.js`), drawings (`ga.js`), plot plan (`pp.js`), maintenance (`mh1-4.js`, `pdm.js`, `rp.js`), scenarios (`scn.js`, `scnui.js`), Knowledge Studio (`ks.js`, `wiz.js`), reports (`rc.js`), coverage (`cov.js`), integrations (`int.js`).
+**Views.** P&ID engine (`pid2.js`; automatic sheets in `auto.js`), drawings (`ga.js`), plot plan (`pp.js`), maintenance (`mh1-4.js`, `pdm.js`, `rp.js`), scenarios (`scn.js`, `scnui.js`), Knowledge Studio (`ks.js`, `wiz.js`), reports (`rc.js`), coverage (`cov.js`), integrations (`int.js`).
 
 **Helpers** (`fx.js`, `help.js`, `ui.js`). Label de-collision for SVG figures, motion, the guided tour, shared UI patterns and accessibility fixes.
 

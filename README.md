@@ -4,6 +4,10 @@ Knowledge hub for the LLDPE unit, built for CALIBER 2026 Case 1. It puts the P&I
 
 All plant data in the repository is the sample data supplied for CALIBER.
 
+## Other plants
+
+The app is an engine plus a case pack. `cases/lldpe` is this plant. A new plant is described in a short `plant.json` and compiled into a pack (`python3 tools/pack_build.py cases/<id>`, `python3 build.py <id>`). `cases/mock-cdu` shows the result for a crude distillation unit with no drawn geometry. See `docs/CASE_PACKS.md`, `docs/NEW_CASE_RUNBOOK.md` and `CLAUDE.md`.
+
 ## Run it
 
 Open `knowledge-hub-integrated_BAP5.html` in a browser. It works on its own, with data kept in the browser.

@@ -4,7 +4,7 @@
 const {chromium}=require('playwright'),path=require('path'),fs=require('fs');
 const file=path.resolve(process.argv[2]||'dist/index.html'),out=path.resolve(process.argv[3]||'/tmp/case_shots'),quick=process.argv.includes('--quick');
 fs.mkdirSync(out,{recursive:true});
-(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
 const p=await b.newPage({viewport:{width:1440,height:900}});p.setDefaultTimeout(60000);
 const errs=[];p.on('pageerror',e=>errs.push('pageerror: '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/ERR_FILE_NOT_FOUND/.test(m.text()))errs.push('console: '+m.text())});
 await p.goto('file://'+file,{waitUntil:'commit'});

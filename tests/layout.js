@@ -1,7 +1,7 @@
-/* Layout audit: opens every page, tab and key modal at several widths and reports overlapping text, clipped text,
+/* Layout audit (set PAGE=/path/to/index.html to audit another case's build): opens every page, tab and key modal at several widths and reports overlapping text, clipped text,
    content spilling out of its card and horizontal page overflow. Run: node tests/layout.js [--strict] */
 const path=require("path"),{chromium}=require("playwright");
-const FILE="file://"+path.resolve(__dirname,"..","knowledge-hub-integrated_BAP5.html"),STRICT=process.argv.includes("--strict");
+const FILE="file://"+path.resolve(process.env.PAGE||path.join(__dirname,"..","knowledge-hub-integrated_BAP5.html")),STRICT=process.argv.includes("--strict");
 const AUDIT=`(()=>{
  const sel=e=>{let s=e.tagName.toLowerCase();if(e.id)s+="#"+e.id;else if(e.className&&typeof e.className==="string")s+="."+e.className.trim().split(/\\s+/).slice(0,2).join(".");return s};
  const vis=e=>{const r=e.getBoundingClientRect(),cs=getComputedStyle(e);return r.width>2&&r.height>2&&cs.visibility!=="hidden"&&cs.display!=="none"&&cs.opacity!=="0"};
