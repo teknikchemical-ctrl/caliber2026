@@ -28,8 +28,7 @@ function pidFrameUpd(){const n=P.set,e=$("#pht"),g=$("#phs");if(!e||!g)return;co
 const _pUpd0=pUpd;pUpd=function(){_pUpd0.apply(this,arguments);try{pidFrameUpd()}catch(e){}};
 /* ---------- plant overview: all unit P&IDs connected by process streams on the plot plan grid ---------- */
 const OV={sel:0,ov:"live",z:1,vb:[0,0,1900,1070],timer:null,TW:420,TH:300,HH:42};
-const OVX=c=>20+c*480,OVY=r=>r?680:56,OVCOL={1:[0,0],2:[1,0],3:[2,0],4:[3,0],5:[0,1],6:[1,1],7:[2,1],8:[3,1]};
-const OVL=[["feed","Hexane feed",1,3,"proc",0,[110,60]],["slr","Heated solvent",5,1,"proc",null,[150,150]],["eff","Reactor effluent",3,6,"proc",1,[130,-130]],["pol","Polymer slurry",6,2,"proc",null,[140,150]],["rg","Recycle gas",6,4,"gas",2,[190,-60]],["rgr","Recycle gas return",4,3,"gas",null,null],["cwk","Cooling water",7,4,"cw",3,[-120,100]],["cwf","Cooling water",7,8,"cw",null,null],["sol","Hexane solvent",8,5,"proc",4,[-150,-110]],["n2","Nitrogen header",0,[2,3,8],"n2",5,[0,[ -170,170,-160]]],["stm","Steam header",0,[5,2],"stm",6,[0,[-60,110]]]];
+/*@@CASE:ov@@*/
 function ovTile(n){const [c,r]=OVCOL[n];return{x:OVX(c),y:OVY(r),w:OV.TW,h:OV.HH+OV.TH,c,r}}
 function ovStreams(){const L=[],lane=k=>448+k*30;
  OVL.forEach(([id,lab,a,b,svc,ln_,off])=>{if(a===0){const ts=b.map(x=>ovTile(x)),y=lane(ln_),xs=ts.map(t=>t.x+t.w/2+(off[1][b.indexOf(b[ts.indexOf(t)])]||0));const pts=[[20,y],[1880,y]];L.push({id,lab,svc,from:0,to:b,pts:[[30,y],[Math.max(...xs),y]],util:1,stubs:b.map((x,i)=>{const t=ts[i],px=xs[i];return t.r?[[px,y],[px,t.y]]:[[px,y],[px,t.y+t.h]]}),ly:y});return}

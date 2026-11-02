@@ -2,7 +2,7 @@
    safety critical requests, rankings and data issues. Handlers return {text, sources, conf, intent}. A remote LLM receives the same
    tools, so the behaviour is identical whether the answer is composed locally or by a model. ===== */
 regMod("intent","1.0",["dl","fx","ai","fm"],"Intent classification and answer handlers");
-const SET_ALIAS={1:["feed pump","charge pump","hexane feed pump","ga-1201"],2:["polymer dryer","fluid bed dryer","dryer","yd-2301"],3:["catalyst reduction","reactor","dc-3401"],4:["recycle gas compressor","recycle compressor","compressor","kc-4501"],5:["solvent heater","heater","ea-5601"],6:["level control valve","lp separator","separator","lv-6701"],7:["cooling tower fan","cooling tower","tower fan","cooling fan","ct-7801"],8:["reflux accumulator","accumulator drum","reflux drum","fractionation","fa-8901"]};
+/*@@CASE:alias@@*/
 function aiSets(q){const l=" "+String(q).toLowerCase()+" ",hit=[];K.sets.forEach(s=>{const names=[s.tag.toLowerCase(),...(SET_ALIAS[s.n]||[])];let best=-1;names.forEach(a=>{const x=l.indexOf(a);if(x>=0&&(best<0||x<best))best=x});if(best>=0)hit.push([best,s.n])});
  if(hit.length)return hit.sort((a,b)=>a[0]-b[0]).map(h=>h[1]);
  /* no equipment named: infer from instrument tags, preferring interlock initiators, then the instrument index, then the P&ID */

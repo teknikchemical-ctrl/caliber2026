@@ -17,7 +17,7 @@ const HSE_LIM={heat:[[37.5,"Equipment damage, steel loses strength","#7a0f1b"],[
  blast:[[35,"Serious structural damage","#7a0f1b"],[21,"Heavy damage to buildings, ear drum rupture","#cf222e"],[7,"Windows break, light injury","#f08a24"]]};
 const HSE={sc:"cloud",n:1,hole:50,u:2,st:"D",esd:"auto",ign:-1,t:0,play:false,speed:6,view:"2d",tmax:480,T:null,R:null,seq:0,sel:null,resp:45,inv:null};
 /* ---------- source ---------- */
-const HSE_P={1:[16,80,1500],3:[6,250,60],4:[16,150,600],5:[16,200,2500],6:[8,120,1800],8:[10,120,3000]};
+/*@@CASE:hse@@*/
 function hseKey(n){const f=S(n).fluid||"";return/ethylene/i.test(f)?"ethylene":/hexane/i.test(f)?"hexane":/h2|hydrogen/i.test(f)?"hydrogen":null}
 function hseSrc(n){const k=hseKey(n);if(!k)return null;const d=HSE_P[n]||[8,100,800],o=K.opl.find(x=>x.set===n&&/barg/.test(x.dp||""));
  const P=o&&parseFloat(o.dp)||d[0],T=o&&(/(\d+)\s*degC/.exec(o.dt||"")||[])[1]||d[1];return{n,k,f:HSE_F[k],P:+P,T:+T,inv:HSE.inv||d[2]}}

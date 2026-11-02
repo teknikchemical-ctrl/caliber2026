@@ -8,8 +8,7 @@
    ===================================================================================================== */
 regMod("plant3d","1.0",["g3d"],"3D plant layout");
 const P3={built:false,cam:{yaw:-.62,pit:.6,dist:46,tx:0,ty:1.5,tz:0},to:null,sel:0,hover:0,pipe:null,orbit:false,labels:true,flow:true,motion:true,open:false,faces:[],units:{},pipes:[],t:0,dirty:true,cv:null,st:{},hit:[],pend:0,at:0,seq:0};
-const P3POS={1:[-16.5,-9],2:[-5.5,-9],3:[5.5,-9],4:[16.5,-9],5:[-16.5,9],6:[-5.5,9],7:[5.5,9],8:[16.5,9]};
-const P3SC={1:2.5,2:1.75,3:2.0,4:1.85,5:1.95,6:4.0,7:2.9,8:2.2};
+/*@@CASE:p3@@*/
 const P3SKY=[[233,240,248],[203,218,236]],P3GR=[214,220,228];
 function p3Prim(list,u,layer,id){const out=[];list.forEach(p=>g3Parts(p).forEach(f=>{g3Orient(p,f);let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r;f.u=u;f.layer=layer||2;f.pid=id||null;out.push(f)}));return out}
 function p3Place(n){const M=g3Mesh(n,.5),s=P3SC[n],[x0,z0]=P3POS[n],cx=(M.mn[0]+M.mx[0])/2,cz=(M.mn[2]+M.mx[2])/2,out=[];

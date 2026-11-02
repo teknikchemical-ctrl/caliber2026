@@ -2,10 +2,22 @@
 import re,subprocess,json,sys,os,tempfile
 ROOT=os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0,os.path.join(ROOT,'tools'))
+# case pack: python3 build.py [case-id]   (or CASE=case-id). Default: lldpe. See cases/README.md
+CASE=(sys.argv[1] if len(sys.argv)>1 and not sys.argv[1].startswith('-') else os.environ.get('CASE','lldpe'))
+CDIR=os.path.join(ROOT,'cases',CASE)
+if not os.path.isdir(CDIR): sys.exit('case pack not found: '+CDIR)
+cf=lambda *p:open(os.path.join(CDIR,*p)).read()
+AUTO={'pid':'autoPidAll();','gad':'autoGadAll();','g3m':'autoG3mAll();','plot':'autoPlot();','p3':'autoP3();','ov':'autoOv();','hse':'autoHse();','h3':'autoH3();','alias':'autoAlias();'}
 from theme import *
 base=open(os.path.join(ROOT,'src','base.html')).read()
-base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@KB_BLOB@@',open(os.path.join(ROOT,'src','data','kb_blob.html')).read())
-w=lambda f:open(os.path.join(ROOT,'src','modules',f)).read()
+base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@CASE:kb@@',cf('kb.json').strip()).replace('@@CASE:dsil@@',cf('dsil.json').strip())
+def snip(t):
+    def r(m):
+        n=m.group(1);f=os.path.join(CDIR,'geo',n+'.js')
+        return open(f).read() if os.path.exists(f) else AUTO[n]
+    return re.sub(r'/\*@@CASE:(\w+)@@\*/',r,t)
+w=lambda f:snip(open(os.path.join(ROOT,'src','modules',f)).read())
+base=snip(base)
 TMP=tempfile.mkdtemp()
 h=base
 def P(old,new,cnt=1):
@@ -32,8 +44,8 @@ for x,y in [('const vb=full?PP.vb:[0,0,880,830],o=[];','const vb=opt.vb||(full?P
  ('${full?"":`<div class="row" style="font-size:12px','${full||opt.mini?"":`<div class="row" style="font-size:12px')]:
     assert x in pp,x; pp=pp.replace(x,y)
 a=h.index('const gKey=(d,i)=>');b=h.index('const _r1=render;')
-mods=[w('dl.js'),w('ui.js'),w('facts.js'),w('ai.js'),w('intent.js'),w('gad.js'),w('ga.js'),pp,'const MH='+open(os.path.join(ROOT,'src','data','mh.json')).read()+';\nconst EVAL_CASES='+open(os.path.join(ROOT,'src','data','eval_cases.json')).read()+';\nconst SCHEMA_SQL='+json.dumps(open(os.path.join(ROOT,'src','data','schema.sql')).read())+';\nconst PROMPT_TEMPLATE='+json.dumps(open(os.path.join(ROOT,'src','data','prompt_template.md')).read())+';\n']
-for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pidx.js','pid2.js','pidv.js','pdm.js','pdm2.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','fx.js','help.js','auth.js','notify.js','ingest.js','gov.js','eq2.js','perf.js','ready.js','hse.js','hse3d.js','ai2.js','g3neck.js','g3d.js','g3r.js','plant3d.js','sim3d.js','plan.js','i18n.js','sync.js','dash.js','polish.js']:
+mods=[w('auto.js'),w('dl.js'),w('ui.js'),w('facts.js'),w('ai.js'),w('intent.js'),w('gad.js'),w('ga.js'),pp,'const MH='+cf('mh.json')+';\nconst EVAL_CASES='+cf('eval_cases.json')+';\nconst SCHEMA_SQL='+json.dumps(open(os.path.join(ROOT,'src','data','schema.sql')).read())+';\nconst PROMPT_TEMPLATE='+json.dumps(open(os.path.join(ROOT,'src','data','prompt_template.md')).read())+';\n']
+for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pid2.js','pidv.js','pdm.js','pdm2.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','fx.js','help.js','auth.js','notify.js','ingest.js','gov.js','eq2.js','perf.js','ready.js','hse.js','hse3d.js','ai2.js','g3neck.js','g3d.js','g3r.js','plant3d.js','sim3d.js','plan.js','i18n.js','sync.js','dash.js','polish.js']:
     try: mods.append(w(f))
     except FileNotFoundError: pass
 h=h[:a]+''.join(mods)+h[b:]

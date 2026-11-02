@@ -7,7 +7,7 @@
    ===================================================================================================== */
 regMod("hse3d","1.0",["g3r","hse"],"3D site view");
 const H3={built:false,cam:{yaw:.0,pit:.66,dist:175,tx:180,ty:2,tz:178},to:null,sel:0,drag:null};
-const H3_EL={1:0,2:6,3:0,4:0,5:0,6:3,7:12,8:4.5};
+/*@@CASE:h3@@*/
 function hse3Build(){if(H3.built)return;const faces=[];let pi=0,cur="";
  const add=(prims,tf,rn)=>{prims.forEach(p=>{g3Parts(p).forEach(f=>{g3Orient(p,f);faces.push({p:f.p.map(tf),n:rn?rn(f.n):f.n,mid:tf(f.mid),c:f.c,m:f.m,sm:f.sm,k:cur,pi,light:f.light,sc:f.sc})});pi++})};
  const id=v=>v,B=(x,y,z,w,h,d,c,o)=>g3B("",x,y,z,w,h,d,c,o),C=(ax,x,y,z,l,r,c,o)=>g3C("",ax,x,y,z,l,r,c,o);

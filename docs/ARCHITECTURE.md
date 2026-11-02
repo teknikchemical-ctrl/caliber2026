@@ -1,6 +1,6 @@
 # Architecture
 
-One HTML file, assembled from the files in `src/` by `build.py`. Edit the sources, never the generated file. `build.py` also writes `dist/index.html` for Netlify.
+One HTML file, assembled from the files in `src/` by `build.py`. Edit the sources, never the generated file. `build.py` also writes `dist/index.html` for Netlify. Generated files are not committed: Netlify and CI run the build.
 
 ## Layout
 
