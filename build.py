@@ -4,13 +4,14 @@ ROOT=os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0,os.path.join(ROOT,'tools'))
 # case pack: python3 build.py [case-id]   (or CASE=case-id). Default: lldpe. See cases/README.md
 CASE=(sys.argv[1] if len(sys.argv)>1 and not sys.argv[1].startswith('-') else os.environ.get('CASE','lldpe'))
-CDIR=os.path.join(ROOT,'cases',CASE)
+CDIR=CASE if os.path.isabs(CASE) else os.path.join(ROOT,'cases',CASE)
+OUT=os.environ.get('BUILD_OUT')   # build a throw-away copy to this folder instead of dist/ (used by tests and dry runs)
 if not os.path.isdir(CDIR): sys.exit('case pack not found: '+CDIR)
 cf=lambda *p:open(os.path.join(CDIR,*p)).read()
 AUTO={'pid':'autoPidAll();','gad':'autoGadAll();','g3m':'autoG3mAll();','plot':'autoPlot();','p3':'autoP3();','ov':'autoOv();','hse':'autoHse();','h3':'autoH3();','alias':'autoAlias();'}
 from theme import *
 base=open(os.path.join(ROOT,'src','base.html')).read()
-base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@CASE:kb@@',cf('kb.json').strip()).replace('@@CASE:dsil@@',cf('dsil.json').strip())
+base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@CASE:kb@@',cf('kb.json').strip()).replace('@@CASE:dsil@@',cf('dsil.json').strip()).replace('@@CASE:ga@@',cf('ga.json').strip())
 def snip(t):
     def r(m):
         n=m.group(1);f=os.path.join(CDIR,'geo',n+'.js')
@@ -63,8 +64,6 @@ P('if(tab==="overview"){','if(tab==="scn")b=scnUnitTab(n);else if(tab==="a360")b
 # search box and role selector in sidebar
 P('<div class="nav active" data-page="dashboard">','<div class="gsb" onclick="gsOpen()">Search the knowledge base <kbd>Ctrl K</kbd></div>\n  <div class="nav active" data-page="dashboard">')
 # ---------- P&ID layout touch-ups ----------
-P('tx(496,76,"CATALYST REDUCTION|REACTOR|DC-3401A",13,"middle",1)','tx(496,56,"CATALYST REDUCTION|REACTOR|DC-3401A",13,"middle",1)')
-P('bx(356,292,60,26,"Interlock T1|2oo3 VOTING",7)','bx(356,316,60,26,"Interlock T1|2oo3 VOTING",7)')
 # ---------- P&ID page uses the v2 sheet ----------
 i=h.index('<div class="sheet"><svg id="psvg"');j=h.index('</svg></div>',i)+12
 h=h[:i]+'<div class="sheet">${pidSvgOnly(P.set,{w:P.z+"%",keepSel:true})}</div>'+h[j:]
@@ -114,19 +113,22 @@ for old,new in [
  ('`Click the <b>','`Select the <b>'),('"Click the <b>','"Select the <b>'),
  ]:
     if old in h: h=h.replace(old,new)
-    else: print("WARN text patch missing:",old[:60])
+    elif CASE=="lldpe": print("WARN text patch missing:",old[:60])
 
 # ---------- 4. theme + cleanup ----------
 h=remap(h)
 h=h.replace(ROOT_OLD,ROOT_NEW)
 h=h.replace('<meta name="viewport" content="width=device-width, initial-scale=1.0" />','<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n<meta name="theme-color" content="#155ea3" />\n<link rel="manifest" href="manifest.webmanifest" />\n<link rel="icon" href="icon-192.png" />',1)
 h=strip_emoji(h); h=dashes(h)
-open(os.path.join(ROOT,'knowledge-hub-integrated_BAP5.html'),'w').write(h)
-os.makedirs(os.path.join(ROOT,'dist'),exist_ok=True)
-open(os.path.join(ROOT,'dist','index.html'),'w').write(h)
-import shutil
-for f in os.listdir(os.path.join(ROOT,'src','pwa')):
-    shutil.copy(os.path.join(ROOT,'src','pwa',f),os.path.join(ROOT,'dist',f))
+if OUT:
+    os.makedirs(OUT,exist_ok=True); open(os.path.join(OUT,'index.html'),'w').write(h)
+else:
+    open(os.path.join(ROOT,'knowledge-hub-integrated_BAP5.html'),'w').write(h)
+    os.makedirs(os.path.join(ROOT,'dist'),exist_ok=True)
+    open(os.path.join(ROOT,'dist','index.html'),'w').write(h)
+    import shutil
+    for f in os.listdir(os.path.join(ROOT,'src','pwa')):
+        shutil.copy(os.path.join(ROOT,'src','pwa',f),os.path.join(ROOT,'dist',f))
 bad=0
 for k,m in enumerate(re.finditer(r'<script>(.*?)</script>',h,re.S)):
     open(os.path.join(TMP,f'sc{k}.js'),'w').write(m.group(1))

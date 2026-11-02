@@ -2,7 +2,7 @@
 /*@@CASE:plot@@*/
 const MODES={dt:["Breakdown downtime (h)",n=>sum(woOf(n),m=>m.dt)],cm:["Corrective work orders",n=>cnt(woOf(n),m=>m.type==="Corrective")],rv:["Instruments flagged REVIEW",n=>cnt(K.inst,i=>i.set===n&&i.flag)]};
 const modeSel=()=>`<select onchange="st.f.mm=this.value;render()">${Object.entries(MODES).map(([k,[l]])=>`<option value="${k}" ${(st.f.mm||"dt")===k?"selected":""}>Colour by: ${l}</option>`).join("")}</select>`;
-const PS=4.6,PX=e=>(e-96)*PS+46,PY=n=>(n-96)*PS+34,AREAC=["#9ec5fe","#a5d6a7","#ffd59e","#f4a6a6","#cdb4f6","#9fe0d8","#f6e58d","#c3c9d6"];
+const PS=window.PPS||4.6,PX=e=>(e-96)*PS+46,PY=n=>(n-96)*PS+34,AREAC=["#9ec5fe","#a5d6a7","#ffd59e","#f4a6a6","#cdb4f6","#9fe0d8","#f6e58d","#c3c9d6"];
 const PP={sel:null,mode:"explore",L:{areas:1,heat:0,haz:0,esc:1,fire:0,walk:0},wind:315,op:[110,186],opn:[110,186],at:"Control room",anim:null,trail:[],clock:0,dist:0,round:null,drill:null,vb:[0,0,880,830],timer:null};
 const ppFP=n=>{const m=/([\d.]+)\s*x\s*([\d.]+)/.exec(S(n).pp.footprint_text);return[+m[1],+m[2]]};
 const ppAcc=n=>[POS[n][0],POS[n][1]<168?150:222];
