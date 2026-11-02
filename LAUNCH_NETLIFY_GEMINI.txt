@@ -60,6 +60,9 @@ Site configuration > Environment variables > Add a variable. Add these:
    AI_DAILY_MAX    600       total AI requests per day for the whole site. Keep it below the
                              daily limit AI Studio shows for your key.
 
+   CASE            lldpe     which plant to build (the folder name under cases/). Leave it out for the
+                             default case. Set it to the new case's folder name to deploy another plant.
+
 Optional:
    AI_RATE_PER_MIN  12       requests per visitor per minute
    AI_RATE_PER_DAY  120      requests per visitor per day

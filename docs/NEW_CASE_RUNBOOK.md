@@ -8,6 +8,9 @@ This is the plan for the hackathon day. It assumes two people, each with a Claud
 3. In each session run `bash tools/setup_env.sh`, then `python3 build.py` and `npm run test:quick`. Everything must be green before the day.
 4. Agree who is Stream A and who is Stream B (`CLAUDE.md`).
 
+## Deploying another case
+Netlify builds the default case (`lldpe`). For a new case set the environment variable `CASE=<id>` in Netlify (Site configuration > Environment variables) and redeploy, or change the default in `build.py`. For the drop package: `CASE=<id> python3 build.py && python3 tools/pack.py`. Locally: `python3 build.py <id>`.
+
 ## Hour by hour
 
 | When | Stream A (data and intelligence) | Stream B (pages, visuals, deliverables) |
