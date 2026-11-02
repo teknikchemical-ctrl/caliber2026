@@ -28,7 +28,7 @@ function p3Scene(){const F=[],add=(list,u,layer,id)=>F.push(...p3Prim(list,u||0,
  add([p3B(-33,2.2,0,9,4.4,7,"white",{r:.3,m:.1}),p3B(-33,4.5,0,9.4,.35,7.4,"steel",{r:.1}),...[-3,-1,1,3].map(x=>p3B(-33+x,2.4,3.52,1.4,1.1,.06,"blue",{r:.03})),p3B(-33,1.2,3.52,1.3,2.1,.06,"dark",{r:.04}),p3C("y",-30,5.2,-2,1.6,.08,"steel")],0,2);
  add([p3C("y",-33,3.6,-15,7.2,4.2,"paint",{m:.4,seg:48}),g3E("",  "y",-33,7.2,-15,1.4,4.2,"paint",0,Math.PI/2,{m:.4}),p3C("y",-29,3.6,-15,7.2,.1,"gray"),p3C("y",-33,.35,-15,.5,4.5,"gray"),...Array.from({length:6},(_,i)=>p3C("y",-33,.9+i*1.1,-15,.08,4.25,"steel",{m:.6,seg:48}))],0,2);
  add([p3C("y",33,13,-17,26,.45,"white",{m:.3,seg:16},.3),p3B(33,.3,-17,3,.6,3,"gray",{r:.2}),...[0,1,2,3,4,5].map(i=>p3B(33,3+i*4,-17,1.4,.18,1.4,"steel",{r:.05})),p3C("x",33,25,-17,2.2,.08,"steel",{seg:8})],0,2);
- const [sx,sz]=P3POS[6];add([p3C("y",sx-5.2,4,sz+1.2,7.2,1.5,"paint",{m:.5,seg:36}),g3E("","y",sx-5.2,7.6,sz+1.2,.9,1.5,"paint",0,Math.PI/2,{m:.5}),g3E("","y",sx-5.2,.4,sz+1.2,.9,1.5,"paint",Math.PI/2,Math.PI,{m:.5}),p3B(sx-5.2,.2,sz+1.2,2.4,.4,2.4,"gray",{r:.2})],0,2);
+ if(P3POS[6]&&/separator/i.test((S(6)||{}).name||"")){const [sx,sz]=P3POS[6];add([p3C("y",sx-5.2,4,sz+1.2,7.2,1.5,"paint",{m:.5,seg:36}),g3E("","y",sx-5.2,7.6,sz+1.2,.9,1.5,"paint",0,Math.PI/2,{m:.5}),g3E("","y",sx-5.2,.4,sz+1.2,.9,1.5,"paint",Math.PI/2,Math.PI,{m:.5}),p3B(sx-5.2,.2,sz+1.2,2.4,.4,2.4,"gray",{r:.2})],0,2)}
  return F}
 /* pipes: from a unit's top, up to a lane in the rack, along the rack, and down to the next unit */
 const P3LANE=(L)=>({y:4.3+(L%3)*.8+(L>=3?.0:0),z:(L-4)*.52});
@@ -39,10 +39,7 @@ function p3Routes(){const R=[],tops=n=>P3.units[n].top+.5,anch=(n,off)=>[P3POS[n
    R.push({id,lab,svc,from:0,to:b,pts:hdr,r:.22,hdr:1});tg.forEach(([x,z,n])=>{R.push({id:id+n,lab,svc,from:0,to:[n],pts:[[x,L.y,L.z],[x,L.y,z],[x,tops(n),z]],r:.14,stub:1,base:id})});return}
   const A=anch(a,off&&off[0]),B=anch(b,off&&off[1]);
   R.push({id,lab,svc,from:a,to:[b],pts:[[A[0],tops(a),A[1]],[A[0],L.y,A[1]],[A[0],L.y,L.z],[B[0],L.y,L.z],[B[0],L.y,B[1]],[B[0],tops(b),B[1]]],r:svc==="cw"?.26:svc==="gas"?.2:.18})});
- /* feed from the storage tank */
- const f1=P3.units[1],tk=[-33,-15];R.push({id:"tank",lab:"Hexane from 12-T-01",svc:"proc",from:0,to:[1],pts:[[tk[0]+4.2,1.2,tk[1]],[P3POS[1][0]-6,1.2,tk[1]],[P3POS[1][0]-6,1.2,P3POS[1][1]],[P3POS[1][0]-2.6,1.2,P3POS[1][1]]],r:.2});
- /* separator outlet to the control valve */
- const sp=P3POS[6];R.push({id:"sep",lab:"Separator outlet",svc:"proc",from:0,to:[6],pts:[[sp[0]-5.2,.9,sp[1]+1.2],[sp[0]-2.3,.9,sp[1]+1.2],[sp[0]-2.3,.9,sp[1]]],r:.18});
+ if(typeof P3EXTRA==="function")P3EXTRA(R);
  return R}
 function p3PipeFaces(R){const out=[];
  R.forEach((r,ri)=>{const col=(SVC[r.svc]||SVC.proc)[1],pts=r.pts,len=[0];

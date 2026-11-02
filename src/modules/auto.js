@@ -144,3 +144,10 @@ function autoH3(){window.H3_EL={};KB.sets.forEach(s=>{const h=((s.ga||{}).height
 function autoAlias(){window.SET_ALIAS={};KB.sets.forEach(s=>{const nm=String(s.name||"").toLowerCase(),a=[nm,nm.replace(/[\/\-]/g," "),String(s.tag).toLowerCase().replace(/-.*/,"")+" "+String(s.tag).toLowerCase().replace(/^[a-z]+-/,"")];
   nm.split(/[\s\/]+/).filter(w=>w.length>4&&!/system|unit|equipment|control/.test(w)).forEach(w=>{if(KB.sets.filter(o=>o.name.toLowerCase().split(/[\s\/]+/).includes(w)).length===1)a.push(w)});SET_ALIAS[s.n]=[...new Set(a)]})}
 function autoEqn(){window.EQN={};KB.sets.forEach(s=>{EQN[s.n]=s.name.toUpperCase()})}
+/* generic chain-reaction rules from the stream list: each stream that stops starves its receiver and blocks its sender. They are assumptions and are listed as such in the scenario register. */
+function autoScn(){window.SCN_UTIL={};window.SCN_RULES=[];const num=sp=>{const m=/(-?\d+(?:\.\d+)?)\s*([A-Za-z%\/0-9]*)/.exec(String(sp||""));return m?[parseFloat(m[1]),m[2]||""]:null};
+ const pick=(n,re)=>{const il=KB.IL[n]||{trig:[]},t=il.trig.filter(x=>num(x.sp));return t.find(x=>re.test(x.c+" "+x.sp))||null};
+ OVL.forEach(([id,lab,a,b],i)=>{if(typeof a!=="number"||typeof b!=="number")return;const sa=autoSet(a),sb=autoSet(b);if(!sa||!sb)return;
+  const lo=pick(b,/low|<|min/i),hi=pick(a,/high|>|max/i);
+  if(lo){const [v,u]=num(lo.sp);SCN_RULES.push({id:"S-"+id,ev:"supply",stream:id,unit:b,tag:lo.tag,name:lo.c,dir:"low",from:+(v*1.8||1).toFixed(2),to:+(v*.4).toFixed(2),u,trip:{tag:lo.tag,lim:lo.sp},delay:4+i,why:"The stream from "+sa.tag+" to "+sb.tag+" stops, so "+lo.c.toLowerCase()+" is reached at "+sb.tag+"."})}
+  if(hi){const [v,u]=num(hi.sp);SCN_RULES.push({id:"B-"+id,ev:"block",stream:id,unit:a,tag:hi.tag,name:hi.c,dir:"high",from:+(v*.6).toFixed(2),to:+(v*1.3).toFixed(2),u,trip:{tag:hi.tag,lim:hi.sp},delay:5+i,why:sb.tag+" is down and the stream from "+sa.tag+" cannot leave, so "+hi.c.toLowerCase()+" is reached at "+sa.tag+"."})}})}

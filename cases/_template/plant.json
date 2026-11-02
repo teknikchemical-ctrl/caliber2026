@@ -1,0 +1,491 @@
+{
+ "_help": "Template for tools/pack_build.py. Copy this folder to cases/<your-id>, edit, then run: python3 tools/pack_build.py cases/<your-id> && python3 build.py <your-id>. Every field below that is not marked required can be left out. See docs/CASE_PACKS.md.",
+ "case": {
+  "id": "template",
+  "title": "Example Plant",
+  "product": "Asset Knowledge Platform",
+  "subtitle": "Example Plant | Equipment Records",
+  "company": "Example Co",
+  "code": "EXP",
+  "brief": "hackathon brief"
+ },
+ "sets": [
+  {
+   "tag": "P-101A",
+   "name": "Crude Charge Pump",
+   "kind": "pump",
+   "type": "Centrifugal pump (API 610 BB2)",
+   "unit": "CRUDE PREHEAT",
+   "area": 100,
+   "fluid": "Crude oil",
+   "crit": "HIGH CRITICAL",
+   "size": "Suction 10 in, discharge 8 in",
+   "pid": {
+    "ref": "CDU-PID-101",
+    "title": "Crude charge pump system",
+    "sys": "Crude preheat (Unit 100)",
+    "process": "Crude oil is pumped from tank T-101 by charge pump P-101A through suction valve XV-101 to the preheat train and heater F-101. A minimum flow line with FV-101 returns flow to suction on low flow. Seal flush follows API Plan 11 with quench."
+   },
+   "ga": {
+    "length_mm": 3200,
+    "height_mm": 1100,
+    "cl_mm": 450,
+    "weight_kg": 4200,
+    "motor": "200 kW"
+   },
+   "pp": {
+    "footprint": "5.0 x 3.5 m",
+    "grid": "B-2",
+    "elev": "EL +0.00"
+   },
+   "assets": [
+    {
+     "tag": "T-101",
+     "name": "Crude Storage Tank (upstream)",
+     "type": "Storage tank",
+     "loc": "Tank farm"
+    },
+    {
+     "tag": "M-101A",
+     "name": "Charge pump motor",
+     "type": "Electric motor",
+     "power": "200 kW"
+    }
+   ],
+   "instruments": [
+    {
+     "tag": "XV-101",
+     "type": "Motor operated valve",
+     "var": "Suction isolation",
+     "sp": "START PERMISSIVE: open (ZSO-101)",
+     "act": "Closes on trip",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "ZSO-101",
+     "type": "Limit switch",
+     "var": "Suction valve open",
+     "sp": null,
+     "act": "Feeds start permissive",
+     "eq": "XV-101"
+    },
+    {
+     "tag": "PT-101",
+     "type": "Pressure transmitter",
+     "var": "Suction pressure",
+     "sp": "0.8 barg normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "PSLL-101",
+     "type": "Pressure switch",
+     "var": "Suction pressure low-low",
+     "sp": "< 0.3 barg",
+     "act": "Trips pump",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "PT-102",
+     "type": "Pressure transmitter",
+     "var": "Discharge pressure",
+     "sp": "24 barg normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "FT-101",
+     "type": "Flow transmitter",
+     "var": "Discharge flow",
+     "sp": "300 m3/h normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "FSLL-101",
+     "type": "Flow switch",
+     "var": "Discharge flow low-low",
+     "sp": "< 90 m3/h for 30 s",
+     "act": "Trips pump",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "FV-101",
+     "type": "Control valve",
+     "var": "Minimum flow",
+     "sp": "Opens on low flow",
+     "act": "Opens",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "TT-101",
+     "type": "Temperature transmitter",
+     "var": "Bearing temperature",
+     "sp": "70 degC normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "TSHH-101",
+     "type": "Temperature switch",
+     "var": "Bearing temperature high-high",
+     "sp": "> 95 degC",
+     "act": "Trips pump",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "VT-101",
+     "type": "Vibration transmitter",
+     "var": "Bearing vibration",
+     "sp": "3 mm/s normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "VSHH-101",
+     "type": "Vibration switch",
+     "var": "Bearing vibration high-high",
+     "sp": "> 9 mm/s",
+     "act": "Trips pump",
+     "eq": "P-101A"
+    }
+   ],
+   "datasheet": {
+    "no": "CDU-DS-P-101A",
+    "title": "CENTRIFUGAL PUMP DATA SHEET",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "P-101A"
+       ],
+       [
+        "Equipment Name",
+        "CRUDE CHARGE PUMP"
+       ],
+       [
+        "Type",
+        "Centrifugal pump API 610 BB2"
+       ],
+       [
+        "Service",
+        "Charge crude oil to preheat train"
+       ],
+       [
+        "Criticality",
+        "HIGH CRITICAL"
+       ]
+      ]
+     ],
+     [
+      "Design and mechanical",
+      [
+       [
+        "Flow",
+        "300 m3/h"
+       ],
+       [
+        "Differential head",
+        "250 m"
+       ],
+       [
+        "Suction pressure",
+        "0.8 barg"
+       ],
+       [
+        "Discharge pressure",
+        "24 barg"
+       ],
+       [
+        "Casing material",
+        "ASTM A216 WCB"
+       ],
+       [
+        "Motor power",
+        "200 kW"
+       ],
+       [
+        "Seal",
+        "Mechanical, API Plan 11 + 62"
+       ]
+      ]
+     ]
+    ]
+   },
+   "interlock": {
+    "logic": "SEQ-101",
+    "sil": "SIL 2",
+    "desc": "CRUDE CHARGE PUMP (P-101A) SHUTDOWN LOGIC",
+    "effects": [
+     "TRIP PUMP MOTOR M-101A",
+     "CLOSE SUCTION XV-101",
+     "OPEN MIN FLOW FV-101",
+     "ANNUNCIATE ALARM ON DCS"
+    ],
+    "triggers": [
+     {
+      "c": "Suction pressure LOW-LOW",
+      "tag": "PSLL-101",
+      "sp": "< 0.3 barg",
+      "vote": "2oo3",
+      "fx": [
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Discharge flow LOW-LOW",
+      "tag": "FSLL-101",
+      "sp": "< 90 m3/h for 30 s",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       0,
+       1,
+       1
+      ]
+     },
+     {
+      "c": "Bearing temperature HIGH-HIGH",
+      "tag": "TSHH-101",
+      "sp": "> 95 degC",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Bearing vibration HIGH-HIGH",
+      "tag": "VSHH-101",
+      "sp": "> 9 mm/s",
+      "vote": "1oo2",
+      "fx": [
+       1,
+       1,
+       0,
+       1
+      ]
+     }
+    ],
+    "permissives": [
+     [
+      "1",
+      "Suction valve open",
+      "ZSO-101"
+     ],
+     [
+      "2",
+      "Seal flush established (dP > 1.5 bar)",
+      "PDI-101"
+     ],
+     [
+      "3",
+      "No active trip / reset done",
+      "DCS reset"
+     ]
+    ]
+   },
+   "nozzles": [
+    {
+     "m": "N1",
+     "sv": "Suction",
+     "sz": "10\"-150# RF",
+     "face": "RF",
+     "r": "Crude from tank T-101 through XV-101"
+    },
+    {
+     "m": "N2",
+     "sv": "Discharge",
+     "sz": "8\"-300# RF",
+     "face": "RF",
+     "r": "To preheat train and heater F-101"
+    },
+    {
+     "m": "N3",
+     "sv": "Seal flush",
+     "sz": "1\" SW",
+     "face": "RF",
+     "r": "API Plan 11 flush"
+    },
+    {
+     "m": "N4",
+     "sv": "Casing drain",
+     "sz": "1\" SW",
+     "face": "RF",
+     "r": "Drain"
+    },
+    {
+     "m": "N5",
+     "sv": "Casing vent",
+     "sz": "1\" SW",
+     "face": "RF",
+     "r": "Vent"
+    }
+   ],
+   "bom": [
+    {
+     "name": "Casing",
+     "mat": "A216 WCB",
+     "qty": 1
+    },
+    {
+     "name": "Impeller",
+     "mat": "A743 CA6NM",
+     "qty": 1
+    },
+    {
+     "name": "Shaft",
+     "mat": "AISI 4140",
+     "qty": 1
+    },
+    {
+     "name": "Mechanical seal",
+     "mat": "Carbon / SiC",
+     "qty": 1
+    },
+    {
+     "name": "Bearing housing",
+     "mat": "Cast iron",
+     "qty": 1
+    },
+    {
+     "name": "Wear ring",
+     "mat": "SS410",
+     "qty": 2
+    },
+    {
+     "name": "Coupling",
+     "mat": "AISI 4140",
+     "qty": 1
+    },
+    {
+     "name": "Baseplate",
+     "mat": "Carbon steel",
+     "qty": 1
+    }
+   ],
+   "opl": [
+    {
+     "title": "Mechanical seal flush (API Plan 11) check",
+     "cls": "Trouble Case",
+     "obj": "Confirm seal flush dP above 1.5 bar before start.",
+     "steps": [
+      [
+       "Line up flush to seal chamber",
+       "LOTO verified"
+      ],
+      [
+       "Check PDI-101 reads 1.5 to 2.5 bar",
+       "Within range"
+      ],
+      [
+       "Check no leak at seal",
+       "Dry"
+      ]
+     ],
+     "cases": [
+      [
+       "Crude leak at seal gland",
+       "Flush orifice plugged",
+       "Cleaned orifice, replaced seal cartridge"
+      ]
+     ],
+     "dp": "24 barg",
+     "dt": "120 degC",
+     "tags": "PDI-101, PSLL-101",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    },
+    {
+     "title": "Pump start-up and priming",
+     "cls": "Basic Knowledge",
+     "obj": "Prime and vent the pump before every start.",
+     "steps": [
+      [
+       "Open suction valve XV-101",
+       "Valve open (ZSO-101)"
+      ],
+      [
+       "Vent casing at N5",
+       "Liquid at vent"
+      ],
+      [
+       "Start motor and open discharge slowly",
+       "Flow above 90 m3/h"
+      ]
+     ],
+     "cases": [
+      [
+       "Pump does not build pressure",
+       "Air in casing",
+       "Re-vent and re-prime"
+      ]
+     ],
+     "dp": "24 barg",
+     "dt": "120 degC",
+     "tags": "XV-101, ZSO-101",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "T-201",
+   "name": "Product Tank",
+   "kind": "vessel",
+   "unit": "STORAGE",
+   "area": 200,
+   "fluid": "Naphtha",
+   "crit": "MEDIUM CRITICAL",
+   "pid": {
+    "process": "Product from the unit is received in tank T-201 and pumped to the terminal."
+   },
+   "ga": {
+    "length_mm": 12000,
+    "height_mm": 10000
+   },
+   "pp": {
+    "footprint": "14.0 x 14.0 m",
+    "grid": "B-3"
+   },
+   "instruments": [
+    {
+     "tag": "LT-201",
+     "type": "Level transmitter",
+     "var": "Tank level",
+     "sp": "60 % normal"
+    },
+    {
+     "tag": "LSHH-201",
+     "type": "Level switch",
+     "var": "Level high-high",
+     "sp": "> 92 %",
+     "act": "Closes inlet"
+    }
+   ]
+  }
+ ],
+ "history": {
+  "source": "synthetic",
+  "per_set": 10
+ }
+}

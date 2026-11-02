@@ -15,7 +15,7 @@ def _meta():
     m.setdefault('examples',[]); m.setdefault('failures',[]); m.setdefault('dsprefix',m.get('code','')+'-DS' if m.get('code') else 'DS')
     return m
 META=_meta()
-AUTO={'pid':'autoPidAll();','gad':'autoGadAll();','g3m':'autoG3mAll();','plot':'autoPlot();','p3':'autoP3();','ov':'autoOv();','hse':'autoHse();','h3':'autoH3();','alias':'autoAlias();','eqn':'autoEqn();'}
+AUTO={'pid':'autoPidAll();','gad':'autoGadAll();','g3m':'autoG3mAll();','plot':'autoPlot();','p3':'autoP3();','ov':'autoOv();','hse':'autoHse();','h3':'autoH3();','alias':'autoAlias();','eqn':'autoEqn();','scn':'autoScn();'}
 from theme import *
 base=open(os.path.join(ROOT,'src','base.html')).read()
 base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@CASE:kb@@',cf('kb.json').strip()).replace('@@CASE:dsil@@',cf('dsil.json').strip()).replace('@@CASE:ga@@',cf('ga.json').strip()).replace('@@CASE:meta@@',json.dumps(META))
