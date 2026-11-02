@@ -15,7 +15,7 @@ Netlify builds the default case (`lldpe`). For a new case set the environment va
 
 | When | Stream A (data and intelligence) | Stream B (pages, visuals, deliverables) |
 |---|---|---|
-| 0:00 to 0:30 | Read the brief. Fill `docs/CAPABILITIES.md` against it: which asks the app already covers, which need a new module. Copy `cases/_template` to `cases/<id>`. | Same brief. Decide the story: the three questions the judges will ask and the one demo path. Start the deck outline. |
+| 0:00 to 0:30 | Read the brief. Fill `docs/CAPABILITIES.md` against it: which asks the app already covers, which need a new module. Run `tools/new_case.sh <id> "<Plant title>"`. | Same brief. Decide the story: the three questions the judges will ask and the one demo path. Start the deck outline. |
 | 0:30 to 2:30 | **Intake.** Split the documents with `tools/pdf_pages.sh`, read them, write `plant.json` (use `docs/INTAKE_PROMPTS.md`). Import the maintenance history with `tools/pack_import_mh.py` if it is a spreadsheet. | Research and numbers for the business case. Reuse the finance and report builders, change the inputs. |
 | 2:30 to 3:00 | `python3 tools/pack_build.py cases/<id>`, fix every error from the validator, `python3 build.py <id>`, `node tests/smoke_case.js`. **Push. First public URL exists.** | Review the first build on the URL: list what looks wrong or wrong-worded. |
 | 3:00 to 7:00 | Make the assistant excellent on this case: add case-specific evaluation questions, fix wrong answers, add any case-specific tool. Keep the score above 90%. | Hand-draw the two or three hero units: put the corrected sheets in `cases/<id>/geo/pid.js` (or accept the generated ones). Build the case-specific page the brief asks for. |

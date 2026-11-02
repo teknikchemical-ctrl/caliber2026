@@ -18,6 +18,7 @@ Single-file web app (Asset Knowledge Platform) built from `src/` and a **case pa
 | Layout audit | `node tests/layout.js --quick --strict` |
 | Screenshots of every page | `node tools/case_shots.js dist/index.html /tmp/shots [--quick]` |
 | Check a pack | `python3 tools/pack_validate.py <id>` |
+| New case from the template | `tools/new_case.sh <id> "<title>" [CODE]` |
 | Compile plant.json to a pack | `python3 tools/pack_build.py cases/<id>` |
 | Import work orders from Excel | `python3.13 tools/pack_import_mh.py in.xlsx cases/<id>/mh.json` |
 | Visible text audit | `node tools/text_audit.js /tmp/t.json dist/index.html` |
