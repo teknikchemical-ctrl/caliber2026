@@ -32,7 +32,7 @@ function covGen(){const Q=[],add=(cat,q,exp,o={})=>Q.push({cat,q,exp:[].concat(e
   const ot=K.opl.find(o=>o.set===s.n&&(o.ts||[]).length);if(ot){const t=ot.ts[0];add("Failure memory",`How was this resolved: ${t[0].slice(0,70)}`,(t[2].split(/[ ,]+/).filter(w=>w.length>5)[0]||t[2].slice(0,8)))}
   const cr=MH.find(r=>r.n===s.n&&r.bd==="Yes"&&r.root&&r.root.length>12);if(cr)add("Root cause",`What was the root cause of ${cr.prob.slice(0,80)} on ${s.tag}?`,cr.root.split(/[ ,]+/).filter(w=>w.length>5)[0]||cr.root.slice(0,8));
   const wo=MH.filter(r=>r.n===s.n).slice(-1)[0];if(wo)add("Maintenance",`What was the latest work order on ${s.tag}?`,wo.wo)});
-["What is the weather in Jakarta today?","Who won the football match yesterday?","What is the stock price of Chandra Asri?","Give me a recipe for fried rice"].forEach(q=>add("Out of scope (must refuse)",q,[],{neg:true}));
+["What is the weather in Jakarta today?","Who won the football match yesterday?","What is the stock price of the company?","Give me a recipe for fried rice"].forEach(q=>add("Out of scope (must refuse)",q,[],{neg:true}));
  (STORE.mem.cfg.cq||[]).forEach(c=>add("Custom question",c.q,c.exp?c.exp.split("|").map(x=>x.trim()):[],{neg:!c.exp}));
  return Q}
 async function covRun(){if(COV.running)return;COV.running=true;COV.res=[];const Q=covGen();COV.total=Q.length;COV.done=0;const cfg={...AI.cfg};AI.cfg.remote=false;AI.cfg.mock=false;const sv=window.AI_PROVIDER;window.AI_PROVIDER=undefined;covPaint();

@@ -20,7 +20,7 @@
   <div class="foot"><span class="dot" id="apiDot" style="background:var(--warn)"></span><span id="apiStatus">Local KB · 8 sets loaded</span></div>
 </aside>
 <main id="app"></main>
-<script>window.KB=@@CASE:kb@@;</script>
+<script>window.CASE=@@CASE:meta@@;window.NW=n=>["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve"][n]||String(n);window.KB=@@CASE:kb@@;</script>
 
 <style>
 .cx{border-collapse:collapse;width:100%;font-size:12.5px}.cx th,.cx td{border:1px solid var(--line);padding:6px 7px;text-align:center;vertical-align:middle}.cx th{background:var(--panel2);font-weight:600;font-size:11px}.cx td.l{text-align:left}
@@ -165,7 +165,7 @@ const modeSel=()=>`<select onchange="st.f.mm=this.value;render()">${Object.entri
 function dashboard(){
   const hi=K.issues.filter(i=>i.severity==="High"),noApp=cnt(K.docs,d=>!d.status),maxD=Math.max(...K.sets.map(s=>sum(woOf(s.n),m=>m.dt)));
   const cell=(ok,t)=>ok?`<span style="color:var(--ok)">✔${t?" "+t:""}</span>`:`<span style="color:var(--bad)">✘ missing</span>`;
-  return `<h1>Knowledge Hub Dashboard</h1><p class="sub">${K.sets.length} equipment knowledge sets · LLDPE unit · built from the CALIBER Case 1 knowledge base</p>
+  return `<h1>Knowledge Hub Dashboard</h1><p class="sub">${K.sets.length} equipment knowledge sets · ${CASE.title} · built from the ${CASE.brief} knowledge base</p>
   ${stats([[K.sets.length,"Equipment knowledge sets"],[K.docs.length,`Documents (${cnt(K.docs,d=>d.type==="One Point Lesson (OPL)")} OPL)`],[K.mnt.length,"Completed work orders"],[K.chunks.length+K.inst.length+K.mnt.length,"Indexed knowledge items"]])}
   <div class="split" style="margin-top:14px"><div class="card rel"><div class="row between"><h3>Plot plan · equipment locations</h3>${modeSel()}</div><p class="muted" style="margin-bottom:8px">Click an equipment node to open its knowledge set</p>${mapSvg(0)}</div>
   <div class="card"><h3>Needs attention</h3>
@@ -468,7 +468,7 @@ render();
 "use strict";
 const CL=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const F=(v,d=1)=>v==null||!isFinite(v)?"—":(+v).toFixed(d);
-const EQN={1:"HEXANE FEED PUMP",2:"POLYMER FLUID BED DRYER",3:"CATALYST REDUCTION REACTOR",4:"RECYCLE GAS COMPRESSOR",5:"SOLVENT HEATER",6:"SEPARATOR LEVEL CONTROL VALVE",7:"COOLING TOWER CELL FAN",8:"REFLUX ACCUMULATOR DRUM"};
+/*@@CASE:eqn@@*/
 const areaOf=n=>(S(n).pp.area_subtitle||"").replace(/^AREA\s*/i,"");
 const chk=(o,s)=>(K.chunks.find(c=>c.doc===o.doc&&c.sec.startsWith(s))||{}).text||"";
 const purposeOf=o=>{const m=/PURPOSE \/ OBJECTIVE: (.*?) Hazard note:/.exec(chk(o,"OPL Header"));return m?m[1]:o.obj};

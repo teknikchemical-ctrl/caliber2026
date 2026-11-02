@@ -1,0 +1,26 @@
+{
+ "id": "lldpe",
+ "title": "LLDPE unit",
+ "product": "Asset Knowledge Platform",
+ "subtitle": "LLDPE Unit | Equipment Records",
+ "company": "Chandra Asri",
+ "site": "Cilegon",
+ "brief": "CALIBER Case 1",
+ "plotref": "TJC-LLD-PP-XXXX",
+ "examples": [
+  "What is the start permissive for the recycle gas compressor KC-4501?",
+  "How is a mechanical seal leak on the hexane feed pump resolved?",
+  "Which interlocks protect the polymer dryer YD-2301?",
+  "Where is the cooling tower fan CT-7801 located?",
+  "What is the MTBF of each equipment?"
+ ],
+ "dsprefix": "TJC-LLD-DS",
+ "failures": [
+  "Mechanical seal leak on the hexane feed pump",
+  "Dryer trips on high vibration",
+  "Control valve sticking on level control",
+  "Heater outlet temperature overshoot",
+  "Gearbox oil pressure low on cooling tower fan",
+  "Recycle compressor surge"
+ ]
+}

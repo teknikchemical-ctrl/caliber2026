@@ -10,7 +10,16 @@ regMod("hse","1.0",[],"HSE hazard simulator");
 const HSE_F={
  hexane:{name:"n-Hexane",M:86.2,lfl:1.2,ufl:7.4,hc:44.7e6,rl:659,tb:69,hv:335e3,cp:2300,g:1.06,pv:24000,dense:true,burn:.105,sep:140},
  ethylene:{name:"Ethylene",M:28.05,lfl:2.7,ufl:36,hc:47.1e6,g:1.24,gas:true,sep:200},
- hydrogen:{name:"Hydrogen",M:2.016,lfl:4,ufl:75,hc:120e6,g:1.41,gas:true,light:true,sep:100}};
+ hydrogen:{name:"Hydrogen",M:2.016,lfl:4,ufl:75,hc:120e6,g:1.41,gas:true,light:true,sep:100},
+ /* screening properties of other common plant fluids: a case pack picks one through the fluid text of its equipment set */
+ propane:{name:"Propane / LPG",M:44.1,lfl:2.1,ufl:9.5,hc:46.4e6,g:1.13,gas:true,sep:150},
+ propylene:{name:"Propylene",M:42.1,lfl:2,ufl:11.1,hc:45.8e6,g:1.15,gas:true,sep:150},
+ butane:{name:"Butane",M:58.1,lfl:1.8,ufl:8.4,hc:45.7e6,g:1.1,gas:true,sep:150},
+ methane:{name:"Fuel gas (methane)",M:16.04,lfl:5,ufl:15,hc:50e6,g:1.31,gas:true,light:true,sep:100},
+ benzene:{name:"Benzene",M:78.1,lfl:1.2,ufl:7.8,hc:40.1e6,rl:879,tb:80,hv:394e3,cp:1740,g:1.1,pv:12700,dense:true,burn:.12,sep:140},
+ methanol:{name:"Methanol",M:32,lfl:6,ufl:36,hc:19.9e6,rl:792,tb:65,hv:1100e3,cp:2500,g:1.2,pv:13000,dense:false,burn:.03,sep:120},
+ naphtha:{name:"Naphtha / light hydrocarbon liquid",M:90,lfl:1.2,ufl:7.1,hc:44e6,rl:700,tb:100,hv:330e3,cp:2200,g:1.05,pv:20000,dense:true,burn:.1,sep:140}};
+const HSE_RE=[[/ethylene/i,"ethylene"],[/propylene/i,"propylene"],[/propane|\blpg\b/i,"propane"],[/butane/i,"butane"],[/hexane|pentane|heptane|solvent/i,"hexane"],[/h2|hydroge/i,"hydrogen"],[/fuel gas|natural gas|methane|\bcng\b|\blng\b/i,"methane"],[/benzene|toluene|xylene/i,"benzene"],[/methanol|ethanol/i,"methanol"],[/naphtha|gasoline|kerosene|diesel|crude|light ends|condensate oil/i,"naphtha"]];
 const HSE_ST={A:"Very unstable (bright sun, light wind)",B:"Unstable (sunny)",C:"Slightly unstable",D:"Neutral (overcast, windy)",E:"Stable (evening)",F:"Very stable (clear calm night)"};
 /* limits used for the zones */
 const HSE_LIM={heat:[[37.5,"Equipment damage, steel loses strength","#7a0f1b"],[12.5,"Fatal in about a minute, ignition of wood","#cf222e"],[4.7,"Pain in about 15 seconds, protective clothing needed","#f08a24"]],
@@ -18,7 +27,7 @@ const HSE_LIM={heat:[[37.5,"Equipment damage, steel loses strength","#7a0f1b"],[
 const HSE={sc:"cloud",n:1,hole:50,u:2,st:"D",esd:"auto",ign:-1,t:0,play:false,speed:6,view:"2d",tmax:480,T:null,R:null,seq:0,sel:null,resp:45,inv:null};
 /* ---------- source ---------- */
 /*@@CASE:hse@@*/
-function hseKey(n){const f=S(n).fluid||"";return/ethylene/i.test(f)?"ethylene":/hexane/i.test(f)?"hexane":/h2|hydrogen/i.test(f)?"hydrogen":null}
+function hseKey(n){const f=S(n).fluid||"";const m=HSE_RE.find(r=>r[0].test(f));return m?m[1]:null}
 function hseSrc(n){const k=hseKey(n);if(!k)return null;const d=HSE_P[n]||[8,100,800],o=K.opl.find(x=>x.set===n&&/barg/.test(x.dp||""));
  const P=o&&parseFloat(o.dp)||d[0],T=o&&(/(\d+)\s*degC/.exec(o.dt||"")||[])[1]||d[1];return{n,k,f:HSE_F[k],P:+P,T:+T,inv:HSE.inv||d[2]}}
 const hseUnits=()=>K.sets.filter(s=>hseKey(s.n));
@@ -207,7 +216,7 @@ const _ppPanel=ppPanel;ppPanel=function(){return PP.mode==="hazard"?(HSE.R?hsePa
 const _mapSvg=mapSvg;mapSvg=function(sel,opt){let s=_mapSvg.apply(this,arguments);if(opt&&opt.full&&PP.mode==="hazard"&&HSE.R)s=s.replace('<g id="ppcloud"></g>',`<g id="hseov">${hseOverlay(HSE.R,HSE.t)}</g><g id="ppcloud"></g>`);return s};
 function ppBody(){const M=[["explore","Site overview"],["hazard","Hazard simulator"]],LY=[["areas","Areas"],["heat","Heat map"],["haz","Hazard zones"],["esc","Muster and gates"],["fire","Fire protection"],["walk","Walkways"]];
  if(PP.mode==="release")PP.mode="hazard";if(PP.mode==="hazard"&&!HSE.R)hseCalc();
- return `<div class="split" style="grid-template-columns:minmax(0,1fr) 380px"><div class="card" style="min-width:0"><div class="row between" style="margin-bottom:8px"><h3>Plot plan | LLDPE unit <span class="tag">TJC-LLD-PP-XXXX</span></h3><span class="row" style="gap:4px">${M.map(([k,l])=>`<button class="${PP.mode===k?"":"ghost"}" style="padding:5px 11px;font-size:12.5px" onclick="PP.mode='${k}';ppUpd(true);render()">${l}</button>`).join("")}</span></div>
+ return `<div class="split" style="grid-template-columns:minmax(0,1fr) 380px"><div class="card" style="min-width:0"><div class="row between" style="margin-bottom:8px"><h3>Plot plan | ${CASE.title} ${CASE.plotref?`<span class="tag">${CASE.plotref}</span>`:""}</h3><span class="row" style="gap:4px">${M.map(([k,l])=>`<button class="${PP.mode===k?"":"ghost"}" style="padding:5px 11px;font-size:12.5px" onclick="PP.mode='${k}';ppUpd(true);render()">${l}</button>`).join("")}</span></div>
   <div id="pptask">${ppTaskBar()}</div>
   ${PP.mode==="hazard"?hseTL():`<div class="chips" style="margin:8px 0 6px;align-items:center">${LY.map(([k,l])=>`<span class="chip" style="${PP.L[k]?"color:var(--acc);border-color:var(--acc)":""}" onclick="PP.L['${k}']=PP.L['${k}']?0:1;ppUpd(true);render()">${l}</span>`).join("")}<span style="margin-left:auto" class="row"><button class="ghost" style="padding:3px 10px" onclick="ppZoom(1.25)">-</button><button class="ghost" style="padding:3px 10px" onclick="ppZoom(0)">Fit</button><button class="ghost" style="padding:3px 10px" onclick="ppZoom(.8)">+</button>${PP.L.heat?modeSel():""}</span></div>`}
   <div id="ppmap">${hseMapHTML()}</div>

@@ -8,10 +8,17 @@ CDIR=CASE if os.path.isabs(CASE) else os.path.join(ROOT,'cases',CASE)
 OUT=os.environ.get('BUILD_OUT')   # build a throw-away copy to this folder instead of dist/ (used by tests and dry runs)
 if not os.path.isdir(CDIR): sys.exit('case pack not found: '+CDIR)
 cf=lambda *p:open(os.path.join(CDIR,*p)).read()
-AUTO={'pid':'autoPidAll();','gad':'autoGadAll();','g3m':'autoG3mAll();','plot':'autoPlot();','p3':'autoP3();','ov':'autoOv();','hse':'autoHse();','h3':'autoH3();','alias':'autoAlias();'}
+def _meta():
+    m=json.loads(cf('case.json')) if os.path.exists(os.path.join(CDIR,'case.json')) else {}
+    m.setdefault('id',os.path.basename(CDIR)); m.setdefault('title',m['id'])
+    m.setdefault('product','Asset Knowledge Platform'); m.setdefault('subtitle',m['title']+' | Equipment Records'); m.setdefault('company',''); m.setdefault('brief','case'); m.setdefault('plotref','')
+    m.setdefault('examples',[]); m.setdefault('failures',[]); m.setdefault('dsprefix',m.get('code','')+'-DS' if m.get('code') else 'DS')
+    return m
+META=_meta()
+AUTO={'pid':'autoPidAll();','gad':'autoGadAll();','g3m':'autoG3mAll();','plot':'autoPlot();','p3':'autoP3();','ov':'autoOv();','hse':'autoHse();','h3':'autoH3();','alias':'autoAlias();','eqn':'autoEqn();'}
 from theme import *
 base=open(os.path.join(ROOT,'src','base.html')).read()
-base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@CASE:kb@@',cf('kb.json').strip()).replace('@@CASE:dsil@@',cf('dsil.json').strip()).replace('@@CASE:ga@@',cf('ga.json').strip())
+base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@CASE:kb@@',cf('kb.json').strip()).replace('@@CASE:dsil@@',cf('dsil.json').strip()).replace('@@CASE:ga@@',cf('ga.json').strip()).replace('@@CASE:meta@@',json.dumps(META))
 def snip(t):
     def r(m):
         n=m.group(1);f=os.path.join(CDIR,'geo',n+'.js')
@@ -84,7 +91,7 @@ for old,new in [('<b>OPERATOR TRAINING SIMULATOR</b> &nbsp;·&nbsp; ${tg0} &nbsp
     else: print("WARN missing",old[:60])
 
 # ---------- 3. language ----------
-for old,new in [('<title>AI Manufacturing Knowledge Hub</title>','<title>Asset Knowledge Platform</title>'),('⚙️ Knowledge Hub<small>CALIBER 2026 · Case 1</small>','Asset Knowledge Platform<small>LLDPE Unit | Equipment Records</small>'),
+for old,new in [('<title>AI Manufacturing Knowledge Hub</title>','<title>Asset Knowledge Platform</title>'),('⚙️ Knowledge Hub<small>CALIBER 2026 · Case 1</small>','Asset Knowledge Platform<small>'+META['subtitle']+'</small>'),
  ('["seq","OTS · Interlock simulator"]','["seq","Interlock Logic"]')]:
     P(old,new)
 P('(!f.ds||d.set==f.ds)&&(!q||(d.name+d.id).toLowerCase().includes(q)));','(!f.ds||d.set==f.ds)&&(!f.dst||ds(d)===f.dst)&&(!q||(d.name+d.id).toLowerCase().includes(q)));')

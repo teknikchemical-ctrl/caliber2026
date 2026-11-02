@@ -60,7 +60,7 @@ function autoPid(n){
  else{const hx=kind==="hx"||kind==="fired",W=kind==="dryer"?380:hx?260:240,H=kind==="dryer"?130:100,opt=kind==="dryer"?"dryer":kind==="hx"?"hx":kind==="fired"?"zz":"";addN([T,"h",X,ML,W,H," ",opt]);ann.push(tx(X,ML-H/2-12,T+"|"+s.name,9,"middle",1,0,1));
   inX=[X-W/2-10];top=ML-H/2;bot=ML+H/2;
   if(hx){outY=ML;outX=[X+W/2+10];pipes.push([[X0(),ML,X-W/2,ML],{g:gt}],[[X+W/2,ML,905,ML],{a:1,g:gt}]);
-   const hot=/heater|reboiler|evaporator|vaporizer/i.test(s.name),ul=hot?"STEAM":"COOLING|WATER";pipes.push([[X-60,ML-H/2-70,X-60,ML-H/2],{th:1,a:1}],[[X+60,ML+H/2,X+60,ML+H/2+70,905,ML+H/2+70],{th:1,a:1}]);ann.push(tx(X-60,ML-H/2-82,ul,8.5,"middle",1),tx(X+160,ML+H/2+84,hot?"CONDENSATE":"RETURN",8.5,"middle",1))}
+   const hot=/heater|reboiler|evaporator|vaporizer/i.test(s.name),ul=kind==="fired"?"FUEL|GAS":hot?"STEAM":"COOLING|WATER";pipes.push([[X-60,ML-H/2-70,X-60,ML-H/2],{th:1,a:1}],[[X+60,ML+H/2,X+60,ML+H/2+70,905,ML+H/2+70],{th:1,a:1}]);ann.push(tx(X-60,ML-H/2-82,ul,8.5,"middle",1),tx(X+160,ML+H/2+84,kind==="fired"?"FLUE|GAS":hot?"CONDENSATE":"RETURN",8.5,"middle",1))}
   else{outY=ML+H/2+60;pipes.push([[X0(),ML-20,X-W/2,ML-20],{g:gt}],[[X+60,ML+H/2,X+60,outY,905,outY],{a:1,g:gt}]);if(kind==="dryer")ann.push(tx(X,ML+H/2+14,"STEAM TUBE BUNDLE",8.5,"middle",1))}
   if(kind!=="hx"&&kind!=="fired"&&kind!=="dryer")ann.push();inY=hx?ML:ML-20}
  function X0(){return 116}
@@ -138,8 +138,9 @@ function autoPlot(){const {C,R}=autoGrid();window.PPS=Math.min(4.6,4.6*2/Math.ma
 function autoP3(){const {C,R}=autoGrid();window.P3POS={};window.P3SC={};KB.sets.forEach((s,i)=>{P3POS[s.n]=[((i%C)-(C-1)/2)*11,(Math.floor(i/C)-(R-1)/2)*18];
   const k=autoKind(s.n);P3SC[s.n]=k==="comp"?1.9:k==="fan"?2.4:k==="pump"?3:autoVertical(k)?1.9:2.2})}
 function autoOv(){const N=KB.sets.length,C=Math.min(6,Math.max(4,Math.ceil(N/2)));window.OVX=c=>20+c*480;window.OVY=r=>r?680:56;window.OVCOL={};KB.sets.forEach((s,i)=>{OVCOL[s.n]=[i%C,Math.floor(i/C)]});
- OV.vb=[0,0,20+C*480,1070];window.OVL=[];KB.sets.forEach((s,i)=>{if(i===KB.sets.length-1)return;const t=KB.sets[i+1];OVL.push([s.tag.toLowerCase().replace(/\W/g,""),"Process stream",s.n,t.n,"proc",OVCOL[s.n][1]===OVCOL[t.n][1]?null:0,[110,60]])})}
+ OV.vb=OV.vb0=[0,0,20+C*480,1070];window.OVN={};KB.sets.forEach(s=>{if(s.name.length>21)OVN[s.n]=s.name.replace(/\b(system|unit|equipment)\b/ig,'').replace(/\s+/g,' ').trim().slice(0,21)});window.OVL=[];KB.sets.forEach((s,i)=>{if(i===KB.sets.length-1)return;const t=KB.sets[i+1];OVL.push([s.tag.toLowerCase().replace(/\W/g,""),"Process stream",s.n,t.n,"proc",OVCOL[s.n][1]===OVCOL[t.n][1]?null:0,[110,60]])})}
 function autoHse(){window.HSE_P={}}
 function autoH3(){window.H3_EL={};KB.sets.forEach(s=>{const h=((s.ga||{}).height_mm||0)/1000;H3_EL[s.n]=h>8?+(h*.8).toFixed(1):0})}
 function autoAlias(){window.SET_ALIAS={};KB.sets.forEach(s=>{const nm=String(s.name||"").toLowerCase(),a=[nm,nm.replace(/[\/\-]/g," "),String(s.tag).toLowerCase().replace(/-.*/,"")+" "+String(s.tag).toLowerCase().replace(/^[a-z]+-/,"")];
-  nm.split(/[\s\/]+/).filter(w=>w.length>4&&!/system|unit|equipment|control/.test(w)).forEach(w=>a.push(w));SET_ALIAS[s.n]=[...new Set(a)]})}
+  nm.split(/[\s\/]+/).filter(w=>w.length>4&&!/system|unit|equipment|control/.test(w)).forEach(w=>{if(KB.sets.filter(o=>o.name.toLowerCase().split(/[\s\/]+/).includes(w)).length===1)a.push(w)});SET_ALIAS[s.n]=[...new Set(a)]})}
+function autoEqn(){window.EQN={};KB.sets.forEach(s=>{EQN[s.n]=s.name.toUpperCase()})}

@@ -1,0 +1,2317 @@
+{
+ "case": {
+  "id": "mock-cdu",
+  "title": "Crude Distillation Unit",
+  "product": "Asset Knowledge Platform",
+  "subtitle": "CDU | Equipment Records",
+  "company": "Demonstration Refinery",
+  "site": "Demo site",
+  "code": "CDU"
+ },
+ "sets": [
+  {
+   "tag": "P-101A",
+   "name": "Crude Charge Pump",
+   "kind": "pump",
+   "type": "Centrifugal pump (API 610 BB2)",
+   "unit": "CRUDE PREHEAT",
+   "area": 100,
+   "fluid": "Crude oil",
+   "crit": "HIGH CRITICAL",
+   "size": "Suction 10 in, discharge 8 in",
+   "pid": {
+    "ref": "CDU-PID-101",
+    "title": "Crude charge pump system",
+    "sys": "Crude preheat (Unit 100)",
+    "process": "Crude oil is pumped from tank T-101 by charge pump P-101A through suction valve XV-101 to the preheat train and heater F-101. A minimum flow line with FV-101 returns flow to suction on low flow. Seal flush follows API Plan 11 with quench."
+   },
+   "ga": {
+    "length_mm": 3200,
+    "height_mm": 1100,
+    "cl_mm": 450,
+    "weight_kg": 4200,
+    "motor": "200 kW"
+   },
+   "pp": {
+    "footprint": "5.0 x 3.5 m",
+    "grid": "B-2",
+    "elev": "EL +0.00"
+   },
+   "assets": [
+    {
+     "tag": "T-101",
+     "name": "Crude Storage Tank (upstream)",
+     "type": "Storage tank",
+     "loc": "Tank farm"
+    },
+    {
+     "tag": "M-101A",
+     "name": "Charge pump motor",
+     "type": "Electric motor",
+     "power": "200 kW"
+    }
+   ],
+   "instruments": [
+    {
+     "tag": "XV-101",
+     "type": "Motor operated valve",
+     "var": "Suction isolation",
+     "sp": "START PERMISSIVE: open (ZSO-101)",
+     "act": "Closes on trip",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "ZSO-101",
+     "type": "Limit switch",
+     "var": "Suction valve open",
+     "sp": null,
+     "act": "Feeds start permissive",
+     "eq": "XV-101"
+    },
+    {
+     "tag": "PT-101",
+     "type": "Pressure transmitter",
+     "var": "Suction pressure",
+     "sp": "0.8 barg normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "PSLL-101",
+     "type": "Pressure switch",
+     "var": "Suction pressure low-low",
+     "sp": "< 0.3 barg",
+     "act": "Trips pump",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "PT-102",
+     "type": "Pressure transmitter",
+     "var": "Discharge pressure",
+     "sp": "24 barg normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "FT-101",
+     "type": "Flow transmitter",
+     "var": "Discharge flow",
+     "sp": "300 m3/h normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "FSLL-101",
+     "type": "Flow switch",
+     "var": "Discharge flow low-low",
+     "sp": "< 90 m3/h for 30 s",
+     "act": "Trips pump",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "FV-101",
+     "type": "Control valve",
+     "var": "Minimum flow",
+     "sp": "Opens on low flow",
+     "act": "Opens",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "TT-101",
+     "type": "Temperature transmitter",
+     "var": "Bearing temperature",
+     "sp": "70 degC normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "TSHH-101",
+     "type": "Temperature switch",
+     "var": "Bearing temperature high-high",
+     "sp": "> 95 degC",
+     "act": "Trips pump",
+     "eq": "P-101A"
+    },
+    {
+     "tag": "VT-101",
+     "type": "Vibration transmitter",
+     "var": "Bearing vibration",
+     "sp": "3 mm/s normal",
+     "act": null,
+     "eq": "P-101A"
+    },
+    {
+     "tag": "VSHH-101",
+     "type": "Vibration switch",
+     "var": "Bearing vibration high-high",
+     "sp": "> 9 mm/s",
+     "act": "Trips pump",
+     "eq": "P-101A"
+    }
+   ],
+   "datasheet": {
+    "no": "CDU-DS-P-101A",
+    "title": "CENTRIFUGAL PUMP DATA SHEET",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "P-101A"
+       ],
+       [
+        "Equipment Name",
+        "CRUDE CHARGE PUMP"
+       ],
+       [
+        "Type",
+        "Centrifugal pump API 610 BB2"
+       ],
+       [
+        "Service",
+        "Charge crude oil to preheat train"
+       ],
+       [
+        "Criticality",
+        "HIGH CRITICAL"
+       ]
+      ]
+     ],
+     [
+      "Design and mechanical",
+      [
+       [
+        "Flow",
+        "300 m3/h"
+       ],
+       [
+        "Differential head",
+        "250 m"
+       ],
+       [
+        "Suction pressure",
+        "0.8 barg"
+       ],
+       [
+        "Discharge pressure",
+        "24 barg"
+       ],
+       [
+        "Casing material",
+        "ASTM A216 WCB"
+       ],
+       [
+        "Motor power",
+        "200 kW"
+       ],
+       [
+        "Seal",
+        "Mechanical, API Plan 11 + 62"
+       ]
+      ]
+     ]
+    ]
+   },
+   "interlock": {
+    "logic": "SEQ-101",
+    "sil": "SIL 2",
+    "desc": "CRUDE CHARGE PUMP (P-101A) SHUTDOWN LOGIC",
+    "effects": [
+     "TRIP PUMP MOTOR M-101A",
+     "CLOSE SUCTION XV-101",
+     "OPEN MIN FLOW FV-101",
+     "ANNUNCIATE ALARM ON DCS"
+    ],
+    "triggers": [
+     {
+      "c": "Suction pressure LOW-LOW",
+      "tag": "PSLL-101",
+      "sp": "< 0.3 barg",
+      "vote": "2oo3",
+      "fx": [
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Discharge flow LOW-LOW",
+      "tag": "FSLL-101",
+      "sp": "< 90 m3/h for 30 s",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       0,
+       1,
+       1
+      ]
+     },
+     {
+      "c": "Bearing temperature HIGH-HIGH",
+      "tag": "TSHH-101",
+      "sp": "> 95 degC",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Bearing vibration HIGH-HIGH",
+      "tag": "VSHH-101",
+      "sp": "> 9 mm/s",
+      "vote": "1oo2",
+      "fx": [
+       1,
+       1,
+       0,
+       1
+      ]
+     }
+    ],
+    "permissives": [
+     [
+      "1",
+      "Suction valve open",
+      "ZSO-101"
+     ],
+     [
+      "2",
+      "Seal flush established (dP > 1.5 bar)",
+      "PDI-101"
+     ],
+     [
+      "3",
+      "No active trip / reset done",
+      "DCS reset"
+     ]
+    ]
+   },
+   "nozzles": [
+    {
+     "m": "N1",
+     "sv": "Suction",
+     "sz": "10\"-150# RF",
+     "face": "RF",
+     "r": "Crude from tank T-101 through XV-101"
+    },
+    {
+     "m": "N2",
+     "sv": "Discharge",
+     "sz": "8\"-300# RF",
+     "face": "RF",
+     "r": "To preheat train and heater F-101"
+    },
+    {
+     "m": "N3",
+     "sv": "Seal flush",
+     "sz": "1\" SW",
+     "face": "RF",
+     "r": "API Plan 11 flush"
+    },
+    {
+     "m": "N4",
+     "sv": "Casing drain",
+     "sz": "1\" SW",
+     "face": "RF",
+     "r": "Drain"
+    },
+    {
+     "m": "N5",
+     "sv": "Casing vent",
+     "sz": "1\" SW",
+     "face": "RF",
+     "r": "Vent"
+    }
+   ],
+   "bom": [
+    {
+     "name": "Casing",
+     "mat": "A216 WCB",
+     "qty": 1
+    },
+    {
+     "name": "Impeller",
+     "mat": "A743 CA6NM",
+     "qty": 1
+    },
+    {
+     "name": "Shaft",
+     "mat": "AISI 4140",
+     "qty": 1
+    },
+    {
+     "name": "Mechanical seal",
+     "mat": "Carbon / SiC",
+     "qty": 1
+    },
+    {
+     "name": "Bearing housing",
+     "mat": "Cast iron",
+     "qty": 1
+    },
+    {
+     "name": "Wear ring",
+     "mat": "SS410",
+     "qty": 2
+    },
+    {
+     "name": "Coupling",
+     "mat": "AISI 4140",
+     "qty": 1
+    },
+    {
+     "name": "Baseplate",
+     "mat": "Carbon steel",
+     "qty": 1
+    }
+   ],
+   "opl": [
+    {
+     "title": "Mechanical seal flush (API Plan 11) check",
+     "cls": "Trouble Case",
+     "obj": "Confirm seal flush dP above 1.5 bar before start.",
+     "steps": [
+      [
+       "Line up flush to seal chamber",
+       "LOTO verified"
+      ],
+      [
+       "Check PDI-101 reads 1.5 to 2.5 bar",
+       "Within range"
+      ],
+      [
+       "Check no leak at seal",
+       "Dry"
+      ]
+     ],
+     "cases": [
+      [
+       "Crude leak at seal gland",
+       "Flush orifice plugged",
+       "Cleaned orifice, replaced seal cartridge"
+      ]
+     ],
+     "dp": "24 barg",
+     "dt": "120 degC",
+     "tags": "PDI-101, PSLL-101",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    },
+    {
+     "title": "Pump start-up and priming",
+     "cls": "Basic Knowledge",
+     "obj": "Prime and vent the pump before every start.",
+     "steps": [
+      [
+       "Open suction valve XV-101",
+       "Valve open (ZSO-101)"
+      ],
+      [
+       "Vent casing at N5",
+       "Liquid at vent"
+      ],
+      [
+       "Start motor and open discharge slowly",
+       "Flow above 90 m3/h"
+      ]
+     ],
+     "cases": [
+      [
+       "Pump does not build pressure",
+       "Air in casing",
+       "Re-vent and re-prime"
+      ]
+     ],
+     "dp": "24 barg",
+     "dt": "120 degC",
+     "tags": "XV-101, ZSO-101",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "F-101",
+   "name": "Crude Heater",
+   "kind": "fired",
+   "type": "Fired heater (box)",
+   "unit": "CRUDE HEATING",
+   "area": 200,
+   "fluid": "Crude oil / fuel gas",
+   "crit": "HIGH CRITICAL",
+   "size": "22 MW duty",
+   "pid": {
+    "ref": "CDU-PID-201",
+    "title": "Crude fired heater",
+    "sys": "Crude heating (Unit 200)",
+    "process": "Preheated crude passes through the radiant and convection coils of fired heater F-101 and leaves at 355 degC to column C-101. Fuel gas is fired through burners under flame scanner and pilot protection. Tube skin temperature is monitored by TE-201 to TE-208."
+   },
+   "ga": {
+    "length_mm": 14000,
+    "height_mm": 16000,
+    "cl_mm": 0,
+    "weight_kg": 185000
+   },
+   "pp": {
+    "footprint": "14.0 x 8.0 m",
+    "grid": "C-2",
+    "elev": "EL +0.00"
+   },
+   "assets": [
+    {
+     "tag": "BNR-201",
+     "name": "Burner bank",
+     "type": "Gas burners"
+    },
+    {
+     "tag": "SK-201",
+     "name": "Stack",
+     "type": "Stack and damper"
+    }
+   ],
+   "instruments": [
+    {
+     "tag": "FT-201",
+     "type": "Flow transmitter",
+     "var": "Crude pass flow",
+     "sp": "400 m3/h normal",
+     "act": null,
+     "eq": "F-101"
+    },
+    {
+     "tag": "FSLL-201",
+     "type": "Flow switch",
+     "var": "Pass flow low-low",
+     "sp": "< 40% of normal",
+     "act": "Trips fuel gas",
+     "eq": "F-101"
+    },
+    {
+     "tag": "TT-201",
+     "type": "Temperature transmitter",
+     "var": "Coil outlet temperature",
+     "sp": "355 degC normal",
+     "act": null,
+     "eq": "F-101"
+    },
+    {
+     "tag": "TSHH-201",
+     "type": "Temperature switch",
+     "var": "Tube skin temperature high-high",
+     "sp": "> 650 degC",
+     "act": "Trips fuel gas",
+     "eq": "F-101"
+    },
+    {
+     "tag": "PT-201",
+     "type": "Pressure transmitter",
+     "var": "Fuel gas pressure",
+     "sp": "2.5 barg normal",
+     "act": null,
+     "eq": "F-101"
+    },
+    {
+     "tag": "PSLL-201",
+     "type": "Pressure switch",
+     "var": "Fuel gas pressure low-low",
+     "sp": "< 0.8 barg",
+     "act": "Trips fuel gas",
+     "eq": "F-101"
+    },
+    {
+     "tag": "BSL-201",
+     "type": "Flame scanner",
+     "var": "Flame failure",
+     "sp": "Loss of flame",
+     "act": "Trips fuel gas",
+     "eq": "F-101"
+    },
+    {
+     "tag": "XV-201",
+     "type": "Shutoff valve",
+     "var": "Fuel gas shutoff",
+     "sp": "Closes on trip",
+     "act": null,
+     "eq": "F-101"
+    },
+    {
+     "tag": "PV-201",
+     "type": "Control valve",
+     "var": "Fuel gas pressure control",
+     "sp": null,
+     "act": null,
+     "eq": "F-101"
+    },
+    {
+     "tag": "AT-201",
+     "type": "Analyzer",
+     "var": "Flue gas oxygen",
+     "sp": "2.5 % normal",
+     "act": null,
+     "eq": "F-101"
+    },
+    {
+     "tag": "PSV-201",
+     "type": "Relief valve",
+     "var": "Fuel gas header relief",
+     "sp": "8 barg",
+     "act": null,
+     "eq": "F-101"
+    }
+   ],
+   "datasheet": {
+    "no": "CDU-DS-F-101",
+    "title": "FIRED HEATER DATA SHEET",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "F-101"
+       ],
+       [
+        "Equipment Name",
+        "CRUDE HEATER"
+       ],
+       [
+        "Type",
+        "Box heater, forced draft"
+       ],
+       [
+        "Criticality",
+        "HIGH CRITICAL"
+       ]
+      ]
+     ],
+     [
+      "Design",
+      [
+       [
+        "Duty",
+        "22 MW"
+       ],
+       [
+        "Coil outlet temperature",
+        "355 degC"
+       ],
+       [
+        "Design pressure",
+        "35 barg"
+       ],
+       [
+        "Fuel",
+        "Refinery fuel gas"
+       ],
+       [
+        "Efficiency",
+        "88 %"
+       ]
+      ]
+     ]
+    ]
+   },
+   "interlock": {
+    "logic": "SEQ-201",
+    "sil": "SIL 2",
+    "desc": "CRUDE HEATER (F-101) SHUTDOWN LOGIC",
+    "effects": [
+     "CLOSE FUEL GAS SHUTOFF XV-201",
+     "TRIP FORCED DRAFT FAN",
+     "OPEN STEAM SNUFFING",
+     "ANNUNCIATE ALARM ON DCS"
+    ],
+    "triggers": [
+     {
+      "c": "Pass flow LOW-LOW",
+      "tag": "FSLL-201",
+      "sp": "< 40 % of normal",
+      "vote": "2oo3",
+      "fx": [
+       1,
+       0,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Tube skin temperature HIGH-HIGH",
+      "tag": "TSHH-201",
+      "sp": "> 650 degC",
+      "vote": "1oo2",
+      "fx": [
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Fuel gas pressure LOW-LOW",
+      "tag": "PSLL-201",
+      "sp": "< 0.8 barg",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       0,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Flame failure",
+      "tag": "BSL-201",
+      "sp": "Loss of flame",
+      "vote": "2oo3",
+      "fx": [
+       1,
+       0,
+       0,
+       1
+      ]
+     }
+    ],
+    "permissives": [
+     [
+      "1",
+      "Furnace purge complete (5 min)",
+      "DCS purge"
+     ],
+     [
+      "2",
+      "Pilot flame proven",
+      "BSL-201"
+     ],
+     [
+      "3",
+      "Pass flow above minimum",
+      "FT-201"
+     ]
+    ]
+   },
+   "nozzles": [
+    {
+     "m": "N1",
+     "sv": "Crude inlet",
+     "sz": "12\"-300# RF",
+     "face": "RF",
+     "r": "Preheated crude from exchangers"
+    },
+    {
+     "m": "N2",
+     "sv": "Crude outlet",
+     "sz": "14\"-300# RF",
+     "face": "RF",
+     "r": "Hot crude to column C-101"
+    },
+    {
+     "m": "N3",
+     "sv": "Fuel gas",
+     "sz": "4\"-150# RF",
+     "face": "RF",
+     "r": "Fuel gas header"
+    },
+    {
+     "m": "N4",
+     "sv": "Steam snuffing",
+     "sz": "2\"-150# RF",
+     "face": "RF",
+     "r": "Snuffing steam"
+    }
+   ],
+   "bom": [
+    {
+     "name": "Radiant coil",
+     "mat": "A335 P9",
+     "qty": 1
+    },
+    {
+     "name": "Convection coil",
+     "mat": "A106 B",
+     "qty": 1
+    },
+    {
+     "name": "Refractory lining",
+     "mat": "Ceramic fibre",
+     "qty": 1
+    },
+    {
+     "name": "Burner",
+     "mat": "Dual fuel",
+     "qty": 8
+    },
+    {
+     "name": "Stack",
+     "mat": "Carbon steel",
+     "qty": 1
+    },
+    {
+     "name": "Damper",
+     "mat": "Carbon steel",
+     "qty": 1
+    },
+    {
+     "name": "Tube support",
+     "mat": "25Cr-20Ni",
+     "qty": 40
+    },
+    {
+     "name": "Peephole",
+     "mat": "Cast steel",
+     "qty": 6
+    }
+   ],
+   "opl": [
+    {
+     "title": "Furnace purge before light-off",
+     "cls": "Basic Knowledge",
+     "obj": "Purge the firebox for at least five minutes before any light-off.",
+     "steps": [
+      [
+       "Confirm all fuel gas valves closed",
+       "XV-201 closed"
+      ],
+      [
+       "Start forced draft fan and purge",
+       "Purge timer complete"
+      ],
+      [
+       "Light pilots and prove flame",
+       "BSL-201 healthy"
+      ]
+     ],
+     "cases": [
+      [
+       "Flame will not prove",
+       "Dirty scanner lens",
+       "Clean the lens and re-check"
+      ]
+     ],
+     "dp": "35 barg",
+     "dt": "380 degC",
+     "tags": "XV-201, BSL-201",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "C-101",
+   "name": "Crude Distillation Column",
+   "kind": "column",
+   "type": "Distillation column (trayed)",
+   "unit": "FRACTIONATION",
+   "area": 300,
+   "fluid": "Crude oil / naphtha / steam",
+   "crit": "HIGH CRITICAL",
+   "size": "3.8 m x 42 m",
+   "pid": {
+    "ref": "CDU-PID-301",
+    "title": "Crude distillation column",
+    "sys": "Fractionation (Unit 300)",
+    "process": "Hot crude from heater F-101 flashes in column C-101. Naphtha leaves as overhead vapour to condenser E-102, kerosene and diesel are drawn as side streams, and residue leaves from the bottom. Stripping steam is injected below the bottom tray. Column pressure is controlled by PIC-301."
+   },
+   "ga": {
+    "length_mm": 3800,
+    "height_mm": 42000,
+    "cl_mm": 0,
+    "weight_kg": 210000
+   },
+   "pp": {
+    "footprint": "8.0 x 8.0 m",
+    "grid": "D-2",
+    "elev": "EL +0.00"
+   },
+   "instruments": [
+    {
+     "tag": "PT-301",
+     "type": "Pressure transmitter",
+     "var": "Column top pressure",
+     "sp": "1.4 barg normal",
+     "act": null,
+     "eq": "C-101"
+    },
+    {
+     "tag": "PSHH-301",
+     "type": "Pressure switch",
+     "var": "Column top pressure high-high",
+     "sp": "> 2.4 barg",
+     "act": "Trips heater feed",
+     "eq": "C-101"
+    },
+    {
+     "tag": "TT-301",
+     "type": "Temperature transmitter",
+     "var": "Top temperature",
+     "sp": "125 degC normal",
+     "act": null,
+     "eq": "C-101"
+    },
+    {
+     "tag": "LT-301",
+     "type": "Level transmitter",
+     "var": "Bottom level",
+     "sp": "50 % normal",
+     "act": null,
+     "eq": "C-101"
+    },
+    {
+     "tag": "LSHH-301",
+     "type": "Level switch",
+     "var": "Bottom level high-high",
+     "sp": "> 85 %",
+     "act": "Trips heater feed",
+     "eq": "C-101"
+    },
+    {
+     "tag": "LSLL-301",
+     "type": "Level switch",
+     "var": "Bottom level low-low",
+     "sp": "< 15 %",
+     "act": "Closes bottoms valve",
+     "eq": "C-101"
+    },
+    {
+     "tag": "FT-301",
+     "type": "Flow transmitter",
+     "var": "Stripping steam flow",
+     "sp": "3 t/h normal",
+     "act": null,
+     "eq": "C-101"
+    },
+    {
+     "tag": "TT-302",
+     "type": "Temperature transmitter",
+     "var": "Flash zone temperature",
+     "sp": "350 degC normal",
+     "act": null,
+     "eq": "C-101"
+    },
+    {
+     "tag": "PV-301",
+     "type": "Control valve",
+     "var": "Column pressure control",
+     "sp": null,
+     "act": null,
+     "eq": "C-101"
+    },
+    {
+     "tag": "LV-301",
+     "type": "Control valve",
+     "var": "Bottom level control",
+     "sp": null,
+     "act": null,
+     "eq": "C-101"
+    },
+    {
+     "tag": "PSV-301",
+     "type": "Relief valve",
+     "var": "Column relief",
+     "sp": "3.5 barg",
+     "act": null,
+     "eq": "C-101"
+    }
+   ],
+   "datasheet": {
+    "no": "CDU-DS-C-101",
+    "title": "COLUMN DATA SHEET",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "C-101"
+       ],
+       [
+        "Equipment Name",
+        "CRUDE DISTILLATION COLUMN"
+       ],
+       [
+        "Type",
+        "Trayed column, 38 trays"
+       ],
+       [
+        "Criticality",
+        "HIGH CRITICAL"
+       ]
+      ]
+     ],
+     [
+      "Design",
+      [
+       [
+        "Diameter",
+        "3.8 m"
+       ],
+       [
+        "Height",
+        "42 m"
+       ],
+       [
+        "Design pressure",
+        "3.5 barg"
+       ],
+       [
+        "Design temperature",
+        "400 degC"
+       ],
+       [
+        "Shell material",
+        "SA-516-70 + 410S clad"
+       ]
+      ]
+     ]
+    ]
+   },
+   "interlock": {
+    "logic": "SEQ-301",
+    "sil": "SIL 1",
+    "desc": "CRUDE DISTILLATION COLUMN (C-101) SHUTDOWN LOGIC",
+    "effects": [
+     "TRIP HEATER FEED F-101",
+     "CLOSE BOTTOMS VALVE LV-301",
+     "ANNUNCIATE ALARM ON DCS"
+    ],
+    "triggers": [
+     {
+      "c": "Top pressure HIGH-HIGH",
+      "tag": "PSHH-301",
+      "sp": "> 2.4 barg",
+      "vote": "1oo2",
+      "fx": [
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Bottom level HIGH-HIGH",
+      "tag": "LSHH-301",
+      "sp": "> 85 %",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Bottom level LOW-LOW",
+      "tag": "LSLL-301",
+      "sp": "< 15 %",
+      "vote": "1oo1",
+      "fx": [
+       0,
+       1,
+       1
+      ]
+     }
+    ],
+    "permissives": [
+     [
+      "1",
+      "Bottom level normal",
+      "LT-301"
+     ],
+     [
+      "2",
+      "Stripping steam available",
+      "FT-301"
+     ]
+    ]
+   },
+   "nozzles": [
+    {
+     "m": "N1",
+     "sv": "Feed",
+     "sz": "14\"-300# RF",
+     "face": "RF",
+     "r": "Hot crude from heater F-101"
+    },
+    {
+     "m": "N2",
+     "sv": "Overhead vapour",
+     "sz": "30\"-150# RF",
+     "face": "RF",
+     "r": "To condenser E-102"
+    },
+    {
+     "m": "N3",
+     "sv": "Bottoms",
+     "sz": "10\"-150# RF",
+     "face": "RF",
+     "r": "Residue to vacuum unit"
+    },
+    {
+     "m": "N4",
+     "sv": "Stripping steam",
+     "sz": "6\"-150# RF",
+     "face": "RF",
+     "r": "Steam header"
+    },
+    {
+     "m": "N5",
+     "sv": "PSV",
+     "sz": "8\"-150# RF",
+     "face": "RF",
+     "r": "To flare"
+    },
+    {
+     "m": "M1",
+     "sv": "Manway",
+     "sz": "24\" FLG",
+     "face": "RF",
+     "r": "Access"
+    }
+   ],
+   "bom": [
+    {
+     "name": "Shell",
+     "mat": "SA-516-70 + 410S",
+     "qty": 1
+    },
+    {
+     "name": "Top head",
+     "mat": "SA-516-70",
+     "qty": 1
+    },
+    {
+     "name": "Bottom head",
+     "mat": "SA-516-70",
+     "qty": 1
+    },
+    {
+     "name": "Trays",
+     "mat": "SS410",
+     "qty": 38
+    },
+    {
+     "name": "Feed distributor",
+     "mat": "SS316",
+     "qty": 1
+    },
+    {
+     "name": "Demister pad",
+     "mat": "SS316",
+     "qty": 1
+    },
+    {
+     "name": "Skirt",
+     "mat": "Carbon steel",
+     "qty": 1
+    },
+    {
+     "name": "Manway",
+     "mat": "SA-516-70",
+     "qty": 4
+    }
+   ],
+   "opl": [
+    {
+     "title": "Column pressure excursion response",
+     "cls": "Trouble Case",
+     "obj": "Know the first three actions when column pressure rises.",
+     "steps": [
+      [
+       "Confirm PT-301 and PSHH-301 readings",
+       "Both agree"
+      ],
+      [
+       "Reduce heater firing",
+       "Pressure falls"
+      ],
+      [
+       "Check condenser cooling water",
+       "Flow normal"
+      ]
+     ],
+     "cases": [
+      [
+       "Column pressure rising",
+       "Condenser cooling lost",
+       "Restore cooling water, reduce firing"
+      ]
+     ],
+     "dp": "3.5 barg",
+     "dt": "400 degC",
+     "tags": "PT-301, PSHH-301",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "E-102",
+   "name": "Overhead Condenser",
+   "kind": "hx",
+   "type": "Shell and tube condenser",
+   "unit": "OVERHEAD SYSTEM",
+   "area": 400,
+   "fluid": "Naphtha vapour / cooling water",
+   "crit": "HIGH CRITICAL",
+   "size": "1,800 m2",
+   "pid": {
+    "ref": "CDU-PID-401",
+    "title": "Overhead condenser",
+    "sys": "Overhead (Unit 400)",
+    "process": "Naphtha vapour from column C-101 is condensed in overhead condenser E-102 against cooling water from tower CT-701. Condensate flows to reflux drum V-102. Cooling water flow is controlled by TV-401 on the outlet temperature."
+   },
+   "ga": {
+    "length_mm": 7500,
+    "height_mm": 2200,
+    "cl_mm": 1500,
+    "weight_kg": 48000
+   },
+   "pp": {
+    "footprint": "9.0 x 3.0 m",
+    "grid": "D-3",
+    "elev": "EL +4.50"
+   },
+   "instruments": [
+    {
+     "tag": "TT-401",
+     "type": "Temperature transmitter",
+     "var": "Condensate outlet temperature",
+     "sp": "45 degC normal",
+     "act": null,
+     "eq": "E-102"
+    },
+    {
+     "tag": "TSHH-401",
+     "type": "Temperature switch",
+     "var": "Condensate temperature high-high",
+     "sp": "> 80 degC",
+     "act": "Alarm and reduce firing",
+     "eq": "E-102"
+    },
+    {
+     "tag": "FT-401",
+     "type": "Flow transmitter",
+     "var": "Cooling water flow",
+     "sp": "900 m3/h normal",
+     "act": null,
+     "eq": "E-102"
+    },
+    {
+     "tag": "FSLL-401",
+     "type": "Flow switch",
+     "var": "Cooling water flow low-low",
+     "sp": "< 400 m3/h",
+     "act": "Alarm and trip heater feed",
+     "eq": "E-102"
+    },
+    {
+     "tag": "PT-401",
+     "type": "Pressure transmitter",
+     "var": "Shell pressure",
+     "sp": "1.2 barg normal",
+     "act": null,
+     "eq": "E-102"
+    },
+    {
+     "tag": "TV-401",
+     "type": "Control valve",
+     "var": "Cooling water control",
+     "sp": null,
+     "act": null,
+     "eq": "E-102"
+    },
+    {
+     "tag": "PSV-401",
+     "type": "Relief valve",
+     "var": "Shell relief",
+     "sp": "3 barg",
+     "act": null,
+     "eq": "E-102"
+    }
+   ],
+   "datasheet": {
+    "no": "CDU-DS-E-102",
+    "title": "HEAT EXCHANGER DATA SHEET",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "E-102"
+       ],
+       [
+        "Equipment Name",
+        "OVERHEAD CONDENSER"
+       ],
+       [
+        "Type",
+        "Shell and tube, AES"
+       ],
+       [
+        "Criticality",
+        "HIGH CRITICAL"
+       ]
+      ]
+     ],
+     [
+      "Design",
+      [
+       [
+        "Surface area",
+        "1,800 m2"
+       ],
+       [
+        "Duty",
+        "18 MW"
+       ],
+       [
+        "Shell pressure",
+        "3.5 barg"
+       ],
+       [
+        "Tube material",
+        "Admiralty brass"
+       ]
+      ]
+     ]
+    ]
+   },
+   "interlock": {
+    "logic": "SEQ-401",
+    "sil": "SIL 1",
+    "desc": "OVERHEAD CONDENSER (E-102) PROTECTION LOGIC",
+    "effects": [
+     "TRIP HEATER FEED F-101",
+     "ANNUNCIATE ALARM ON DCS"
+    ],
+    "triggers": [
+     {
+      "c": "Cooling water flow LOW-LOW",
+      "tag": "FSLL-401",
+      "sp": "< 400 m3/h",
+      "vote": "2oo3",
+      "fx": [
+       1,
+       1
+      ]
+     },
+     {
+      "c": "Condensate temperature HIGH-HIGH",
+      "tag": "TSHH-401",
+      "sp": "> 80 degC",
+      "vote": "1oo1",
+      "fx": [
+       0,
+       1
+      ]
+     }
+    ],
+    "permissives": [
+     [
+      "1",
+      "Cooling water flow established",
+      "FT-401"
+     ]
+    ]
+   },
+   "nozzles": [
+    {
+     "m": "N1",
+     "sv": "Vapour inlet",
+     "sz": "30\"-150# RF",
+     "face": "RF",
+     "r": "From column C-101 overhead"
+    },
+    {
+     "m": "N2",
+     "sv": "Condensate outlet",
+     "sz": "12\"-150# RF",
+     "face": "RF",
+     "r": "To reflux drum V-102"
+    },
+    {
+     "m": "N3",
+     "sv": "Cooling water in",
+     "sz": "20\"-150# RF",
+     "face": "RF",
+     "r": "Cooling water supply"
+    },
+    {
+     "m": "N4",
+     "sv": "Cooling water out",
+     "sz": "20\"-150# RF",
+     "face": "RF",
+     "r": "Cooling water return"
+    },
+    {
+     "m": "N5",
+     "sv": "Vent",
+     "sz": "2\" SW",
+     "face": "RF",
+     "r": "Vent"
+    }
+   ],
+   "bom": [
+    {
+     "name": "Shell",
+     "mat": "SA-516-70",
+     "qty": 1
+    },
+    {
+     "name": "Tube bundle",
+     "mat": "Admiralty brass",
+     "qty": 1
+    },
+    {
+     "name": "Channel head",
+     "mat": "SA-516-70",
+     "qty": 2
+    },
+    {
+     "name": "Tubesheet",
+     "mat": "Naval brass",
+     "qty": 2
+    },
+    {
+     "name": "Baffles",
+     "mat": "Carbon steel",
+     "qty": 24
+    },
+    {
+     "name": "Saddle",
+     "mat": "Carbon steel",
+     "qty": 2
+    },
+    {
+     "name": "Expansion joint",
+     "mat": "SS316",
+     "qty": 1
+    }
+   ],
+   "opl": [
+    {
+     "title": "Tube leak detection",
+     "cls": "Trouble Case",
+     "obj": "Detect a tube leak before cooling water is contaminated.",
+     "steps": [
+      [
+       "Sample cooling water return",
+       "Hydrocarbon free"
+      ],
+      [
+       "Check shell pressure PT-401",
+       "Stable"
+      ]
+     ],
+     "cases": [
+      [
+       "Hydrocarbon in cooling water",
+       "Tube leak",
+       "Isolate bundle, pressure test, plug tubes"
+      ]
+     ],
+     "dp": "3.5 barg",
+     "dt": "150 degC",
+     "tags": "PT-401, FT-401",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "V-102",
+   "name": "Reflux Drum",
+   "kind": "drum",
+   "type": "Horizontal drum",
+   "unit": "OVERHEAD SYSTEM",
+   "area": 500,
+   "fluid": "Naphtha / fuel gas / sour water",
+   "crit": "HIGH CRITICAL",
+   "size": "2.4 m x 7 m",
+   "pid": {
+    "ref": "CDU-PID-501",
+    "title": "Reflux drum",
+    "sys": "Overhead (Unit 500)",
+    "process": "Condensed naphtha from E-102 collects in reflux drum V-102. A boot separates sour water. Reflux pumps return part of the naphtha to the column top and the rest goes to the naphtha stabiliser. Off gas leaves to the fuel gas system under pressure control PV-501."
+   },
+   "ga": {
+    "length_mm": 7000,
+    "height_mm": 2900,
+    "cl_mm": 1800,
+    "weight_kg": 14500
+   },
+   "pp": {
+    "footprint": "8.0 x 3.0 m",
+    "grid": "E-3",
+    "elev": "EL +1.50"
+   },
+   "instruments": [
+    {
+     "tag": "LT-501",
+     "type": "Level transmitter",
+     "var": "Drum level",
+     "sp": "50 % normal",
+     "act": null,
+     "eq": "V-102"
+    },
+    {
+     "tag": "LSHH-501",
+     "type": "Level switch",
+     "var": "Drum level high-high",
+     "sp": "> 85 %",
+     "act": "Trips column feed",
+     "eq": "V-102"
+    },
+    {
+     "tag": "LSLL-501",
+     "type": "Level switch",
+     "var": "Drum level low-low",
+     "sp": "< 10 %",
+     "act": "Trips reflux pumps",
+     "eq": "V-102"
+    },
+    {
+     "tag": "PT-501",
+     "type": "Pressure transmitter",
+     "var": "Drum pressure",
+     "sp": "1.0 barg normal",
+     "act": null,
+     "eq": "V-102"
+    },
+    {
+     "tag": "PSHH-501",
+     "type": "Pressure switch",
+     "var": "Drum pressure high-high",
+     "sp": "> 2.5 barg",
+     "act": "Opens vent",
+     "eq": "V-102"
+    },
+    {
+     "tag": "LT-502",
+     "type": "Level transmitter",
+     "var": "Boot interface level",
+     "sp": "30 % normal",
+     "act": null,
+     "eq": "V-102"
+    },
+    {
+     "tag": "PV-501",
+     "type": "Control valve",
+     "var": "Drum pressure control",
+     "sp": null,
+     "act": null,
+     "eq": "V-102"
+    },
+    {
+     "tag": "XV-501",
+     "type": "Shutoff valve",
+     "var": "Column feed shutoff",
+     "sp": null,
+     "act": null,
+     "eq": "V-102"
+    },
+    {
+     "tag": "PSV-501",
+     "type": "Relief valve",
+     "var": "Drum relief",
+     "sp": "3 barg",
+     "act": null,
+     "eq": "V-102"
+    }
+   ],
+   "datasheet": {
+    "no": "CDU-DS-V-102",
+    "title": "PRESSURE VESSEL DATA SHEET",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "V-102"
+       ],
+       [
+        "Equipment Name",
+        "REFLUX DRUM"
+       ],
+       [
+        "Type",
+        "Horizontal drum with boot"
+       ],
+       [
+        "Criticality",
+        "HIGH CRITICAL"
+       ]
+      ]
+     ],
+     [
+      "Design",
+      [
+       [
+        "Diameter",
+        "2.4 m"
+       ],
+       [
+        "Length",
+        "7 m"
+       ],
+       [
+        "Design pressure",
+        "3.5 barg"
+       ],
+       [
+        "Design temperature",
+        "150 degC"
+       ],
+       [
+        "Material",
+        "SA-516-70"
+       ]
+      ]
+     ]
+    ]
+   },
+   "interlock": {
+    "logic": "SEQ-501",
+    "sil": "SIL 1",
+    "desc": "REFLUX DRUM (V-102) SHUTDOWN LOGIC",
+    "effects": [
+     "CLOSE COLUMN FEED XV-501",
+     "TRIP REFLUX PUMPS",
+     "OPEN VENT PV-501",
+     "ANNUNCIATE ALARM ON DCS"
+    ],
+    "triggers": [
+     {
+      "c": "Drum level HIGH-HIGH",
+      "tag": "LSHH-501",
+      "sp": "> 85 %",
+      "vote": "1oo2",
+      "fx": [
+       1,
+       0,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Drum level LOW-LOW",
+      "tag": "LSLL-501",
+      "sp": "< 10 %",
+      "vote": "1oo2",
+      "fx": [
+       0,
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Drum pressure HIGH-HIGH",
+      "tag": "PSHH-501",
+      "sp": "> 2.5 barg",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       0,
+       1,
+       1
+      ]
+     }
+    ],
+    "permissives": [
+     [
+      "1",
+      "Level in normal band (20 to 80 %)",
+      "LT-501"
+     ],
+     [
+      "2",
+      "No active trip / reset done",
+      "DCS reset"
+     ]
+    ]
+   },
+   "nozzles": [
+    {
+     "m": "N1",
+     "sv": "Inlet",
+     "sz": "12\"-150# RF",
+     "face": "RF",
+     "r": "Condensate from E-102"
+    },
+    {
+     "m": "N2",
+     "sv": "Reflux out",
+     "sz": "8\"-150# RF",
+     "face": "RF",
+     "r": "To reflux pumps"
+    },
+    {
+     "m": "N3",
+     "sv": "Product out",
+     "sz": "6\"-150# RF",
+     "face": "RF",
+     "r": "To naphtha stabiliser"
+    },
+    {
+     "m": "N4",
+     "sv": "Boot drain",
+     "sz": "2\"-150# RF",
+     "face": "RF",
+     "r": "Sour water draw-off"
+    },
+    {
+     "m": "N5",
+     "sv": "PSV",
+     "sz": "4\"-150# RF",
+     "face": "RF",
+     "r": "To flare"
+    },
+    {
+     "m": "M1",
+     "sv": "Manway",
+     "sz": "24\" FLG",
+     "face": "RF",
+     "r": "Access"
+    }
+   ],
+   "bom": [
+    {
+     "name": "Shell",
+     "mat": "SA-516-70",
+     "qty": 1
+    },
+    {
+     "name": "Head",
+     "mat": "SA-516-70",
+     "qty": 2
+    },
+    {
+     "name": "Water boot",
+     "mat": "SA-516-70",
+     "qty": 1
+    },
+    {
+     "name": "Saddle",
+     "mat": "Carbon steel",
+     "qty": 2
+    },
+    {
+     "name": "Vortex breaker",
+     "mat": "SS304",
+     "qty": 2
+    },
+    {
+     "name": "Mist pad",
+     "mat": "SS304",
+     "qty": 1
+    },
+    {
+     "name": "Level bridle",
+     "mat": "SA-106-B",
+     "qty": 1
+    }
+   ],
+   "opl": [
+    {
+     "title": "Boot water draw-off",
+     "cls": "Basic Knowledge",
+     "obj": "Drain the boot only against the interface level LT-502.",
+     "steps": [
+      [
+       "Check LT-502 interface level",
+       "Above 40 %"
+      ],
+      [
+       "Open drain slowly",
+       "Water only at sight glass"
+      ],
+      [
+       "Close before hydrocarbon shows",
+       "Drain closed"
+      ]
+     ],
+     "cases": [
+      [
+       "Hydrocarbon in sour water",
+       "Drain left open",
+       "Close drain, notify supervisor"
+      ]
+     ],
+     "dp": "3.5 barg",
+     "dt": "150 degC",
+     "tags": "LT-502, LSHH-501",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "T-101",
+   "name": "Crude Storage Tank",
+   "kind": "vessel",
+   "type": "Fixed roof storage tank",
+   "unit": "TANK FARM",
+   "area": 600,
+   "fluid": "Crude oil",
+   "crit": "MEDIUM CRITICAL",
+   "size": "40 m diameter",
+   "pid": {
+    "ref": "CDU-PID-601",
+    "title": "Crude tank",
+    "sys": "Tank farm (Unit 600)",
+    "process": "Crude oil is received into fixed roof tank T-101 and fed to the unit by charge pump P-101A. Tank level is measured by radar LT-601 with an independent high-high switch. A pressure vacuum vent protects the roof."
+   },
+   "ga": {
+    "length_mm": 40000,
+    "height_mm": 14000,
+    "cl_mm": 0,
+    "weight_kg": 260000
+   },
+   "pp": {
+    "footprint": "42.0 x 42.0 m",
+    "grid": "A-2",
+    "elev": "EL +0.00"
+   },
+   "instruments": [
+    {
+     "tag": "LT-601",
+     "type": "Level transmitter",
+     "var": "Tank level (radar)",
+     "sp": "60 % normal",
+     "act": null,
+     "eq": "T-101"
+    },
+    {
+     "tag": "LSHH-601",
+     "type": "Level switch",
+     "var": "Tank level high-high",
+     "sp": "> 92 %",
+     "act": "Closes inlet valve",
+     "eq": "T-101"
+    },
+    {
+     "tag": "LSLL-601",
+     "type": "Level switch",
+     "var": "Tank level low-low",
+     "sp": "< 8 %",
+     "act": "Trips charge pump",
+     "eq": "T-101"
+    },
+    {
+     "tag": "TT-601",
+     "type": "Temperature transmitter",
+     "var": "Tank temperature",
+     "sp": "40 degC normal",
+     "act": null,
+     "eq": "T-101"
+    },
+    {
+     "tag": "XV-601",
+     "type": "Shutoff valve",
+     "var": "Inlet shutoff",
+     "sp": null,
+     "act": null,
+     "eq": "T-101"
+    }
+   ],
+   "datasheet": {
+    "no": "CDU-DS-T-101",
+    "title": "STORAGE TANK DATA SHEET",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "T-101"
+       ],
+       [
+        "Equipment Name",
+        "CRUDE STORAGE TANK"
+       ],
+       [
+        "Type",
+        "Fixed roof"
+       ],
+       [
+        "Criticality",
+        "MEDIUM CRITICAL"
+       ]
+      ]
+     ],
+     [
+      "Design",
+      [
+       [
+        "Diameter",
+        "40 m"
+       ],
+       [
+        "Height",
+        "14 m"
+       ],
+       [
+        "Capacity",
+        "17,600 m3"
+       ],
+       [
+        "Material",
+        "A36"
+       ]
+      ]
+     ]
+    ]
+   },
+   "interlock": {
+    "logic": "SEQ-601",
+    "sil": "SIL 1",
+    "desc": "CRUDE STORAGE TANK (T-101) OVERFILL LOGIC",
+    "effects": [
+     "CLOSE INLET XV-601",
+     "TRIP CHARGE PUMP P-101A",
+     "ANNUNCIATE ALARM ON DCS"
+    ],
+    "triggers": [
+     {
+      "c": "Tank level HIGH-HIGH",
+      "tag": "LSHH-601",
+      "sp": "> 92 %",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       0,
+       1
+      ]
+     },
+     {
+      "c": "Tank level LOW-LOW",
+      "tag": "LSLL-601",
+      "sp": "< 8 %",
+      "vote": "1oo1",
+      "fx": [
+       0,
+       1,
+       1
+      ]
+     }
+    ],
+    "permissives": [
+     [
+      "1",
+      "Level in normal band",
+      "LT-601"
+     ]
+    ]
+   },
+   "nozzles": [
+    {
+     "m": "N1",
+     "sv": "Inlet",
+     "sz": "16\"-150# RF",
+     "face": "RF",
+     "r": "Crude receipt line"
+    },
+    {
+     "m": "N2",
+     "sv": "Outlet",
+     "sz": "12\"-150# RF",
+     "face": "RF",
+     "r": "To charge pump P-101A"
+    },
+    {
+     "m": "N3",
+     "sv": "Drain",
+     "sz": "4\"-150# RF",
+     "face": "RF",
+     "r": "Water draw-off"
+    },
+    {
+     "m": "M1",
+     "sv": "Manway",
+     "sz": "24\" FLG",
+     "face": "RF",
+     "r": "Access"
+    }
+   ],
+   "bom": [
+    {
+     "name": "Shell course",
+     "mat": "A36",
+     "qty": 6
+    },
+    {
+     "name": "Roof",
+     "mat": "A36",
+     "qty": 1
+    },
+    {
+     "name": "Bottom plate",
+     "mat": "A36",
+     "qty": 1
+    },
+    {
+     "name": "Rafter",
+     "mat": "A36",
+     "qty": 1
+    },
+    {
+     "name": "Pressure vacuum vent",
+     "mat": "Aluminium",
+     "qty": 1
+    },
+    {
+     "name": "Stairway",
+     "mat": "Carbon steel",
+     "qty": 1
+    }
+   ],
+   "opl": [
+    {
+     "title": "Tank level reading and verification",
+     "cls": "Basic Knowledge",
+     "obj": "Cross-check radar level against the high-high switch before filling.",
+     "steps": [
+      [
+       "Read LT-601",
+       "Matches gauge"
+      ],
+      [
+       "Check LSHH-601 test status",
+       "Tested in date"
+      ]
+     ],
+     "cases": [
+      [
+       "Level reads high but tank is not full",
+       "Radar affected by foam",
+       "Verify by manual dip"
+      ]
+     ],
+     "dp": "0.02 barg",
+     "dt": "60 degC",
+     "tags": "LT-601, LSHH-601",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "CT-701",
+   "name": "Cooling Tower Fan",
+   "kind": "fan",
+   "type": "Induced draft cooling tower cell",
+   "unit": "COOLING WATER",
+   "area": 700,
+   "fluid": "Cooling water / air",
+   "crit": "MEDIUM CRITICAL",
+   "size": "6 cells",
+   "pid": {
+    "ref": "CDU-PID-701",
+    "title": "Cooling tower",
+    "sys": "Cooling water (Unit 700)",
+    "process": "Warm cooling water from condenser E-102 is distributed over the fill of cooling tower CT-701 and cooled by the induced draft fan. Cold water collects in the basin and is pumped back to the users. Make-up water enters on basin level control."
+   },
+   "ga": {
+    "length_mm": 14000,
+    "height_mm": 9000,
+    "cl_mm": 8000,
+    "weight_kg": 42000,
+    "motor": "90 kW"
+   },
+   "pp": {
+    "footprint": "14.0 x 14.0 m",
+    "grid": "F-2",
+    "elev": "EL +0.00"
+   },
+   "instruments": [
+    {
+     "tag": "VT-701",
+     "type": "Vibration transmitter",
+     "var": "Fan vibration",
+     "sp": "3 mm/s normal",
+     "act": null,
+     "eq": "CT-701"
+    },
+    {
+     "tag": "VSHH-701",
+     "type": "Vibration switch",
+     "var": "Fan vibration high-high",
+     "sp": "> 9 mm/s",
+     "act": "Trips fan",
+     "eq": "CT-701"
+    },
+    {
+     "tag": "TT-701",
+     "type": "Temperature transmitter",
+     "var": "Cold water temperature",
+     "sp": "30 degC normal",
+     "act": null,
+     "eq": "CT-701"
+    },
+    {
+     "tag": "LT-701",
+     "type": "Level transmitter",
+     "var": "Basin level",
+     "sp": "60 % normal",
+     "act": null,
+     "eq": "CT-701"
+    },
+    {
+     "tag": "LSLL-701",
+     "type": "Level switch",
+     "var": "Basin level low-low",
+     "sp": "< 20 %",
+     "act": "Trips fan",
+     "eq": "CT-701"
+    },
+    {
+     "tag": "FT-701",
+     "type": "Flow transmitter",
+     "var": "Make-up flow",
+     "sp": "60 m3/h normal",
+     "act": null,
+     "eq": "CT-701"
+    }
+   ],
+   "datasheet": {
+    "no": "CDU-DS-CT-701",
+    "title": "COOLING TOWER DATA SHEET",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "CT-701"
+       ],
+       [
+        "Equipment Name",
+        "COOLING TOWER FAN"
+       ],
+       [
+        "Type",
+        "Induced draft"
+       ],
+       [
+        "Criticality",
+        "MEDIUM CRITICAL"
+       ]
+      ]
+     ],
+     [
+      "Design",
+      [
+       [
+        "Flow",
+        "12,000 m3/h"
+       ],
+       [
+        "Range",
+        "10 degC"
+       ],
+       [
+        "Fan motor",
+        "90 kW"
+       ]
+      ]
+     ]
+    ]
+   },
+   "interlock": {
+    "logic": "SEQ-701",
+    "sil": "SIL 1",
+    "desc": "COOLING TOWER FAN (CT-701) PROTECTION LOGIC",
+    "effects": [
+     "TRIP FAN MOTOR CT-701",
+     "ANNUNCIATE ALARM ON DCS"
+    ],
+    "triggers": [
+     {
+      "c": "Fan vibration HIGH-HIGH",
+      "tag": "VSHH-701",
+      "sp": "> 9 mm/s",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       1
+      ]
+     },
+     {
+      "c": "Basin level LOW-LOW",
+      "tag": "LSLL-701",
+      "sp": "< 20 %",
+      "vote": "1oo1",
+      "fx": [
+       1,
+       1
+      ]
+     }
+    ],
+    "permissives": [
+     [
+      "1",
+      "Basin level normal",
+      "LT-701"
+     ]
+    ]
+   },
+   "nozzles": [
+    {
+     "m": "N1",
+     "sv": "Hot water in",
+     "sz": "30\" FLG",
+     "face": "RF",
+     "r": "Warm return from users"
+    },
+    {
+     "m": "N2",
+     "sv": "Cold water out",
+     "sz": "30\" FLG",
+     "face": "RF",
+     "r": "To cooling water pumps"
+    },
+    {
+     "m": "N3",
+     "sv": "Make-up",
+     "sz": "6\" FLG",
+     "face": "RF",
+     "r": "Make-up water"
+    },
+    {
+     "m": "N4",
+     "sv": "Blowdown",
+     "sz": "4\" FLG",
+     "face": "RF",
+     "r": "Blowdown"
+    }
+   ],
+   "bom": [
+    {
+     "name": "Fan",
+     "mat": "FRP",
+     "qty": 1
+    },
+    {
+     "name": "Gearbox",
+     "mat": "Cast iron",
+     "qty": 1
+    },
+    {
+     "name": "Drive shaft",
+     "mat": "Carbon fibre",
+     "qty": 1
+    },
+    {
+     "name": "Fill",
+     "mat": "PVC",
+     "qty": 1
+    },
+    {
+     "name": "Basin",
+     "mat": "Concrete",
+     "qty": 1
+    },
+    {
+     "name": "Drift eliminator",
+     "mat": "PVC",
+     "qty": 1
+    }
+   ],
+   "opl": [
+    {
+     "title": "Fan vibration check",
+     "cls": "Trouble Case",
+     "obj": "Check fan vibration trend weekly.",
+     "steps": [
+      [
+       "Read VT-701",
+       "Below 5 mm/s"
+      ],
+      [
+       "Inspect fan blades",
+       "No cracks"
+      ]
+     ],
+     "cases": [
+      [
+       "High fan vibration",
+       "Blade imbalance",
+       "Rebalance blades and re-check"
+      ]
+     ],
+     "dp": "atm",
+     "dt": "40 degC",
+     "tags": "VT-701, VSHH-701",
+     "safety": [
+      "Apply LOTO and verify zero energy",
+      "Use gas detector in flammable service"
+     ],
+     "tools": [
+      "Torque wrench",
+      "Gas detector"
+     ]
+    }
+   ]
+  }
+ ],
+ "documents": [
+  {
+   "name": "Management of change MOC-2025-014 (heater coil replacement)",
+   "type": "Management of change",
+   "set": 2,
+   "date": "2025-08-01",
+   "text": "Heater F-101 radiant coil replaced during the 2025 turnaround. New tube skin thermocouples TE-201 to TE-208 installed. Tube skin high-high trip setpoint confirmed at 650 degC."
+  }
+ ],
+ "history": {
+  "source": "synthetic",
+  "per_set": 16
+ }
+}

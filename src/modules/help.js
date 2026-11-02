@@ -5,7 +5,7 @@
    ===================================================================================================== */
 regMod("help","1.0",[],"Guided tour");
 const TOUR=[
- {page:"dashboard",sel:'.nav[data-page="dashboard"]',t:"Plant overview",x:"All eight P&IDs are laid out as on the plot plan and linked by their process lines. Pick a tile to see its state or open its P&ID, or simulate a trip and watch it spread through the plant."},
+ {page:"dashboard",sel:'.nav[data-page="dashboard"]',t:"Plant overview",x:"All "+NW(K.sets.length)+" P&IDs are laid out as on the plot plan and linked by their process lines. Pick a tile to see its state or open its P&ID, or simulate a trip and watch it spread through the plant."},
  {page:"equipment",sel:'.nav[data-page="equipment"]',t:"Equipment sets",x:"P&ID, GA drawing, datasheet, interlock logic, OPLs and maintenance history for each equipment set, in one place."},
  {page:"mnt",sel:'.nav[data-page="mnt"]',t:"Maintenance",x:"Work order history, timeline, forecasts and plant replay. Each forecast shows how much data is behind it."},
  {page:"scn",sel:'.nav[data-page="scn"]',t:"Scenarios",x:"Replay an OPL case or a work order on the P&ID, or trip a unit and follow the knock-on effects. The assumptions register lists every rule used."},
@@ -14,7 +14,7 @@ const TOUR=[
  {sel:".foot .gear[aria-label=Settings]",t:"Settings",x:"Settings: shared database status, access codes, AI options, answer language and diagnostics."}];
 /* the scripted walkthrough for a demonstration: one story, in order, each step opens the right page */
 const DEMO=[
- {page:"dashboard",sel:'.nav[data-page="dashboard"]',t:"The plant at a glance",x:"Eight equipment sets on one plot plan, joined by their process lines. Open any tile for its P&ID and state."},
+ {page:"dashboard",sel:'.nav[data-page="dashboard"]',t:"The plant at a glance",x:NW(K.sets.length).replace(/^./,c=>c.toUpperCase())+" equipment sets on one plot plan, joined by their process lines. Open any tile for its P&ID and state."},
  {page:"ai",sel:'.nav[data-page="ai"]',t:"Ask a question",x:"Ask: What is the start permissive for the recycle gas compressor KC-4501? The answer lists numbered sources with revision and approval status, a confidence level and a check of every number."},
  {page:"scn",sel:'.nav[data-page="scn"]',t:"Follow a failure through the plant",x:"Pick a unit, trip it, and watch the effect move along the process lines. Each rule used is listed in the assumptions register."},
  {page:"mnt",sel:'.nav[data-page="mnt"]',t:"Maintenance history and forecast",x:"Work orders by period, root causes, and which units are most likely to fail next, with the amount of data behind each forecast."},
