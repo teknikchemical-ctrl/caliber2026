@@ -2,7 +2,11 @@
 import { J, cfgA, store, cfg2, discoverModels } from "./_lib.mjs";
 export const config = { path: "/api/selftest" };
 export default async (req) => {
-  const c = await cfgA(), out = [];
+  const out = [];
+  try { return await run(out); } catch (e) { out.push({ name: "Diagnostics", ok: false, detail: "the check itself failed: " + String((e && e.message) || e).slice(0, 200) }); return J({ ok: false, checks: out }); }
+};
+async function run(out) {
+  const c = await cfgA();
   const add = (name, ok, detail) => out.push({ name, ok, detail });
   try { const s = await store("rl"); await s.setJSON("selftest", { t: Date.now() }); const r = await s.get("selftest"); add("Shared storage", !!r, r ? "read and write work" : "write did not persist"); } catch (e) { add("Shared storage", false, String(e.message || e).slice(0, 140)); }
   const configured = c.provider === "mock" || (c.provider && c.key);
@@ -11,7 +15,7 @@ export default async (req) => {
     try {
       const base = c.provider === "openai" ? c.base : (c.base || "https://generativelanguage.googleapis.com/v1beta");
       const url = c.provider === "openai" ? base.replace(/\/$/, "") + "/models" : base + "/models?pageSize=50";
-      const r = await fetch(url, { headers: c.provider === "openai" ? { authorization: "Bearer " + c.key } : { "x-goog-api-key": c.key } });
+      const r = await fetch(url, { signal: AbortSignal.timeout(6000), headers: c.provider === "openai" ? { authorization: "Bearer " + c.key } : { "x-goog-api-key": c.key } });
       if (!r.ok) throw new Error("HTTP " + r.status + (r.status === 400 || r.status === 403 ? " (the key is not accepted)" : ""));
       const j = await r.json(), names = (j.models || j.data || []).map(m => String(m.name || m.id).replace(/^models\//, ""));
       const has = names.includes(c.model);
@@ -22,17 +26,17 @@ export default async (req) => {
       /* a real one-word call, trying the configured models and then the models the key offers; reports which one answered */
       const base = c.base || "https://generativelanguage.googleapis.com/v1beta"; let found = [], said = [], done = false;
       try { found = await discoverModels(c); } catch {}
-      for (const m of [...new Set([c.model, ...(c.fallbacks || []), ...found.slice(0, 3)])]) {
+      for (const m of [...new Set([c.model, ...(c.fallbacks || []), ...found.slice(0, 3)])].slice(0, 4)) {
         try {
-          const r = await fetch(`${base}/models/${encodeURIComponent(m)}:generateContent`, { method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": c.key }, body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Reply with the single word OK." }] }], generationConfig: { maxOutputTokens: 64 } }) });
+          const r = await fetch(`${base}/models/${encodeURIComponent(m)}:generateContent`, { method: "POST", signal: AbortSignal.timeout(5000), headers: { "content-type": "application/json", "x-goog-api-key": c.key }, body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Reply with the single word OK." }] }], generationConfig: { maxOutputTokens: 64, ...(/gemini-2\.5-flash/.test(m) ? { thinkingConfig: { thinkingBudget: 0 } } : {}) } }) });
           if (r.ok) { add("AI answer", true, "model " + m + " answered" + (m !== c.model ? " (the configured model " + c.model + " was refused" + (said.length ? ": " + said[0].slice(0, 200) : "") + "; the server falls back to this one)" : "")); done = true; break; }
           let msg = "HTTP " + r.status; try { const j = await r.json(); if (j.error && j.error.message) msg += " " + String(j.error.message).slice(0, 120); } catch {}
           said.push(m + ": " + msg);
-        } catch (e) { said.push(m + ": " + String(e.message || e).slice(0, 80)); }
+        } catch (e) { said.push(m + ": " + (e && e.name === "TimeoutError" ? "no answer within 5 s" : String(e.message || e).slice(0, 80))); }
       }
       if (!done) add("AI answer", false, said.join(" | ").slice(0, 400) || "no model answered");
     }
   }
   add("Access codes", true, ["edit", "approve", "admin"].map(k => k + ": " + (process.env[k.toUpperCase() + "_CODE"] ? "set" : "not set")).join(", "));
   return J({ ok: out.every(x => x.ok), checks: out });
-};
+}

@@ -103,7 +103,7 @@ export const isModelError = e => !!e && [400, 404].includes(e.status) && /model|
 export async function discoverModels(c, signal) {
   if (DISC.key === c.key && Date.now() - DISC.at < 600000 && DISC.list.length) return DISC.list;
   const base = c.base || "https://generativelanguage.googleapis.com/v1beta";
-  const r = await fetch(base + "/models?pageSize=200", { headers: { "x-goog-api-key": c.key }, signal });
+  const r = await fetch(base + "/models?pageSize=200", { headers: { "x-goog-api-key": c.key }, signal: signal || AbortSignal.timeout(5000) });
   if (!r.ok) return [];
   const j = await r.json(), score = n => {
     const v = (/gemini-(\d+(?:\.\d+)?)/.exec(n) || [0, 0])[1], fam = /flash-lite/.test(n) ? 1 : /flash/.test(n) ? 3 : /pro/.test(n) ? 2 : 0;
