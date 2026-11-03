@@ -2,7 +2,7 @@
   {
     "id": "FIN01",
     "cat": "Financial model",
-    "q": "What is the total maintenance cost?",
+    "q": "What is the total maintenance cost in the costing model?",
     "must": [
       "271,470,000 IDR"
     ],
@@ -14,7 +14,7 @@
   {
     "id": "FIN02",
     "cat": "Financial model",
-    "q": "What is the recorded downtime cost basis?",
+    "q": "What is the recorded downtime cost basis in the costing model?",
     "must": [
       "189.60 h"
     ],
@@ -38,7 +38,7 @@
   {
     "id": "FIN04",
     "cat": "Financial model",
-    "q": "How many work orders support the cost summary?",
+    "q": "How many work orders support the cost summary in the costing model?",
     "must": [
       "112 work orders"
     ],
@@ -98,7 +98,7 @@
   {
     "id": "FIN09",
     "cat": "Financial model",
-    "q": "What is the investment cost?",
+    "q": "What is the investment cost in the costing model?",
     "must": [
       "9,775,000 IDR"
     ],
@@ -110,7 +110,7 @@
   {
     "id": "FIN10",
     "cat": "Financial model",
-    "q": "What is the annual running cost?",
+    "q": "What is the annual running cost in the costing model?",
     "must": [
       "1,500,000 IDR"
     ],
@@ -170,7 +170,7 @@
   {
     "id": "FIN15",
     "cat": "Financial model",
-    "q": "Does downtime cost imply plant outage time?",
+    "q": "Does downtime cost imply plant outage time in the costing model?",
     "must": [
       "Asset downtime is not plant outage time"
     ],

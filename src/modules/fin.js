@@ -88,6 +88,6 @@ function finSummary({set=0}={}){set=K.sets.some(s=>s.n===set)?set:0;if(!window.F
 if(typeof document!=='undefined'){
  regMod('fin','2.0',['dl'],'Costing and business case');document.documentElement.dataset.fin=(window.FIN&&FIN.currency)?'1':'0';
  AI.tools.cost_summary={description:'Recorded maintenance cost, downtime and labelled business case assumptions, NPV and costs. Monetary figures match the Costing page.',parameters:{type:'object',properties:{set:{type:'integer',description:'Equipment set, or 0 for whole case'}},required:[]},run:finSummary};
- const finPreviousRoute=aiRoute;aiRoute=function(q,ctx){if(typeof aiIntent==='function'&&aiIntent(q).t==='bypass')return finPreviousRoute.apply(this,arguments);if(window.FIN&&FIN.currency&&/\b(cost|costing|downtime cost|npv|irr|payback|business case|benefit.cost)\b/i.test(q)){const s=K.sets.find(x=>q.toLowerCase().includes(x.tag.toLowerCase()));return['cost_summary',{set:s?s.n:ctx?.set||0}]}return finPreviousRoute.apply(this,arguments)};
+ const finPreviousRoute=aiRoute;aiRoute=function(q,ctx){if(typeof aiIntent==='function'&&aiIntent(q).t==='bypass')return finPreviousRoute.apply(this,arguments);const s=K.sets.find(x=>q.toLowerCase().includes(x.tag.toLowerCase()));if(window.FIN&&FIN.currency&&(/\b(costing|npv|irr|payback|business case|benefit.cost)\b/i.test(q)||(s&&/\bcosts?\b/i.test(q))))return['cost_summary',{set:s?s.n:ctx?.set||0}];return finPreviousRoute.apply(this,arguments)};
 }
 if(typeof module!=='undefined'&&module.exports)module.exports={finRecords,finValidate,finNPV,finIRR,finModel,FIN_FIELDS};
