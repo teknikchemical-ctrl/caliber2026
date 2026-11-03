@@ -11,7 +11,7 @@ await p.goto('file://'+file,{waitUntil:'commit'});
 await p.waitForFunction(()=>window.go&&document.getElementById('app')&&document.getElementById('app').children.length>0,null,{timeout:90000});
 await p.waitForTimeout(800);
 const sets=await p.evaluate(()=>K.sets.map(s=>s.n));
-const V=[['dashboard',`go('dashboard')`],['equipment',`go('equipment')`],['plot',`PP.mode='explore';go('plot')`],['hazard',`PP.mode='hazard';go('plot')`],['maintenance',`go('mnt')`],['scenarios',`go('scn')`],['interlocks',`go('il')`],['assistant',`go('ai')`],['studio',`go('ks')`],['performance',`go('perf')`],['governance',`go('gov')`],['documents',`go('documents')`],['opl',`go('opl')`],['quality',`go('quality')`]];
+const V=[['dashboard',`go('dashboard')`],['equipment',`go('equipment')`],['plot',`PP.mode='explore';go('plot')`],['hazard',`PP.mode='hazard';go('plot')`],['maintenance',`go('mnt')`],['scenarios',`go('scn')`],['interlocks',`go('il')`],['assistant',`go('ai')`],['studio',`go('ks')`],['performance',`go('perf')`],['governance',`go('gov')`],['documents',`go('documents')`],['opl',`go('opl')`],['quality',`go('quality')`],['costing',`go('fin')`]];
 const tabs=quick?['overview','pid','ga']:['overview','pid','ga','plot','docs','ds','seq','opl','maint'];
 for(const n of sets.slice(0,quick?2:99))for(const t of tabs)V.push([`set${n}_${t}`,`go('equipment',{set:${n},tab:'${t}'})`]);
 const bad=[];

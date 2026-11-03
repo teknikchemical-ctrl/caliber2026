@@ -1,0 +1,2 @@
+/* Styles for the costing page (owned by Codex). Loaded last. Hides the menu entry when the case has no fin.json. */
+html[data-fin="0"] .nav[data-page="fin"]{display:none}

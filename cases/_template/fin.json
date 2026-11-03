@@ -1,0 +1,20 @@
+{
+ "_help": "Financial inputs of the case. Codex defines the final schema in src/modules/fin.js. Every number must be labelled in 'basis' as Case data, Market source, Estimate or Assumption.",
+ "currency": "IDR",
+ "horizon_years": 5,
+ "discount_rate": 0.118,
+ "assumptions": [
+  {
+   "name": "Value of one hour of downtime",
+   "value": 0,
+   "unit": "IDR per hour",
+   "basis": "Assumption: replace with the case figure"
+  },
+  {
+   "name": "Loaded cost of one working hour",
+   "value": 0,
+   "unit": "IDR per hour",
+   "basis": "Assumption: replace with the case figure"
+  }
+ ]
+}

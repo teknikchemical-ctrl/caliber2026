@@ -18,7 +18,7 @@ META=_meta()
 AUTO={'pid':'autoPidAll();','gad':'autoGadAll();','g3m':'autoG3mAll();','plot':'autoPlot();','p3':'autoP3();','ov':'autoOv();','hse':'autoHse();','h3':'autoH3();','alias':'autoAlias();','eqn':'autoEqn();','scn':'autoScn();'}
 from theme import *
 base=open(os.path.join(ROOT,'src','base.html')).read()
-base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@CASE:kb@@',cf('kb.json').strip()).replace('@@CASE:dsil@@',cf('dsil.json').strip()).replace('@@CASE:ga@@',cf('ga.json').strip()).replace('@@CASE:meta@@',json.dumps(META))
+base=base.replace('@@BASE_CSS@@',open(os.path.join(ROOT,'src','base.css')).read()).replace('@@CASE:kb@@',cf('kb.json').strip()).replace('@@CASE:dsil@@',cf('dsil.json').strip()).replace('@@CASE:ga@@',cf('ga.json').strip()).replace('@@CASE:meta@@',json.dumps(META)).replace('@@CASE:fin@@',cf('fin.json').strip() if os.path.exists(os.path.join(CDIR,'fin.json')) else '{}')
 def snip(t):
     def r(m):
         n=m.group(1);f=os.path.join(CDIR,'geo',n+'.js')
@@ -53,7 +53,7 @@ for x,y in [('const vb=full?PP.vb:[0,0,880,830],o=[];','const vb=opt.vb||(full?P
     assert x in pp,x; pp=pp.replace(x,y)
 a=h.index('const gKey=(d,i)=>');b=h.index('const _r1=render;')
 mods=[w('auto.js'),w('auto3d.js'),'const EQC='+open(os.path.join(ROOT,'src','data','eqclass.json')).read()+';\n',w('dl.js'),w('ui.js'),w('facts.js'),w('ai.js'),w('intent.js'),w('gad.js'),w('ga.js'),pp,'const MH='+cf('mh.json')+';\nconst EVAL_CASES='+cf('eval_cases.json')+';\nconst SCHEMA_SQL='+json.dumps(open(os.path.join(ROOT,'src','data','schema.sql')).read())+';\nconst PROMPT_TEMPLATE='+json.dumps(open(os.path.join(ROOT,'src','data','prompt_template.md')).read())+';\n']
-for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pid2.js','pidv.js','pdm.js','pdm2.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','fx.js','help.js','auth.js','notify.js','ingest.js','gov.js','eq2.js','perf.js','ready.js','hse.js','hse3d.js','ai2.js','eqclass.js','g3neck.js','g3d.js','g3r.js','plant3d.js','sim3d.js','plan.js','i18n.js','sync.js','dash.js','polish.js']:
+for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pid2.js','pidv.js','pdm.js','pdm2.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','fx.js','help.js','auth.js','notify.js','ingest.js','gov.js','eq2.js','perf.js','ready.js','hse.js','hse3d.js','ai2.js','eqclass.js','fin.js','g3neck.js','g3d.js','g3r.js','plant3d.js','sim3d.js','plan.js','i18n.js','sync.js','dash.js','polish.js']:
     try: mods.append(w(f))
     except FileNotFoundError: pass
 h=h[:a]+''.join(mods)+h[b:]
@@ -62,7 +62,7 @@ for t,r in [('["ga","Equipment drawing"],','["ga","Equipment drawing"],["perf","
 P('"go(\'documents\',{doc:\'"+s.pp.document_id+"\'})"','"st.tab=\'plot\';render()"')
 P('<div class="nav" data-page="equipment">🏭 Equipment Sets</div>','<div class="nav" data-page="equipment">Equipment Sets</div>\n  <div class="nav" data-page="plot">Plot Plan</div>\n  <div class="nav" data-page="mnt">Maintenance</div>\n  <div class="nav" data-page="perf">Performance</div>\n  <div class="nav" data-page="scn">Scenarios</div>\n  <div class="nav" data-page="il">Interlock Library</div>')
 P('p==="pid"?pidPage():','p==="pid"?pidPage():p==="plot"?plotPage():p==="mnt"?mhPage():p==="perf"?perfPage():p==="gov"?govPage():')
-i=h.index('.pbar{padding'); h=h[:i]+w('style2.css')+w('style3.css')+(w('style4.css') if True else '')+w('style3d.css')+h[i:]
+i=h.index('.pbar{padding'); h=h[:i]+w('style2.css')+w('style3.css')+(w('style4.css') if True else '')+w('style3d.css')+w('style_fin.css')+h[i:]
 
 # ---------- contextual exports ----------
 P('<button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button>','<div class="row" style="gap:8px"><button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button><button class="ghost" onclick="rcOpen(\'dossier\',{set:${n}})">Export dossier</button></div>')
@@ -122,6 +122,9 @@ for old,new in [
     if old in h: h=h.replace(old,new)
     elif CASE=="lldpe": print("WARN text patch missing:",old[:60])
 
+# ---------- costing page (module fin.js, owned by Codex) ----------
+P('<div class="nav" data-page="gov">Governance</div>','<div class="nav" data-page="gov">Governance</div>\n  <div class="nav" data-page="fin">Costing</div>')
+P('p==="gov"?govPage():','p==="gov"?govPage():p==="fin"?finPage():')
 # ---------- 4. theme + cleanup ----------
 h=remap(h)
 h=h.replace(ROOT_OLD,ROOT_NEW)
