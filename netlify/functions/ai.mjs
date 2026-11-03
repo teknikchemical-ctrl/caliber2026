@@ -113,21 +113,32 @@ async function* run(c, p, user, signal, useTools) {
   if (c.provider === "mock") { yield* mock(user.src, p); return; }
   const sys = SYSTEM(plantName(p));
   if (c.provider === "openai") { yield* openai(c, c.chosen, user.text, signal, sys); return; }
-  const tried = new Set(); let lastErr;
-  const attempt = async function* (m) { tried.add(m); for await (const d of gemini(c, m, user.text, signal, useTools, sys)) yield d; };
-  for (const m of [c.chosen, ...c.fallbacks.filter(m => m !== c.chosen)]) {
-    let started = false;
-    try { for await (const d of attempt(m)) { started = true; yield d; } c.used = m; return; }
-    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || !isRetryable(e)) throw e; }
+  const tried = new Set(), errors = [];
+  let queue = [...new Set([c.chosen, ...c.fallbacks])], discovered = false;
+  const discover = async () => {
+    discovered = true;
+    try { const found = await discoverModels(c, AbortSignal.any([signal, AbortSignal.timeout(1000)]));
+      queue = [...found.filter(m => !tried.has(m)).slice(0, 3), ...queue];
+    } catch {}
+  };
+  while (queue.length || !discovered) {
+    if (signal.aborted) break;
+    // Do not let retired aliases and overloaded defaults consume the whole request.
+    if (!discovered && (tried.size >= 2 || !queue.length)) await discover();
+    const m = queue.shift(); if (!m || tried.has(m)) continue;
+    tried.add(m); let started = false;
+    const firstToken = new AbortController(), timer = setTimeout(() => firstToken.abort(), 3000);
+    const attemptSignal = AbortSignal.any([signal, firstToken.signal]);
+    try {
+      for await (const d of gemini(c, m, user.text, attemptSignal, useTools, sys)) { started = true; clearTimeout(timer); yield d; }
+      c.used = m; return;
+    } catch (e) {
+      const timeout = /AbortError|TimeoutError/.test(e.name);
+      if (started || (!timeout && (!(e instanceof ProviderError) || !isRetryable(e)))) throw e;
+      errors.push(m + ": " + (timeout ? "no answer within 3 s" : e.message));
+    } finally { clearTimeout(timer); }
   }
-  /* every configured name was refused as unknown: ask the key what it can use */
-  let found = []; try { found = await discoverModels(c, signal); } catch {}
-  for (const m of found.filter(m => !tried.has(m)).slice(0, 3)) {
-    let started = false;
-    try { for await (const d of attempt(m)) { started = true; yield d; } c.used = m; return; }
-    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || !isRetryable(e)) throw e; }
-  }
-  throw lastErr;
+  throw new ProviderError("No model answered. " + errors.join(" | ").slice(0, 500) + ". Check AI_MODEL and provider quota in Settings diagnostics.", 502);
 }
 
 export default async (req, ctx) => {
@@ -145,11 +156,11 @@ export default async (req, ctx) => {
   c.chosen = c.models.includes(p.model) ? p.model : c.model;
   const { user, src } = build(p), u = { text: user, src };
   const useTools = p.draft ? null : decls(p.tools).length && !(p.tool_results && p.tool_results.length) ? decls(p.tools) : null;
-  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 24000);
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
   const gen = run(c, p, u, ctl.signal, useTools);
   const cites = text => [...new Set([...text.matchAll(/\[(\d{1,2})\]/g)].map(m => +m[1]))].map(n => src.find(s => s.n === n)).filter(Boolean).map(s => s.chunk_id);
   const modelName = () => c.provider === "mock" ? "mock" : (c.used || c.chosen);
-  const errMsg = e => (e && e.name === "AbortError") ? "the AI provider took too long" : String((e && e.message) || e).slice(0, 160);
+  const errMsg = e => (e && e.name === "AbortError") ? "the AI provider took too long" : String((e && e.message) || e).slice(0, 650);
 
   if (!p.stream) {
     try {

@@ -17,6 +17,7 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  if(rq.url.includes("chat/completions")&&j.stream===false){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({choices:[{message:{content:"OK"}}]}))}
  if(rq.method==="GET"&&rq.url.includes("/models")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({models:[{name:"models/gemini-2.0-flash"},{name:"models/gemini-2.5-flash"},{name:"models/gemini-embedding-001",supportedGenerationMethods:["embedContent"]},{name:"models/gemini-9-flash",supportedGenerationMethods:["generateContent"]},{name:"models/gemini-9-flash-lite",supportedGenerationMethods:["generateContent"]}]}))}
  if(rq.url.includes("batchEmbedContents")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({embeddings:(j.requests||[]).map((_,i)=>({values:[1,i%3,2,0.5]}))}))}
+ if(/\/models\/busy-model:/.test(rq.url)){rs.writeHead(503,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"High demand"}}))}
  if(/\/models\/quota-\d:/.test(rq.url)){rs.writeHead(429,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"Quota exceeded for this model"}}))}
  if(/\/models\/(badmodel|gone-\d|gemini-2\.0-flash-gone):/.test(rq.url)){rs.writeHead(404,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"models/badmodel is not found for API version v1beta"}}))}
  if(rq.url.includes(":generateContent")){const tx=(((j.contents||[{}])[0].parts||[{}])[0].text||""),body=(/TEXT:\n([\s\S]*?)\n\nKnown equipment/.exec(tx)||[])[1]||"";
@@ -57,6 +58,11 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  s1.kill();
  let s2=proc(8902,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k"});await up(8902);
  r=await post(8902);ok(r.s===200&&/Gemini says/.test(r.j.answer),"Gemini adapter returns an answer");
+ /* Reproduce the live chain: retired model, overloaded alias, then a stalled alias. */
+ const recovery=proc(8928,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k",AI_MODEL:"gone-1",AI_MODEL_FALLBACK:"busy-model,slow-answer,gone-2"});await up(8928);
+ try{const recovered=await post(8928);ok(recovered.s===200&&recovered.j.model==="gemini-9-flash","retired and overloaded models trigger discovery before a stalled fallback")}finally{recovery.kill()}
+ const slowRecovery=proc(8929,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k",AI_MODEL:"slow-answer",AI_MODEL_FALLBACK:"gemini-2.0-flash"});await up(8929);
+ try{const recovered=await post(8929);ok(recovered.s===200&&recovered.j.model==="gemini-2.0-flash","a stalled assistant model times out per attempt and a fallback answers")}finally{slowRecovery.kill()}
  /* AI reading of documents */
  {const EX="Start-up KC-4501 Rev B 2026-03-01\n1. Check lube oil level\n2. Open suction valve ZSO-4510\nWARNING: Do not start with lube oil pressure below 2 barg\nPSLL-4504 trip set point: 2 barg\nContact password: hunter22 or mail ops@example.com";
   const ex=await fetch("http://localhost:8902/api/extract",{method:"POST",body:JSON.stringify({text:EX,name:"startup.txt",known:[{tag:"KC-4501",name:"Recycle Gas Compressor"}]})}).then(async r=>({s:r.status,j:await r.json()}));
@@ -209,6 +215,8 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  /* answer log and audit shared */
  await A.evaluate(async()=>{await aiAsk("Where is CT-7801 located?")});await A.waitForTimeout(1200);await C.evaluate(()=>syNow());await C.waitForTimeout(800);
  ok(await C.evaluate(()=>STORE.mem.qa.some(q=>/CT-7801/.test(q.q))),"answer log shared");
+ const partialStream=await A.evaluate(async()=>{const original=window.fetch,cfg={...AI.cfg};try{AI.cfg.mock=false;AI.cfg.stream=true;window.fetch=async()=>new Response('{"delta":"incomplete answer"}\n{"error":"provider timed out"}\n',{headers:{"content-type":"application/x-ndjson"}});try{await aiCallProvider({question:"test"},{onToken:()=>{}});return false}catch(e){return /provider timed out/.test(e.message)}}finally{window.fetch=original;Object.assign(AI.cfg,cfg)}});
+ ok(partialStream,"a provider error after partial streamed text is rejected instead of accepted as an answer");
  /* safety request is never rewritten by the AI */
  const sf=await A.evaluate(async()=>{const r=await aiAsk("How do I bypass the trip on KC-4501?",{noLog:true});return{via:r.via,s:r.safety}});ok(sf.via==="local"&&sf.s,"bypass request is answered by the local safety handler");
  /* tool question: computed draft passes to the AI */
