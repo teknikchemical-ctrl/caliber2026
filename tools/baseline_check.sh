@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # Run before starting work, before every push, and before merging. Tells you whether you are on the same baseline as main and
-# whether you touched files that belong to the other Claude.
-#   tools/baseline_check.sh a     (Claude A: features, data, AI, integrator)
-#   tools/baseline_check.sh b     (Claude B: 3D UI)
-#   tools/baseline_check.sh any   (takeover mode: no ownership check, see docs/TAKEOVER.md)
+# whether you touched files that belong to another agent.
+#   tools/baseline_check.sh a       Claude A: features, data, AI, integrator (everything except B's and Codex's files)
+#   tools/baseline_check.sh b       Claude B: 3D UI
+#   tools/baseline_check.sh codex   Codex: costing page, finance model, deck, manual
+#   tools/baseline_check.sh any     takeover mode: no ownership check, see docs/TAKEOVER.md
 set -uo pipefail
 cd "$(dirname "$0")/.."
-role="${1:?role: a, b or any}"
+role="${1:?role: a, b, codex or any}"
 git fetch -q origin 2>/dev/null || echo "(could not fetch: results may be out of date)"
 B3D='^(src/modules/(g3d|g3r|g3neck|plant3d|hse3d|sim3d|auto3d)\.js|src/modules/style3d\.css|cases/[^/]+/geo/(g3m|p3|h3)\.js|tools/g3bridge\.js|tests/stress3d\.js)$'
+CODEX='^((deck|finance|manual)/.*|src/modules/(fin\.js|style_fin\.css)|cases/[^/]+/(fin|eval_extra_fin)\.json|docs/handoff/codex\.md|tests/fin_[a-z0-9_]+\.js|tools/record_demo\.js)$'
 base=$(git merge-base HEAD origin/main)
 behind=$(git rev-list --count HEAD..origin/main); ahead=$(git rev-list --count origin/main..HEAD)
 echo "branch:        $(git rev-parse --abbrev-ref HEAD) at $(git rev-parse --short HEAD)"
@@ -20,12 +22,17 @@ echo "you are $ahead commit(s) ahead of main and $behind behind it"
 files=$( (git diff --name-only "$base" HEAD; git diff --name-only HEAD; git ls-files --others --exclude-standard) | sort -u)
 bad=""
 while IFS= read -r f; do [ -z "$f" ] && continue
-  if [ "$role" = "any" ]; then :; elif [ "$role" = "b" ]; then echo "$f" | grep -Eq "$B3D" || bad="$bad\n  $f"
-  else echo "$f" | grep -Eq "$B3D" && bad="$bad\n  $f"; fi
+  isb=0; isx=0; echo "$f" | grep -Eq "$B3D" && isb=1; echo "$f" | grep -Eq "$CODEX" && isx=1
+  case "$role" in
+    any) ;;
+    a)     [ $isb -eq 1 ] || [ $isx -eq 1 ] && bad="$bad\n  $f" ;;
+    b)     [ $isb -eq 1 ] || bad="$bad\n  $f" ;;
+    codex) [ $isx -eq 1 ] || bad="$bad\n  $f" ;;
+  esac
 done <<< "$files"
 if [ -n "$bad" ]; then
-  case "$role" in b) echo "PROBLEM: you changed files that are not Claude B's:";; codex) echo "PROBLEM: you changed files that are not Codex's:";; *) echo "PROBLEM: you changed Claude B's files:";; esac
-  printf "$bad\n"; echo "Move the request to docs/TASKS.md, or write 'taking <file>' there first."; exit 1
+  case "$role" in a) echo "PROBLEM: you changed files that belong to Claude B or Codex:";; b) echo "PROBLEM: you changed files that are not Claude B's:";; codex) echo "PROBLEM: you changed files that are not Codex's:";; esac
+  printf "$bad\n"; echo "Put the request in your handoff file (Waiting on), or write 'taking <file>' in docs/TASKS.md first."; exit 1
 fi
 echo "ownership: OK (no files outside your list)"
 [ "$behind" -gt 0 ] && exit 2 || exit 0
