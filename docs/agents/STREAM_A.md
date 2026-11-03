@@ -10,6 +10,8 @@ You build everything in the prototype except the 3D views, and you are the integ
 ## You own (edit freely)
 Everything except the files in Claude B's list: `cases/<id>/` (all of it except `geo/g3m.js`, `geo/p3.js`, `geo/h3.js`), all other `src/modules/*.js`, `src/data/`, `netlify/`, `tools/` (except `tools/g3bridge.js`), `tests/` (except `tests/stress3d.js`), `build.py`, `src/base.html`, `docs/`, the deck, finance and manual folders.
 
+Codex owns `src/modules/fin.js`, `src/modules/style_fin.css`, `cases/<id>/fin.json`, `cases/<id>/eval_extra_fin.json`, `tests/fin_*.js`, `finance/`, `deck/`, `manual/`: never edit them.
+
 ## You must not edit
 Claude B's files: `src/modules/g3d.js g3r.js g3neck.js plant3d.js hse3d.js sim3d.js auto3d.js style3d.css`, `cases/<id>/geo/g3m.js p3.js h3.js`, `tools/g3bridge.js`, `tests/stress3d.js`. If you need a change there, write it in `docs/TASKS.md` for B.
 

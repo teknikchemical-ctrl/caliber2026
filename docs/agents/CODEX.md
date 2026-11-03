@@ -1,27 +1,36 @@
-# Role: Codex, deliverables, tests and documentation
+# Role: Codex, costing and financial features of the app, and the financial deliverables
 
-You work on everything around the app, so you rarely touch the same files as the Claude sessions.
+You build everything about cost, value and the business case, inside the app and in the documents, without touching the code the two Claude sessions work on.
 
 ## Mission
-Produce the hackathon deliverables and strengthen the tests: the deck, the business case and financial model, the report, the user manual, the demo script, extra evaluation questions, and documentation.
+1. **The "Costing" page of the app** (`src/modules/fin.js`): the costing and business case features the hackathon brief and the case call for. Ideas, in the order I would do them:
+   - cost of downtime and maintenance cost by equipment, by work order type and by month, from the work orders in `MH` (fields `dt`, `lc`, `mc`, `tc`, `bd`), with charts;
+   - cost build-up: one-off, per-unit and running costs, contingency;
+   - value levers and a business case calculator with inputs the user can change: net present value, internal rate of return, payback, benefit-cost ratio, with pessimistic, base and optimistic scenarios, a sensitivity chart and a cumulative cash flow chart;
+   - risk-adjusted view that links the predictive risk of each unit (`pdmUnit(n)`) to expected loss;
+   - exports: CSV and a printable document through the helpers listed at the top of `fin.js`;
+   - an assistant tool (`cost_summary`) so the assistant answers cost questions with the same numbers, and 15 or more evaluation questions in `cases/<id>/eval_extra_fin.json`.
+2. **The inputs** (`cases/<id>/fin.json`): you define the schema. Every number carries a basis: Case data, Market source, Estimate or Assumption. Never invent a number silently.
+3. **The financial model and report** in `finance/` (Excel model with live formulas, report in PDF and Word) and the financial slides in `deck/`. The first case's versions are templates: copy, change inputs and wording, regenerate. Use `python3.13` for the openpyxl and python-docx scripts.
 
 ## You own (edit freely)
-`deck/`, `finance/`, `manual/`, `docs/` except `docs/CONTRACT.md` and `docs/TASKS.md` lines that are not yours, `tools/record_demo.js`, new files under `tests/` with names you choose (not `regress.js` or `smoke_case.js`).
+`src/modules/fin.js`, `src/modules/style_fin.css`, `cases/<id>/fin.json`, `cases/<id>/eval_extra_fin.json`, `tests/fin_*.js`, `finance/`, `deck/`, `manual/`, `tools/record_demo.js`, `docs/handoff/codex.md`.
 
 ## You must not edit
-`src/`, `cases/<id>/` (propose changes in `docs/TASKS.md`; for evaluation questions put them in `cases/<id>/eval_extra.json` only if Stream A agrees), `build.py`, `netlify/`.
+Every other file. Especially `build.py`, `src/base.html`, `src/modules/*.js` other than `fin.js`, `cases/<id>/plant*`, `kb.json` and the other generated case files, `tests/regress.js`, `tests/smoke_case.js`. The page is already wired into the menu and the build (menu entry "Costing", hidden when the case has no `fin.json`). If you need something from the app (a number, a helper, a change elsewhere), write it under "Waiting on" in your handoff file for Claude A.
 
 ## First 30 minutes
-1. Read `AGENTS.md`, `docs/CONTEXT.md`, `CLAUDE.md` (the text and output rules apply to you too: no em dashes, `%` not "percent", bold key figures, page break after each report section, under the page limit).
-2. Run the setup commands. Note that `python3` may lack openpyxl, pillow or python-pptx; use `python3.13` for the document and spreadsheet tools.
-3. `git checkout -b codex/deliverables integration`.
-4. Read the brief and the judging criteria. Write the deck outline and the three questions the judges will ask into `docs/TASKS.md`.
+1. Read `AGENTS.md`, `docs/CONTEXT.md`, `docs/TWO_CLAUDES.md`, `docs/TAKEOVER.md`, and the header comment of `src/modules/fin.js`, which lists every helper you may use. Run the setup commands (section 5 of the context file).
+2. Create your branch `codex/finance` from `origin/main` and publish it to GitHub. Never push to `main`. Do not open a pull request: Claude A merges your branch.
+3. Build the example plant with its sample inputs: `BUILD_OUT=/tmp/fin python3 build.py mock-cdu`, then `node tests/fin_smoke.js /tmp/fin/index.html`. Open the Costing page in the built file and see what is there now.
+4. Read the old business case in `src/modules/gov.js` (functions `govBizCalc`, `govBiz`) and `finance/spec.py` and `finance/build_xlsx.py`. They are the model of the first case: read them for formulas, do not copy its numbers or wording.
+5. Write your plan in `docs/handoff/codex.md`.
 
 ## Loop
-The first case's deck, report and finance model in `deck/`, `finance/`, `manual/` are templates: copy, change inputs and wording, regenerate. Everything numeric must trace to a source or be labelled Assumption or Estimate. Never reuse the first plant's numbers or names. Screenshots come from the built app: `node tools/case_shots.js dist/index.html /tmp/shots`.
+Change `fin.js`, rebuild with `BUILD_OUT`, look at the page in the built file (screenshot with `node tools/case_shots.js /tmp/fin/index.html /tmp/shots --quick`), run `node tests/fin_smoke.js /tmp/fin/index.html` and extend it with checks of your own numbers (totals against the records, NPV against a hand calculation). Run `tools/baseline_check.sh codex` before every push. Commit small, push your branch after every working step, update `docs/handoff/codex.md` at every push.
+
+## The real case
+Tomorrow the case documents are in `cases/<id>/source/` on `main` and Claude A builds the case pack in `cases/<id>/`. `git fetch origin && git merge origin/main` regularly, to get its data. Your `fin.json` is for that case: take figures from the brief and the documents, and label everything.
 
 ## Done when
-Deck, report and demo script match what the app really shows on the final build, every figure has a source or label, and the files are in the formats the hackathon asks for.
-
-## Hand off to
-Integrator and the human: list the files and how to regenerate them in `docs/TASKS.md`.
+The Costing page works on the real case with correct numbers that trace to the records or to labelled assumptions, the assistant answers cost questions with the same numbers, the Excel model and report match the page, the evaluation questions pass, `node tests/fin_smoke.js` passes, and your handoff file says how to regenerate everything.

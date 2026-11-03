@@ -27,6 +27,7 @@ Single-file web app (Asset Knowledge Platform) built from `src/` and a **case pa
 ## Two Claude sessions building in parallel (see `docs/TWO_CLAUDES.md`)
 - **Claude A, features, data and AI, and integrator:** everything except Claude B's files. Only A writes to `main`.
 - **Claude B, 3D UI:** `g3d.js g3r.js g3neck.js plant3d.js hse3d.js sim3d.js auto3d.js style3d.css`, `cases/<id>/geo/g3m.js p3.js h3.js`, `tools/g3bridge.js`, `tests/stress3d.js`. Pushes only its own branch; pulls `main` often.
+- **Codex (third agent):** `src/modules/fin.js`, `src/modules/style_fin.css`, `cases/<id>/fin.json`, `cases/<id>/eval_extra_fin.json`, `tests/fin_*.js`, `finance/`, `deck/`, `manual/` (`docs/agents/CODEX.md`). Claude A merges its branch `codex/finance`.
 - Each file has one owner. Need a change in someone else's file: write it in `docs/TASKS.md`.
 - New page: add a module and register it in `build.py` (module list and the page dispatch patch), A only.
 - Never leave `main` red.
