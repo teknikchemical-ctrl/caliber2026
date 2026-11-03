@@ -1,2 +1,11 @@
 /* Styles for the costing page (owned by Codex). Loaded last. Hides the menu entry when the case has no fin.json. */
 html[data-fin="0"] .nav[data-page="fin"]{display:none}
+.fin-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.fin-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.fin-scroll{overflow-x:auto;max-width:100%}.fin-table{width:100%;border-collapse:collapse;font-size:13px}
+.fin-table th,.fin-table td{padding:9px;text-align:left;border-bottom:1px solid var(--line,#ddd);vertical-align:top}
+.fin-table th{background:#eff4fa;color:#16334f}.fin-input{width:140px;max-width:100%;color:#1554ad;padding:7px}
+.fin-actions{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
+@media print{.fin-actions{display:none}.fin-input{border:0;color:#000;padding:0}.fin-table{break-inside:auto}}
+
+.fin-bars>div{margin:10px 0}.fin-bar{height:12px;min-width:2px;border-radius:3px;margin:4px 0}.fin-bars span{font-size:12px}

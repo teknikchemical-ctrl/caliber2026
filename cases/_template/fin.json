@@ -1,20 +1,103 @@
 {
- "_help": "Financial inputs of the case. Codex defines the final schema in src/modules/fin.js. Every number must be labelled in 'basis' as Case data, Market source, Estimate or Assumption.",
- "currency": "IDR",
- "horizon_years": 5,
- "discount_rate": 0.118,
- "assumptions": [
-  {
-   "name": "Value of one hour of downtime",
-   "value": 0,
-   "unit": "IDR per hour",
-   "basis": "Assumption: replace with the case figure"
+  "schema_version": 1,
+  "currency": "IDR",
+  "status": "Unvalued template: supply sourced inputs before making a business case",
+  "inputs": {
+    "horizon": {
+      "value": null,
+      "unit": "years",
+      "basis": "Assumption",
+      "source": "Required case input: Evaluation period."
+    },
+    "discount": {
+      "value": null,
+      "unit": "fraction/year",
+      "basis": "Assumption",
+      "source": "Required case input: Illustrative required return, not a market quote."
+    },
+    "historyYears": {
+      "value": null,
+      "unit": "years",
+      "basis": "Assumption",
+      "source": "Required case input: Explicit observation exposure for annualisation; confirm against the real history coverage."
+    },
+    "downtimeValue": {
+      "value": null,
+      "unit": "IDR/asset-hour",
+      "basis": "Assumption",
+      "source": "Required case input: Illustrative contribution lost; simultaneous asset downtime may overlap. Not plant outage hours."
+    },
+    "avoidMaintenance": {
+      "value": null,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Required case input: Avoidable share of recorded maintenance cost; excludes the downtime lever."
+    },
+    "avoidDowntime": {
+      "value": null,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Required case input: Avoidable share of recorded asset downtime."
+    },
+    "oneOff": {
+      "value": null,
+      "unit": "IDR",
+      "basis": "Assumption",
+      "source": "Required case input: Shared implementation cost at year zero."
+    },
+    "perUnit": {
+      "value": null,
+      "unit": "IDR/set",
+      "basis": "Assumption",
+      "source": "Required case input: Implementation cost for each included equipment set."
+    },
+    "units": {
+      "value": null,
+      "unit": "sets",
+      "basis": "Assumption",
+      "source": "Required case input: Demonstration rollout covers seven equipment sets."
+    },
+    "contingency": {
+      "value": null,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Required case input: Applied to shared and per-set implementation costs."
+    },
+    "annualRunning": {
+      "value": null,
+      "unit": "IDR/year",
+      "basis": "Assumption",
+      "source": "Required case input: Support and hosting at constant prices."
+    },
+    "otherBenefit": {
+      "value": null,
+      "unit": "IDR/year",
+      "basis": "Assumption",
+      "source": "Required case input: No additional monetised lever is assumed."
+    }
   },
-  {
-   "name": "Loaded cost of one working hour",
-   "value": 0,
-   "unit": "IDR per hour",
-   "basis": "Assumption: replace with the case figure"
-  }
- ]
+  "scenarios": [
+    {
+      "name": "Pessimistic",
+      "benefit": 0.5,
+      "cost": 1.25,
+      "basis": "Assumption",
+      "source": "SYNTHETIC: half the base benefit, 25% higher costs."
+    },
+    {
+      "name": "Base",
+      "benefit": 1,
+      "cost": 1,
+      "basis": "Assumption",
+      "source": "SYNTHETIC base assumptions."
+    },
+    {
+      "name": "Optimistic",
+      "benefit": 1.5,
+      "cost": 0.9,
+      "basis": "Assumption",
+      "source": "SYNTHETIC: 50% higher benefit, 10% lower costs."
+    }
+  ],
+  "risk": []
 }

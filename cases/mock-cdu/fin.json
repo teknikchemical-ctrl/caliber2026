@@ -1,20 +1,103 @@
 {
- "_help": "Financial inputs of the case. Codex defines the final schema in src/modules/fin.js. Every number must be labelled in 'basis' as Case data, Market source, Estimate or Assumption.",
- "currency": "IDR",
- "horizon_years": 5,
- "discount_rate": 0.118,
- "assumptions": [
-  {
-   "name": "Value of one hour of downtime",
-   "value": 0,
-   "unit": "IDR per hour",
-   "basis": "Assumption: replace with the case figure"
+  "schema_version": 1,
+  "currency": "IDR",
+  "status": "SYNTHETIC demonstration, not an investment recommendation",
+  "inputs": {
+    "horizon": {
+      "value": 5,
+      "unit": "years",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Evaluation period."
+    },
+    "discount": {
+      "value": 0.118,
+      "unit": "fraction/year",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Illustrative required return, not a market quote."
+    },
+    "historyYears": {
+      "value": 2,
+      "unit": "years",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Explicit observation exposure for annualisation; confirm against the real history coverage."
+    },
+    "downtimeValue": {
+      "value": 1000000,
+      "unit": "IDR/asset-hour",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Illustrative contribution lost; simultaneous asset downtime may overlap. Not plant outage hours."
+    },
+    "avoidMaintenance": {
+      "value": 0.2,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Avoidable share of recorded maintenance cost; excludes the downtime lever."
+    },
+    "avoidDowntime": {
+      "value": 0.2,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Avoidable share of recorded asset downtime."
+    },
+    "oneOff": {
+      "value": 5000000,
+      "unit": "IDR",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Shared implementation cost at year zero."
+    },
+    "perUnit": {
+      "value": 500000,
+      "unit": "IDR/set",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Implementation cost for each included equipment set."
+    },
+    "units": {
+      "value": 7,
+      "unit": "sets",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Demonstration rollout covers seven equipment sets."
+    },
+    "contingency": {
+      "value": 0.15,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Applied to shared and per-set implementation costs."
+    },
+    "annualRunning": {
+      "value": 1500000,
+      "unit": "IDR/year",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. Support and hosting at constant prices."
+    },
+    "otherBenefit": {
+      "value": 0,
+      "unit": "IDR/year",
+      "basis": "Assumption",
+      "source": "SYNTHETIC demonstration only. No additional monetised lever is assumed."
+    }
   },
-  {
-   "name": "Loaded cost of one working hour",
-   "value": 0,
-   "unit": "IDR per hour",
-   "basis": "Assumption: replace with the case figure"
-  }
- ]
+  "scenarios": [
+    {
+      "name": "Pessimistic",
+      "benefit": 0.5,
+      "cost": 1.25,
+      "basis": "Assumption",
+      "source": "SYNTHETIC: half the base benefit, 25% higher costs."
+    },
+    {
+      "name": "Base",
+      "benefit": 1,
+      "cost": 1,
+      "basis": "Assumption",
+      "source": "SYNTHETIC base assumptions."
+    },
+    {
+      "name": "Optimistic",
+      "benefit": 1.5,
+      "cost": 0.9,
+      "basis": "Assumption",
+      "source": "SYNTHETIC: 50% higher benefit, 10% lower costs."
+    }
+  ],
+  "risk": []
 }

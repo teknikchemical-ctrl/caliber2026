@@ -1,0 +1,194 @@
+[
+  {
+    "id": "FIN01",
+    "cat": "Financial model",
+    "q": "What is the total maintenance cost?",
+    "must": [
+      "271,470,000 IDR"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN02",
+    "cat": "Financial model",
+    "q": "What is the recorded downtime cost basis?",
+    "must": [
+      "189.60 h"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN03",
+    "cat": "Financial model",
+    "q": "How many breakdowns are in the costing records?",
+    "must": [
+      "11 breakdowns"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN04",
+    "cat": "Financial model",
+    "q": "How many work orders support the cost summary?",
+    "must": [
+      "112 work orders"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN05",
+    "cat": "Financial model",
+    "q": "What is the business case NPV?",
+    "must": [
+      "151,823,149 IDR"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN06",
+    "cat": "Financial model",
+    "q": "What is the business case horizon?",
+    "must": [
+      "5 years"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN07",
+    "cat": "Financial model",
+    "q": "What discount rate is used for NPV?",
+    "must": [
+      "11.8%"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN08",
+    "cat": "Financial model",
+    "q": "What is the annual benefit in the business case?",
+    "must": [
+      "46,107,000 IDR"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN09",
+    "cat": "Financial model",
+    "q": "What is the investment cost?",
+    "must": [
+      "9,775,000 IDR"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN10",
+    "cat": "Financial model",
+    "q": "What is the annual running cost?",
+    "must": [
+      "1,500,000 IDR"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN11",
+    "cat": "Financial model",
+    "q": "What is the business case IRR?",
+    "must": [
+      "456.25%"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN12",
+    "cat": "Financial model",
+    "q": "What is the simple payback?",
+    "must": [
+      "0.22 years"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN13",
+    "cat": "Financial model",
+    "q": "What is the benefit-cost ratio?",
+    "must": [
+      "10.98"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN14",
+    "cat": "Financial model",
+    "q": "Is this business case synthetic?",
+    "must": [
+      "SYNTHETIC"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN15",
+    "cat": "Financial model",
+    "q": "Does downtime cost imply plant outage time?",
+    "must": [
+      "Asset downtime is not plant outage time"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  },
+  {
+    "id": "FIN16",
+    "cat": "Financial model",
+    "q": "Are risk rankings probabilities in this business case?",
+    "must": [
+      "risk rankings are not probabilities"
+    ],
+    "src": [
+      "data"
+    ],
+    "min_conf": 60
+  }
+]

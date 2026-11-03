@@ -1,0 +1,28 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const {finRecords,finModel,finIRR}=require('../src/modules/fin.js');
+const fin=JSON.parse(fs.readFileSync('cases/mock-cdu/fin.json')),history=JSON.parse(fs.readFileSync('cases/mock-cdu/mh.json'));
+const v=Object.fromEntries(Object.entries(fin.inputs).map(([k,a])=>[k,a.value]));
+const totals=finRecords(history),m=finModel(totals,v);
+assert.deepEqual(m.errors,[]);
+assert.equal(totals.maintenance,history.reduce((a,r)=>a+(r.tc??0),0));
+assert.equal(totals.downtime,history.reduce((a,r)=>a+(r.dt??0),0));
+assert.equal(Object.values(totals.equipment).reduce((a,x)=>a+x.cost,0),totals.maintenance);
+const independentInvestment=(v.oneOff+v.units*v.perUnit)*(1+v.contingency);
+const independentAnnual=totals.maintenance/v.historyYears*v.avoidMaintenance+totals.downtime/v.historyYears*v.downtimeValue*v.avoidDowntime+v.otherBenefit-v.annualRunning;
+let expected=-independentInvestment;for(let year=1;year<=v.horizon;year++)expected+=independentAnnual/(1+v.discount)**year;
+assert.ok(Math.abs(m.npv-expected)<1e-6);
+const close=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
+close(finIRR([-100,110]),.1);
+assert.equal(finIRR([-100,0,0]),null);assert.equal(finIRR([0,100]),null);assert.equal(finIRR([-100,200,-110]),null);
+const simple={...v,oneOff:100,perUnit:0,contingency:0,annualRunning:0,avoidMaintenance:0,avoidDowntime:0,otherBenefit:60,horizon:2,discount:0};
+const a=finModel(totals,simple);close(a.npv,20);close(a.payback,100/60);close(a.bcr,1.2);
+const zero=finModel(totals,{...simple,oneOff:0,otherBenefit:0});assert.equal(zero.bcr,null);assert.equal(zero.irr,null);assert.equal(zero.payback,0);
+assert.equal(finModel(totals,{...simple,otherBenefit:0}).payback,null);
+assert.ok(finModel(totals,{...v,historyYears:0}).errors.length);
+assert.ok(finModel(totals,{...v,discount:NaN}).errors.length);
+assert.ok(finModel(totals,{...v,horizon:2.5}).errors.length);
+assert.ok(finModel(totals,{...v,avoidMaintenance:1.2}).errors.length);
+assert.ok(finModel(totals,{...v,oneOff:null}).errors.length);
+const missing=finRecords([{tc:null,dt:null},{tc:0,dt:0}]);assert.equal(missing.missingCost,1);assert.equal(missing.missingDowntime,1);
+console.log('Financial model checks passed; independent sample NPV',expected);
+for(const s of fin.scenarios){const result=finModel(totals,v,s);assert.deepEqual(result.errors,[]);close(result.investment,m.investment*s.cost);}
