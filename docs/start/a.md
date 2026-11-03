@@ -150,7 +150,7 @@ Validator 0 errors, smoke test passes with at least 90% on the evaluation questi
 # Current task board
 # Task board
 
-Branches: Claude A = `<fill in>`, Claude B = `<fill in>`. Case id = `<fill in>`.
+Branches: Claude A = `claude/great-tesla-l0uw33`, Claude B = `claude/funny-edison-pis09w`. Case id = `<fill in tomorrow>`.
 
 Update your own lines only. Status: `todo`, `doing`, `blocked`, `done`. Newest handoff notes go at the bottom.
 
