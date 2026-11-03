@@ -22,6 +22,9 @@ Anything else. In particular `build.py`, `src/base.html`, the case data (`cases/
 3. Write down what is weak (proportions, materials, labels, empty areas, camera, speed) in `docs/TASKS.md`.
 4. When the real case's pack exists on `main` (Claude A), `git pull origin main` and work on those machines.
 
+## Handoff duty
+At every push update `docs/handoff/b.md` (done, in progress, next, gotchas, how to check, waiting on) and your rows in `docs/TASKS.md`. Do not write notes at the bottom of `docs/TASKS.md`. If the other Claude stops, follow `docs/TAKEOVER.md`. Run `tools/state.sh` at the start of work to see the other's state.
+
 ## Loop
 Start and end of every piece of work: `tools/baseline_check.sh b` (same baseline as `main`, only your own files).
 

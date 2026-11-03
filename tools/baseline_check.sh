@@ -3,9 +3,10 @@
 # whether you touched files that belong to the other Claude.
 #   tools/baseline_check.sh a     (Claude A: features, data, AI, integrator)
 #   tools/baseline_check.sh b     (Claude B: 3D UI)
+#   tools/baseline_check.sh any   (takeover mode: no ownership check, see docs/TAKEOVER.md)
 set -uo pipefail
 cd "$(dirname "$0")/.."
-role="${1:?role: a or b}"
+role="${1:?role: a, b or any}"
 git fetch -q origin 2>/dev/null || echo "(could not fetch: results may be out of date)"
 B3D='^(src/modules/(g3d|g3r|g3neck|plant3d|hse3d|sim3d|auto3d)\.js|src/modules/style3d\.css|cases/[^/]+/geo/(g3m|p3|h3)\.js|tools/g3bridge\.js|tests/stress3d\.js)$'
 base=$(git merge-base HEAD origin/main)
@@ -19,7 +20,7 @@ echo "you are $ahead commit(s) ahead of main and $behind behind it"
 files=$( (git diff --name-only "$base" HEAD; git diff --name-only HEAD; git ls-files --others --exclude-standard) | sort -u)
 bad=""
 while IFS= read -r f; do [ -z "$f" ] && continue
-  if [ "$role" = "b" ]; then echo "$f" | grep -Eq "$B3D" || bad="$bad\n  $f"
+  if [ "$role" = "any" ]; then :; elif [ "$role" = "b" ]; then echo "$f" | grep -Eq "$B3D" || bad="$bad\n  $f"
   else echo "$f" | grep -Eq "$B3D" && bad="$bad\n  $f"; fi
 done <<< "$files"
 if [ -n "$bad" ]; then

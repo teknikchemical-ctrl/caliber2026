@@ -30,6 +30,7 @@ Single-file web app (Asset Knowledge Platform) built from `src/` and a **case pa
 - Each file has one owner. Need a change in someone else's file: write it in `docs/TASKS.md`.
 - New page: add a module and register it in `build.py` (module list and the page dispatch patch), A only.
 - Never leave `main` red.
+- Keep `docs/handoff/<a|b>.md` current at every push. If the other Claude stops: `docs/TAKEOVER.md`. See the other's state: `tools/state.sh`.
 
 ## Rules for text and output (the owner is strict about these)
 - Visible text reads like a plant engineer wrote it: plain, specific, no marketing words. No em dashes or en dashes anywhere (`build.py` rewrites them, but do not write them). No emoji.

@@ -20,6 +20,9 @@ Claude B's files: `src/modules/g3d.js g3r.js g3neck.js plant3d.js hse3d.js sim3d
 4. The case documents are in `cases/<id>/source/`. Run `tools/pdf_pages.sh` on each PDF (output goes to `cases/_source/`, ignored by git).
 5. Follow `docs/INTAKE_PROMPTS.md` steps 1 to 8, one file per set in `cases/<id>/plant/sets/`.
 
+## Handoff duty
+At every push update `docs/handoff/a.md` (done, in progress, next, gotchas, how to check, waiting on) and your rows in `docs/TASKS.md`. Do not write notes at the bottom of `docs/TASKS.md`. If the other Claude stops, follow `docs/TAKEOVER.md`. Run `tools/state.sh` at the start of work to see the other's state.
+
 ## Loop
 Start and end of every piece of work: `tools/baseline_check.sh a` (same baseline as `main`, only your own files).
 

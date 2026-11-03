@@ -30,3 +30,11 @@ If a test fails, A tells B in `docs/TASKS.md` what broke and does not update `ma
 
 ## Files
 Each file has exactly one owner (see the two role files). The case documents are uploaded to `cases/<id>/source/` on `main` by the human; both Claudes pull them.
+
+## How each Claude knows what the other is doing
+- **Handoff files:** `docs/handoff/a.md` and `docs/handoff/b.md`. Each Claude updates only its own at every push.
+- **Task board:** `docs/TASKS.md`, one row per task, each Claude edits only its own rows.
+- **The state script:** `tools/state.sh` builds a snapshot from git (branches, last commits, changed files, both handoff notes). Run it at the start of work and after every merge.
+- **What the human can ask:** "Run `tools/state.sh` and tell me what the other Claude has done since we last merged."
+
+If one Claude stops (usage limit or otherwise), see `docs/TAKEOVER.md`.
