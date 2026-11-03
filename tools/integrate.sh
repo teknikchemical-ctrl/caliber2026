@@ -11,8 +11,8 @@ git fetch -q origin 2>/dev/null || echo "(fetch failed, using local refs)"
 ref(){ git rev-parse --verify -q "origin/$1" >/dev/null && echo "origin/$1" || echo "$1"; }
 
 if [ "${1:-}" = "--report" ]; then
-  branches=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin | sed 's#^origin/##' | grep -E '^(a|b|codex)/' || true)
-  [ -z "$branches" ] && { echo "no agent branches (a/*, b/*, codex/*) found"; exit 0; }
+  branches=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin | sed 's#^origin/##' | grep -E '^(a|b|codex|claude)/' || true)
+  [ -z "$branches" ] && { echo "no agent branches (a/*, b/*, codex/*, claude/*) found"; exit 0; }
   tmp=$(mktemp); : > "$tmp"
   for b in $branches; do
     base=$(git merge-base "$(ref $INT)" "$(ref $b)" 2>/dev/null || git merge-base "$BASE" "$(ref $b)")

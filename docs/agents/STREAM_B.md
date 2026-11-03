@@ -1,27 +1,29 @@
-# Role: Claude B, pages and visuals
+# Role: Claude B, 3D UI design
 
-You make the new plant look right and add any page the hackathon brief asks for.
+You design and build the 3D side of the prototype: how the plant, each machine, the hazard simulation and the scenario replay look and feel in 3D.
 
 ## Mission
-Review what the generated drawings and pages look like for the new case, fix the worst problems (hand-drawn sheets for the hero units, wording, layout), and build the case-specific page or feature from the brief.
+Make the 3D experience the best part of the demo for the new plant: convincing models of the real equipment, a clear 3D plant view, a clean 3D interface (toolbar, labels, legends, selection cards, camera presets), smooth frame rate. The renderer is our own canvas software renderer (no library); read `src/modules/g3d.js` first.
 
 ## You own (edit freely)
-`cases/<id>/geo/`, `src/modules/` files `pid2.js pidv.js g3d.js g3r.js g3neck.js plant3d.js hse.js hse3d.js plan.js pp.js dash.js eq2.js mh1.js mh2.js mh3.js mh4.js pdm.js pdm2.js scn.js scnui.js gov.js rc.js perf.js ready.js il.js fx.js auto.js i18n.js polish.js`, `src/modules/style*.css`, `src/base.css`, any new page module you add.
+`src/modules/g3d.js g3r.js g3neck.js plant3d.js hse3d.js sim3d.js auto3d.js style3d.css`, `cases/<id>/geo/g3m.js p3.js h3.js`, `tools/g3bridge.js`, `tests/stress3d.js`.
 
 ## You must not edit
-`build.py`, `src/base.html`, `tests/*` (ask the integrator), `cases/<id>/plant*`, `kb.json` and the other generated pack files (Stream A's), Codex's files.
+Anything else. In particular `build.py`, `src/base.html`, the case data (`cases/<id>/plant*`, `kb.json` ...), the assistant and the other pages. If you need a change elsewhere, write it in `docs/TASKS.md` for Claude A. A small edit in a file you do not own is allowed only after you write "taking <file>" in `docs/TASKS.md`, and you merge it quickly.
+
+## What you can rely on
+- Every set has a 3D model from `src/modules/auto3d.js` (generated from the parts list and nozzle table by equipment kind: pump, compressor, fan, valve, exchanger, fired heater, column, reactor, drum, tank, dryer). A hand-built model for one set goes in `cases/<id>/geo/g3m.js` (see `cases/lldpe/geo/g3m.js` for 8 examples).
+- Part keys follow the parts list numbers and nozzle marks (`1`, `2`, `N1` ...), so selecting a part shows its card.
+- Where 3D appears: dashboard "Plant in 3D" (`plant3d.js`), equipment tab "Drawing and 3D" (`g3d.js`), plot plan hazard 3D (`hse3d.js`), scenario "3D view" and plant replay (`sim3d.js`).
 
 ## First 30 minutes
-1. Read `docs/CONTEXT.md`, `docs/CASE_PACKS.md`, `docs/CONTRACT.md`, `docs/CAPABILITIES.md`. Run the setup commands.
-2. `git checkout -b b/review integration`.
-3. Until Stream A's pack exists, build `mock-cdu` (`BUILD_OUT=/tmp/x python3 build.py mock-cdu`) and `node tools/case_shots.js /tmp/x/index.html /tmp/shots` to see what generated geometry looks like. When the real pack lands, repeat on it.
-4. List defects in `docs/TASKS.md`: wrong labels, overlaps, ugly sheets, wording from another plant (`node tools/text_audit.js`).
+1. Read `docs/CONTEXT.md`, `docs/CONTRACT.md`, `docs/TWO_CLAUDES.md`, `docs/agents/STREAM_B.md` (this file). Run the setup commands in section 5 of the context file.
+2. Build the example plant and look at its 3D: `BUILD_OUT=/tmp/x python3 build.py mock-cdu`, then `node tools/case_shots.js /tmp/x/index.html /tmp/shots`. Screenshots of every set's 3D tab are produced by the equipment page views; also look at the dashboard.
+3. Write down what is weak (proportions, materials, labels, empty areas, camera, speed) in `docs/TASKS.md`.
+4. When the real case's pack exists on `main` (Claude A), `git pull origin main` and work on those machines.
 
 ## Loop
-Fix, rebuild, look at the screenshot, push. For a new page: new module file, registered by the integrator in `build.py` (write "needs registering: <module>" in `docs/TASKS.md`). Check the first-screen time with `node tools/profile_load.js` after anything that runs at start-up.
+Change, rebuild, look at the screenshot, run `node tests/stress3d.js` and `node tools/profile_load.js` (first screen under about 1 s; keep 3D at a good frame rate), commit, push your branch. Pull `main` before each new piece of work.
 
 ## Done when
-The dashboard, two equipment pages and the case-specific feature look right on the real pack, `node tests/layout.js --quick --strict` reports 0 findings, and no screenshot shows wording from another plant.
-
-## Hand off to
-Integrator: when the branch is ready. Stream A: if a defect is in the data.
+Every machine of the real case has a convincing 3D model, the plant 3D view reads clearly with correct states, selection and cards work on every part, the 3D toolbar and legends are clean, no wording from another plant, stress test passes, no script errors.

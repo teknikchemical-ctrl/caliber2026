@@ -46,9 +46,9 @@ If `python3` cannot import openpyxl, pillow or pptx, use `python3.13` for those 
 
 ## 6. Rules that apply to everyone
 1. **Work only in your own files** (your role file lists them). Never edit another agent's files. If you need a change there, add a line to `docs/TASKS.md` for its owner.
-2. **Shared hot files** (`build.py`, `src/base.html`, `tests/regress.js`, `tests/smoke_case.js`, `docs/CONTRACT.md`) are changed only by the integrator, or by you after writing "taking build.py" in `docs/TASKS.md`.
+2. **Shared hot files** (`build.py`, `src/base.html`, `tests/regress.js`, `tests/smoke_case.js`, `docs/CONTRACT.md`) are changed only by Claude A (the integrator), or by you after writing "taking build.py" in `docs/TASKS.md`. With two Claudes read `docs/TWO_CLAUDES.md` for the day-to-day routine.
 3. **Never commit generated files**: `dist/`, `knowledge-hub-integrated_BAP5.html`, `AKP-netlify-drop.zip`, `node_modules/`.
-4. **Commit small and often** on your own branch. Push after every working step. Never force-push. Never push to `main`.
+4. **Commit small and often** on your own branch. Push after every working step. Never force-push. Never push to `main` unless you are Claude A (integrator) and the tests pass.
 5. **Run the tests before every push to the integration branch**: `npm run test:quick` and the smoke test of the case you touched.
 6. **Text rules**: visible text reads like a plant engineer wrote it; no em or en dashes, no emoji, `%` not "percent", units after a space (`3.2 barg`). No placeholders, no invented people. Synthetic data is labelled. See `CLAUDE.md`.
 7. **Safety content**: the assistant must refuse to explain how to bypass a trip or interlock; hazard results stay labelled screening estimates.

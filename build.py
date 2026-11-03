@@ -52,7 +52,7 @@ for x,y in [('const vb=full?PP.vb:[0,0,880,830],o=[];','const vb=opt.vb||(full?P
  ('${full?"":`<div class="row" style="font-size:12px','${full||opt.mini?"":`<div class="row" style="font-size:12px')]:
     assert x in pp,x; pp=pp.replace(x,y)
 a=h.index('const gKey=(d,i)=>');b=h.index('const _r1=render;')
-mods=[w('auto.js'),'const EQC='+open(os.path.join(ROOT,'src','data','eqclass.json')).read()+';\n',w('dl.js'),w('ui.js'),w('facts.js'),w('ai.js'),w('intent.js'),w('gad.js'),w('ga.js'),pp,'const MH='+cf('mh.json')+';\nconst EVAL_CASES='+cf('eval_cases.json')+';\nconst SCHEMA_SQL='+json.dumps(open(os.path.join(ROOT,'src','data','schema.sql')).read())+';\nconst PROMPT_TEMPLATE='+json.dumps(open(os.path.join(ROOT,'src','data','prompt_template.md')).read())+';\n']
+mods=[w('auto.js'),w('auto3d.js'),'const EQC='+open(os.path.join(ROOT,'src','data','eqclass.json')).read()+';\n',w('dl.js'),w('ui.js'),w('facts.js'),w('ai.js'),w('intent.js'),w('gad.js'),w('ga.js'),pp,'const MH='+cf('mh.json')+';\nconst EVAL_CASES='+cf('eval_cases.json')+';\nconst SCHEMA_SQL='+json.dumps(open(os.path.join(ROOT,'src','data','schema.sql')).read())+';\nconst PROMPT_TEMPLATE='+json.dumps(open(os.path.join(ROOT,'src','data','prompt_template.md')).read())+';\n']
 for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pid2.js','pidv.js','pdm.js','pdm2.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','fx.js','help.js','auth.js','notify.js','ingest.js','gov.js','eq2.js','perf.js','ready.js','hse.js','hse3d.js','ai2.js','eqclass.js','g3neck.js','g3d.js','g3r.js','plant3d.js','sim3d.js','plan.js','i18n.js','sync.js','dash.js','polish.js']:
     try: mods.append(w(f))
     except FileNotFoundError: pass
@@ -62,7 +62,7 @@ for t,r in [('["ga","Equipment drawing"],','["ga","Equipment drawing"],["perf","
 P('"go(\'documents\',{doc:\'"+s.pp.document_id+"\'})"','"st.tab=\'plot\';render()"')
 P('<div class="nav" data-page="equipment">🏭 Equipment Sets</div>','<div class="nav" data-page="equipment">Equipment Sets</div>\n  <div class="nav" data-page="plot">Plot Plan</div>\n  <div class="nav" data-page="mnt">Maintenance</div>\n  <div class="nav" data-page="perf">Performance</div>\n  <div class="nav" data-page="scn">Scenarios</div>\n  <div class="nav" data-page="il">Interlock Library</div>')
 P('p==="pid"?pidPage():','p==="pid"?pidPage():p==="plot"?plotPage():p==="mnt"?mhPage():p==="perf"?perfPage():p==="gov"?govPage():')
-i=h.index('.pbar{padding'); h=h[:i]+w('style2.css')+w('style3.css')+(w('style4.css') if True else '')+h[i:]
+i=h.index('.pbar{padding'); h=h[:i]+w('style2.css')+w('style3.css')+(w('style4.css') if True else '')+w('style3d.css')+h[i:]
 
 # ---------- contextual exports ----------
 P('<button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button>','<div class="row" style="gap:8px"><button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button><button class="ghost" onclick="rcOpen(\'dossier\',{set:${n}})">Export dossier</button></div>')

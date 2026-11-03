@@ -24,13 +24,12 @@ Single-file web app (Asset Knowledge Platform) built from `src/` and a **case pa
 | Visible text audit | `node tools/text_audit.js /tmp/t.json dist/index.html` |
 | Start-up and idle profiling | `node tools/profile_load.js`, `node tools/profile_idle.js` |
 
-## Two people building in parallel
-Split by stream, not by feature, and merge small changes often (see `docs/CONTRACT.md`).
-- **Stream A, data and intelligence:** `dl.js`, `ai*.js`, `intent.js`, `ks.js`, `wiz.js`, `ingest.js`, `sync.js`, `eqclass.js`, `netlify/`, `cases/`, `tools/pack_*`.
-- **Stream B, pages and visuals:** `pid*.js`, `g3d.js`, `g3r.js`, `plant3d.js`, `hse*.js`, `plan.js`, `pp.js`, `dash.js`, `eq2.js`, `mh*.js`, `pdm*.js`, `scn*.js`, `gov.js`, `rc.js`, `perf.js`, `auto.js`, `base.css`, `i18n.js`.
-- **Shared hot files, one owner at a time (ask in the PR before editing):** `build.py`, `src/base.html`, `tests/regress.js`, `tests/smoke_case.js`.
-- New page: add a module and register it in `build.py` (module list and the page dispatch patch). Keep the page function in its own file.
-- Branch per person per stream, pull `main` before starting, open small PRs, never leave `main` red.
+## Two Claude sessions building in parallel (see `docs/TWO_CLAUDES.md`)
+- **Claude A, features, data and AI, and integrator:** everything except Claude B's files. Only A writes to `main`.
+- **Claude B, 3D UI:** `g3d.js g3r.js g3neck.js plant3d.js hse3d.js sim3d.js auto3d.js style3d.css`, `cases/<id>/geo/g3m.js p3.js h3.js`, `tools/g3bridge.js`, `tests/stress3d.js`. Pushes only its own branch; pulls `main` often.
+- Each file has one owner. Need a change in someone else's file: write it in `docs/TASKS.md`.
+- New page: add a module and register it in `build.py` (module list and the page dispatch patch), A only.
+- Never leave `main` red.
 
 ## Rules for text and output (the owner is strict about these)
 - Visible text reads like a plant engineer wrote it: plain, specific, no marketing words. No em dashes or en dashes anywhere (`build.py` rewrites them, but do not write them). No emoji.

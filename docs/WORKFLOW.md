@@ -1,3 +1,5 @@
+> With two Claude sessions (the usual case) use the simpler routine in `docs/TWO_CLAUDES.md`: `main` is the shared version and only Claude A writes to it. The longer scheme below is for three or more agents.
+
 # Workflow for several agents on one repository
 
 ```
