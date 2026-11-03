@@ -45,5 +45,8 @@ First screen under about 1 s on a normal laptop; no work at start-up that can wa
 ## Safety of the app's own content
 The assistant never explains how to bypass a trip or interlock (`safety_guard` tool). Hazard results are screening estimates and say so. Do not weaken either.
 
+## Several agents at once
+Read `docs/CONTEXT.md`, `docs/WORKFLOW.md` and your role file in `docs/agents/`. Coordination happens only in `docs/TASKS.md`. `AGENTS.md` is the same guide for Codex.
+
 ## Where things are
-`docs/ARCHITECTURE.md` (modules and data flow), `docs/CASE_PACKS.md`, `docs/CONTRACT.md`, `docs/NEW_CASE_RUNBOOK.md`, `docs/INTAKE_PROMPTS.md`, `docs/CAPABILITIES.md`, `LAUNCH_NETLIFY_GEMINI.txt`, `DEPLOY_AND_CONNECT_AI.txt`.
+`docs/ARCHITECTURE.md` (modules and data flow), `docs/CASE_PACKS.md`, `docs/CONTRACT.md`, `docs/NEW_CASE_RUNBOOK.md`, `docs/INTAKE_PROMPTS.md`, `docs/CAPABILITIES.md`, `docs/CONTEXT.md`, `docs/WORKFLOW.md`, `docs/NETLIFY_MULTI_CASE.md`, `LAUNCH_NETLIFY_GEMINI.txt`, `DEPLOY_AND_CONNECT_AI.txt`.
