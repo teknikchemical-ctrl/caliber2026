@@ -33,6 +33,14 @@ function autoG3m(n){const kind=autoKind(n),g=GA[n],B=g.bom,N=Math.max(1,B.length
   if(g.mot)a.push(g3C("M","y",0,Hh+.3,0,.22,.14,"blue"));
   for(let i=1;i<Math.min(N,3);i++)a.push(g3B(key(i),(i%2?1:-1)*1.0,.45,1.32,.3,.5,.05,"steel",{r:.01}));
   g.nz.forEach((z,i)=>a.push(g3C(z.m,"x",(i%2?1:-1)*(W/2+.2),.5+(i%2)*.6,0,.45,.1,"amber"),g3C(z.m,"x",(i%2?1:-1)*(W/2+.42),.5+(i%2)*.6,0,.04,.17,"steel")));return a}
+  /* fired heater: radiant box on legs, coil and burners (coil shows in X-ray), convection section and stack */
+ if(kind==="fired"){const W=2.8,Hh=2.2,Dp=1.7,y0=.5,k=i=>key(Math.min(i,N-1));a.push(g3B("",0,.06,0,W+.5,.12,Dp+.5,"gray",{r:.04}),g3B("",0,.012,0,W+.6,.03,Dp+.6,"dark",{r:.04,zb:.6}));
+  [-1,1].forEach(sx=>[-1,1].forEach(sz=>a.push(g3C("","y",sx*W*.42,y0/2,sz*Dp*.4,y0,.07,"dark"))));
+  a.push(g3B(k(0),0,y0+Hh/2,0,W,Hh,Dp,"paint",{sh:1,r:.05,m:.4}),g3B(k(0),0,y0+Hh+.04,0,W+.14,.08,Dp+.14,"steel",{r:.02}));
+  for(let i=0;i<6;i++)a.push(g3C(k(1),"x",0,y0+.55+i*.28,(i%2?.28:-.28),W*.92,.05,"red",{in:1,seg:12}));
+  [-.8,0,.8].forEach(x=>a.push(g3C(k(2),"y",x,y0-.14,0,.28,.13,"dark"),g3C(k(2),"y",x,y0-.3,0,.05,.09,"amber",{light:1,seg:10})));
+  a.push(g3B(k(4),-W*.2,y0+Hh+.5,0,W*.6,.84,Dp*.7,"paint",{sh:1,r:.04,m:.4}),g3C(k(3),"y",-W*.2,y0+Hh+.92+1.3,0,2.6,.2,"steel",{m:.6},.16),g3C(k(3),"y",-W*.2,y0+Hh+.92+2.58,0,.05,.24,"steel"),...[-.8,0,.8].flatMap(x=>[1,-1].map(sd=>g3B("",x,y0+1.5,sd*(Dp/2+.02),.34,.3,.05,"dark",{r:.02}))));
+  g.nz.forEach((z,i)=>{const sd=1,yy=y0+.35+(i%3)*.6,x=-W*.38+Math.floor(i/3)*W*.38+(i%3)*.12;a.push(g3C(z.m,"z",x,yy,sd*(Dp/2+.3),.6,.07,"amber"),g3C(z.m,"z",x,yy,sd*(Dp/2+.6),.04,.13,"steel"))});return a}
  /* drum, exchanger, dryer, fired heater and anything else: a horizontal shell on saddles */
  const L=kind==="dryer"?3.8:kind==="hx"?3.6:kind==="fired"?3.2:3.0,R=kind==="drum"?.62:kind==="hx"?.48:kind==="dryer"?.7:.6,cy=R+.42,w=L/N;
  B.forEach((b,i)=>a.push(g3C(key(i),"x",-L/2+w*(i+.5),cy,0,w*.995,R,kind==="hx"&&i===0?"steel":"paint",{sh:1,m:.5})));

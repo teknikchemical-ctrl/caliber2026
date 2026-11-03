@@ -83,7 +83,7 @@ function g3BridgeCalc(prims){const H=.05,pts=[],owner=[];
 function g3Mesh(n,q){const key=n+(q?"q"+q:"");if(G3.mesh[key])return G3.mesh[key];const q0=G3.q;G3.q=q||1;try{let prims=(G3M[n]||[]).concat(g3Extra(G3M[n]||[])),faces=[];if(typeof G3NECK!=="undefined"&&G3NECK[n])prims=prims.concat(G3NECK[n].map(a=>g3C(a[0],a[1],a[2],a[3],a[4],a[5],a[6],"steel",{seg:10,m:.5,br:1})));
  prims.forEach((p,pi)=>{g3Parts(p).forEach(f=>{g3Orient(p,f);f.pi=pi;faces.push(f)})});
  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];faces.forEach(f=>f.p.forEach(v=>{for(let i=0;i<3;i++){mn[i]=Math.min(mn[i],v[i]);mx[i]=Math.max(mx[i],v[i])}}));
- const ctr=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],Rs=Math.hypot(...[0,1,2].map(i=>(mx[i]-mn[i])/2)),Rf=Math.max((mx[1]-mn[1])/2*1.12,Math.hypot((mx[0]-mn[0])/2,(mx[2]-mn[2])/2)*.78);
+ const ctr=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],Rs=Math.hypot(...[0,1,2].map(i=>(mx[i]-mn[i])/2)),hz=Math.hypot((mx[0]-mn[0])/2,(mx[2]-mn[2])/2),Rf=Math.max((mx[1]-mn[1])/2*1.12+hz*.3,hz*.8);
  return G3.mesh[key]={faces,ctr,R:Rs,Rf,ymin:mn[1],mn,mx}}finally{G3.q=q0}}
 function g3Info(n,k){if(!k)return"";const nz=GA[n]&&GA[n].nz.find(q=>q.m===k),b=nz?null:gBom(n,k),s=S(n);if(!nz&&!b)return"";
  const wo=MH.filter(m=>m.n===n&&mhParts(m).includes(k)),V=nz?null:gVal(n,k),rows=nz?[["Nozzle",k],["Service",nz.sv],["Size and rating",nz.sz],["Remarks",nz.r]]:[["Item",k==="M"?"Driver":k],["Material",b.mat],["Quantity",b.qty],["Drawing",s.ga.dwg_no]];
