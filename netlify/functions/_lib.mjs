@@ -58,14 +58,14 @@ export async function budget(max, peek = false) {
 export const cfg = (o = {}) => ({
   provider: (o.provider || process.env.AI_PROVIDER || (o.key || process.env.AI_API_KEY || process.env.GEMINI_API_KEY ? "gemini" : "")).toLowerCase(),
   key: o.key || process.env.AI_API_KEY || process.env.GEMINI_API_KEY || "",
-  model: o.model || process.env.AI_MODEL || "gemini-2.5-flash",
+  model: o.model || process.env.AI_MODEL || "gemini-flash-latest",
   models: (process.env.AI_MODELS || "").split(",").map(s => s.trim()).filter(Boolean),
   base: o.base || process.env.AI_BASE_URL || "",
   daily: +process.env.AI_DAILY_MAX || 800,
   perMin: +process.env.AI_RATE_PER_MIN || 12,
   perDay: +process.env.AI_RATE_PER_DAY || 120
 });
-export const cfg2 = (o = {}) => ({ ...cfg(o), fallbacks: (process.env.AI_MODEL_FALLBACK || "gemini-2.0-flash,gemini-1.5-flash").split(",").map(s => s.trim()).filter(Boolean), embedModel: process.env.AI_EMBED_MODEL || "gemini-embedding-001", embedDaily: +process.env.AI_EMBED_DAILY || 4000 });
+export const cfg2 = (o = {}) => ({ ...cfg(o), fallbacks: (process.env.AI_MODEL_FALLBACK || "gemini-flash-latest,gemini-flash-lite-latest,gemini-2.5-flash,gemini-2.0-flash").split(",").map(s => s.trim()).filter(Boolean), embedModel: process.env.AI_EMBED_MODEL || "gemini-embedding-001", embedDaily: +process.env.AI_EMBED_DAILY || 4000 });
 /* AI settings saved from the Settings page (admin) are kept on the server and win over the environment variables. */
 let _stored = { at: 0, v: {} };
 export async function storedCfg(force) {
@@ -93,3 +93,24 @@ export async function bump(name, field, n = 1) {
 export async function statsToday(name) {
   try { const s = await store("rl"); return (await s.get("stats/" + name + "/" + new Date().toISOString().slice(0, 10))) || {}; } catch { return {}; }
 }
+
+/* Google retires model names over time. When the configured model and its fallbacks are all refused as unknown, ask the key which models it can use
+   and rank them: newest flash first, then flash-lite, then pro. Cached for ten minutes per key. */
+let DISC = { at: 0, key: "", list: [] };
+export const isModelError = e => !!e && [400, 404].includes(e.status) && /model|not found|not supported|no longer|deprecat|retired/i.test(String(e.message || ""));
+export async function discoverModels(c, signal) {
+  if (DISC.key === c.key && Date.now() - DISC.at < 600000 && DISC.list.length) return DISC.list;
+  const base = c.base || "https://generativelanguage.googleapis.com/v1beta";
+  const r = await fetch(base + "/models?pageSize=200", { headers: { "x-goog-api-key": c.key }, signal });
+  if (!r.ok) return [];
+  const j = await r.json(), score = n => {
+    const v = (/gemini-(\d+(?:\.\d+)?)/.exec(n) || [0, 0])[1], fam = /flash-lite/.test(n) ? 1 : /flash/.test(n) ? 3 : /pro/.test(n) ? 2 : 0;
+    return fam * 1000 + (/latest/.test(n) ? 500 : 0) + parseFloat(v) * 10 - (/preview|exp/.test(n) ? 5 : 0);
+  };
+  const list = (j.models || []).filter(m => !m.supportedGenerationMethods || m.supportedGenerationMethods.includes("generateContent"))
+    .map(m => String(m.name || "").replace(/^models\//, "")).filter(n => /^gemini-/.test(n) && !/embedding|image|tts|live|audio|vision|robotics|computer-use|learnlm|imagen|veo|aqa|thinking-exp|customtools/.test(n))
+    .sort((a, b) => score(b) - score(a));
+  DISC = { at: Date.now(), key: c.key, list };
+  return list;
+}
+export const plantName = p => String((p && p.plant) || "process plant").replace(/[^\w .,&()\/|-]/g, "").slice(0, 80) || "process plant";

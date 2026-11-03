@@ -25,3 +25,10 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 
 ## Waiting on the other Claude / the human
 - 
+
+## AI assistant fix (latest)
+- Server no longer depends on one Gemini model name. Default chain: gemini-flash-latest, gemini-flash-lite-latest, gemini-2.5-flash, gemini-2.0-flash. If all are refused as unknown, `discoverModels` (in `_lib.mjs`) asks the key which models it offers and tries the best three.
+- System prompts use the case title (`plant` in the request) instead of a hard-coded LLDPE unit.
+- Settings "Test the AI connection" now shows the real server error, and the first failing diagnostic check.
+- Diagnostics make a real one-word call and name the model that answered.
+- Tests: `tests/live.js` covers retired models and the diagnostics call. Not yet run with a real Gemini key.

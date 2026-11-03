@@ -3,10 +3,10 @@
    Providers (env AI_PROVIDER): gemini (default when a key is set), openai (any OpenAI compatible API such as Groq or OpenRouter, needs AI_BASE_URL), mock (tests).
    Gemini: if the configured model is unknown to the key, the models in AI_MODEL_FALLBACK are tried in order. When the page sends tool
    definitions and no computed draft exists, the model may answer with tool calls; the page runs them and calls again with the results. */
-import { J, cfgA, clientId, limit, budget, cfg2, bump } from "./_lib.mjs";
+import { J, cfgA, clientId, limit, budget, cfg2, bump, discoverModels, isModelError, plantName } from "./_lib.mjs";
 export const config = { path: "/api/ai" };
 
-const SYSTEM = `You are the knowledge assistant of a petrochemical plant (LLDPE unit). You help engineers, operators, reliability and HSE staff.
+const SYSTEM = plant => `You are the knowledge assistant of a process plant (${plant}). You help engineers, operators, reliability and HSE staff.
 Rules:
 1. Answer only from the SOURCES, the VERIFIED DRAFT and the TOOL RESULTS in this request. If they do not support an answer, say so plainly and do not guess.
 2. Cite every statement with the source number in square brackets, for example [2]. Only use numbers that exist in SOURCES.
@@ -56,10 +56,10 @@ const decls = tools => (Array.isArray(tools) ? tools : []).slice(0, 20).filter(t
 class ProviderError extends Error { constructor(m, status) { super(m); this.status = status; } }
 async function failText(r) { let m = "provider HTTP " + r.status; try { const j = JSON.parse(await r.text()); if (j.error && j.error.message) m += ": " + String(j.error.message).slice(0, 140); } catch {} return new ProviderError(m, r.status); }
 
-async function* gemini(c, model, user, signal, tools) {
+async function* gemini(c, model, user, signal, tools, sys) {
   const base = c.base || "https://generativelanguage.googleapis.com/v1beta";
   const mk = think => {
-    const body = { systemInstruction: { parts: [{ text: SYSTEM }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 1400 } };
+    const body = { systemInstruction: { parts: [{ text: sys }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 1400 } };
     /* 2.5 flash models spend the output budget on hidden reasoning unless it is switched off */
     if (think && /gemini-2\.5-flash/.test(model)) body.generationConfig.thinkingConfig = { thinkingBudget: 0 };
     if (tools && tools.length) { body.tools = [{ functionDeclarations: tools }]; body.toolConfig = { functionCallingConfig: { mode: "AUTO" } }; }
@@ -81,10 +81,10 @@ async function* gemini(c, model, user, signal, tools) {
   });
   if (!got) throw new ProviderError(block ? "the provider declined this request (" + block + ")" : fin ? "the provider stopped without an answer (" + fin + ")" : "the provider returned no answer", 502);
 }
-async function* openai(c, model, user, signal) {
+async function* openai(c, model, user, signal, sys) {
   const r = await fetch(`${c.base.replace(/\/$/, "")}/chat/completions`, {
     method: "POST", signal, headers: { "content-type": "application/json", authorization: "Bearer " + c.key },
-    body: JSON.stringify({ model, stream: true, temperature: 0.2, max_tokens: 900, messages: [{ role: "system", content: SYSTEM }, { role: "user", content: user }] })
+    body: JSON.stringify({ model, stream: true, temperature: 0.2, max_tokens: 900, messages: [{ role: "system", content: sys }, { role: "user", content: user }] })
   });
   if (!r.ok) throw await failText(r);
   yield* sse(r, j => (j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content) || "");
@@ -111,13 +111,21 @@ async function* mock(src, p) {
 /* try the configured model, then the fallbacks, until one is accepted; an error after text has started is passed on */
 async function* run(c, p, user, signal, useTools) {
   if (c.provider === "mock") { yield* mock(user.src, p); return; }
-  if (c.provider === "openai") { yield* openai(c, c.chosen, user.text, signal); return; }
-  const list = [c.chosen, ...c.fallbacks.filter(m => m !== c.chosen)];
-  let lastErr;
-  for (const m of list) {
+  const sys = SYSTEM(plantName(p));
+  if (c.provider === "openai") { yield* openai(c, c.chosen, user.text, signal, sys); return; }
+  const tried = new Set(); let lastErr;
+  const attempt = async function* (m) { tried.add(m); for await (const d of gemini(c, m, user.text, signal, useTools, sys)) yield d; };
+  for (const m of [c.chosen, ...c.fallbacks.filter(m => m !== c.chosen)]) {
     let started = false;
-    try { for await (const d of gemini(c, m, user.text, signal, useTools)) { started = true; yield d; } c.used = m; return; }
-    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || ![400, 404].includes(e.status) || !/model|not found|not supported/i.test(e.message)) throw e; }
+    try { for await (const d of attempt(m)) { started = true; yield d; } c.used = m; return; }
+    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || !isModelError(e)) throw e; }
+  }
+  /* every configured name was refused as unknown: ask the key what it can use */
+  let found = []; try { found = await discoverModels(c, signal); } catch {}
+  for (const m of found.filter(m => !tried.has(m)).slice(0, 3)) {
+    let started = false;
+    try { for await (const d of attempt(m)) { started = true; yield d; } c.used = m; return; }
+    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || !isModelError(e)) throw e; }
   }
   throw lastErr;
 }

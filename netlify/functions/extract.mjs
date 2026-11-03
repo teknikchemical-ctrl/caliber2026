@@ -5,12 +5,12 @@
    - free text fields are kept only if most of their words occur in the source
    The page then shows the result for a person to review before anything is saved. */
 import { createHash } from "node:crypto";
-import { J, cfgA, store, clientId, limit, budget, bump } from "./_lib.mjs";
+import { J, cfgA, store, clientId, limit, budget, bump, discoverModels, isModelError, plantName } from "./_lib.mjs";
 export const config = { path: "/api/extract" };
 const KINDS = ["sop", "datasheet", "interlock", "instruments", "maintenance", "opl", "incident", "pid", "notes"];
 const FACT_KINDS = ["setpoint", "permissive", "instrument_range", "final_element", "datasheet"];
 const CHUNK = 12000, MAX_CHUNKS = 6, MAX_TEXT = 140000;
-const SYSTEM = `You read documents from a petrochemical plant (LLDPE unit) and return ONLY one JSON object, no prose, no code fences.
+const SYSTEM = plant => `You read documents from a process plant (${plant}) and return ONLY one JSON object, no prose, no code fences.
 Rules: use only what the text says. Never invent a value, tag, revision or date. If something is not in the text, use an empty string or an empty list.
 Every item in "steps", "warnings", "facts" and "kv" must include a "quote": a short span copied exactly, character for character, from the text.
 Equipment tags look like KC-4501, PSLL-4504, GA-1201A. Known equipment of this plant may be listed after the text.
@@ -44,9 +44,9 @@ const TAG = /\b[A-Z]{1,5}-?\d{3,5}[A-Z]?\b/g;
 /* ---------- provider calls (one JSON answer, no streaming) ---------- */
 class PErr extends Error { constructor(m, s) { super(m); this.status = s; } }
 async function failText(r) { let m = "provider HTTP " + r.status; try { const j = JSON.parse(await r.text()); if (j.error && j.error.message) m += ": " + String(j.error.message).slice(0, 140); } catch {} return new PErr(m, r.status); }
-async function geminiJson(c, model, user, signal) {
+async function geminiJson(c, model, user, signal, sys) {
   const base = c.base || "https://generativelanguage.googleapis.com/v1beta";
-  const mk = think => { const b = { systemInstruction: { parts: [{ text: SYSTEM }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { temperature: 0, maxOutputTokens: 6000, responseMimeType: "application/json" } };
+  const mk = think => { const b = { systemInstruction: { parts: [{ text: sys }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { temperature: 0, maxOutputTokens: 6000, responseMimeType: "application/json" } };
     if (think && /gemini-2\.5-flash/.test(model)) b.generationConfig.thinkingConfig = { thinkingBudget: 0 }; return b; };
   const call = b => fetch(`${base}/models/${encodeURIComponent(model)}:generateContent`, { method: "POST", signal, headers: { "content-type": "application/json", "x-goog-api-key": c.key }, body: JSON.stringify(b) });
   let r = await call(mk(true));
@@ -57,9 +57,9 @@ async function geminiJson(c, model, user, signal) {
   if (!t) throw new PErr(j.promptFeedback && j.promptFeedback.blockReason ? "the provider declined this request (" + j.promptFeedback.blockReason + ")" : "the provider returned no answer", 502);
   return t;
 }
-async function openaiJson(c, model, user, signal) {
+async function openaiJson(c, model, user, signal, sys) {
   const r = await fetch(`${c.base.replace(/\/$/, "")}/chat/completions`, { method: "POST", signal, headers: { "content-type": "application/json", authorization: "Bearer " + c.key },
-    body: JSON.stringify({ model, temperature: 0, max_tokens: 4000, response_format: { type: "json_object" }, messages: [{ role: "system", content: SYSTEM }, { role: "user", content: user }] }) });
+    body: JSON.stringify({ model, temperature: 0, max_tokens: 4000, response_format: { type: "json_object" }, messages: [{ role: "system", content: sys }, { role: "user", content: user }] }) });
   if (!r.ok) throw await failText(r);
   const j = await r.json(); return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
 }
@@ -79,11 +79,16 @@ function parseJson(t) {
 }
 async function callModel(c, user, signal) {
   if (c.provider === "mock") return mockJson(user.text, user.name);
-  if (c.provider === "openai") return openaiJson(c, c.model, user.prompt, signal);
-  const list = [c.model, ...(c.fallbacks || []).filter(m => m !== c.model)]; let last;
-  for (const m of list) {
-    try { const t = await geminiJson(c, m, user.prompt, signal); c.used = m; return t; }
-    catch (e) { last = e; if (!(e instanceof PErr) || ![400, 404].includes(e.status) || !/model|not found|not supported/i.test(e.message)) throw e; }
+  const sys = SYSTEM(user.plant);
+  if (c.provider === "openai") return openaiJson(c, c.model, user.prompt, signal, sys);
+  const tried = new Set(); let last;
+  const go = async m => { tried.add(m); const t = await geminiJson(c, m, user.prompt, signal, sys); c.used = m; return t; };
+  for (const m of [c.model, ...(c.fallbacks || []).filter(m => m !== c.model)]) {
+    try { return await go(m); } catch (e) { last = e; if (!(e instanceof PErr) || !isModelError(e)) throw e; }
+  }
+  let found = []; try { found = await discoverModels(c, signal); } catch {}
+  for (const m of found.filter(m => !tried.has(m)).slice(0, 3)) {
+    try { return await go(m); } catch (e) { last = e; if (!(e instanceof PErr) || !isModelError(e)) throw e; }
   }
   throw last;
 }
@@ -151,7 +156,7 @@ export default async (req, ctx) => {
     for (let i = 0; i < pieces.length; i++) {
       const bg = await budget(c.daily); if (!bg.ok) { await bump("ai", "budget"); throw new PErr("daily AI budget used up", 429); }
       const prompt = `Document name: ${name || "(none)"}${pieces.length > 1 ? `\nPart ${i + 1} of ${pieces.length}` : ""}\n\nTEXT:\n${pieces[i]}\n\nKnown equipment: ${known || "(not supplied)"}`;
-      const t = await callModel(c, { prompt, text: pieces[i], name }, ctl.signal);
+      const t = await callModel(c, { prompt, text: pieces[i], name, plant: plantName(p) }, ctl.signal);
       const v = verify(parseJson(t), pieces[i]); outs.push(v.o); rej.push(...v.rej); kept += v.kept; await bump("ai", "q"); await bump("ai", "ok");
     }
   } catch (e) {
