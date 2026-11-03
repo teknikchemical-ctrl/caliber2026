@@ -4,6 +4,7 @@
 #   tools/baseline_check.sh a       Claude A: features, data, AI, integrator (everything except B's and Codex's files)
 #   tools/baseline_check.sh b       Claude B: 3D UI
 #   tools/baseline_check.sh codex   Codex: costing page, finance model, deck, manual
+#   tools/baseline_check.sh ai      Codex on the AI assistant only (netlify functions, ai.js, sync.js, live test)
 #   tools/baseline_check.sh any     takeover mode: no ownership check, see docs/TAKEOVER.md
 set -uo pipefail
 cd "$(dirname "$0")/.."
@@ -11,6 +12,7 @@ role="${1:?role: a, b, codex or any}"
 git fetch -q origin 2>/dev/null || echo "(could not fetch: results may be out of date)"
 B3D='^(src/modules/(g3d|g3r|g3neck|plant3d|hse3d|sim3d|auto3d)\.js|src/modules/style3d\.css|cases/[^/]+/geo/(g3m|p3|h3)\.js|tools/g3bridge\.js|tests/stress3d\.js)$'
 CODEX='^((deck|finance|manual)/.*|src/modules/(fin\.js|style_fin\.css)|cases/[^/]+/(fin|eval_extra_fin)\.json|docs/handoff/codex\.md|tests/fin_[a-z0-9_]+\.js|tools/record_demo\.js)$'
+AIF='^(netlify/functions/[a-z_0-9]+\.mjs|src/modules/(ai|ai2|sync|intent|facts)\.js|tests/live\.js|docs/(AI_ASSISTANT|AI_PROVIDER_CONTRACT|BACKEND_API)\.md|docs/handoff/codex-ai\.md)$'
 base=$(git merge-base HEAD origin/main)
 behind=$(git rev-list --count HEAD..origin/main); ahead=$(git rev-list --count origin/main..HEAD)
 echo "branch:        $(git rev-parse --abbrev-ref HEAD) at $(git rev-parse --short HEAD)"
@@ -22,12 +24,13 @@ echo "you are $ahead commit(s) ahead of main and $behind behind it"
 files=$( (git diff --name-only "$base" HEAD; git diff --name-only HEAD; git ls-files --others --exclude-standard) | sort -u)
 bad=""
 while IFS= read -r f; do [ -z "$f" ] && continue
-  isb=0; isx=0; echo "$f" | grep -Eq "$B3D" && isb=1; echo "$f" | grep -Eq "$CODEX" && isx=1
+  isb=0; isx=0; isa=0; echo "$f" | grep -Eq "$AIF" && isa=1; echo "$f" | grep -Eq "$B3D" && isb=1; echo "$f" | grep -Eq "$CODEX" && isx=1
   case "$role" in
     any) ;;
-    a)     [ $isb -eq 1 ] || [ $isx -eq 1 ] && bad="$bad\n  $f" ;;
+    a)     [ $isb -eq 1 ] || [ $isx -eq 1 ] || [ $isa -eq 1 ] && bad="$bad\n  $f" ;;
     b)     [ $isb -eq 1 ] || bad="$bad\n  $f" ;;
     codex) [ $isx -eq 1 ] || bad="$bad\n  $f" ;;
+    ai)    [ $isa -eq 1 ] || bad="$bad\n  $f" ;;
   esac
 done <<< "$files"
 if [ -n "$bad" ]; then
