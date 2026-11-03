@@ -3,7 +3,7 @@
    Providers (env AI_PROVIDER): gemini (default when a key is set), openai (any OpenAI compatible API such as Groq or OpenRouter, needs AI_BASE_URL), mock (tests).
    Gemini: if the configured model is unknown to the key, the models in AI_MODEL_FALLBACK are tried in order. When the page sends tool
    definitions and no computed draft exists, the model may answer with tool calls; the page runs them and calls again with the results. */
-import { J, cfgA, clientId, limit, budget, cfg2, bump, discoverModels, isModelError, plantName } from "./_lib.mjs";
+import { J, cfgA, clientId, limit, budget, cfg2, bump, discoverModels, isModelError, isRetryable, plantName } from "./_lib.mjs";
 export const config = { path: "/api/ai" };
 
 const SYSTEM = plant => `You are the knowledge assistant of a process plant (${plant}). You help engineers, operators, reliability and HSE staff.
@@ -118,14 +118,14 @@ async function* run(c, p, user, signal, useTools) {
   for (const m of [c.chosen, ...c.fallbacks.filter(m => m !== c.chosen)]) {
     let started = false;
     try { for await (const d of attempt(m)) { started = true; yield d; } c.used = m; return; }
-    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || !isModelError(e)) throw e; }
+    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || !isRetryable(e)) throw e; }
   }
   /* every configured name was refused as unknown: ask the key what it can use */
   let found = []; try { found = await discoverModels(c, signal); } catch {}
   for (const m of found.filter(m => !tried.has(m)).slice(0, 3)) {
     let started = false;
     try { for await (const d of attempt(m)) { started = true; yield d; } c.used = m; return; }
-    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || !isModelError(e)) throw e; }
+    catch (e) { lastErr = e; if (started || !(e instanceof ProviderError) || !isRetryable(e)) throw e; }
   }
   throw lastErr;
 }

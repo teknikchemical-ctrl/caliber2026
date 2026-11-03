@@ -97,6 +97,8 @@ export async function statsToday(name) {
 /* Google retires model names over time. When the configured model and its fallbacks are all refused as unknown, ask the key which models it can use
    and rank them: newest flash first, then flash-lite, then pro. Cached for ten minutes per key. */
 let DISC = { at: 0, key: "", list: [] };
+/* errors where the next model may still work: unknown model, quota used up on this model, or provider overloaded */
+export const isRetryable = e => !!e && ([429, 500, 502, 503, 504].includes(e.status) || isModelError(e));
 export const isModelError = e => !!e && [400, 404].includes(e.status) && /model|not found|not supported|no longer|deprecat|retired/i.test(String(e.message || ""));
 export async function discoverModels(c, signal) {
   if (DISC.key === c.key && Date.now() - DISC.at < 600000 && DISC.list.length) return DISC.list;

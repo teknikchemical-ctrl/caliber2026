@@ -25,7 +25,7 @@ export default async (req) => {
       for (const m of [...new Set([c.model, ...(c.fallbacks || []), ...found.slice(0, 3)])]) {
         try {
           const r = await fetch(`${base}/models/${encodeURIComponent(m)}:generateContent`, { method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": c.key }, body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Reply with the single word OK." }] }], generationConfig: { maxOutputTokens: 64 } }) });
-          if (r.ok) { add("AI answer", true, "model " + m + " answered" + (m !== c.model ? " (the configured model " + c.model + " was refused, so the server falls back to this one)" : "")); done = true; break; }
+          if (r.ok) { add("AI answer", true, "model " + m + " answered" + (m !== c.model ? " (the configured model " + c.model + " was refused" + (said.length ? ": " + said[0].slice(0, 200) : "") + "; the server falls back to this one)" : "")); done = true; break; }
           let msg = "HTTP " + r.status; try { const j = await r.json(); if (j.error && j.error.message) msg += " " + String(j.error.message).slice(0, 120); } catch {}
           said.push(m + ": " + msg);
         } catch (e) { said.push(m + ": " + String(e.message || e).slice(0, 80)); }

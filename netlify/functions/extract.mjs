@@ -5,7 +5,7 @@
    - free text fields are kept only if most of their words occur in the source
    The page then shows the result for a person to review before anything is saved. */
 import { createHash } from "node:crypto";
-import { J, cfgA, store, clientId, limit, budget, bump, discoverModels, isModelError, plantName } from "./_lib.mjs";
+import { J, cfgA, store, clientId, limit, budget, bump, discoverModels, isModelError, isRetryable, plantName } from "./_lib.mjs";
 export const config = { path: "/api/extract" };
 const KINDS = ["sop", "datasheet", "interlock", "instruments", "maintenance", "opl", "incident", "pid", "notes"];
 const FACT_KINDS = ["setpoint", "permissive", "instrument_range", "final_element", "datasheet"];
@@ -84,11 +84,11 @@ async function callModel(c, user, signal) {
   const tried = new Set(); let last;
   const go = async m => { tried.add(m); const t = await geminiJson(c, m, user.prompt, signal, sys); c.used = m; return t; };
   for (const m of [c.model, ...(c.fallbacks || []).filter(m => m !== c.model)]) {
-    try { return await go(m); } catch (e) { last = e; if (!(e instanceof PErr) || !isModelError(e)) throw e; }
+    try { return await go(m); } catch (e) { last = e; if (!(e instanceof PErr) || !isRetryable(e)) throw e; }
   }
   let found = []; try { found = await discoverModels(c, signal); } catch {}
   for (const m of found.filter(m => !tried.has(m)).slice(0, 3)) {
-    try { return await go(m); } catch (e) { last = e; if (!(e instanceof PErr) || !isModelError(e)) throw e; }
+    try { return await go(m); } catch (e) { last = e; if (!(e instanceof PErr) || !isRetryable(e)) throw e; }
   }
   throw last;
 }
