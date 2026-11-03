@@ -7,7 +7,7 @@
    Drawn on a canvas with a small software renderer; the models are the same solids as the equipment drawings.
    ===================================================================================================== */
 regMod("plant3d","1.0",["g3d"],"3D plant layout");
-const P3={built:false,cam:{yaw:-.62,pit:.6,dist:46,tx:0,ty:1.5,tz:0},to:null,sel:0,hover:0,pipe:null,orbit:false,labels:true,flow:true,motion:true,open:false,faces:[],units:{},pipes:[],t:0,dirty:true,cv:null,st:{},hit:[],pend:0,at:0,seq:0};
+const P3={built:false,cam:{yaw:-.62,pit:.62,dist:68,tx:0,ty:1.5,tz:0},to:null,sel:0,hover:0,pipe:null,orbit:false,labels:true,flow:true,motion:true,open:false,faces:[],units:{},pipes:[],t:0,dirty:true,cv:null,st:{},hit:[],pend:0,at:0,seq:0};
 /*@@CASE:p3@@*/
 const P3SKY=[[233,240,248],[203,218,236]],P3GR=[214,220,228];
 function p3Prim(list,u,layer,id){const out=[];list.forEach(p=>g3Parts(p).forEach(f=>{g3Orient(p,f);let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r;f.u=u;f.layer=layer||2;f.pid=id||null;out.push(f)}));return out}
@@ -133,7 +133,7 @@ function p3State(){K.sets.forEach(s=>{let st="ok";try{st=P3.stateFn?P3.stateFn(s
  const el=document.getElementById("p3card");if(el&&P3.sel)el.innerHTML=p3Card(P3.sel);else if(el&&P3.pipe)el.innerHTML=p3PipeCard(P3.pipe)}
 /* ---------- interaction ---------- */
 function p3Fly(n,open){const u=P3.units[n];P3.orbit=false;P3.sel=n;P3.focus=n;P3.pipe=null;P3.pend=open?n:0;P3.to={tx:u.x,ty:u.top*.45,tz:u.z,dist:Math.max(13,u.r*5.2),yaw:P3.cam.yaw,pit:.42};p3Panel()}
-function p3Reset(){P3.sel=0;P3.focus=0;P3.pipe=null;P3.pend=0;P3.to={tx:0,ty:1.5,tz:0,dist:46,yaw:P3.cam.yaw,pit:.6};p3Panel()}
+function p3Reset(){P3.sel=0;P3.focus=0;P3.pipe=null;P3.pend=0;P3.to={tx:0,ty:1.5,tz:0,dist:68,yaw:P3.cam.yaw,pit:.62};p3Panel()}
 function p3Select(n,fly){if(P3.onPick){try{P3.onPick(n)}catch(e){}}if(fly)return p3Fly(n,P3.open);P3.sel=n;P3.focus=0;P3.pipe=null;P3.pend=0;P3.orbit=false;const u=P3.units[n];P3.to={tx:u.x,ty:2,tz:u.z,dist:Math.max(28,P3.cam.dist*.7),yaw:P3.cam.yaw,pit:P3.cam.pit};p3Panel()}
 function p3Card(n){const s=S(n),a=P3.st[n]||{st:"ok"},T={ok:"Running",alarm:"Alarm",trip:"Trip active",upset:"Upset from a supply loss"}[a.st];
  return `<div class="row between"><div><span class="tag acc">${esc(s.tag)}</span> <span class="p3st ${a.st}">${T}</span></div><button class="ghost g3x" onclick="p3Reset()" aria-label="Back to the whole plant">Whole plant</button></div><h3 style="margin:8px 0 2px">${esc(s.name)}</h3><div class="muted" style="font-size:12px;margin-bottom:8px">Area ${s.area}, ${esc(s.unit)}</div>

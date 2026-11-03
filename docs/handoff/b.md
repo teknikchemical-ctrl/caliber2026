@@ -11,7 +11,7 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 - Baseline on mock-cdu before any 3D change: stress3d passes, case_shots 0 errors, hazard 3D and scenario 3D work
 
 ## In progress (not finished: which files, what state)
-- T06 started: nothing changed in the 3D code yet
+- T06 started, committed but NOT yet reviewed by the human (human asked to stop design work): g3d.js `Rf` framing (fixes cropped tank and cooling tower), plant3d.js default and reset camera (dist 68, pit .62, whole plant), auto3d.js new fired-heater model (box, burners, convection box, stack, doors; nozzles all on the +z side, last tweak not looked at in a screenshot). Tests passed: smoke, stress3d. Revert with `git revert` of the commit if unwanted.
 
 ## Next, in order
 1. T06: fix items 1, 3 and 7 of the review first (largest visible gain), then 2, 4, 5. All fit in auto3d.js, g3d.js, plant3d.js, style3d.css
