@@ -13,7 +13,7 @@ Each Claude updates only its own rows (status: `todo`, `doing`, `blocked`, `done
 | T05 | B | done | Look at the 3D of the example plant (`mock-cdu`) and list what is weak | none | |
 | T06 | B | todo | Improve the 3D models by kind, the plant 3D view and the 3D interface | auto3d.js, plant3d.js, g3d.js, style3d.css | |
 | T07 | A | todo | The features the brief asks for, and the AI assistant on this plant | src/modules | |
-| T08 | codex | todo | Costing page, `fin.json`, assistant cost tool, financial model and slides | src/modules/fin.js, cases/<id>/fin.json, finance/, deck/ | |
+| T08 | codex (finance) | todo | Costing page, `fin.json`, assistant cost tool, financial model and slides | src/modules/fin.js, cases/<id>/fin.json, finance/, deck/ | |
 | T09 | codex | todo | 15+ cost evaluation questions in `eval_extra_fin.json` | cases/<id>/eval_extra_fin.json | appended on every compile |
 | T10 | integrator | todo | First integration, tests, screenshots, text audit | build.py, tests | |
 

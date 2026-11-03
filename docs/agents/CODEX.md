@@ -34,3 +34,15 @@ Tomorrow the case documents are in `cases/<id>/source/` on `main` and Claude A b
 
 ## Done when
 The Costing page works on the real case with correct numbers that trace to the records or to labelled assumptions, the assistant answers cost questions with the same numbers, the Excel model and report match the page, the evaluation questions pass, `node tests/fin_smoke.js` passes, and your handoff file says how to regenerate everything.
+
+## Other agents working at the same time (read this)
+- **Claude A** builds the case pack, features and merges everything into `main`. **Claude B** builds the 3D UI. **Codex AI** (branch `codex/ai`) owns the assistant: `netlify/functions/*`, `src/modules/ai.js`, `ai2.js`, `intent.js`, `facts.js`, `sync.js`, `tests/live.js`. You are **Codex Finance** (branch `codex/finance`). The two Codex sessions never edit each other's files.
+- Your assistant tool `cost_summary` lives in `fin.js` and registers itself in `AI.tools` and `aiRoute` (pattern in `src/modules/eqclass.js`). Never edit `ai.js` for it. If the tool needs a hook that does not exist, write it under "Waiting on" for Codex AI and Claude A.
+- Cost questions must be answered with the same numbers as the Costing page. Add them to `cases/<id>/eval_extra_fin.json`; they are scored on the Governance page.
+- Everything the finance side delivers must trace to the case brief, the case documents or a labelled assumption.
+
+## Financial model standard (for `finance/` and the Costing page)
+- Inputs in one place, each with unit and basis (Case data, Market source, Estimate, Assumption). Formulas, never pasted results. Blue text for inputs, black for formulas.
+- Show at least: one-off cost, annual running cost, annual benefit by lever, net cash flow per year, cumulative cash flow, NPV, IRR, payback, benefit-cost ratio, three scenarios (pessimistic, base, optimistic), and a sensitivity of NPV to the two or three biggest inputs.
+- State the discount rate, the horizon and the currency on every page and slide. Bold the headline figures in running text. Page break after every report section.
+- The Excel model and the Costing page must give the same NPV to the shown precision. Test it in `tests/fin_*.js` against a hand calculation.
