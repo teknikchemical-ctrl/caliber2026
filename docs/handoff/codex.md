@@ -1,16 +1,14 @@
-# Codex finance handoff
-**Updated:** 2026-11-03 20:10 WIB | **Branch:** codex/finance | **Baseline:** 700bd46939a86565ffdcbac35c06dcfd2457d551 | Current change: see git log -1.
-## Done
-- Read the role briefing, fin.js helper contract, governance formulas and finance builders; installed dependencies; built mock-cdu and inspected its Costing screenshot.
-- tests/fin_smoke.js now serves the chosen HTML over loopback HTTP, keeps all five checks, closes resources and optionally writes FIN_SCREENSHOT. The local server explicitly reports no shared backend.
-- Finance smoke: 5 checks passed. lldpe and mock-cdu pack validation: 0 errors, 0 warnings. Default build and static checks passed. No application or case inputs changed.
-## In progress
-- Real-case work has not started. The example remains a starter page with synthetic maintenance records and zero-valued financial assumptions, not a business case.
-## Next, in order
-1. After the human announces the case: git fetch origin, git merge origin/main; inspect the brief and case pack; record sources and missing inputs in fin.json with Case data, Market source, Estimate or Assumption labels.
-2. Implement record-based cost breakdowns, downtime valuation, cost build-up, scenarios, NPV/IRR/payback/BCR, sensitivity and cash flow; avoid double counting and treating risk categories as probabilities.
-3. Add cost_summary, CSV/print exports and 15+ evaluation questions; reconcile page, Excel formulas, reports and slides; test totals and financial edge cases independently.
-## How to check / gotchas
-- From repo root: BUILD_OUT=/tmp/fin python3 build.py mock-cdu; CHROMIUM=/usr/bin/chromium FIN_SCREENSHOT=/tmp/fin-costing.png node tests/fin_smoke.js /tmp/fin/index.html. Browser/socket commands need the cloud command sandbox escalation; Playwright download is policy-blocked. Run tools/baseline_check.sh codex before every push; commit only owned files. No PR or main push.
-## Waiting on
-- Human: announce the real case and its id. Claude A: shared regress.js, smoke_case.js and case_shots.js use file URLs blocked by this browser's administrator policy; npm run test:quick reaches passing build/static then fails before regression assertions. Shared browser suites/screenshots remain unverified here; consider local HTTP support. Existing build text-patch warnings remain unchanged.
+# Codex Finance handoff
+**Updated:** 2026-11-03 WIB | **Branch:** codex/finance | **Baseline:** 7995889 | Commit: see git log -1.
+## Ready to merge
+- Sample-case Finance workflow: record cost/downtime breakdowns and charts, labelled inputs, cost build-up, NPV/IRR/payback/BCR, 3 scenarios, cash flow, sensitivity, explicit unvalued risk, CSV/print and cost_summary in fin.js only.
+- cases/mock-cdu/fin.json has SYNTHETIC demonstration assumptions; _template has null required values. All real-case inputs remain to be sourced. Benefits cover the whole supplied history, not a guessed partial rollout.
+- 16 Finance evaluation questions; smoke test checks answers directly. Integrator: recompile mock-cdu to include eval_extra_fin.json in Governance; generated case files are untouched.
+- finance/build_case.py generates a live-formula workbook, Word report and financial slides from any case's saved FIN inputs and MH. Reproduction: finance/CASE_FINANCE.md. Legacy first-case deliverables unchanged.
+## Validation
+- Pure model/edge checks and independent Python NPV passed; 16 LibreOffice-recalculated metrics (returns, scenarios, sensitivity) match the page. Sample NPV 151,823,149 IDR; demonstration only.
+- HTTP Finance smoke tests passed with 16 answer evaluations, totals, user edits/reset, invalid inputs and responsive checks; rendered page, report and slides inspected. Default build/static checks passed.
+- Required quick suite: build/static pass; shared regression cannot navigate file:// (ERR_BLOCKED_BY_ADMINISTRATOR with system Chromium). Shared layout/case/3D suites remain unverified; no shared tests edited.
+## Next / waiting on
+- Human/integrator: load and announce real case id on main; Finance then merges main, replaces sourced inputs and reconciles deliverables. No invented probability from risk categories. Use explicit annual probability and consequence for risk valuation.
+- Merge main hourly during active real-case work; push only codex/finance, no PR. For preview, human configures the Netlify branch. Generated sample artifacts are under /tmp/finance-mock-cdu and reproducible from the committed builder.
