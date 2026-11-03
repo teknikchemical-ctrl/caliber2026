@@ -8,7 +8,8 @@ export default async () => {
   let left = null;
   if (configured) { try { left = (await budget(c.daily, true)).left; } catch {} }
   const stats = await statsToday("ai");
-  return J({ ok: true, version: "1.1", store: st,
+  return J({ ok: true, version: "1.2", store: st,
+    deployment: { commit: /^[a-f0-9]{7,40}$/i.test(process.env.COMMIT_REF || "") ? process.env.COMMIT_REF : null, ai_revision: "model-recovery-2" },
     canSetKey: !!process.env.ADMIN_CODE, access: { edit: !!process.env.EDIT_CODE, approve: !!process.env.APPROVE_CODE, admin: !!process.env.ADMIN_CODE },
-    ai: { source: c.source, configured, provider: c.provider || "", model: c.model, models: c.models.length ? c.models : [c.model], available: configured && left !== 0, budget_left: left, embed: configured, today: stats } });
+    ai: { source: c.source, configured, provider: c.provider || "", model: c.model, models: c.models.length ? c.models : [c.model], available: configured && left !== 0, budget_left: left, embed: configured && ["gemini", "mock"].includes(c.provider), today: stats } });
 };

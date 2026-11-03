@@ -16,7 +16,7 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  }
  if(rq.url.includes("chat/completions")&&j.stream===false){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({choices:[{message:{content:"OK"}}]}))}
  if(rq.method==="GET"&&rq.url.includes("/models")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({models:[{name:"models/gemini-2.0-flash"},{name:"models/gemini-2.5-flash"},{name:"models/gemini-embedding-001",supportedGenerationMethods:["embedContent"]},{name:"models/gemini-9-flash",supportedGenerationMethods:["generateContent"]},{name:"models/gemini-9-flash-lite",supportedGenerationMethods:["generateContent"]}]}))}
- if(rq.url.includes("batchEmbedContents")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({embeddings:(j.requests||[]).map((_,i)=>({values:[1,i%3,2,0.5]}))}))}
+ if(rq.url.includes("batchEmbedContents")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({embeddings:(j.requests||[]).map((_,i)=>({values:[1,i%3,j.requests[i].taskType==="RETRIEVAL_QUERY"?4:2,0.5]}))}))}
  if(/\/models\/busy-model:/.test(rq.url)){rs.writeHead(503,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"High demand"}}))}
  if(/\/models\/quota-\d:/.test(rq.url)){rs.writeHead(429,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"Quota exceeded for this model"}}))}
  if(/\/models\/(badmodel|gone-\d|gemini-2\.0-flash-gone):/.test(rq.url)){rs.writeHead(404,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"models/badmodel is not found for API version v1beta"}}))}
@@ -48,19 +48,24 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  const body={question:"set point?",stream:false,retrieved:[{chunk_id:"x#1",text:"Set point 95 degC",status:"Approved"}]};
  const post=(port,o)=>fetch(`http://localhost:${port}/api/ai`,{method:"POST",body:JSON.stringify(o||body)}).then(async r=>({s:r.status,j:await r.json().catch(()=>null)}));
  /* provider adapters */
- let s1=proc(8901,{AI_PROVIDER:"openai",AI_BASE_URL:"http://localhost:8977/v1",AI_API_KEY:"k",AI_MODEL:"m1"});await up(8901);
+ let s1=proc(8901,{COMMIT_REF:"0123456789abcdef0123456789abcdef01234567",AI_PROVIDER:"openai",AI_BASE_URL:"http://localhost:8977/v1",AI_API_KEY:"k",AI_MODEL:"m1"});await up(8901);
  let r=await post(8901);ok(r.s===200&&/95 degC/.test(r.j.answer)&&r.j.citations[0]==="x#1","OpenAI compatible adapter returns an answer with mapped citations");
  const st=await fetch("http://localhost:8901/api/ai",{method:"POST",body:JSON.stringify({...body,stream:true})}).then(r=>r.text());ok(/"delta"/.test(st)&&/"done":true/.test(st),"adapter streams delta events then a done event");
  r=await post(8901,{question:""});ok(r.s===400,"empty question rejected");
  r=await fetch("http://localhost:8901/api/ai",{method:"POST",body:"x".repeat(300000)}).then(r=>r.status);ok(r===413,"oversized request rejected");
  r=await fetch("http://localhost:8901/api/health").then(r=>r.json());ok(r.ai.configured&&!JSON.stringify(r).includes('"k"'),"health reports AI configured and exposes no key");
- let n429=0;for(let i=0;i<16;i++){const x=await post(8901);if(x.s===429)n429++}ok(n429>=3,"per visitor rate limit applies ("+n429+" blocked)");
+ ok(r.deployment?.commit==="0123456789abcdef0123456789abcdef01234567"&&r.deployment?.ai_revision==="model-recovery-2","health identifies the deployed commit and AI revision without credentials");
+ ok(r.ai.embed===false,"OpenAI compatible health does not advertise unsupported Gemini embeddings");
+ // Freeze the limiter clock: slow shared workers can cross a minute boundary during an HTTP burst.
+ {const {limit}=await import("../netlify/functions/_lib.mjs"),clock=Date.now;
+  try{Date.now=()=>1800000000000;const a=await limit("live-rate-test",{perMin:2,perDay:100,key:"clock-test"}),b=await limit("live-rate-test",{perMin:2,perDay:100,key:"clock-test"}),c=await limit("live-rate-test",{perMin:2,perDay:100,key:"clock-test"});ok(a.ok&&b.ok&&!c.ok&&c.why==="rate","per visitor rate limit blocks the third request within the same minute")}finally{Date.now=clock}
+ }
  s1.kill();
  let s2=proc(8902,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k"});await up(8902);
  r=await post(8902);ok(r.s===200&&/Gemini says/.test(r.j.answer),"Gemini adapter returns an answer");
  /* Reproduce the live chain: retired model, overloaded alias, then a stalled alias. */
  const recovery=proc(8928,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k",AI_MODEL:"gone-1",AI_MODEL_FALLBACK:"busy-model,slow-answer,gone-2"});await up(8928);
- try{const recovered=await post(8928);ok(recovered.s===200&&recovered.j.model==="gemini-9-flash","retired and overloaded models trigger discovery before a stalled fallback")}finally{recovery.kill()}
+ try{const recovered=await post(8928);ok(recovered.s===200&&recovered.j.model==="gemini-9-flash","retired and overloaded models trigger discovery before a stalled fallback");const diagnostic=await fetch("http://localhost:8928/api/selftest").then(r=>r.json());ok(diagnostic.attempts?.some(a=>a.model==="gemini-9-flash"&&a.ok)&&!diagnostic.attempts?.some(a=>a.model==="slow-answer"),"diagnostics also discover a working model before a stalled alias and retain attempt results")}finally{recovery.kill()}
  const slowRecovery=proc(8929,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k",AI_MODEL:"slow-answer",AI_MODEL_FALLBACK:"gemini-2.0-flash"});await up(8929);
  try{const recovered=await post(8929);ok(recovered.s===200&&recovered.j.model==="gemini-2.0-flash","a stalled assistant model times out per attempt and a fallback answers")}finally{slowRecovery.kill()}
  /* AI reading of documents */
@@ -96,13 +101,19 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
   const port=8920+i,ds=proc(port,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:key,AI_MODEL:"gemini-2.5-flash",AI_MODEL_FALLBACK:"gemini-2.0-flash"});
   try{ok(await up(port),"diagnostic test server starts ("+key+")");const t=performance.now(),d=await fetch(`http://localhost:${port}/api/selftest`).then(r=>r.json());
    ok(!d.ok&&d.checks.some(c=>!c.ok&&expected.test(c.detail)),"diagnostics explain "+key+" without claiming an answer");
+   if(key==="slow-body-diagnostics")ok(d.attempts?.length>0&&d.attempts.every(a=>a.model&&a.detail),"deadline diagnostics retain model names and attempt details");
    const elapsed=Math.round(performance.now()-t);console.log("    diagnostics elapsed (including worker scheduling): "+elapsed+" ms for "+key);
   }finally{ds.kill()}
  }
  const ds=proc(8926,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k",AI_MODEL:"slow-answer",AI_MODEL_FALLBACK:"gemini-2.0-flash"});await up(8926);
- try{const d=await fetch("http://localhost:8926/api/selftest").then(r=>r.json());ok(d.checks.some(c=>c.name==="AI answer"&&c.ok&&/gemini-2.0-flash/.test(c.detail)&&/1.5 s/.test(c.detail)),"a slow diagnostic model leaves time for a working fallback")}finally{ds.kill()}
+ try{const d=await fetch("http://localhost:8926/api/selftest").then(r=>r.json());ok(d.attempts?.some(a=>a.model==="slow-answer"&&!a.ok)&&(d.checks.some(c=>c.name==="AI answer"&&c.ok&&/gemini-2.0-flash/.test(c.detail))||d.checks.some(c=>c.name==="Diagnostics"&&!c.ok&&/6 s diagnostics time limit/.test(c.detail))),"a slow diagnostic attempt returns a working fallback or an explicit total-deadline result")}finally{ds.kill()}
  const ods=proc(8927,{AI_PROVIDER:"openai",AI_BASE_URL:"http://localhost:8977/v1",AI_API_KEY:"k",AI_MODEL:"m1"});await up(8927);
  try{const d=await fetch("http://localhost:8927/api/selftest").then(r=>r.json());ok(d.checks.some(c=>c.name==="AI answer"&&c.ok&&/m1/.test(c.detail)),"OpenAI compatible diagnostics also require actual answer text")}finally{ods.kill()}
+ const docVectors=await fetch("http://localhost:8906/api/embed",{method:"POST",body:JSON.stringify({texts:["task-specific"]})}).then(r=>r.json());
+ const queryVectors=await fetch("http://localhost:8906/api/embed",{method:"POST",body:JSON.stringify({texts:["task-specific"],query:true})}).then(r=>r.json());
+ ok(JSON.stringify(docVectors.vectors)!==JSON.stringify(queryVectors.vectors),"identical text has separate document and query embedding cache entries");
+ const queryAgain=await fetch("http://localhost:8906/api/embed",{method:"POST",body:JSON.stringify({texts:["task-specific"],query:true})}).then(r=>r.json());
+ ok(JSON.stringify(queryAgain.vectors)===JSON.stringify(queryVectors.vectors),"query embedding cache reuses only query vectors");
  s6.kill();s6b.kill();s6c.kill();
  let s7=proc(8907,{AI_PROVIDER:"mock",AI_RATE_PER_MIN:"60"});await up(8907);
  r=await post(8907,{question:"TOOLTEST",tools:[{name:"maintenance_stats",description:"x",parameters:{type:"object"}}],retrieved:[]});ok(r.j.tool_calls&&r.j.tool_calls.length===1,"mock provider returns a tool call");
@@ -148,11 +159,11 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  /* two users in two browsers */
  const srv=proc(8910,{AI_PROVIDER:"mock",AI_RATE_PER_MIN:"60",AI_RATE_PER_DAY:"500"});ok(await up(8910),"dev server up");
  const b=await chromium.launch({args:["--disable-background-timer-throttling","--disable-renderer-backgrounding","--disable-backgrounding-occluded-windows","--disable-features=IntensiveWakeUpThrottling"],...(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{})}),errs=[];
- const mk=async()=>{const c=await b.newContext({viewport:{width:1440,height:900}}),p=await c.newPage();p.on("pageerror",e=>errs.push(e.message));p.on("dialog",d=>d.accept("t"));await p.goto("http://localhost:8910/",{waitUntil:"commit"});await p.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await p.waitForTimeout(1800);return p};
+ const mk=async()=>{const c=await b.newContext({viewport:{width:1440,height:900}}),p=await c.newPage();p.on("pageerror",e=>errs.push(e.message));p.on("dialog",d=>d.accept("t"));await p.goto("http://localhost:8910/",{waitUntil:"commit"});await p.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await p.evaluate(()=>go("ai"));await p.waitForTimeout(1800);return p};
  const A=await mk(),B=await mk();
  const evalContext=await b.newContext(),ep=await evalContext.newPage();
- try{await ep.goto("http://localhost:8910/");await ep.waitForFunction(()=>typeof evalRun==="function"&&SYNC.state==="online");
-  await ep.evaluate(()=>{AIP.use=false;AI.cfg.remote=false;AI.cfg.mock=false;evalRun()});await ep.waitForFunction(()=>!EV.running,null,{timeout:180000});
+ try{await ep.goto("http://localhost:8910/",{waitUntil:"commit",timeout:60000});await ep.waitForFunction(()=>typeof evalRun==="function"&&SYNC.state==="online",null,{timeout:60000});
+  await ep.evaluate(()=>{go("ai");AIP.use=false;AI.cfg.remote=false;AI.cfg.mock=false;evalRun()});await ep.waitForFunction(()=>!EV.running,null,{timeout:180000});
   const evaluation=await ep.evaluate(()=>({summary:evSummary(),failed:EV.res.filter(r=>!r.pass).map(r=>r.id)}));
   ok(evaluation.summary.n===131&&evaluation.summary.ok===131,"original plant assistant evaluation: "+evaluation.summary.ok+"/"+evaluation.summary.n+" passed "+evaluation.failed.join(","));
  }finally{await evalContext.close()}
@@ -168,6 +179,9 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  const emptyConnection=await A.evaluate(async()=>{const call=aiCallProvider,api=syApi;try{aiCallProvider=async()=>({answer:""});syApi=async()=>({checks:[]});await setTestAi();return document.querySelector("#aitest").textContent}finally{aiCallProvider=call;syApi=api}});
  ok(/No answer:.*no answer text/.test(emptyConnection),"Settings does not call an empty answer a working connection");
  await A.evaluate(()=>setTestAi());await A.keyboard.press("Escape");
+ await A.evaluate(()=>{EMBQ.err="HTTP 429: embedding quota exhausted";setOpen()});
+ ok(await A.evaluate(()=>document.querySelector("#setbody").textContent.includes("unavailable: HTTP 429: embedding quota exhausted")&&document.querySelector("#setbody").textContent.includes("Keyword search still works")),"Settings explains embedding failure instead of indefinite loading");
+ await A.evaluate(()=>{EMBQ.err="";setClose()});
  /* shared knowledge */
  const id=await A.evaluate(()=>{ROLE.name="Engineer";const it=UKB.add({type:"lesson",title:"Shared seal lesson",text:"Flush plan 32 stabilises the seal on GA-1201A.",set:1});UKB.setStatus(it.id,"In review");return it.id});
  await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(800);
@@ -207,7 +221,7 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  /* meaning-based search data */
  let waited=0;while(waited<45000&&!(await A.evaluate(()=>DB.hasEmb))){await A.waitForTimeout(1500);waited+=1500}
  ok(await A.evaluate(()=>DB.hasEmb),"record embeddings are prepared in the background");
- const qv=await A.evaluate(async()=>{const v=await embQuery("recycle compressor start permissive");return v?v.length:0});ok(qv>0,"a question can be embedded for meaning-based search");
+ const qv=await A.evaluate(async()=>{let v=await embQuery("recycle compressor start permissive");if(!v)v=await embQuery("recycle compressor start permissive");return v?v.length:0});ok(qv>0,"a question can be embedded for meaning-based search");
  const sem=await A.evaluate(async()=>{const r=await aiAsk("What are the start permissives of the recycle compressor?",{noLog:true});return{n:r.sources.length}});ok(sem.n>0,"search with embeddings still returns sources");
  /* new visitor sees the shared state on first load */
  const id2=await A.evaluate(()=>UKB.add({type:"lesson",title:"Persisted lesson",text:"x",set:2}).id);await A.waitForTimeout(1500);

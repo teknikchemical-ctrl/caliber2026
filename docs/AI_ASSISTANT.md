@@ -50,3 +50,39 @@ This cloud browser blocks file URLs, so the shared regression runner in `npm run
 The assistant gives each Gemini model up to 3 s to start returning text, within an 8 s provider-call budget. After two retryable failures it asks the provider for currently available models before spending time on more configured aliases. Authentication errors stop retries. Once text starts, the request can continue until the overall deadline; a streaming error discards the partial answer and uses the local records. These are application timers, not a guarantee of wall time on a paused or overloaded worker.
 
 A model listed by the key can still be retired for new users or have no usable quota. Do not assume a replacement name from a truncated provider error. Read the current model list or a successful connection test. If diagnostics still say "key accepted, 50 models visible" and "no answer within 5 s", that response is from the earlier diagnostic implementation. Claude A must merge this branch and deploy the resulting main commit to the production site before these fixes can be checked there.
+
+## Connection plan for the hackathon
+
+Keep the existing architecture for tomorrow. The supplied failures occur at model calls, while shared storage and the API key checks succeed. Replacing the database would not resolve a retired model or provider overload.
+
+```mermaid
+flowchart LR
+  Case[Selected case records] --> Search[Browser keyword search and computed tools]
+  Upload[Uploaded documents] --> Review[Human review and approval]
+  Review --> Blobs[Netlify Blobs shared knowledge]
+  Blobs --> Search
+  Search --> Proxy[Netlify AI function]
+  Proxy --> Gemini[Gemini with server-side key]
+  Gemini --> Checks[Citation and number checks]
+  Checks --> Answer[Answer with sources]
+  Search --> Local[Local answer when the provider fails]
+```
+
+The system uses retrieval, not model training. Adding a document makes its reviewed content searchable; it does not retrain Gemini or guarantee that every uploaded statement is correct. The existing case pack holds plant records, Netlify Blobs holds shared knowledge and server settings, and embeddings help find relevant text. Keyword search must remain usable when embeddings fail. Keep synthetic examples separate from the real case and verify every safety-critical value against an approved source.
+
+Before the demo:
+
+1. Claude A merges the latest `codex/ai` and deploys the production site from main. In Netlify, confirm the successful deploy's commit and production URL, rather than a branch preview URL.
+2. Open `/api/health` on that exact site. The updated endpoint includes `deployment.commit` and `deployment.ai_revision` (`model-recovery-2`). Compare the commit with Netlify's deployed commit. A missing revision means the endpoint is older than this update. A null commit means the build environment did not supply `COMMIT_REF`; use Netlify's deploy details to identify it.
+3. Open Settings and run Test the AI connection and Run diagnostics. A configured key or model-list success alone is insufficient. Record the model that actually answered and any failed attempt message. Do not copy the key.
+4. Check Search by meaning. The updated Settings shows an embedding error instead of indefinite loading. It also states that keyword search remains usable. OpenAI compatible providers do not advertise this Gemini-only embedding endpoint.
+5. On the real case, ask one question with a known documented answer, one maintenance calculation, one question absent from the records and one unsafe bypass request. Open the citations and compare the answer with the real-case documents. The absent answer must identify the missing evidence and the unsafe request must be refused.
+6. Add one non-critical test knowledge item, review and approve it, then confirm a second browser can retrieve it. Remove that test item after checking. This verifies shared knowledge, independently of model availability.
+
+If the live site still fails after these checks, send the production URL, `deployment.commit`, `deployment.ai_revision`, the connection-test message and all diagnostic check messages, with credentials removed. These identify whether the next fix belongs to deployment, key restrictions, model availability, provider quota or embeddings. The local fake-provider tests cannot establish that a particular real Gemini model will answer tomorrow.
+
+The server embedding cache now separates provider, endpoint, model and retrieval task. Identical text sent as a question can no longer reuse a document embedding by mistake. Existing browser-side embedding caches can still need a refresh when the model or provider changes; keep `AI_EMBED_MODEL` stable during the demo and report any model change before reusing stored vectors.
+
+Diagnostics now discover available models after two failed configured attempts, matching the normal assistant's recovery order. The JSON includes `attempts` with each model name, whether it answered and its result; a deadline response retains completed and currently running attempts. Flash Lite ranks ahead of Pro among discovered alternatives to avoid prioritising a heavier Pro model over a lightweight fallback. The provider model list still does not guarantee quota or successful generation.
+
+For tomorrow's different plant, follow `docs/NETLIFY_MULTI_CASE.md` and use a separate Netlify site and its storage. Preserve the original plant's site and records. This keeps old shared knowledge and saved settings from being mistaken for the new plant's evidence. Verify the new case title and equipment tags before uploading or approving documents.

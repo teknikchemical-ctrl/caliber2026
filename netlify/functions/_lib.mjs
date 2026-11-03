@@ -106,7 +106,7 @@ export async function discoverModels(c, signal) {
   const r = await fetch(base + "/models?pageSize=200", { headers: { "x-goog-api-key": c.key }, signal: signal || AbortSignal.timeout(5000) });
   if (!r.ok) return [];
   const j = await r.json(), score = n => {
-    const v = (/gemini-(\d+(?:\.\d+)?)/.exec(n) || [0, 0])[1], fam = /flash-lite/.test(n) ? 1 : /flash/.test(n) ? 3 : /pro/.test(n) ? 2 : 0;
+    const v = (/gemini-(\d+(?:\.\d+)?)/.exec(n) || [0, 0])[1], fam = /flash-lite/.test(n) ? 2 : /flash/.test(n) ? 3 : /pro/.test(n) ? 1 : 0;
     return fam * 1000 + (/latest/.test(n) ? 500 : 0) + parseFloat(v) * 10 - (/preview|exp/.test(n) ? 5 : 0);
   };
   const list = (j.models || []).filter(m => !m.supportedGenerationMethods || m.supportedGenerationMethods.includes("generateContent"))

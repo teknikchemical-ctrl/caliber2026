@@ -6,18 +6,18 @@ const TOTAL_MS = 6000, ATTEMPT_MS = 1500;
 const timeoutText = "no answer within 1.5 s; try again or select a faster model in Netlify AI_MODEL";
 const reason = e => /TimeoutError|AbortError/.test(e && e.name) ? timeoutText : String((e && e.message) || e).slice(0, 180);
 export default async () => {
-  const out = [], ctl = new AbortController(); let timer;
-  const work = run(out, ctl.signal).catch(e => {
+  const out = [], attempts = [], ctl = new AbortController(); let timer;
+  const work = run(out, ctl.signal, attempts).catch(e => {
     out.push({ name: "Diagnostics", ok: false, detail: "The check failed: " + reason(e) });
-    return J({ ok: false, checks: out });
+    return J({ ok: false, checks: out, attempts });
   });
   const deadline = new Promise(resolve => { timer = setTimeout(() => {
     ctl.abort();
-    resolve(J({ ok: false, checks: [...out, { name: "Diagnostics", ok: false, detail: "The 6 s diagnostics time limit was reached. Retry once. If it repeats, check the Netlify function logs and AI_MODEL setting." }] }));
+    resolve(J({ ok: false, attempts, checks: [...out, { name: "Diagnostics", ok: false, detail: "The 6 s diagnostics time limit was reached. " + (attempts.length ? "Latest model: " + attempts[attempts.length-1].model + ". " + attempts[attempts.length-1].detail : "No model call started; configuration or storage used the budget.") }] }));
   }, TOTAL_MS); });
   try { return await Promise.race([work, deadline]); } finally { clearTimeout(timer); }
 };
-async function run(out, signal) {
+async function run(out, signal, attempts) {
   const c = await cfgA();
   const add = (name, ok, detail) => out.push({ name, ok, detail });
   // A new attempt gets its own timeout, but can never outlive the overall check.
@@ -40,6 +40,7 @@ async function run(out, signal) {
     const tryModel = async m => {
       if (signal.aborted || stop || tried.has(m)) return;
       tried.add(m);
+      const attempt = { model: m, ok: false, detail: "Still waiting for provider response." }; attempts.push(attempt);
       try {
         const gemini = c.provider === "gemini";
         const body = gemini ? { contents: [{ role: "user", parts: [{ text: "Reply with the single word OK." }] }], generationConfig: { maxOutputTokens: 64, ...(/gemini-2\.5-flash/.test(m) ? { thinkingConfig: { thinkingBudget: 0 } } : {}) } } : { model: m, messages: [{ role: "user", content: "Reply with the single word OK." }], max_tokens: 64, stream: false };
@@ -60,17 +61,25 @@ async function run(out, signal) {
           throw new Error(block ? "no answer text (" + block + ")" : "no answer text in the provider response");
         }
         add("AI answer", true, "model " + m + " returned answer text" + (said.length ? ". Earlier attempt: " + said[0] : "") + ". If the assistant still fails, run Test the AI connection to check its full request.");
-        answered = true;
-      } catch (e) { said.push(m + ": " + reason(e)); }
+        answered = true; attempt.ok = true; attempt.detail = "Returned visible answer text.";
+      } catch (e) { attempt.detail = reason(e); said.push(m + ": " + attempt.detail); }
     };
     const configuredModels = c.provider === "gemini" ? [...new Set([c.model, ...(c.fallbacks || [])])].slice(0, 4) : [c.model];
-    for (const m of configuredModels) { await tryModel(m); if (answered || stop || signal.aborted) break; }
-    if (!answered && !stop && !signal.aborted && c.provider === "gemini") {
+    let discovered = false;
+    for (const m of configuredModels) {
+      if (tried.size >= 2 && !discovered && c.provider === "gemini" && !signal.aborted) {
+        discovered = true;
+        try { const found = await discoverModels(c, attemptSignal()); for (const candidate of found.filter(x => !tried.has(x)).slice(0, 3)) { await tryModel(candidate); if (answered || stop || signal.aborted) break; } } catch (e) { said.push("Model discovery: " + reason(e)); }
+        if (answered || stop || signal.aborted) break;
+      }
+      await tryModel(m); if (answered || stop || signal.aborted) break;
+    }
+    if (!answered && !stop && !signal.aborted && !discovered && c.provider === "gemini") {
       try { const found = await discoverModels(c, attemptSignal()); for (const m of found.filter(m => !tried.has(m)).slice(0, 3)) { await tryModel(m); if (answered || stop || signal.aborted) break; } } catch (e) { said.push("Model discovery: " + reason(e)); }
     }
     if (!answered) add("AI answer", false, (said.join(" | ").slice(0, 650) || "No model answered.") + " Check AI_MODEL, the key restrictions and the provider quota; then retry. Never share the key.");
   }
   if (c.provider === "mock") add("AI answer", true, "Test provider selected. No real Gemini connection was checked.");
   add("Access codes", true, ["edit", "approve", "admin"].map(k => k + ": " + (process.env[k.toUpperCase() + "_CODE"] ? "set" : "not set")).join(", "));
-  return J({ ok: out.every(x => x.ok), checks: out });
+  return J({ ok: out.every(x => x.ok), checks: out, attempts });
 }
