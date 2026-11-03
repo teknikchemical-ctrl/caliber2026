@@ -15,7 +15,7 @@ Turn the hackathon case documents into `cases/<id>/` so the app shows the new pl
 1. Read `docs/CONTEXT.md`, `docs/CASE_PACKS.md`, `docs/INTAKE_PROMPTS.md`. Run the five setup commands in section 5 of the context file.
 2. `git checkout -b a/intake integration` (or from `main` if `integration` does not exist yet).
 3. `tools/new_case.sh <id> "<Plant title>" <CODE>` then `python3 tools/pack_split.py cases/<id>`.
-4. Put the case documents in `cases/_source/` (not committed) and run `tools/pdf_pages.sh` on each PDF.
+4. The case documents are committed (private repository) in `cases/<id>/source/`. If they are not there, ask the human to add them or to attach them. Run `tools/pdf_pages.sh` on each PDF (output goes to `cases/_source/`, which git ignores).
 5. Follow `docs/INTAKE_PROMPTS.md` steps 1 to 8, writing one file per set in `cases/<id>/plant/sets/`.
 
 ## Loop

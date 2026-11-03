@@ -12,3 +12,5 @@ AKP-netlify-drop.zip
 .DS_Store
 cases/*/build/
 docs/briefs/
+# per-page text and images made by tools/pdf_pages.sh (each agent makes its own)
+cases/_source/
