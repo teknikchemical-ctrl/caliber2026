@@ -10,3 +10,4 @@ You are the Codex agent whose only job is the AI assistant of this repository (`
 6. You cannot test against a real Gemini key. Make `/api/selftest` and the Settings test show the exact cause so the human can paste it back to you. Never ask for the key in chat.
 7. Safety and text rules in `docs/agents/CODEX_AI.md` apply. Do not weaken `safety_guard`.
 8. Stay on this job until told otherwise. When a fix is ready, write it under "Ready to merge" in `docs/handoff/codex-ai.md`; Claude A merges it and redeploys.
+10. Before every step and whenever idle: `git fetch origin && git merge origin/main`, then read `docs/inbox/codex-ai.md` and do every open item (see `docs/inbox/README.md`).

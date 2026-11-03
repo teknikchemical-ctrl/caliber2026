@@ -178,3 +178,5 @@ Each Claude updates only its own rows (status: `todo`, `doing`, `blocked`, `done
 
 ## Handoff notes
 Moved to `docs/handoff/a.md` and `docs/handoff/b.md`. Request something from the other Claude in the "Waiting on" section of your own handoff file and put its id in the `note` column of your row here.
+
+Before every step and whenever idle: `git fetch origin && git merge origin/main`, then read `docs/inbox/claude-b.md` and do every open item (see `docs/inbox/README.md`).

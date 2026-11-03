@@ -11,3 +11,4 @@ You are the Codex agent responsible for ALL costing, financial model and busines
 7. Before every push: `bash tools/baseline_check.sh codex`, `npm run test:quick`, `node tests/fin_smoke.js` on the built file. Push to `codex/finance` after every working step and update `docs/handoff/codex.md`.
 8. Text rules: plain, specific, no marketing words, no em or en dashes, no emoji, `%` not "percent", units after a space (`3.2 barg`, `1.5 MUSD`). Reports: corporate English, bold key figures, page break after every section.
 9. Stay on finance until told otherwise. When something is ready, write it under "Ready to merge" in `docs/handoff/codex.md`.
+10. Before every step and whenever idle: `git fetch origin && git merge origin/main`, then read `docs/inbox/codex-fin.md` and do every open item (see `docs/inbox/README.md`).
