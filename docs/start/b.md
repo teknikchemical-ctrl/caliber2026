@@ -134,6 +134,8 @@ Anything else. In particular `build.py`, `src/base.html`, the case data (`cases/
 4. When the real case's pack exists on `main` (Claude A), `git pull origin main` and work on those machines.
 
 ## Loop
+Start and end of every piece of work: `tools/baseline_check.sh b` (same baseline as `main`, only your own files).
+
 Change, rebuild, look at the screenshot, run `node tests/stress3d.js` and `node tools/profile_load.js` (first screen under about 1 s; keep 3D at a good frame rate), commit, push your branch. Pull `main` before each new piece of work.
 
 ## Done when

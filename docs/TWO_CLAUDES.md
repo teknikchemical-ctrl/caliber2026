@@ -4,6 +4,13 @@
 - **`main` is the shared version.** Only Claude A writes to `main`, and only after merging B's branch and passing the tests.
 - Claude B never pushes to `main`. B pushes its own branch often and pulls `main` often.
 
+## Check the baseline (both Claudes, at the start, before every push, before every merge)
+```
+tools/baseline_check.sh a     # Claude A
+tools/baseline_check.sh b     # Claude B
+```
+It prints the commit of `main`, how far your branch is ahead of or behind it, and lists any file you changed that belongs to the other Claude. If it says you are behind, merge `origin/main` first. If it names files that are not yours, move that request to `docs/TASKS.md`.
+
 ## Claude B starts or refreshes from main
 ```
 git fetch origin

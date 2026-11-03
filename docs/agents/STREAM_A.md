@@ -21,6 +21,8 @@ Claude B's files: `src/modules/g3d.js g3r.js g3neck.js plant3d.js hse3d.js sim3d
 5. Follow `docs/INTAKE_PROMPTS.md` steps 1 to 8, one file per set in `cases/<id>/plant/sets/`.
 
 ## Loop
+Start and end of every piece of work: `tools/baseline_check.sh a` (same baseline as `main`, only your own files).
+
 Write sets, `python3 tools/pack_build.py cases/<id>`, fix every ERROR and read every warning, `BUILD_OUT=/tmp/x python3 build.py <id>`, `node tests/smoke_case.js /tmp/x/index.html`, commit, push. Every 1 to 2 hours: merge Claude B's branch (`docs/TWO_CLAUDES.md`), run the tests, update `main`.
 
 ## Done when
