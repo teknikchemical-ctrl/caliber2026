@@ -7,6 +7,14 @@ const proc=(port,env)=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),"akp-"));
 const up=async port=>{for(let i=0;i<40;i++){try{const r=await fetch(`http://localhost:${port}/api/health`);if(r.ok)return true}catch(e){}await sleep(150)}return false};
 /* fake upstream providers (OpenAI compatible and Gemini shapes) */
 let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+=d);rq.on("end",()=>{const j=JSON.parse(b||"{}");if(rq.url==="/__last"){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify(LAST))}if(rq.method==="POST")LAST={url:rq.url,body:j,key:rq.headers["x-goog-api-key"]};if(rq.url.includes("/models/nothink:")&&j.generationConfig&&j.generationConfig.thinkingConfig){rs.writeHead(400,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"Thinking is not supported by this model"}}))}
+ if(rq.headers["x-goog-api-key"]==="slow-diagnostics"||rq.url.includes("/models/slow-answer:")){return}
+ if(rq.headers["x-goog-api-key"]==="rejected-diagnostics"){rs.writeHead(403,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"API key restrictions reject this request"}}))}
+ if(rq.url.includes(":generateContent")&&["empty-diagnostics","blocked-diagnostics","invalid-diagnostics","slow-body-diagnostics"].includes(rq.headers["x-goog-api-key"])){
+  rs.writeHead(200,{"content-type":"application/json"});
+  if(rq.headers["x-goog-api-key"]==="slow-body-diagnostics"){rs.write('{');return}
+  return rs.end(rq.headers["x-goog-api-key"]==="invalid-diagnostics"?"not JSON":JSON.stringify(rq.headers["x-goog-api-key"]==="blocked-diagnostics"?{promptFeedback:{blockReason:"SAFETY"}}:{candidates:[{content:{parts:[{thought:true,text:"hidden reasoning"}]}}]}));
+ }
+ if(rq.url.includes("chat/completions")&&j.stream===false){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({choices:[{message:{content:"OK"}}]}))}
  if(rq.method==="GET"&&rq.url.includes("/models")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({models:[{name:"models/gemini-2.0-flash"},{name:"models/gemini-2.5-flash"},{name:"models/gemini-embedding-001",supportedGenerationMethods:["embedContent"]},{name:"models/gemini-9-flash",supportedGenerationMethods:["generateContent"]},{name:"models/gemini-9-flash-lite",supportedGenerationMethods:["generateContent"]}]}))}
  if(rq.url.includes("batchEmbedContents")){rs.writeHead(200,{"content-type":"application/json"});return rs.end(JSON.stringify({embeddings:(j.requests||[]).map((_,i)=>({values:[1,i%3,2,0.5]}))}))}
  if(/\/models\/quota-\d:/.test(rq.url)){rs.writeHead(429,{"content-type":"application/json"});return rs.end(JSON.stringify({error:{message:"Quota exceeded for this model"}}))}
@@ -24,7 +32,18 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  else if(/BLOCKTEST/.test(JSON.stringify(j.contents))){rs.write("data: "+JSON.stringify({promptFeedback:{blockReason:"SAFETY"}})+"\n\n")}
  else{for(const w of ["Gemini says ","the trip is 80 degC [1]."])rs.write("data: "+JSON.stringify({candidates:[{content:{parts:[{text:w}]}}]})+"\n\n")}
  rs.end()})});
-(async()=>{await new Promise(r=>fake.listen(8977,r));
+(async()=>{
+ /* A suspended cloud worker can delay every timer. Advance the deadline clock explicitly,
+    then verify that the handler returns JSON even when its provider never responds. */
+ {const {mock}=require("node:test"),saved={...process.env},originalFetch=global.fetch;
+  process.env.LOCAL_STORE_DIR=fs.mkdtempSync(path.join(os.tmpdir(),"akp-diagnostic-clock-"));process.env.AI_PROVIDER="gemini";process.env.AI_API_KEY="synthetic-clock-test";
+  const {default:diagnostics}=await import("../netlify/functions/selftest.mjs");
+  global.fetch=async()=>new Promise(()=>{});
+  try{mock.timers.enable({apis:["setTimeout"]});const result=diagnostics();mock.timers.tick(6000);const response=await result,d=await response.json();
+   ok(response.status===200&&!d.ok&&d.checks.some(c=>c.name==="Diagnostics"&&!c.ok&&/6 s diagnostics time limit/.test(c.detail)),"diagnostic deadline returns readable JSON at 6 s without a provider response");
+  }finally{mock.timers.reset();global.fetch=originalFetch;for(const name of ["LOCAL_STORE_DIR","AI_PROVIDER","AI_API_KEY"]){if(saved[name]===undefined)delete process.env[name];else process.env[name]=saved[name]}}
+ }
+ await new Promise(r=>fake.listen(8977,r));
  const body={question:"set point?",stream:false,retrieved:[{chunk_id:"x#1",text:"Set point 95 degC",status:"Approved"}]};
  const post=(port,o)=>fetch(`http://localhost:${port}/api/ai`,{method:"POST",body:JSON.stringify(o||body)}).then(async r=>({s:r.status,j:await r.json().catch(()=>null)}));
  /* provider adapters */
@@ -66,7 +85,19 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  r=await fetch("http://localhost:8906/api/selftest").then(r=>r.json());ok(r.checks.some(c=>/Shared storage/.test(c.name)&&c.ok)&&r.checks.some(c=>/Provider connection/.test(c.name)&&c.ok)&&r.checks.some(c=>/Model badmodel/.test(c.name)&&!c.ok),"diagnostics report storage, connection and an unavailable model");
  r=await fetch("http://localhost:8906/api/embed",{method:"POST",body:JSON.stringify({texts:["alpha","beta"]})}).then(r=>r.json());ok(r.vectors&&r.vectors.length===2&&r.dim>0,"embedding batch returns vectors");
  const e2=await fetch("http://localhost:8906/api/embed",{method:"POST",body:JSON.stringify({texts:["alpha","beta"]})}).then(r=>r.json());ok(JSON.stringify(e2.vectors)===JSON.stringify(r.vectors),"embeddings are cached on the server");
- s6.kill();
+ /* Diagnostics must test actual text, handle stalled bodies and remain below deployment limits. */
+ for(const [i,key,expected] of [[0,"empty-diagnostics",/no answer text/],[1,"blocked-diagnostics",/SAFETY/],[2,"invalid-diagnostics",/JSON/],[3,"slow-body-diagnostics",/1.5 s|6 s/],[4,"slow-diagnostics",/6 s/],[5,"rejected-diagnostics",/403/]]){
+  const port=8920+i,ds=proc(port,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:key,AI_MODEL:"gemini-2.5-flash",AI_MODEL_FALLBACK:"gemini-2.0-flash"});
+  try{ok(await up(port),"diagnostic test server starts ("+key+")");const t=performance.now(),d=await fetch(`http://localhost:${port}/api/selftest`).then(r=>r.json());
+   ok(!d.ok&&d.checks.some(c=>!c.ok&&expected.test(c.detail)),"diagnostics explain "+key+" without claiming an answer");
+   const elapsed=Math.round(performance.now()-t);console.log("    diagnostics elapsed (including worker scheduling): "+elapsed+" ms for "+key);
+  }finally{ds.kill()}
+ }
+ const ds=proc(8926,{AI_PROVIDER:"gemini",AI_BASE_URL:"http://localhost:8977/v1beta",AI_API_KEY:"k",AI_MODEL:"slow-answer",AI_MODEL_FALLBACK:"gemini-2.0-flash"});await up(8926);
+ try{const d=await fetch("http://localhost:8926/api/selftest").then(r=>r.json());ok(d.checks.some(c=>c.name==="AI answer"&&c.ok&&/gemini-2.0-flash/.test(c.detail)&&/1.5 s/.test(c.detail)),"a slow diagnostic model leaves time for a working fallback")}finally{ds.kill()}
+ const ods=proc(8927,{AI_PROVIDER:"openai",AI_BASE_URL:"http://localhost:8977/v1",AI_API_KEY:"k",AI_MODEL:"m1"});await up(8927);
+ try{const d=await fetch("http://localhost:8927/api/selftest").then(r=>r.json());ok(d.checks.some(c=>c.name==="AI answer"&&c.ok&&/m1/.test(c.detail)),"OpenAI compatible diagnostics also require actual answer text")}finally{ods.kill()}
+ s6.kill();s6b.kill();s6c.kill();
  let s7=proc(8907,{AI_PROVIDER:"mock",AI_RATE_PER_MIN:"60"});await up(8907);
  r=await post(8907,{question:"TOOLTEST",tools:[{name:"maintenance_stats",description:"x",parameters:{type:"object"}}],retrieved:[]});ok(r.j.tool_calls&&r.j.tool_calls.length===1,"mock provider returns a tool call");
  r=await post(8907,{question:"TOOLTEST",tool_results:[{name:"maintenance_stats",result:"26 work orders"}],tools:[{name:"maintenance_stats",description:"x",parameters:{type:"object"}}],retrieved:[]});ok(/26 work orders/.test(r.j.answer),"tool results are used to write the answer");
@@ -113,12 +144,24 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  const b=await chromium.launch({args:["--disable-background-timer-throttling","--disable-renderer-backgrounding","--disable-backgrounding-occluded-windows","--disable-features=IntensiveWakeUpThrottling"],...(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{})}),errs=[];
  const mk=async()=>{const c=await b.newContext({viewport:{width:1440,height:900}}),p=await c.newPage();p.on("pageerror",e=>errs.push(e.message));p.on("dialog",d=>d.accept("t"));await p.goto("http://localhost:8910/",{waitUntil:"commit"});await p.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await p.waitForTimeout(1800);return p};
  const A=await mk(),B=await mk();
+ const evalContext=await b.newContext(),ep=await evalContext.newPage();
+ try{await ep.goto("http://localhost:8910/");await ep.waitForFunction(()=>typeof evalRun==="function"&&SYNC.state==="online");
+  await ep.evaluate(()=>{AIP.use=false;AI.cfg.remote=false;AI.cfg.mock=false;evalRun()});await ep.waitForFunction(()=>!EV.running,null,{timeout:180000});
+  const evaluation=await ep.evaluate(()=>({summary:evSummary(),failed:EV.res.filter(r=>!r.pass).map(r=>r.id)}));
+  ok(evaluation.summary.n===131&&evaluation.summary.ok===131,"original plant assistant evaluation: "+evaluation.summary.ok+"/"+evaluation.summary.n+" passed "+evaluation.failed.join(","));
+ }finally{await evalContext.close()}
+
  ok(await A.evaluate(()=>SYNC.state)==="online","user A connected to the shared database");
  ok(await A.evaluate(()=>AI.cfg.remote&&AI.conn.label)==="AI connected","assistant switched to the server AI automatically");
  ok(await A.evaluate(()=>!document.body.innerText.includes("Provider endpoint")),"no AI connection fields on the page");
  await A.evaluate(()=>go("ai"));await A.waitForTimeout(300);ok(await A.evaluate(()=>!document.querySelector("#app").innerText.includes("Provider endpoint")&&!document.querySelector("#app").innerText.includes("Connection")),"assistant page has no connection card");
  await A.click(".foot .gear[aria-label=Settings]");await A.waitForTimeout(200);ok(await A.evaluate(()=>!!document.querySelector("#setbg")&&document.querySelector("#setbody").innerText.includes("Shared database")),"gear opens the Settings panel");
- await A.evaluate(()=>setTestAi());await A.waitForTimeout(800);ok(/Working/.test(await A.evaluate(()=>document.querySelector("#aitest").textContent)),"Test the AI connection works");await A.keyboard.press("Escape");
+ await A.evaluate(()=>setTestAi());await A.waitForTimeout(800);ok(/Working/.test(await A.evaluate(()=>document.querySelector("#aitest").textContent)),"Test the AI connection works");
+ const diagnosticFailure=await A.evaluate(async()=>{const call=aiCallProvider,api=syApi;try{aiCallProvider=async()=>{throw new Error("HTTP 502: provider quota exhausted")};syApi=async()=>({checks:[{name:"Model retired",ok:false,detail:"not listed"},{name:"AI answer",ok:false,detail:"quota exceeded; retry later"}]});await setTestAi();return document.querySelector("#aitest").textContent}finally{aiCallProvider=call;syApi=api}});
+ ok(/HTTP 502: provider quota exhausted/.test(diagnosticFailure)&&/AI answer: quota exceeded/.test(diagnosticFailure),"Settings preserves the actual call error and appends the answer diagnostic");
+ const emptyConnection=await A.evaluate(async()=>{const call=aiCallProvider,api=syApi;try{aiCallProvider=async()=>({answer:""});syApi=async()=>({checks:[]});await setTestAi();return document.querySelector("#aitest").textContent}finally{aiCallProvider=call;syApi=api}});
+ ok(/No answer:.*no answer text/.test(emptyConnection),"Settings does not call an empty answer a working connection");
+ await A.evaluate(()=>setTestAi());await A.keyboard.press("Escape");
  /* shared knowledge */
  const id=await A.evaluate(()=>{ROLE.name="Engineer";const it=UKB.add({type:"lesson",title:"Shared seal lesson",text:"Flush plan 32 stabilises the seal on GA-1201A.",set:1});UKB.setStatus(it.id,"In review");return it.id});
  await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(800);
@@ -187,6 +230,7 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  ok(await K.evaluate(()=>document.querySelector("#setbody").innerText.includes("Connect the AI")),"Settings offers to connect the AI");
  await K.fill("#cfg_k","AIzaSyBROWSERTEST123456");await K.click("text=Save and test");await K.waitForTimeout(2500);
  ok(await K.evaluate(()=>SYNC.ai.configured&&AI.conn.state==="remote"&&AI.conn.label==="AI connected"),"after saving the key the assistant switches to the AI");
+ ok(await K.evaluate(()=>/Working:/.test(document.querySelector("#aitest").textContent)),"Save and test retains the connection result after refreshing Settings");
  const ka=await K.evaluate(async()=>{const r=await aiAsk("Where is CT-7801 located?",{noLog:true});return{via:r.via}});ok(ka.via==="remote","a question is answered by the AI with the saved key");
  await kc.close();sk.kill();
  /* offline fallback */
