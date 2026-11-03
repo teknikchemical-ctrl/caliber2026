@@ -24,7 +24,7 @@ while IFS= read -r f; do [ -z "$f" ] && continue
   else echo "$f" | grep -Eq "$B3D" && bad="$bad\n  $f"; fi
 done <<< "$files"
 if [ -n "$bad" ]; then
-  [ "$role" = "b" ] && echo "PROBLEM: you changed files that are not Claude B's:" || echo "PROBLEM: you changed Claude B's files:"
+  case "$role" in b) echo "PROBLEM: you changed files that are not Claude B's:";; codex) echo "PROBLEM: you changed files that are not Codex's:";; *) echo "PROBLEM: you changed Claude B's files:";; esac
   printf "$bad\n"; echo "Move the request to docs/TASKS.md, or write 'taking <file>' there first."; exit 1
 fi
 echo "ownership: OK (no files outside your list)"
