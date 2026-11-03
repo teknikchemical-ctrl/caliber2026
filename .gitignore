@@ -11,3 +11,4 @@ AKP-netlify-drop.zip
 *.pyc
 .DS_Store
 cases/*/build/
+docs/briefs/

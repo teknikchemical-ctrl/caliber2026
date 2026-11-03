@@ -28,6 +28,8 @@ node tools/case_shots.js dist/index.html /tmp/shots   # screenshots of every pag
 
 ## The fast route: write plant.json
 
+`kb.json`, `dsil.json`, `ga.json`, `mh.json`, `eval_cases.json` and `case.json` of a compiled case are **generated**: every compile overwrites them. Edit only the sources: `plant.json` (or the fragments `plant/case.json` and `plant/sets/NN-tag.json`, one file per set, so several people can work at once: `python3 tools/pack_split.py cases/<id>`), `mh.json` when it comes from an import, and `eval_extra.json` (hand-written evaluation questions, appended on every compile).
+
 You describe each equipment set once. `python3 tools/pack_build.py cases/<id>` then creates every file above, including document records, the searchable text chunks, interlock and datasheet records, nozzle and parts tables, work orders (synthetic ones if you supply none, each marked "SYNTHETIC") and 50 or more evaluation questions whose answers come from your own data.
 
 Per set (only the first group is required):

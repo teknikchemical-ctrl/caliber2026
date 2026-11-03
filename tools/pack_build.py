@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compile a compact plant description into a full case pack.
 
-    python3 tools/pack_build.py cases/<id>            reads cases/<id>/plant.json, writes kb.json, dsil.json, ga.json, mh.json, eval_cases.json, case.json
+    python3 tools/pack_build.py cases/<id>            reads cases/<id>/plant.json (or the fragments in cases/<id>/plant/), writes kb.json, dsil.json, ga.json, mh.json, eval_cases.json, case.json
     python3 tools/pack_build.py cases/<id> --check    compile and validate only (writes nothing)
 
 plant.json is much shorter than the pack: you describe each equipment set once (see docs/CASE_PACKS.md and cases/_template/plant.json)
@@ -23,8 +23,20 @@ def tagnum(tag):
 def prefix(case):
     return (case.get("code") or case.get("id") or "PLANT").upper()[:6]
 
+def load_spec(cd):
+    """plant.json, or a folder plant/ of fragments so that several people (or agents) can enter data at the same time:
+       plant/case.json      everything except the sets: case, documents, history, issues
+       plant/sets/*.json    one equipment set per file; files are read in name order (01-p101a.json, 02-f101.json ...)"""
+    fr = os.path.join(cd, "plant")
+    if os.path.isdir(fr):
+        spec = jl(os.path.join(fr, "case.json")) if os.path.exists(os.path.join(fr, "case.json")) else {}
+        sd = os.path.join(fr, "sets")
+        spec["sets"] = [jl(os.path.join(sd, f)) for f in sorted(os.listdir(sd)) if f.endswith(".json")] if os.path.isdir(sd) else []
+        return spec
+    return jl(os.path.join(cd, "plant.json"))
+
 def build(cd):
-    spec = jl(os.path.join(cd, "plant.json"))
+    spec = load_spec(cd)
     case = spec.get("case", {})
     code = prefix(case)
     sets, assets, docs, chunks, inst, opl_all, nz_all, bom_all, issues = [], [], [], [], [], [], [], [], []
@@ -123,6 +135,12 @@ def build(cd):
                      "cause": r.get("root"), "bd": r.get("bd"), "dt": r.get("dt"), "cost": r.get("tc"), "tag": r.get("tag"), "seq": r.get("ilk")})
     kb = {"sets": sets, "assets": assets, "docs": docs, "chunks": chunks, "inst": inst, "mnt": mnt, "opl": opl_all, "nz": nz_all, "bom": bom_all, "issues": spec.get("issues", [])}
     ev = eval_cases(spec, sets, DS, IL, mh)
+    for ex in (os.path.join(cd, "eval_extra.json"), os.path.join(cd, "plant", "eval_extra.json")):   # hand-written questions survive recompiling
+        if os.path.exists(ex):
+            used = {q["id"] for q in ev}
+            for q in jl(ex):
+                if q.get("id") in used or not q.get("id"): q["id"] = f"X{len(ev) + 1:03d}"
+                ev.append(q); used.add(q["id"])
     meta = {"id": case.get("id", os.path.basename(cd)), "title": case.get("title", "Plant"), "product": case.get("product", "Asset Knowledge Platform"), "subtitle": case.get("subtitle", ""), "brief": case.get("brief", "case brief"), "company": case.get("company", ""), "site": case.get("site", ""), "code": code,
             "examples": case.get("examples") or default_examples(sets, IL), "dsprefix": f"{code}-DS", "plotref": case.get("plotref", ""),
             "failures": case.get("failures") or [f"Seal leak on the {sets[0]['name'].lower()}", "High vibration alarm", "Instrument reading drift", f"{sets[-1]['name']} abnormal noise", "Low flow alarm", "Temperature high"]}
