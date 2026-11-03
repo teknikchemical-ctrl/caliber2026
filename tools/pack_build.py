@@ -135,7 +135,8 @@ def build(cd):
                      "cause": r.get("root"), "bd": r.get("bd"), "dt": r.get("dt"), "cost": r.get("tc"), "tag": r.get("tag"), "seq": r.get("ilk")})
     kb = {"sets": sets, "assets": assets, "docs": docs, "chunks": chunks, "inst": inst, "mnt": mnt, "opl": opl_all, "nz": nz_all, "bom": bom_all, "issues": spec.get("issues", [])}
     ev = eval_cases(spec, sets, DS, IL, mh)
-    for ex in (os.path.join(cd, "eval_extra.json"), os.path.join(cd, "plant", "eval_extra.json")):   # hand-written questions survive recompiling
+    import glob
+    for ex in sorted(glob.glob(os.path.join(cd, "eval_extra*.json")) + glob.glob(os.path.join(cd, "plant", "eval_extra*.json"))):   # hand-written questions survive recompiling (eval_extra.json, eval_extra_fin.json ...)
         if os.path.exists(ex):
             used = {q["id"] for q in ev}
             for q in jl(ex):
