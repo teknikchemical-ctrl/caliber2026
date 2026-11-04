@@ -31,7 +31,10 @@ function kbhHide(){const t=document.getElementById("kbh_tip");if(t)t.hidden=true
 function kbhPlace(t,cx,cy){t.hidden=false;const w=t.offsetWidth,h=t.offsetHeight,vw=window.innerWidth,vh=window.innerHeight;let x=cx+16,y=cy+14;if(x+w>vw-8)x=cx-w-16;if(y+h>vh-8)y=Math.max(8,cy-h-14);t.style.left=x+"px";t.style.top=y+"px"}
 function kbhRow(c,name,val,basis,dash){return `<div class="kbh-r"><i style="background:${c}${dash?";opacity:.55":""}"></i><span>${esc(name)}</span><b>${esc(val)}</b>${basis?`<em>${esc(basis)}</em>`:""}</div>`}
 function kbhMove(e){const svg=e.target&&e.target.closest?e.target.closest("svg[data-kbh]"):null;if(!svg){if(KBH.on){KBH.on=0;kbhHide()}return}const R=KBH.o[svg.dataset.kbh];if(!R)return;
- const ctm=svg.getScreenCTM();if(!ctm)return;const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(ctm.inverse()),o=R.o,G=kbhGeo(R.kind,o),u=kbhUnit(o);
+ const ctm=svg.getScreenCTM();if(!ctm)return;const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(ctm.inverse()),o=R.o;
+ if(R.kind==="wf"){const i=Math.floor((p.x-o.m.l)/o.bw);if(i<0||i>=o.bars.length){kbhHide();KBH.on=0;return}KBH.on=1;const x=o.bars[i];let g=svg.querySelector(".kbh-o");if(!g){g=document.createElementNS("http://www.w3.org/2000/svg","g");g.setAttribute("class","kbh-o");svg.appendChild(g)}g.innerHTML=`<rect x="${o.m.l+i*o.bw}" y="${o.m.t}" width="${o.bw}" height="${o.H-o.m.b-o.m.t}" class="kbh-band"/>`;
+  const t=kbhTip();t.innerHTML=`<div class="kbh-h">${esc(x.label)}${x.sub?" ("+esc(x.sub)+")":""}</div>${o.ylabel?`<div class="kbh-c">${esc(o.ylabel)}</div>`:""}${x.total?kbhRow("#33425a","Total",o.f(x.v),"Estimate"):kbhRow(x.v<0?"#3fa55a":"#c53030",x.v<0?"Lowers the cost by":"Raises the cost by",o.f(Math.abs(x.v)),"Estimate")+kbhRow("#9aa8bb","Running total after this step",o.f(x.b),"")}`;kbhPlace(t,e.clientX,e.clientY);return}
+ const G=kbhGeo(R.kind,o),u=kbhUnit(o);
  if(p.x<G.m.l-4||p.x>G.W-G.m.r+4||p.y<0||p.y>G.H-G.m.b+6){kbhHide();KBH.on=0;return}KBH.on=1;
  let g=svg.querySelector(".kbh-o");if(!g){g=document.createElementNS("http://www.w3.org/2000/svg","g");g.setAttribute("class","kbh-o");svg.appendChild(g)}
  let rows="",head="",cap=o.title||o.ylabel||"",ov="";

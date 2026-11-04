@@ -28,7 +28,7 @@ export default guard(async (req, res) => {
   const items = planItems(db, i), M = months(from, horizon), cal = {}, cls = {}, cyc = {}, abc = {}; let occ = 0, active = 0; const locs = new Set();
   items.forEach((it) => { it.occ = occurrences(it, from, horizon); if (it.occ.length) { active++; locs.add(it.funcloc); } occ += it.occ.length; const c = it.eq_class || "Other";
     it.occ.forEach((d) => { const m = d.slice(0, 7); cal[m] = cal[m] || {}; cal[m][c] = (cal[m][c] || 0) + 1; cls[c] = (cls[c] || 0) + 1; });
-    cyc[it.cycle_text] = (cyc[it.cycle_text] || 0) + it.occ.length; abc[it.abc || "none"] = (abc[it.abc || "none"] || 0) + it.occ.length; });
+    { const c = it.cycle_months, k = c == null ? "Unreadable cycle" : c < 1 ? Math.round(c * 4.345) + " weekly" : c < 12 ? Math.round(c) + " monthly" : c % 12 === 0 ? c / 12 + " yearly" : Math.round(c) + " monthly"; cyc[k] = (cyc[k] || 0) + it.occ.length; } abc[it.abc || "none"] = (abc[it.abc || "none"] || 0) + it.occ.length; });
   const topC = Object.entries(cls).sort((a, b) => b[1] - a[1]).slice(0, 7).map((x) => x[0]);
   const calendar = M.map((m) => { const r = { month: m, total: 0 }; Object.entries(cal[m] || {}).forEach(([c, n]) => { r.total += n; const k = topC.includes(c) ? c : "Other classes"; r[k] = (r[k] || 0) + n; }); return r; });
   const sort = i.sort === "location" ? (a, b) => String(a.funcloc).localeCompare(b.funcloc) : i.sort === "cycle" ? (a, b) => a.cycle_months - b.cycle_months : (a, b) => (a.occ[0] || "9999").localeCompare(b.occ[0] || "9999");
