@@ -6,7 +6,7 @@ const ROOT = path.resolve(__dirname, ".."), port = 8600 + Math.floor(Math.random
   const srv = spawn("node", [path.join(ROOT, "tools/spi_dev.mjs"), String(port), "full"], { stdio: "ignore" }); await new Promise(r => setTimeout(r, 1500));
   const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {}), p = await b.newPage({ viewport: { width: 1440, height: 900 } }), errs = []; let bad = 0;
   p.on("pageerror", e => errs.push(e.message));
-  await p.goto(`http://localhost:${port}/`); await p.waitForFunction(() => window.go && window.SPI_HUBS, null, { timeout: 60000 });
+  await p.goto(`http://localhost:${port}/`); await p.waitForFunction(() => typeof go === "function" && typeof SPI_HUBS !== "undefined", null, { timeout: 60000 });
   const pages = await p.evaluate(() => SPI_HUBS.flatMap(h => h.tabs.map(t => t[0])).filter(id => SPI.pages[id]));
   for (const v of pages) {
     await p.evaluate(v => { document.querySelectorAll("#setbg,#notifbox,#tourcard").forEach(e => e.remove()); go(v) }, v); await p.waitForTimeout(3000);
