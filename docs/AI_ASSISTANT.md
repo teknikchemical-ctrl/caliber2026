@@ -128,3 +128,9 @@ Try `Describe material 4100000129`, then `Show its last 6 months of consumption`
 History, on-hand/Min/Max, matching-material issue counts, location indicators, campaigns, maintenance, savings and portfolio counts use chart values taken directly from tool results. Rules value projections are labelled Estimates and cover priced parts only. Material forecast lines and p10 to p90 bands come from the deterministic engine. The model cannot supply plotted numbers. Accepting a proposed adjustment validates it again and reruns the engine before redrawing. A missing value is not replaced with an invented zero.
 
 The old assistant panel uses the same service, normalises its chat history and supports its Stop action. Its footer identifies the provider used for the last answer. A working mock or rules answer does not verify Gemini. Database descriptions and notification text are untrusted source material; they are not instructions to the assistant. This is retrieval and reasoning over the database, not model training.
+
+### Financial questions
+
+The assistant can call Finance's deterministic tools for cleanup NPV, recurring cash balance, inventory budgets, availability funding, policy validation and candidate ranking. Try `What share is required for cleanup NPV break-even?` or `How much inventory budget for A parts if demand rises 20%?`. Explicit scenario changes are Assumptions. Positive NPV and positive recurring cash are separate tests. Funding thresholds are not claimed benefits, and no missing plant contribution margin is invented. Source IDs identify the exact scenario.
+
+Answers and forecasts use the shared visual kit, with units on axes and evidence/value tables behind expandable controls. The Forecast page shows its loading state immediately and ignores delayed responses from a previously selected material.
