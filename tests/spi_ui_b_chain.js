@@ -199,10 +199,18 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
     await p.evaluate(([g, s]) => { SRC.sel[g] = s; go(g) }, [pg, sh]); await p.waitForFunction(s => window.SRC && SRC.d[s] && document.querySelector("#src_dt0 .kb-svg"), sh, { timeout: 30000 }).catch(() => {}); await p.waitForTimeout(600);
     ok(`source data ${sh}: every date field has its own timeline (${n})`, await p.evaluate(() => document.querySelectorAll("[id^=src_dt] .kb-svg, #src_dd .kb-svg").length) === n);
   }
-  ok("source data: raw rows load with paging", await p.evaluate(() => document.querySelectorAll("#src_rt tbody tr").length === 50));
+  await p.evaluate(() => { const d = document.querySelector(".src-raw"); if (d) d.open = true }); await p.waitForTimeout(300);
+  ok("source data: raw rows load with paging behind a toggle", await p.evaluate(() => document.querySelectorAll("#src_rt tbody tr").length === 50 && !!document.querySelector("details.src-raw")));
   await p.evaluate(() => kbDefs()); await p.waitForFunction(() => document.querySelector("#kb_defs .kb-dt"), null, { timeout: 20000 }).catch(() => {});
   ok("figures register: the drawer lists definitions with values", await p.evaluate(() => document.querySelectorAll("#kb_defs .kb-dt tr").length > 25));
   await p.evaluate(() => { document.getElementById("kb_defs").hidden = true });
+  /* round 8: the landing tab of each hub opens with the projection answer, no setting needed, no "AI projection" label */
+  for (const pg of ["spi_golden", "spi_fgold", "spi_mtime", "spi_cimp"]) {
+    await p.evaluate(g => go(g), pg); await p.waitForFunction(() => document.querySelector(".aiv .aiv-ans") && document.querySelectorAll(".aiv .aiv-t").length === 4, null, { timeout: 40000 }).catch(() => {});
+    ok(`${pg}: opens with the projection answer, four figures and the first actions`, await p.evaluate(() => !!document.querySelector(".aiv .aiv-ans") && document.querySelectorAll(".aiv .aiv-t").length === 4 && document.querySelectorAll(".aiv .aiv-a").length >= 3 && !/AI projection/.test(document.querySelector("#app").innerText)));
+  }
+  await p.evaluate(() => ciView("rec")); await p.waitForTimeout(6000);
+  ok("costs: the answer band and the impact tool show the same yearly saving", await p.evaluate(() => { const a = [...document.querySelectorAll(".aiv-t b")].map(e => e.textContent), k = [...document.querySelectorAll(".kb-kpi .kb-kv")].map(e => e.textContent); return a[1] && k.includes(a[1]) }));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
