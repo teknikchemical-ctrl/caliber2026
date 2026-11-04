@@ -30,7 +30,11 @@ function SPI_ZX(){const V=[["fl","Body flanges and bolting","ASME B16.5, B16.34"
   blower:[["brg","Bearings","API 617, API 614",/bearing/i],["seal","Shaft seals","API 617",/seal/i],["cp","Coupling","API 671",/coupling/i],["lub","Lube oil","API 614",/^oil/i],["flt","Filters","ISO 2941",/filter element/i],["fl","Flanged joints and bolting","ASME B16.5, B16.20",/studbolt|gasket|o-ring/i],["oth","Other parts","Baseplate and motor",/./]],
   orifice:[["fl","Flanges, bolting and gaskets","ASME B16.5, B16.36",/studbolt|gasket|flange/i],["oth","Other parts","Orifice plate",/./]],
   jbox:[["gland","Cable glands","IEC 60079-14, IEC 62444",/gland/i],["term","Terminals","IEC 60947-7",/terminal/i],["cab","Cable","IEC 60228",/cable/i],["scr","Screws","Enclosure",/screw/i],["oth","Other parts","Enclosure",/./]],
-  line:[["pipe","Pipe","ASME B36.10M, B31.3",/^pipe/i],["fit","Fittings","ASME B16.9, B16.11",/elbow|tee/i],["fl","Flanges, bolting and gaskets","ASME B16.5, B16.20",/studbolt|gasket|flange/i],["vlv","Valves","ASME B16.34",/^valve/i],["coat","Coating and tape","Protective coating",/antirust|tape/i],["oth","Other parts","Supports",/./]]}}
+  line:[["pipe","Pipe","ASME B36.10M, B31.3",/^pipe/i],["fit","Fittings","ASME B16.9, B16.11",/elbow|tee/i],["fl","Flanges, bolting and gaskets","ASME B16.5, B16.20",/studbolt|gasket|flange/i],["vlv","Valves","ASME B16.34",/^valve/i],["coat","Coating and tape","Protective coating",/antirust|tape/i],["oth","Other parts","Supports",/./]],
+  motor:[["brg","Bearings","IEC 60034, ISO 15",/bearing/i],["fan","Cooling fan","IEC 60034-6",/^fan/i],["tb","Terminal box","IEC 60034-8",/terminal/i],["gl","Cable glands","IEC 62444",/gland/i],["gr","Grease","NLGI grade",/grease/i],["oth","Other parts","Frame and base",/./]],
+  cstation:[["lamp","Indicator lamps","IEC 60947-5-1",/lamp/i],["sw","Switches","IEC 60947-5-1",/switch/i],["tb","Terminals","IEC 60947-7",/terminal/i],["gl","Cable glands","IEC 62444",/gland/i],["oth","Other parts","Enclosure and post",/./]],
+  foundation:[["bolt","Anchor bolts","Anchoring to concrete",/bolt/i],["oth","Other parts","Concrete block",/./]],
+  burner:[["bt","Burner tips","API 535",/burner tip/i],["ref","Refractory (brick, castable, fibre)","API 560",/firebrick|castable|ceramic fib/i],["tc","Thermocouples and thermowells","IEC 60584, ASME PTC 19.3 TW",/thermo/i],["fl","Flanged joints and bolting","ASME B16.5, B16.20",/gasket|studbolt/i],["oth","Other parts","Casing and support",/./]],peepdoor:[["bt","Burner tips","API 535",/burner tip/i],["ref","Refractory (brick, castable, fibre)","API 560",/firebrick|castable|ceramic fib/i],["tc","Thermocouples and thermowells","IEC 60584, ASME PTC 19.3 TW",/thermo/i],["fl","Flanged joints and bolting","ASME B16.5, B16.20",/gasket|studbolt/i],["oth","Other parts","Casing and support",/./]],convsec:[["bt","Burner tips","API 535",/burner tip/i],["ref","Refractory (brick, castable, fibre)","API 560",/firebrick|castable|ceramic fib/i],["tc","Thermocouples and thermowells","IEC 60584, ASME PTC 19.3 TW",/thermo/i],["fl","Flanged joints and bolting","ASME B16.5, B16.20",/gasket|studbolt/i],["oth","Other parts","Casing and support",/./]],qfit:[["bt","Burner tips","API 535",/burner tip/i],["ref","Refractory (brick, castable, fibre)","API 560",/firebrick|castable|ceramic fib/i],["tc","Thermocouples and thermowells","IEC 60584, ASME PTC 19.3 TW",/thermo/i],["fl","Flanged joints and bolting","ASME B16.5, B16.20",/gasket|studbolt/i],["oth","Other parts","Casing and support",/./]],dsteam:[["bt","Burner tips","API 535",/burner tip/i],["ref","Refractory (brick, castable, fibre)","API 560",/firebrick|castable|ceramic fib/i],["tc","Thermocouples and thermowells","IEC 60584, ASME PTC 19.3 TW",/thermo/i],["fl","Flanged joints and bolting","ASME B16.5, B16.20",/gasket|studbolt/i],["oth","Other parts","Casing and support",/./]],coilout:[["bt","Burner tips","API 535",/burner tip/i],["ref","Refractory (brick, castable, fibre)","API 560",/firebrick|castable|ceramic fib/i],["tc","Thermocouples and thermowells","IEC 60584, ASME PTC 19.3 TW",/thermo/i],["fl","Flanged joints and bolting","ASME B16.5, B16.20",/gasket|studbolt/i],["oth","Other parts","Casing and support",/./]]}}
 /* nozzle schedule per class. Sizes and ratings are not in the baseline data and are left as such. */
 function spiNozzles(c){const N=(m,sv)=>({m,sv,sz:"Not in baseline data",r:""});
  return{turbine:[N("N1","HP steam inlet"),N("N2","Exhaust"),N("N3","Gland leak-off"),N("N4","Casing drain"),N("N5","Lube oil supply")],
@@ -52,7 +56,7 @@ function spiBBox(n){window.SPIB=window.SPIB||{};if(SPIB[n])return SPIB[n];const 
  return SPIB[n]={mn,mx}}
 /* ---------- pump, API 610 OH2 (end suction, top discharge, centreline supported) with API 682 seal, plan 11 flush ---------- */
 function spiPump(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,cy=.62,a=[];
- a.push(B(k("oth"),.2,.09,0,3.7,.18,.95,"gray",{r:.04}),B("",.2,.012,0,3.8,.03,1.05,"dark",{r:.04,zb:.6}));
+ a.push(B(k("oth"),.2,.09,0,3.7,.18,.95,"gray",{r:.04}),B("@foundation",.2,.012,0,3.8,.03,1.05,"#b9b3a6",{r:.04,zb:.6}));
  a.push(B("",-.9,.32,0,.5,.28,.6,"gray",{r:.03}),B("",-.15,.34,0,.3,.32,.4,"gray",{r:.03}),B("",1.35,.3,0,1.0,.24,.5,"gray",{r:.03}));
  a.push(C("","x",-.9,cy,0,.44,.37,"paint",{sh:1,m:.5}),C("","x",-.62,cy,0,.2,.27,"paint",{sh:1,m:.5}));
  a.push(C("N1","x",-1.3,cy,0,.4,.11,"amber"),C("N2","y",-.9,cy+.5,0,.55,.09,"amber"),C("N3","y",-.5,cy+.3,0,.2,.03,"amber"),C("N4","y",-.9,cy-.45,.0,.2,.04,"amber"));
@@ -62,7 +66,7 @@ function spiPump(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,cy=.62,a=
  a.push(C(k("seal"),"x",-.5,cy,0,.14,.23,"brass",{m:.7}),C(k("seal"),"x",-.52,cy,0,.2,.13,"steel",{in:1}),C("","y",-.5,cy+.5,0,.4,.018,"steel",{m:.6}),C("","x",-.7,cy+.7,0,.4,.018,"steel",{m:.6}));
  a.push(C(k("brg"),"x",-.15,cy,0,.5,.16,"steel",{m:.6}),C(k("brg"),"x",-.4,cy,0,.05,.2,"steel"),C(k("brg"),"x",.1,cy,0,.05,.2,"steel"),C(k("brg"),"y",-.15,cy-.22,0,.12,.045,"water",{m:.2}));
  a.push(C("","x",.2,cy,0,.28,.05,"dark"),C(k("cp"),"x",.3,cy,0,.34,.1,"red",{m:.4}),C(k("cp"),"x",.16,cy,0,.12,.14,"steel"),C(k("cp"),"x",.44,cy,0,.12,.14,"steel"),B("",.3,cy+.19,0,.46,.025,.26,"gray",{r:.01}),C("","x",.55,cy,0,.14,.05,"dark"));
- a.push(...g3Motor("",1.35,cy,0,1.0,.27));
+ a.push(...g3Motor("@motor",1.35,cy,0,1.0,.27),B("@cstation",2.45,.55,.55,.22,.5,.14,"#3b6ab0",{r:.02}),C("","y",2.45,.2,.55,.4,.03,"gray"));
  return a}
 /* ---------- steam turbine driver, API 612 horizontal split casing, API 614 lube oil console ---------- */
 function spiTurbine(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,cy=.95,a=[];
@@ -89,11 +93,11 @@ function spiFurnace(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
  [-1,1].forEach(sx=>[-1,1].forEach(sz=>a.push(C("","y",sx*1.65,2.7,sz*1.3,5.4,.1,"dark"),C("","y",sx*1.65,.02,sz*1.3,.04,.2,"dark",{zb:.5}))));
  a.push(B(k("oth"),0,1.0,0,3.5,.16,2.8,"gray",{r:.03}),B(k("oth"),0,5.0,0,3.5,.16,2.8,"gray",{r:.03}),B(k("oth"),0,3.0,-1.35,3.5,.1,.1,"dark"),B(k("oth"),0,3.0,1.35,3.5,.1,.1,"dark"));
  a.push(B(k("ref"),0,1.25,0,3.0,.25,2.4,"cat",{r:.02}),B(k("ref"),0,3.15,-1.1,3.0,3.8,.2,"cat",{r:.02}),B(k("ref"),-1.4,3.15,0,.2,3.8,2.4,"cat",{r:.02}),B(k("ref"),1.4,3.15,0,.2,3.8,2.4,"cat",{r:.02}));
- a.push(B(k("fib"),0,5.2,0,3.0,.25,2.4,"white",{r:.02}),B(k("fib"),-.5,5.95,0,2.0,1.25,2.0,"white",{r:.03}));
+ a.push(B(k("fib"),0,5.2,0,3.0,.25,2.4,"white",{r:.02}),B("@convsec",-.5,5.95,0,2.0,1.25,2.0,"white",{r:.03}));
  for(let r=0;r<3;r++)for(let c=0;c<4;c++)a.push(C(k("anc"),"z",-1.05+c*.7,2.0+r*.9,-.93,.1,.025,"steel",{seg:8}));
  [-.9,-.3,.3,.9].forEach(x=>a.push(C(k("coil"),"y",x,3.15,.1,3.7,.065,"red",{m:.5})));
  a.push(C(k("coil"),"x",0,1.55,.1,2.1,.075,"red",{m:.5}),C(k("coil"),"x",0,4.85,.1,2.1,.075,"red",{m:.5}),...[0,1,2].map(r=>C(k("coil"),"x",-.5,5.5+r*.3,0,1.8,.05,"red",{in:1})));
- [-.8,0,.8].forEach(x=>a.push(C("","y",x,1.4,.1,.2,.12,"dark"),C("","y",x,1.52,.1,.05,.09,"amber",{light:1,seg:10})));
+ [-.8,0,.8].forEach(x=>a.push(C("@burner","y",x,1.4,.1,.2,.12,"dark"),C("@burner","y",x,1.52,.1,.05,.09,"amber",{light:1,seg:10})));a.push(B("@peepdoor",-1.53,3.0,.4,.06,.4,.3,"#bcc8d6",{r:.01}),B("@peepdoor",-1.56,3.0,.4,.02,.2,.15,"#2f3744",{r:0}),B("@qfit",2.75,1.55,.1,.3,.34,.34,"#a9b6c6",{r:.02}),C("@dsteam","y",-1.0,5.45,.1,.5,.05,"#a3afbd"),C("@coilout","x",1.3,4.85,.1,.6,.09,"#c8a0a0"));
  a.push(C("N1","x",-2.2,4.85,.1,1.2,.1,"amber"),C("N2","x",1.8,1.55,.1,1.8,.1,"amber"),C("N3","x",2.0,2.9,.7,1.1,.07,"amber"));
  a.push(C(k("fl"),"x",-1.62,4.85,.1,.06,.2,"steel",{m:.7}),...spiBolts(k("fl"),"x",-1.62,4.85,.1,.16,8,.1,.017),C(k("fl"),"x",1.0,1.55,.1,.06,.2,"steel",{m:.7}),...spiBolts(k("fl"),"x",1.0,1.55,.1,.16,8,.1,.017));
  a.push(B(k("vlv"),-2.1,4.85,.1,.4,.3,.3,"steel",{r:.05,m:.6}),C(k("vlv"),"y",-2.1,5.15,.1,.35,.05,"steel"),C(k("vlv"),"y",-2.1,5.38,.1,.03,.2,"red"));
@@ -168,7 +172,7 @@ function spiInstr(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
 function spiBlower(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,E=g3E,cy=.8,a=[];
  a.push(B(k("oth"),.4,.1,0,4.6,.2,1.3,"gray",{r:.05}),B("",.4,.012,0,4.7,.03,1.4,"dark",{r:.05,zb:.6}),B("",-.8,.35,0,.5,.3,.7,"gray"),B("",1.6,.35,0,.5,.3,.7,"gray"));
  a.push(C("","x",-.2,cy,0,.7,.65,"paint",{sh:1,m:.5}),C("","x",-.2,cy,0,.2,.78,"paint",{m:.5}),C("N1","x",-.95,cy,0,.5,.18,"amber"),C("N2","y",-.2,cy+.85,.0,.7,.14,"amber"),C(k("fl"),"x",-1.22,cy,0,.05,.28,"steel",{m:.7}),...spiBolts(k("fl"),"x",-1.22,cy,0,.22,12,.09,.016));
- a.push(C(k("brg"),"x",.5,cy,0,.5,.2,"steel",{m:.6}),C(k("brg"),"x",.25,cy,0,.05,.26,"steel"),C(k("seal"),"x",.18,cy,0,.12,.28,"brass",{m:.7}),C(k("brg"),"y",.5,cy-.28,0,.12,.045,"water"),C("","x",.9,cy,0,.3,.05,"dark"),C(k("cp"),"x",1.05,cy,0,.34,.11,"red",{m:.4}),B("",1.05,cy+.2,0,.46,.025,.26,"gray",{r:.01}),...g3Motor("",2.2,cy,0,1.1,.3));
+ a.push(C(k("brg"),"x",.5,cy,0,.5,.2,"steel",{m:.6}),C(k("brg"),"x",.25,cy,0,.05,.26,"steel"),C(k("seal"),"x",.18,cy,0,.12,.28,"brass",{m:.7}),C(k("brg"),"y",.5,cy-.28,0,.12,.045,"water"),C("","x",.9,cy,0,.3,.05,"dark"),C(k("cp"),"x",1.05,cy,0,.34,.11,"red",{m:.4}),B("",1.05,cy+.2,0,.46,.025,.26,"gray",{r:.01}),...g3Motor("@motor",2.2,cy,0,1.1,.3));
  a.push(B(k("lub"),1.0,.5,.55,.6,.45,.4,"#d4b27a",{r:.04,m:.4}),C(k("flt"),"y",.9,.9,.55,.4,.08,"blue",{m:.5}),C(k("flt"),"y",1.15,.9,.55,.4,.08,"blue",{m:.5}));return a}
 /* orifice assembly: pipe with a flanged orifice plate and two pressure tappings */
 function spiOrifice(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
@@ -187,6 +191,34 @@ function spiPipeRun(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[],r
  a.push(C(k("fl"),"x",-.55,.45,0,.05,r*1.9,"steel",{m:.7}),C(k("fl"),"x",-.45,.45,0,.05,r*1.9,"steel",{m:.7}),...spiBolts(k("fl"),"x",-.5,.45,0,r*1.5,6,.14,.012));
  a.push(C(k("vlv"),"y",.75,1.45,0,.3,r*1.5,"#8fa1b5",{m:.6}),C(k("vlv"),"y",.75,1.7,0,.2,.03,"steel"),C(k("vlv"),"y",.75,1.82,0,.03,.12,"#d14b44"),C(k("coat"),"x",.95,.45,0,.3,r*1.12,"#e8c96b",{m:.1}),B("",-1.5,.2,0,.2,.4,.2,"gray"),B("",.1,.2,0,.2,.4,.2,"gray"));return a}
 const SPI_BUILD={turbine:spiTurbine,furnace:spiFurnace,pump:spiPump,hx:spiHx,valve:spiValve,prv:spiRelief,sdv:spiSdv,mov:spiMov,vessel:spiVessel,column:spiColumn,instr:spiInstr,blower:spiBlower,orifice:spiOrifice,jbox:spiJbox,line:spiPipeRun};
+
+/* sub-item templates (assemblies of the pump, compressor and furnace sets): electric motor, control switch station, concrete foundation, burner, peep door, convection section and furnace fittings */
+function spiMotorT(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[],cy=.6;
+ a.push(B(k("oth"),0,.09,0,1.6,.18,.7,"gray",{r:.04}),C(k("oth"),"x",0,cy,0,1.2,.3,"#3b6ab0",{sh:1,m:.5}),...[...Array(10).keys()].map(i=>C(k("oth"),"x",-.5+i*.11,cy,0,.025,.315,"#2f5fa3",{seg:30})),C(k("brg"),"x",.66,cy,0,.12,.2,"steel",{m:.7}),C(k("brg"),"x",-.66,cy,0,.12,.22,"steel",{m:.7}),C("","x",.8,cy,0,.2,.05,"dark"));
+ a.push(C(k("fan"),"x",-.78,cy,0,.2,.28,"#2f3744",{m:.3}),C(k("fan"),"x",-.9,cy,0,.04,.3,"#8fa1b5"),B(k("tb"),.1,cy+.38,0,.3,.2,.26,"#a3afbd",{r:.02}),C(k("gl"),"y",.1,cy+.53,.0,.12,.035,"#e3a93b"),C(k("gl"),"y",.0,cy+.53,.06,.1,.03,"#e3a93b"),C(k("gr"),"y",.4,cy-.33,.0,.07,.015,"#d9b23c"),B("",.0,.2,.0,.2,.2,.3,"gray"));return a}
+function spiCStation(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
+ a.push(C(k("oth"),"y",0,.5,0,1,.04,"gray"),B("",0,.015,0,.4,.03,.4,"dark",{zb:.4}),B(k("oth"),0,1.2,0,.5,.7,.2,"#bcc8d6",{r:.03,m:.5}),B(k("oth"),0,1.2,.11,.46,.66,.02,"#a9b6c6",{r:.01}));
+ [-.14,0,.14].forEach((x,i)=>a.push(C(k("lamp"),"z",x,1.42,.13,.04,.03,["#3fa55a","#d14b44","#e3a93b"][i],{light:1,seg:16})));
+ [-.12,.12].forEach(x=>a.push(C(k("sw"),"z",x,1.22,.14,.05,.035,"#2f3744",{seg:16}),B(k("sw"),x,1.22,.17,.015,.07,.02,"#cdd6e0",{r:0})));
+ a.push(B(k("sw"),0,1.02,.14,.14,.08,.04,"#d14b44",{r:.01}),B(k("tb"),0,1.22,0,.34,.1,.04,"#3b6ab0",{in:1,r:.005}),...[-.12,0,.12].map(x=>C(k("gl"),"y",x,.82,0,.1,.025,"#e3a93b",{seg:16})));return a}
+function spiFoundation(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
+ a.push(B(k("oth"),0,.25,0,2,.5,1.2,"#b9b3a6",{r:.03,m:.05}),B(k("oth"),0,.52,0,2.1,.04,1.3,"#a39d90",{r:.01}));[[-.8,.45],[.8,.45],[-.8,-.45],[.8,-.45]].forEach(([x,z])=>a.push(C(k("bolt"),"y",x,.65,z,.3,.016,"#a3afbd",{seg:12}),C(k("bolt"),"y",x,.82,z,.03,.03,"#8fa1b5",{seg:6}),spiA(k("bolt"),"y",x,.57,z,.014,.05,.017,"#8fa1b5")));return a}
+function spiBurnerT(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
+ a.push(B(k("oth"),0,.15,0,1.4,.3,1.4,"gray",{r:.03}),spiA(k("ref"),"y",0,.5,0,.4,.5,.2,"#d8c7b0",{m:.05}),spiA(k("ref"),"y",0,.72,0,.1,.38,.2,"#cdb88f",{m:.05}),C(k("bt"),"y",0,.55,0,.5,.1,"#aab5c2",{m:.8},.14));
+ spiRad(8,0,(an)=>a.push(C(k("bt"),"y",Math.cos(an)*.07,.82,Math.sin(an)*.07,.03,.012,"#2f3744",{seg:8})));
+ a.push(C(k("fl"),"y",0,.12,0,.05,.22,"steel",{m:.7}),...spiBolts(k("fl"),"y",0,.12,0,.18,8,.08,.016),C("","y",0,-.1,0,.3,.1,"#e3a93b"),C(k("tc"),"y",.3,.7,0,.6,.012,"#cdd6e0",{seg:8}),C(k("tc"),"y",.3,1.05,0,.06,.04,"#a3afbd"),C(k("tc"),"y",.3,.9,0,.4,.03,"#bcc8d6",{in:1}));return a}
+function spiPeepDoor(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
+ a.push(B(k("oth"),0,.5,0,1,1,.08,"#a3afbd",{r:.02}),B(k("oth"),0,.5,.05,.66,.66,.04,"#bcc8d6",{r:.02}),spiA(k("ref"),"z",0,.5,-.08,.1,.3,.14,"#d8c7b0",{m:.05}),C(k("ref"),"z",0,.5,-.04,.04,.14,"#2f3744"),C("","z",0,.5,.08,.04,.09,"#8fb7d6",{m:.9}),C(k("fl"),"y",.28,.5,.1,.04,.03,"steel"),B(k("oth"),.36,.5,.09,.08,.3,.05,"#8fa1b5",{r:.01}),B(k("oth"),-.5,.5,.0,.04,.7,.12,"steel"),B("",0,.015,0,1.1,.03,.4,"dark",{zb:.4}),C(k("tc"),"x",.0,.9,.12,.5,.012,"#cdd6e0",{seg:8}),C(k("bt"),"z",-.3,.8,.1,.03,.03,"#2f3744"));return a}
+function spiConvSec(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
+ a.push(B(k("oth"),0,.15,0,2.4,.3,1.6,"gray",{r:.03}),B(k("ref"),0,1.1,0,2.2,1.6,1.4,"#e9e4d8",{r:.03,m:.05}),B(k("oth"),0,1.1,0,2.26,.04,1.46,"#a3afbd",{r:.01}));
+ for(let r=0;r<5;r++)a.push(C(k("bt"),"x",0,.55+r*.28,r%2?.25:-.25,2.3,.05,"#c8a0a0",{in:1,seg:12}));
+ a.push(C(k("fl"),"x",1.25,.9,0,.06,.18,"steel",{m:.7}),...spiBolts(k("fl"),"x",1.25,.9,0,.14,8,.1,.014),C("","x",1.6,.9,0,.7,.14,"amber"),B("",0,2.0,0,.6,.4,.6,"#e9e4d8",{r:.03}),C("","y",0,2.7,0,1,.25,"steel",{m:.6}),C(k("tc"),"y",.7,1.95,.4,.5,.012,"#cdd6e0",{seg:8}),C(k("tc"),"y",.7,2.25,.4,.06,.04,"#a3afbd"));return a}
+function spiFurnFit(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,a=[];
+ a.push(C(k("oth"),"x",0,.5,0,1.8,.1,"paint",{m:.5}),B("",-.5,.2,0,.2,.4,.2,"gray"),B("",.5,.2,0,.2,.4,.2,"gray"),spiA(k("ref"),"x",-.3,.5,0,.6,.22,.1,"#d8c7b0",{m:.05}),C(k("fl"),"x",.35,.5,0,.06,.2,"steel",{m:.7}),C(k("fl"),"x",.45,.5,0,.06,.2,"steel",{m:.7}),...spiBolts(k("fl"),"x",.4,.5,0,.16,8,.16,.014),C(k("fl"),"y",0,.8,0,.05,.12,"steel"));
+ a.push(C(k("oth"),"y",0,.8,0,.5,.05,"paint"),C(k("tc"),"y",-.7,.7,0,.6,.02,"#cdd6e0",{m:.8},.012),C(k("tc"),"y",-.7,1.04,0,.1,.04,"#a3afbd"),C(k("bt"),"y",.0,1.12,0,.15,.06,"#aab5c2"));return a}
+Object.assign(SPI_BUILD,{motor:spiMotorT,cstation:spiCStation,foundation:spiFoundation,burner:spiBurnerT,peepdoor:spiPeepDoor,convsec:spiConvSec,qfit:spiFurnFit,dsteam:spiFurnFit,coilout:spiFurnFit});
+function spiSubCls(eqc,d){d=(d||"").toUpperCase();if(/^MOTOR FOR/.test(d))return"motor";if(/CONTROL SWITCH STATION/.test(d))return"cstation";if(/CONCRETE STRUCTURE/.test(d))return"foundation";if(eqc==="BF"){if(/^BURNER/.test(d))return"burner";if(/PEEP DOOR/.test(d))return"peepdoor";if(/CONVECTION SECTION/.test(d))return"convsec";if(/QUENCH FITTING/.test(d))return"qfit";if(/DILUTION STEAM/.test(d))return"dsteam";if(/COIL OUTLET/.test(d))return"coilout"}return""}
+const SPI_SUBLAB={motor:"Electric motor",cstation:"Control switch station",foundation:"Concrete foundation",burner:"Burner",peepdoor:"Peep door",convsec:"Convection section",qfit:"Quench oil fitting",dsteam:"Dilution steam connection",coilout:"Coil outlet"};
 /* register the model of any location under a private key. loc = {cls, funcloc, tag, parts:[{material_no,descr,installed_qty,...}]} */
 function spiLocRegister(loc){window.SPIDYN=window.SPIDYN||{};window.SPILK=(window.SPILK||0)+1;const key="loc"+window.SPILK;
  SPIDYN[key]={cls:loc.cls,funcloc:loc.funcloc,tag:loc.tag};GA[key]={bom:(loc.parts||[]).map(p=>({name:p.descr||"",mat:"Material "+p.material_no,qty:String(p.installed_qty||1)})),nz:[],mot:null};
