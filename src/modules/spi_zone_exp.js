@@ -12,7 +12,7 @@ spiRegister("spi_space","Equipment explorer",async host=>{
  <div class="sp-count"><b>${p3Units().length}</b> blocks, one per designed class (${K.sets.length} equipment sets in ${p3Units().length-P3.tpl.length} blocks, ${P3.tpl.length} class templates). Select a block, then an equipment, then a part.</div></div>
  <div class="ex-lay"><div class="ex-stage" id="ex_stage"><div id="ex_world">${p3Hero({embed:true,h,fn:()=>"ok",lab:n=>esc(spiSpSub(n))})}</div><div id="ex_equip" hidden></div></div><div class="ex-side" id="ex_side" style="max-height:${h}px"></div></div></div>`;
  {const q=(c,k)=>{const e=host.querySelector(c);if(e)e.classList.add(k)};q(".p3head","sp-ph");q(".p3tools","sp-pt");q(".p3key","sp-pk");const wb=host.querySelector(".sp-pt button");if(wb)wb.textContent="All blocks"}
- P3.orbit=true;spiSpDecorate();spiSpFacets();exSide();exTrail();
+ P3.orbit=true;spiSpDecorate();spiSpFacets();spiSpFlows();exSide();exTrail();{const t=host.querySelector(".sp-pt");if(t&&!t.querySelector(".sp-flt")){const l=document.createElement("label");l.className="sp-flt";l.innerHTML=`<input type="checkbox" ${SPSP.showFlows!==false?"checked":""} onchange="SPSP.showFlows=this.checked"> Process connections`;t.insertBefore(l,t.querySelector("button"))}}
  if(st.focus){const q=String(st.focus);st.focus=null;const i=document.getElementById("sp_q");if(i){i.value=q;spiSpType(q)}}
  if(st.funcloc){const f=st.funcloc,m=st.fmat;st.funcloc=null;st.fmat=null;exOpenFunc(f,m)}
 });
