@@ -9,7 +9,7 @@ export default guard(async (req, res) => {
   const M = months("2025-05", 17), dm = Object.fromEntries(db.prepare("select month, qty, n_issues from demand_month where material_no = ?").all(mat).map((r) => [r.month, r]));
   const monthly = M.map((m) => ({ month: m, qty: dm[m] ? dm[m].qty : 0, issues: dm[m] ? dm[m].n_issues : 0 }));
   const issues = db.prepare("select posting_date d, qty, order_no from movement where material_no = ? order by posting_date").all(mat);
-  const po = db.prepare("select pr_date, qty, supplier, lead_days, unit_price, po_delivery, pr_delivery from po_line where material_no = ? order by pr_date").all(mat);
+  const po = db.prepare("select pr_date, qty, supplier, lead_days, unit_price, po_delivery, pr_delivery from pol where material_no = ? order by pr_date").all(mat);
   const leads = po.map((r) => r.lead_days).filter((x) => x != null && x > 0 && x < 720), prices = po.map((r) => r.unit_price).filter((x) => x > 0);
   const locs = db.prepare("select b.funcloc, b.installed_qty, f.criticality, f.descr from bom b left join funcloc f using(funcloc) where b.material_no = ?").all(mat);
   const from = addMonths(CUTOFF.slice(0, 7), 1), plan = {};

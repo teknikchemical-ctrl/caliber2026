@@ -100,6 +100,10 @@ function kbBind(id){const E=document.getElementById(id),svg=E.querySelector(".kb
  br.addEventListener("pointermove",e=>{if(!bd)return;const g=T.geo,r=br.getBoundingClientRect(),per=(T.D1-T.D0)/((g.W-g.m.l-g.m.r)*r.width/g.W),w=T.v1-T.v0;T.v0=Math.min(T.D1-w,Math.max(T.D0,bd.v0+(e.clientX-bd.x)*per));T.v1=T.v0+w;kbDrawTl(id)});
  br.addEventListener("pointerup",()=>{bd=null});
  if(!window.KB_RS){window.KB_RS=1;window.addEventListener("resize",wsDeb(()=>Object.keys(KBT).forEach(k=>{if(document.getElementById(k))kbDrawTl(k);else delete KBT[k]}),200))}}
+/* ---------- no sign-in page for this case (owner request): open signed in as the Caliber demo account ---------- */
+if(window.SPI_MODE&&typeof AUTH_USERS!=="undefined"){const kbAuto=()=>{const u=AUTH_USERS[0];try{localStorage.setItem(AUTH.key,u[0])}catch(e){}const bg=document.getElementById("loginbg");if(bg)bg.remove();document.body.classList.remove("login-open");try{if(!AUTH.user||AUTH.user[0]!==u[0])authApply(u)}catch(e){}};
+ authShow=kbAuto;authLogout=function(){};if(document.getElementById("loginbg")||!AUTH.user)kbAuto();document.addEventListener("DOMContentLoaded",()=>{if(document.getElementById("loginbg")||!AUTH.user)kbAuto()});
+ {const st=document.createElement("style");st.textContent="#loginbg{display:none!important}#authline button[onclick*='authLogout']{display:none!important}";document.head.appendChild(st)}}
 /* ---------- the plant tour is not part of this case ---------- */
 if(window.SPI_MODE){try{localStorage.setItem("akp_tour_done","1")}catch(e){}window.tourStart=function(){};window.demoStart=function(){};setTimeout(()=>{const c=document.getElementById("tourcard");if(c)c.remove();document.querySelectorAll("[onclick*='tourStart'],[onclick*='demoStart']").forEach(b=>b.style.display="none")},500)}
 /* inputs ribbon: the user can hide it; the choice is kept per page in this browser */

@@ -10,7 +10,7 @@ export default guard(async (req, res) => {
   const i = await body(req), db = openDb(), sc = P(i.scope), H = num(i.horizon, 6, 1, 24), budget = Number(i.budget_month_idr) || null;
   const A = { carrying_rate: num(i.carrying_rate, ECON.carrying_rate, 0, 1), order_cost_idr: num(i.order_cost_idr, ECON.order_cost_idr, 0, 1e9), emergency_premium: ECON.emergency_premium, lead_default: num(i.lead_default, ECON.lead_default, 1, 720), lead_delay_days: 0, demand_factor: 1, downtime_idr_h: {}, hours_per_stockout: {}, downtime_share: {} };
   const pol = { mode: i.policy === "current" ? "current" : "service", service: { ...ECON.service, ...P(i.service) } };
-  const onOrder = Object.fromEntries(db.prepare("select material_no, sum(qty) q from po_line where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q]));
+  const onOrder = Object.fromEntries(db.prepare("select material_no, sum(qty) q from pol where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q]));
   const from = addMonths(CUTOFF.slice(0, 7), 1), MM = months(from, H), lines = [];
   portfolioParts(db, sc).forEach((p) => { const mu = (p.total_qty || 0) / 17; if (!(mu > 0)) return; const r = evalPart(p, pol, A); if (!(r.max > 0)) return; const pos = (p.stock || 0) + (onOrder[p.material_no] || 0);
     const t = pos <= r.rop ? 0 : Math.ceil((pos - r.rop) / mu); if (t >= H) return; const q = Math.max(1, Math.ceil(r.max - (pos - mu * t))), lead = p.lt_median || A.lead_default, need = MM[t], ob = new Date(Date.parse(need + "-01") - lead * 864e5).toISOString().slice(0, 10);
