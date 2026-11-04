@@ -211,6 +211,14 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   }
   await p.evaluate(() => ciView("rec")); await p.waitForTimeout(6000);
   ok("costs: the answer band and the impact tool show the same yearly saving", await p.evaluate(() => { const a = [...document.querySelectorAll(".aiv-t b")].map(e => e.textContent), k = [...document.querySelectorAll(".kb-kpi .kb-kv")].map(e => e.textContent); return a[1] && k.includes(a[1]) }));
+  /* round 9: one figure for "order now" on the Summary, the Inventory landing band and Status */
+  await p.evaluate(() => go("spi_summ")); await p.waitForFunction(() => { const e = document.querySelector("#sm_s_reorder .sm-v"); return e && /\d/.test(e.textContent) }, null, { timeout: 40000 }).catch(() => {}); await p.waitForTimeout(2500);
+  const smNow = await p.evaluate(() => document.querySelector("#sm_s_reorder .sm-v").textContent.trim());
+  await p.evaluate(() => go("spi_golden")); await p.waitForFunction(() => document.querySelectorAll(".aiv .aiv-t").length === 4, null, { timeout: 40000 }).catch(() => {});
+  const bandNow = await p.evaluate(() => (document.querySelector(".aiv .aiv-t b") || {}).textContent || "");
+  await p.evaluate(() => go("spi_status")); await p.waitForFunction(() => document.querySelectorAll(".st-c").length >= 5, null, { timeout: 40000 }).catch(() => {});
+  const stNow = await p.evaluate(() => { const c = [...document.querySelectorAll(".st-c")].find(e => /Order now/.test(e.textContent)); return c ? c.querySelector("b").textContent.trim() : "" });
+  ok("one figure for parts to order now: Summary, landing band and Status agree", smNow && bandNow.startsWith(smNow) && stNow === smNow, `${smNow} | ${bandNow} | ${stNow}`);
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
