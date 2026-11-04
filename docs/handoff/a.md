@@ -20,6 +20,8 @@
 - Timeline tab `spi_tl` (`GET /api/data/history?mat|tag|cls|all`): history (issues, value, notifications, planned tasks, PO receipts) and prediction (learned forecast and range, engine p50 and p10 to p90 for one part, campaign-repeat scenario, stock projection), switchable layers, CSV. Assistant tool `timeline` (`spi/ai/timeline.js`). Learned projection is calibrated by the held-out actual/predicted ratio (1.144).
 - Review finding: the engine forecast steps up for 2026-10 to 2026-12 (about 116k a month, then 36k) because of the plan backlog stacked in the first month; shown as a separate layer and explained by the assistant.
 
+- Golden path `server/data/golden.mjs` (optimized orders, Monte Carlo fan and stockout chance, golden against current, inputs), `status.mjs`, `events.mjs`; AI box `src/modules/spi_ai_box.js` + `POST /api/ai/explain` (`spi/ai/explain.js`, Gemini checked against the payload, rules otherwise); browser log of feature runs sent as `context.view.recent`; assistant tools golden_path, plant_status (`spi/ai/golden_ai.js`). Contracts for Claude B in docs/TASKS.md.
+
 ## Open
 - Gemini not connected (owner sets AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel, then selftest).
 - Dynamic Min outliers (424 parts above 3 times lead-time demand) are flagged on Parameters, not capped.

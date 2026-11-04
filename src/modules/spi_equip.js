@@ -1,7 +1,7 @@
 /* SPI equipment views (owner: Claude A): the plant overview and the spare parts panel of an equipment set. Used when window.SPI_MODE is true (case spi). */
 regMod("spi_equip","1.0",["spi_core"],"Equipment spare parts views");
 /* Professional display form of the upper case SAP style descriptions: "BEARING,THRUST PAD,DWG.563-7426,FOR KT-4" becomes "Bearing, thrust pad, DWG.563-7426, for KT-4" */
-const spiDesc=s=>{if(!s)return"";return String(s).split(",").map(x=>x.trim()).filter(Boolean).map((x,i)=>{if(/^FOR\s+/.test(x))return "for "+x.slice(4);if(/\d/.test(x)||/^[A-Z]{1,4}-[A-Z0-9]/.test(x))return x;const l=x.toLowerCase();return i===0?l.charAt(0).toUpperCase()+l.slice(1):l}).join(", ")};
+const spiDesc=s=>{if(!s)return"";return String(s).replace(/,\s*FOR\s*$/i,"").split(",").map(x=>x.trim()).filter(x=>x&&!/^FOR$/i.test(x)).map((x,i)=>{if(/^FOR\s+/.test(x))return "for "+x.slice(4);if(/\d/.test(x)||/^[A-Z]{1,4}-[A-Z0-9]/.test(x))return x;const l=x.toLowerCase();return i===0?l.charAt(0).toUpperCase()+l.slice(1):l}).join(", ")};
 function spiPlantOverview(){
  const sets=K.sets.map(s=>`<tr class="click" onclick="go('equipment',{set:${s.n},tab:'overview'})"><td><b>${esc(s.tag)}</b></td><td>${esc(s.name)}</td><td>${esc(s.type||"")}</td><td>${spiCritBadge(s.crit==="HIGH CRITICAL"?"S":"A")}</td></tr>`).join("");
  return `${ph("Plant overview",`${K.sets.length} equipment sets selected from the baseline data by criticality and parts list size. The layout is a schematic generated from the data.`)}${p3Hero()}

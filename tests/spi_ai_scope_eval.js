@@ -60,6 +60,12 @@ const cases=[
  ['History and forecast for PP-1323B','timeline',/PP-1323B[\s\S]*learned model expects/],
  ['Show the plant timeline','timeline',/whole plant[\s\S]*if it repeats/],
  ['Compare the forecast of 4100000129, 4100005111 and 4100073350','timeline',/Side by side[\s\S]*4100005111[\s\S]*4100073350/],
+ ['Which notifications mention a leak?','search_all',/Notification explorer[\s\S]*Leak/],
+ ['Where can I see supplier performance?','search_all',/Suppliers and lead time tab/],
+ ['vibration','describe_scope',/vibration/i],
+ ['What does the price basis column mean?','describe_scope',/How the price was derived/],
+ ['What is the best course of action?','golden_path',/recommends \*\*[0-9,]+ orders\*\*[\s\S]*cuts the yearly cost/],
+ ['What needs to be done right now?','plant_status',/parts to order now\*\*/],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
  if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100||(r.answer.match(/[.!?](\s|$)/g)||[]).length>7&&tool==='get_page')fails.push('too long '+r.answer.length);

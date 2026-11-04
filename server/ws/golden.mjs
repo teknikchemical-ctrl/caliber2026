@@ -11,7 +11,7 @@ export default guard(async (req, res) => {
   const i = await body(req), db = openDb(), H = num(i.horizon, 12, 3, 24), lf = num(i.lead_factor, 1, 0.3, 4), df = num(i.demand_factor, 1, 0.2, 5), budget = Number(i.budget_idr) || null;
   const A = { carrying_rate: num(i.carrying_rate, ECON.carrying_rate ?? 0.22, 0, 1), order_cost_idr: ECON.order_cost_idr, emergency_premium: ECON.emergency_premium, lead_default: ECON.lead_default, lead_delay_days: 0, demand_factor: df, downtime_idr_h: { ...ECON.downtime_idr_h }, hours_per_stockout: { ...ECON.hours_per_stockout }, downtime_share: { ...ECON.downtime_share }, ...P(i.assumptions) };
   A.demand_factor = df;
-  const svc = { ...(ECON.service || { S: 0.98, A: 0.95, B: 0.9, C: 0.85 }), ...P(i.service) }, sc = P(i.scope);
+  const svc = { ...(ECON.service || { ...ECON.service }), ...P(i.service) }, sc = P(i.scope);
   const on = Object.fromEntries(db.prepare("select material_no, sum(qty) q from po_line where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q]));
   let parts;
   if (i.set || i.loc) { const fl = i.loc ? String(i.loc) : (db.prepare("select funcloc from equipment_set where tag = ?").get(String(i.set)) || {}).funcloc || "PX_" + i.set; const mats = new Set(db.prepare("select material_no from bom where funcloc = ? or funcloc like ?").all(fl, fl + "-%").map((r) => r.material_no)); parts = portfolioParts(db, {}).filter((p) => mats.has(p.material_no)); }
