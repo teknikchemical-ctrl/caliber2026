@@ -23,7 +23,7 @@
   },
   "x-bounds": {
     "multiply": "value between 0.25 and 3.0. Above 2.0 needs two independent evidence ids.",
-    "add_qty": "value between 0 and 10 times the part's largest monthly issue in history.",
+    "add_qty": "value between 0 and 10 times the part's largest monthly issue in history. When that maximum is 0 (no demand in the history): at most the smaller of 10 and the installed quantity, with two independent evidence ids and the flag sparse_history.",
     "set_lead_days": "between 1 and 400 and not below the 10th percentile of the part's PO lead times.",
     "set_zero_after": "only with driver 'obsolescence' and months_since_last of at least 12."
   }
