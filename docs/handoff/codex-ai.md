@@ -1,12 +1,21 @@
-**Branch:** codex/ai | **Baseline:** 6151195 | **Commit:** see git log -1.
+**Branch:** codex/ai | **Baseline:** 18ceea9 | **Commit:** see git log -1.
 ## Ready to merge
-- SPI M1: providers/gemini.js and mock.js, bounded evidence.js, rules_planner.js, validate.js and planner.js. Mock is the default; Gemini ports discovery, 429/5xx retry, 8 s attempts and 25 s total budget, JSON schema mode, token usage and attempt traces. No real key used.
-- All 237 fixture parts produce valid rules plans. 258 SPI AI checks pass, including unknown evidence, schema/bounds, independent evidence, proposed-only inputs, target isolation, injection delimiters, malformed JSON, rejected key and timeout recovery. Run AI_PROVIDER=mock node tests/spi_ai.js.
-- Database evidence is read-only, zero-fills 17 months, retains IDs and flags truncation. Completed-by-cutoff lead times, weak/OEM pooling restrictions and conservative critical no-demand protection are documented in AI_REASONING.md. No stock or price totals are hardcoded.
-- Baseline setup, old Netlify live suite, 17 SPI full-data checks and both SPI registered pages passed before edits. Shared test:quick passes build/static then is blocked by browser file-URL policy. Old provider and UI code remain unchanged in this step.
-## Next
-1. Plan and health Vercel endpoints, then Forecast page; tools/ask and proposal ledger, Ask AI page, resumable batch and golden evaluation. Use spiDesc and spiRegister per latest inbox. No Netlify endpoints on the SPI path.
-2. Human supplies the real key securely in Vercel; verify health, then model-backed plan and question. No key in chat. I cannot report a remaining account-usage percentage from the tools available here.
-## Waiting on
-- Codex Fin: stable runPlan/backtest exports and policy contract (spi/engine still only OWNER.md on this baseline). Claude A: golden questions and Vercel deploy details; confirm scoped target persistence in forecast_input and add_qty policy when the historical maximum is zero.
-- Current inbox read and acknowledged here; docs/inbox is outside the human's edit list. Claude A can mark M1 C1/C2 tasks and inbox rows after merging this commit. No main push or PR.
+- Database -> evidence -> mock/Gemini reasoning -> validator -> backtest gate -> deterministic engine -> Forecast chart is wired through spi/ai/execute.js and POST /api/ai/plan. Handlers are server/ai/plan.mjs and health.mjs behind the single router. GET /api/ai/health probes the configured provider, with deployment identity and no key disclosure. SPI sync no longer requests absent Netlify routes.
+- Forecast page: real part search, zero-filled history, direct engine p10/p50/p90 chart and table, selected plan/provider, evidence/validation/backtest trace, inventory/recommendation and driver Accept/Reject. Accepted inputs are revalidated before rerun; unaccepted AI proposals never alter the executed forecast. Stale predictions clear while rerunning.
+- Campaign evidence and rule inputs are integrated from Claude A's campaign module. Every retained input keeps matching evidence IDs; truncation drops unsupported inputs. Structural and numeric guards remain in force.
+- Codex Fin engine is now merged on main and integrated using its real exports. The normal production loader and all 237 fixture parts pass; six demand-class samples from the full database pass. No engine files edited. Claude A merges this branch and deploys for Vercel verification.
+- Tests: 258 core checks; all 237 fixture parts passed actual database -> reasoning -> real engine integration. Browser verified real history, exact engine chart/table quantiles, accepted-input redraw, and pending-engine honesty. All seven SPI pages load with full API. Old-site live passed; quick build/static passed and regression remains blocked by file-URL policy.
+## Interface notes
+- Engine contract used: contextFor(db,id), runPlan(plan,context), backtest(plan,context). Compare candidate error against an independently evaluated rules plan. Orchestration owns adoption and sets enforce_backtest:false; do not silently apply a second engine baseline. Sparse/missing backtests are not a pass.
+- No engine in production means result:null/status:engine_pending, never a fake forecast. Reasoning provider in the chart test was explicitly synthetic; ordinary mock/rules API mode was also tested with the real engine. Live Gemini and Vercel are not verified. Engine tests are tests/spi_ai_engine_integration.js; SPI_TEST_ENGINE may point to a published candidate for independent integration testing. The final browser test used the real merged engine.
+## Next / waiting on
+- Claude A: merge this branch and deploy Vercel; human: set AI_PROVIDER/AI_API_KEY/AI_MODEL securely and verify /api/ai/health plus a real part forecast. No key in chat, no main push, no PR.
+- Remaining wider-role work: Ask AI/tool loop, resumable AI batch/results.sqlite and golden question evaluation. Latest inbox resolves target persistence and zero-history add_qty bounds; zero-history add_qty validation is now updated and tested (261 core checks). Current inbox read and acknowledged here because inbox is outside the human's edit list.
+
+- Remaining account usage is not exposed by this client. Chart wiring is committed and pushed immediately; next pieces are Ask AI, batch and golden questions.
+- Ready to merge: zero-history additions require installed-capacity bounds, two independent origins and sparse_history. Scope target schema is consumed unchanged.
+
+## Ready to merge: Forecast extension after latest main
+- Preserved Claude A's Forecast base page and integrated AI planning through SPI_FORECAST_HOOKS. The selected AI/rules plan has its own labelled chart, validated Accept/Reject ledger, evidence and adoption trace. Base inventory, backtest and assumptions panels remain intact.
+- Browser verification passed against the real merged engine: exact SQL history and engine quantiles, malformed-response handling, accepted-input rerun and chart redraw.
+- Chart integration was already pushed in 9850fc1; this merge resolves the later base-page addition. Ask AI and batch are the next working pieces. Remaining account usage is unavailable in this client.

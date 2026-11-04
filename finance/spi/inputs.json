@@ -1,0 +1,210 @@
+{
+  "currency": "IDR",
+  "status": "Estimate: low-risk B/C stock-keeping pilot; insurance excluded; all release requires review, not an approved disposition budget",
+  "inputs": {
+    "horizon": {
+      "value": 5,
+      "unit": "years",
+      "basis": "Assumption",
+      "source": "Evaluation horizon; no terminal salvage assumed"
+    },
+    "discount": {
+      "value": 0.12,
+      "unit": "fraction/year",
+      "basis": "Assumption",
+      "source": "Illustrative before-tax discount rate; finance approval required"
+    },
+    "scope": {
+      "value": 1,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Share of the deduplicated B/C stock-keeping cohort, not all plant replenishment"
+    },
+    "release_realisation": {
+      "value": 0.3,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Assumption aligned with the case savings page: 30% of deduplicated B/C candidates realised over three years; not observed cash"
+    },
+    "procurement_execution": {
+      "value": 0,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Base stock-keeping pilot does not execute the full dynamic-order backlog. For a funded availability programme, enter the reviewed incremental share of that backlog separately."
+    },
+    "holding_cash_rate": {
+      "value": 0.04,
+      "unit": "fraction/year",
+      "basis": "Assumption",
+      "source": "Avoidable storage/handling/insurance cash cost only. Excludes financing return to avoid double counting capital release"
+    },
+    "holding_economic_rate": {
+      "value": 0.22,
+      "unit": "fraction/year",
+      "basis": "Assumption",
+      "source": "Total carrying-rate policy from engine; economic indicator, not added to cash NPV"
+    },
+    "emergency_spend": {
+      "value": 0,
+      "unit": "IDR/year",
+      "basis": "Assumption",
+      "source": "Eligible historical emergency purchase spend Not in baseline data; zero benefit until evidenced"
+    },
+    "emergency_premium": {
+      "value": 0.2,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Premium over normal purchase price, applied only to evidenced eligible emergency spend"
+    },
+    "emergency_avoidance": {
+      "value": 0.25,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Fraction of emergency purchasing avoided; requires pilot verification"
+    },
+    "downtime_days_S": {
+      "value": 0,
+      "unit": "plant-days/year",
+      "basis": "Assumption",
+      "source": "Incremental avoided production-critical-path days Not in baseline data; excludes overlap with other criticality classes"
+    },
+    "downtime_days_A": {
+      "value": 0,
+      "unit": "plant-days/year",
+      "basis": "Assumption",
+      "source": "Incremental avoided days Not in baseline data"
+    },
+    "downtime_days_B": {
+      "value": 0,
+      "unit": "plant-days/year",
+      "basis": "Assumption",
+      "source": "Incremental avoided days Not in baseline data"
+    },
+    "downtime_days_C": {
+      "value": 0,
+      "unit": "plant-days/year",
+      "basis": "Assumption",
+      "source": "Incremental avoided days Not in baseline data"
+    },
+    "cost_day_S": {
+      "value": 100000000,
+      "unit": "IDR/plant-day",
+      "basis": "Assumption",
+      "source": "Policy consequence only, not a measured plant contribution margin"
+    },
+    "cost_day_A": {
+      "value": 30000000,
+      "unit": "IDR/plant-day",
+      "basis": "Assumption",
+      "source": "Policy consequence only"
+    },
+    "cost_day_B": {
+      "value": 5000000,
+      "unit": "IDR/plant-day",
+      "basis": "Assumption",
+      "source": "Policy consequence only"
+    },
+    "cost_day_C": {
+      "value": 1000000,
+      "unit": "IDR/plant-day",
+      "basis": "Assumption",
+      "source": "Policy consequence only"
+    },
+    "integration": {
+      "value": 180000000,
+      "unit": "IDR",
+      "basis": "Estimate",
+      "source": "Implementation allowance, not a vendor quotation"
+    },
+    "data_review": {
+      "value": 100000000,
+      "unit": "IDR",
+      "basis": "Estimate",
+      "source": "Part master, ownership, Min/Max and procurement-price validation allowance"
+    },
+    "security": {
+      "value": 80000000,
+      "unit": "IDR",
+      "basis": "Estimate",
+      "source": "Identity, read-only service, logging and security review allowance"
+    },
+    "training": {
+      "value": 40000000,
+      "unit": "IDR",
+      "basis": "Estimate",
+      "source": "Buyer, planner and maintenance reviewer training allowance"
+    },
+    "hardware": {
+      "value": 0,
+      "unit": "IDR",
+      "basis": "Assumption",
+      "source": "Existing browser clients; no GPU required for deterministic engine or managed model API"
+    },
+    "contingency": {
+      "value": 0.2,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "Contingency on one-off solution cost"
+    },
+    "cloud_software": {
+      "value": 168000000,
+      "unit": "IDR/year",
+      "basis": "Estimate",
+      "source": "Hosting, model API, database, logs and backup budget; validate with workload and supplier pricing"
+    },
+    "owner_support": {
+      "value": 180000000,
+      "unit": "IDR/year",
+      "basis": "Estimate",
+      "source": "Incremental service ownership and support allowance"
+    },
+    "evaluation": {
+      "value": 60000000,
+      "unit": "IDR/year",
+      "basis": "Estimate",
+      "source": "Forecast backtesting, critical-spare review and ongoing data QA allowance"
+    },
+    "critical_review_share": {
+      "value": 0.1,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "source": "10% after-review critical-cohort illustration, aligned with the savings page; excludes insurance and is not approved release"
+    },
+    "critical_scenario_enabled": {
+      "value": 0,
+      "unit": "0 or 1",
+      "basis": "Assumption",
+      "source": "Scenario toggle only: include the reviewed S/A cohort hypothesis. Zero in base case; changing this does not grant engineering approval."
+    }
+  },
+  "release_schedule": [
+    0.2,
+    0.4,
+    0.4,
+    0,
+    0
+  ],
+  "scenarios": [
+    {
+      "name": "Pessimistic",
+      "release_factor": 0.5,
+      "cost_factor": 1.25,
+      "benefit_factor": 0.5,
+      "basis": "Assumption"
+    },
+    {
+      "name": "Base",
+      "release_factor": 1,
+      "cost_factor": 1,
+      "benefit_factor": 1,
+      "basis": "Assumption"
+    },
+    {
+      "name": "Optimistic",
+      "release_factor": 1.5,
+      "cost_factor": 0.9,
+      "benefit_factor": 1.5,
+      "basis": "Assumption"
+    }
+  ]
+}
