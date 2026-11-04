@@ -48,6 +48,7 @@ export default guard(async (req, res) => {
   A.demand_factor = num(i.demand_factor, A.demand_factor || 1, 0.1, 5);
   let mats = list(i.mats).map(Number).filter(Boolean), scope = null, all = String(i.all) === "1";
   if (i.mat) mats = [Number(i.mat)];
+  if (i.cls) { const c = String(i.cls).toUpperCase(); scope = { funcloc: "class:" + c, tag: c, descr: "All equipment of class " + c, criticality: null }; mats = [...new Set(db.prepare("select distinct b.material_no from bom b join funcloc f using(funcloc) where f.eq_class = ?").all(c).map((r) => r.material_no))]; }
   if (i.set || i.loc) { const fl = i.loc ? String(i.loc) : (db.prepare("select funcloc from equipment_set where tag = ?").get(String(i.set)) || {}).funcloc || "PX_" + String(i.set); scope = db.prepare("select funcloc, tag, descr, criticality, eq_class_name from funcloc where funcloc = ?").get(fl);
     if (!scope) return fail(res, 404, "This location is not in the baseline data."); mats = db.prepare("select material_no from bom where funcloc = ?").all(fl).map((r) => r.material_no); }
   if (!mats.length && !all) return fail(res, 400, "Choose a part, an equipment set or a location.");
@@ -68,6 +69,7 @@ export default guard(async (req, res) => {
   const t = { parts: out.length, order_now: out.filter((x) => x.decision === "order_now").length, order_by: out.filter((x) => x.decision === "order_by").length, no_order: out.filter((x) => x.decision === "no_order").length, no_use: out.filter((x) => x.decision === "hold_no_use").length,
     order_value: out.reduce((s, x) => s + (x.order_value || 0), 0), cost_current: out.reduce((s, x) => s + x.cost_current.total, 0), cost_recommended: out.reduce((s, x) => s + x.cost_recommended.total, 0), excess_value: out.reduce((s, x) => s + x.risk.excess_value, 0), stock_value: out.reduce((s, x) => s + (x.price || 0) * x.stock, 0), high_risk: out.filter((x) => x.level === "high").length };
   t.saving_per_year = t.cost_current - t.cost_recommended;
+  const byC = ["S", "A", "B", "C"].map((c) => { const pool = out.filter((x) => x.crit === c); return { crit: c, parts: pool.length, cost_current: pool.reduce((s, x) => s + x.cost_current.total, 0), cost_recommended: pool.reduce((s, x) => s + x.cost_recommended.total, 0), value_current: pool.reduce((s, x) => s + x.cost_current.value, 0), value_recommended: pool.reduce((s, x) => s + x.cost_recommended.value, 0), stockouts_current: pool.reduce((s, x) => s + x.cost_current.events, 0), stockouts_recommended: pool.reduce((s, x) => s + x.cost_recommended.events, 0) }; }); t.by_crit = byC;
   const IK = ["emergency_orders", "emergency_cost", "purchase_carry", "working_capital", "downtime_hours", "downtime_cost"], isum = (pool, w) => Object.fromEntries(IK.map((k) => [k, pool.reduce((s, x) => s + x.impact[w][k], 0)]));
   t.impact = { current: isum(out, "current"), recommended: isum(out, "recommended"), by_crit: ["S", "A", "B", "C"].map((c) => { const pool = out.filter((x) => x.crit === c); return { crit: c, parts: pool.length, current: isum(pool, "current"), recommended: isum(pool, "recommended") }; }) };
   const off = num(i.offset, 0, 0, 1e6);
