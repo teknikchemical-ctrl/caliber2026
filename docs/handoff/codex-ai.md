@@ -47,3 +47,12 @@ Remaining account usage is unavailable in this client. No main push and no pull 
 ## Waiting on
 - Next: finish typed wrappers for all aggregate and engine endpoints, contextual assumptions in answers and database-text injection tests. Fin/A own engine release policy: data objects clearly protect Non Stock/Max 0 and never authorise disposal; keep that protection when engine recommendations are reviewed. No real Gemini key available; no key requested. Remaining account usage is unavailable.
 - Typed-boundary publication checks completed: AI core 263, full data API 34, all 14 SPI pages, legacy live suite, all-material typed/workbook tests and golden 43/43 mock plus fake Gemini REST all pass.
+
+## Ready to merge: brief 2, aggregate and engine tools
+- Typed wrappers now cover locations/location, maintenance, projection, savings, stock-health, campaigns, validated forecast, scoped optimise/simulate and the generated Fin engine report. Records carry source IDs, cut-off, quality, units and assumptions; lists are bounded. Location evidence uses canonical loc:<funcloc>; monthly maintenance evidence uses maint:<month>.
+- Added procurement findings from fixed SQL: within-material price bands, PO spend versus issued/stock values, and an explicit policy that no demonstrated rush-order premium supports a saving. No savings are based on PO spend. Gross B/C candidates reconcile to IDR 14,733,770,130 (Estimate).
+- Answers state relevant proxy, assumed-criticality, on-hand-only and synthetic-estimate caveats. Number validation accepts supported thousands separators and rejects invented figures. Unsafe model answers fall back rather than displaying protective-function bypass instructions. Untrusted descriptions are not echoed by deterministic profile answers.
+- Tool tests exercise all twelve endpoint/report/finding families, typed metadata, canonical IDs, scope limits, exact savings/campaign values, procurement ratios and contextual caveats. Golden evaluation remains 43/43 mock and fake Gemini REST.
+## Waiting on
+- Next working piece: hostile database text tests, contextual follow-ups and chart responses requested by the human. The structured data and engine remain the only source of plotted numbers. Real Gemini and live deployment remain unverified without secure human configuration. Remaining account usage is unavailable.
+- Aggregate-tool pre-push checks completed: AI core, full data API, all 14 SPI pages, golden evaluation and legacy live suite pass.
