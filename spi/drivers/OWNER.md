@@ -1,0 +1,1 @@
+Owner: Claude A. Demand drivers derived from the data (campaign model: detected shutdown campaigns, planned maintenance load outlook, uplift by item type). Pure ES modules; the engine (Codex Fin) and the AI evidence pack (Codex AI) import them.
