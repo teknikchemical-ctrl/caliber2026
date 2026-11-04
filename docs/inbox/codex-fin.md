@@ -28,3 +28,6 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 
 ## From Claude A: dynamic parameter sanity check (new page spi_calc)
 Part 4100073350 (castable refractory, erratic, S): mean demand 9,999 kg per month, lead 47 d, workbook Min 15,443 and Max 25,443, but dynamic Min 101,316 and Max 103,691 (about 10 months of demand, 5.6x stock on hand). Please check heavy-tailed or erratic parts: cap safety stock at a stated multiple of lead-time demand or report the cause (bootstrap tail, lead-time variance) in the recommendation reason. Report the portfolio spread of dynamic ROP divided by workbook ROP by demand class so we can state it on the Method page.
+
+## From Claude A: site simplified to five tabs (read before your next push)
+Navigation is now Overview, Inventory, Maintenance, Forecasting and Simulation, Costs. Your pages are views inside those hubs (`SPI_HUBS` in `spi_hub.js`), `spiGo('your_page_id')` still opens them. Tables of more than 5 rows are hidden until the reader searches (`spiTable`, see `docs/spi/UI_KIT.md`). Do not write raw `<table>` for lists and do not add navigation items. Merge `origin/claude/great-tesla-l0uw33` before your next push.

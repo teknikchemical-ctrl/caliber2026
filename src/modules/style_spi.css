@@ -81,3 +81,5 @@ html.spi input[type=range]{accent-color:#2a78d6}.spi-eq>div{border-left-color:#2
 .spi-mbar{display:inline-block;width:60px;height:6px;background:#eceae4;border-radius:3px;vertical-align:middle;margin-left:6px}.spi-mbar i{display:block;height:100%;background:#2a78d6;border-radius:3px}
 .spi-h2{font-size:15px;margin:18px 0 6px;color:#0b0b0b}
 .spi-hm td{white-space:nowrap;font-size:11.5px}
+.spi-hubtabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;padding:4px;background:#efeee9;border-radius:10px;width:fit-content;max-width:100%}.spi-hubtabs button{border:0;background:transparent;padding:7px 14px;border-radius:7px;font:inherit;font-size:13px;color:#52514e;cursor:pointer}.spi-hubtabs button:hover{background:#e4e3dc}.spi-hubtabs button.on{background:#fff;color:#1c5cab;font-weight:600;box-shadow:0 1px 2px rgba(11,11,11,.12)}
+.spi-ts{margin-top:4px}.spi-tsi{width:100%;max-width:420px;font:inherit;padding:8px 11px;border:1px solid #c3c2b7;border-radius:8px;background:#fff}.spi-tsh{margin:6px 0 0}.spi-tsb{margin-top:8px}.spi-tsb[hidden]{display:none}

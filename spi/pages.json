@@ -1,92 +1,27 @@
 [
  [
-  "spi_dash",
+  "spi_h_ov",
   "Overview",
   "M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z"
  ],
  [
-  "spi_fo",
-  "Forecasting and optimisation",
-  "M3 17l5-6 4 3 5-8 4 4M3 21h18M3 3v18"
+  "spi_h_inv",
+  "Inventory",
+  "M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10"
  ],
  [
-  "spi_ready",
-  "Campaign readiness",
-  "M5 20V10M10 20V4M15 20v-8M20 20V7"
- ],
- [
-  "spi_reg",
-  "Registers",
-  "M4 6h16M4 12h16M4 18h10"
- ],
- [
-  "spi_val",
-  "Method and validation",
-  "M5 12l4 4 10-10M4 20h16"
- ],
- [
-  "spi_loc",
-  "Locations and equipment",
-  "M4 20V9l8-5 8 5v11M9 20v-6h6v6"
- ],
- [
-  "spi_maint",
+  "spi_h_mnt",
   "Maintenance",
   "M14 6a4 4 0 0 0-5 5L3 17l4 4 6-6a4 4 0 0 0 5-5l-3 3-3-1-1-3z"
  ],
  [
-  "spi_outlook",
-  "Demand outlook",
-  "M3 17l5-6 4 3 5-8 4 4M3 21h18"
+  "spi_h_fc",
+  "Forecasting and Simulation",
+  "M3 17l5-6 4 3 5-8 4 4M3 21h18M3 3v18"
  ],
  [
-  "spi_savings",
-  "Cost reduction",
+  "spi_h_cost",
+  "Costs",
   "M12 3v18M17 7H9.500a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"
- ],
- [
-  "spi_forecast",
-  "Forecast",
-  "M3 17l5-6 4 3 5-8 4 4M3 21h18"
- ],
- [
-  "spi_reco",
-  "Recommendations",
-  "M5 4h14v16H5zM9 9l2 2 4-4M9 15h6"
- ],
- [
-  "spi_health",
-  "Inventory health",
-  "M12 21s-7-4.5-7-10a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 5.500-7 10-7 10z"
- ],
- [
-  "spi_opt",
-  "Optimisation",
-  "M4 20V10M10 20V4M16 20v-7M22 20H2"
- ],
- [
-  "spi_sim",
-  "Scenario simulator",
-  "M5 4v16M5 6h9l-2 3 2 3H5M17 20l3-3-3-3M12 17h8"
- ],
- [
-  "spi_ask",
-  "Ask the AI",
-  "M4 5h16v11H9l-5 4zM8 9h8M8 12h5"
- ],
- [
-  "spi_impact",
-  "Business impact",
-  "M12 3v18M17 7H9.500a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"
- ],
- [
-  "spi_ingest",
-  "Documents and log",
-  "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7"
- ],
- [
-  "spi_arch",
-  "Data and architecture",
-  "M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6"
  ]
 ]

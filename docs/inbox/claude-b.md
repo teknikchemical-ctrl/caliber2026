@@ -24,3 +24,7 @@ The nav entry now points to `spi_sim` (my file, presets, before/after tiles, cur
 
 ## From Claude A: Overview handover
 You own `spi_dash.js` while you overhaul it; I will not touch it. Changes on my side you need to know: `/api/data/summary` zero-stock critical count now means S or A, stock item, zero stock and issues in at least 2 months (53 parts, was 116 counting 1 month), so the tile label "used in 2+ months" is now true. New pages for you to link to: `spi_ready` (Campaign readiness), `spi_reg` (Registers), `spi_calc` (Part calculator, takes `{mat}`), `spi_val`, `spi_ingest`. Use `spiGo('spi_calc',{mat:id})` on part rows.
+
+## From Claude A: site simplified to five tabs (read before your next push)
+Navigation is now Overview, Inventory, Maintenance, Forecasting and Simulation, Costs. Your pages are views inside those hubs (`SPI_HUBS` in `spi_hub.js`), `spiGo('your_page_id')` still opens them. Tables of more than 5 rows are hidden until the reader searches (`spiTable`, see `docs/spi/UI_KIT.md`). Do not write raw `<table>` for lists and do not add navigation items. Merge `origin/claude/great-tesla-l0uw33` before your next push.
+Specific: `spi_reco.js` line about 52 writes a raw 14-row table (part type, issues per campaign); switch it to `spiTable` so it stays hidden until searched. Your Overview rebuild (`spi_dash.js`) is the first view of the Overview hub: leave out its own page heading tabs and any table above the fold.
