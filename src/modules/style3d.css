@@ -72,9 +72,9 @@
 .sp-rb{color:#1b2733;display:flex;flex-direction:column;align-items:flex-start;background:rgba(255,255,255,.92);border:1px solid #c5d3e4;border-radius:9px;padding:5px 10px;cursor:pointer;font:inherit;min-width:112px}
 .sp-rb b{font-size:12.5px;color:#1b2733}.sp-rb span{font-size:10.5px;color:#5c6b7b}.sp-rb.on{border-color:var(--acc,#1d6fd6);background:#e6f0fd}
 .sp-wrap .p3{margin-top:0!important;border-radius:14px}
-.sp-wrap .p3head{position:absolute;z-index:4;right:12px;top:10px;background:none;border:0;padding:0}
-.sp-wrap .p3head>div:first-child,.sp-wrap .p3chips,.sp-wrap .p3st,.sp-wrap .p3key{display:none!important}
-.sp-wrap .p3tools{background:rgba(255,255,255,.92);border:1px solid #c5d3e4;border-radius:10px;padding:4px 8px;font-size:12px}
+.sp-wrap .sp-ph{position:absolute;z-index:4;right:12px;top:10px;background:none;border:0;padding:0}
+.sp-wrap .sp-ph>div:first-child,.sp-wrap .p3chips,.sp-wrap .p3st,.sp-wrap .sp-pk{display:none!important}
+.sp-wrap .sp-pt{background:rgba(255,255,255,.92);border:1px solid #c5d3e4;border-radius:10px;padding:4px 8px;font-size:12px}
 .sp-wrap .p3card{top:56px}
 .sp-cs{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
 .sp-fo{margin-top:8px;padding:8px;border-radius:8px;background:#f3f7fc;font-size:12.5px}
