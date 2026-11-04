@@ -25,8 +25,7 @@ function spiShape(p,v){const f=v==="f",X=p.x,W=f?p.y:p.z,rect=(cu,cw,du,dw)=>({p
 const spiFx=(v,d)=>Number(v).toFixed(d==null?1:d);
 /* ---------- the sheet ---------- */
 function spiGaSvg(n){const P=spiPrep(n),prims=G3M[n]||[],ZK=new Set(P.zones.filter(z=>z.key).map(z=>z.key));
- let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];const ext=p=>{const h=p.t==="r"?[p.w/2,p.h/2,p.d/2]:p.t==="c"?(p.ax==="x"?[p.len/2,Math.max(p.r,p.r2||0),Math.max(p.r,p.r2||0)]:p.ax==="y"?[Math.max(p.r,p.r2||0),p.len/2,Math.max(p.r,p.r2||0)]:[Math.max(p.r,p.r2||0),Math.max(p.r,p.r2||0),p.len/2]):(p.ax==="x"?[p.ra,p.rb,p.rb]:p.ax==="y"?[p.rb,p.ra,p.rb]:[p.rb,p.rb,p.ra]);[p.x,p.y,p.z].forEach((c,i)=>{mn[i]=Math.min(mn[i],c-h[i]);mx[i]=Math.max(mx[i],c+h[i])})};
- prims.forEach(ext);const Wm=mx[0]-mn[0],Hm=mx[1]-mn[1],Dm=mx[2]-mn[2];
+ const BB=spiBBox(n),mn=BB.mn,mx=BB.mx,Wm=mx[0]-mn[0],Hm=mx[1]-mn[1],Dm=mx[2]-mn[2];
  const s=Math.min(740/Wm,(Hm/Wm>1.5?400:250)/Hm,215/Dm),L0=80,gy=100+Hm*s,ox=L0+(740-Wm*s)/2-mn[0]*s,oy=gy+mn[1]*s,pTop=gy+84,pz0=pTop-mn[2]*s,Ht=pTop+Dm*s+104,
   X=u=>ox+u*s,YF=w=>oy-w*s,YP=w=>pz0+w*s,pt=(v,[u,w])=>X(u).toFixed(1)+","+(v==="f"?YF(w):YP(w)).toFixed(1);
  const out={f:[],p:[]},anch={},tags=[];

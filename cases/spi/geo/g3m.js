@@ -19,7 +19,7 @@ function spiZoneDefs(c){return{
  hx:[["tube","Tubes and piping","TEMA, API 660",/^pipe|^tube/i],["fl","Flanged joints and bolting","ASME B16.5, B16.20",/studbolt|gasket/i],["oth","Other parts","Shell, supports",/./]],
  valve:[["fl","Body flanges and bolting","ASME B16.5, B16.34",/studbolt|gasket/i],["trim","Trim and seat ring","ISA-75, IEC 60534",/trim set|seat ring/i],["pk","Packing","IEC 60534",/packing/i],["act","Actuator diaphragm","ISA-75",/diaphragm|actuator|spring/i],["pos","Positioner","ISA-75, ISA-5.1",/positioner/i],["oth","Other parts","Body and yoke",/./]]}[c]||[]}
 /* nozzle schedule per class. Sizes and ratings are not in the baseline data and are left as such. */
-function spiNozzles(c){const r="Flange facing and rating not stated; drawn as an ASME B16.5 flange (schematic)",N=(m,sv)=>({m,sv,sz:"Not in baseline data",r});
+function spiNozzles(c){const N=(m,sv)=>({m,sv,sz:"Not in baseline data",r:""});
  return{turbine:[N("N1","HP steam inlet"),N("N2","Exhaust"),N("N3","Gland leak-off"),N("N4","Casing drain"),N("N5","Lube oil supply")],
   furnace:[N("N1","Process feed inlet"),N("N2","Cracked gas outlet"),N("N3","Fuel gas to burners")],
   pump:[N("N1","Suction"),N("N2","Discharge"),N("N3","Seal flush"),N("N4","Casing drain")],
@@ -33,6 +33,10 @@ function spiPrep(n){window.SPIP=window.SPIP||{};if(SPIP[n])return SPIP[n];const 
  if(GA[n])GA[n].nz=spiNozzles(cls);
  return SPIP[n]={n,cls,zones,key,line2zone}}
 const spiBolts=(k,ax,x,y,z,R,N,len,r)=>Array.from({length:N},(_,i)=>{const t=i/N*Math.PI*2,u=Math.cos(t)*R,v=Math.sin(t)*R;return g3C(k,ax,ax==="x"?x:x+u,ax==="y"?y:ax==="x"?y+u:y+v,ax==="z"?z:ax==="x"?z+v:z+v,len,r,"steel",{m:.7,seg:8})});
+/* bounding box of the model of a set, metres: {mn:[x,y,z], mx:[x,y,z]} (cheap: from the primitives, no meshing) */
+function spiBBox(n){window.SPIB=window.SPIB||{};if(SPIB[n])return SPIB[n];const mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];
+ (G3M[n]||[]).forEach(p=>{const m=Math.max(p.r||0,p.r2||0),h=p.t==="r"?[p.w/2,p.h/2,p.d/2]:p.t==="c"?(p.ax==="x"?[p.len/2,m,m]:p.ax==="y"?[m,p.len/2,m]:[m,m,p.len/2]):(p.ax==="x"?[p.ra,p.rb,p.rb]:p.ax==="y"?[p.rb,p.ra,p.rb]:[p.rb,p.rb,p.ra]);[p.x,p.y,p.z].forEach((c,i)=>{mn[i]=Math.min(mn[i],c-h[i]);mx[i]=Math.max(mx[i],c+h[i])})});
+ return SPIB[n]={mn,mx}}
 /* ---------- pump, API 610 OH2 (end suction, top discharge, centreline supported) with API 682 seal, plan 11 flush ---------- */
 function spiPump(n){const P=spiPrep(n),k=id=>P.key[id]||"",B=g3B,C=g3C,cy=.62,a=[];
  a.push(B(k("oth"),.2,.09,0,3.7,.18,.95,"gray",{r:.04}),B("",.2,.012,0,3.8,.03,1.05,"dark",{r:.04,zb:.6}));
