@@ -76,3 +76,5 @@ Page `spi_eq` (Equipment 3D, any location) works on the real database for every 
 **Entry points:** `spiGo('spi_eq',{funcloc:'PX_PRV-1188B'})`; the search box on the page; the Locations page detail view (B wraps `spiLocDetail` at run time to add an "Open in 3D" button on every location; A may add the button natively, B's wrapper skips it when present).
 
 **Not yet:** pump motor and seal-system sub-items, furnace sub-items (coils, burners, quench fittings, ducts, peep doors) as their own clickable assemblies; process block flow explorer; equipment timeline lane chart; the corrections to the turbine drive type, the exchanger tube zone (tube plugs are the tube bundle, PIPE is connection piping) and the first-plant leftovers in the plant view.
+
+Corrections done (B): turbine labelled "drive type not stated, API 612 layout assumed"; exchanger: tube plugs mark the tube bundle and PIPE parts are "connection piping"; the plant 3D view no longer draws the first plant's control room, tank or separator (rack and flare are illustrative).
