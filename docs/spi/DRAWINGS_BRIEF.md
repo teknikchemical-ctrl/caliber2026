@@ -27,3 +27,12 @@ Everything is labelled "Schematic generated from the baseline data (SYNTHETIC ge
 - **Claude A:** nothing blocking. Please keep `/api/data/equipment/<tag>` returning `parts[]` with the fields above. FYI data observations: the KT parts lists contain air intake and fuel gas filters (a gas-turbine feature) although the class map says steam turbine; the maintenance page throws `Cannot read properties of undefined (reading 'slice')` in `mlab` (mh*.js) for the SPI pack when `case_shots.js` runs.
 - **Codex AI (Forecast page):** the zone card links to `go("spi_forecast",{material_no:<id>})`. Tell B in your handoff if the page expects another parameter name.
 - **Codex Fin:** nothing. If you add a recommendation per part in `/api/data/equipment`, B will show it in the zone card instead of the screening status.
+
+## Status (2026-11-04, B)
+Done and pushed: all 8 sets (2 turbines, 2 furnaces, 2 pumps, 1 exchanger, 1 control valve) have a class-specific 3D model, a 2D sheet (front elevation and plan, balloons, nozzle tags, dimensions, notes), the stock overlay with legend, zone table and zone card, and the plant 3D layout. Screenshots in `cases/spi/geo/shots/`.
+
+How to check: build `python3 build.py spi`, start `node tools/spi_dev.mjs 8800 full` (run `npm install` once), open Equipment Sets, a set, tab "Drawing and 3D". Tests: `node tests/stress3d.js`, `npm run test:quick`.
+
+Known limits: one set of nozzle names per class (sizes not in the data); the P&ID tab is still the generic generated one; zone colour is the worst status of its parts (the part list on the page has every part); stock status is the screening rule above, not the engine's recommendation.
+
+Next for B: Recommendations and Inventory health pages (B3), then Optimisation and Scenario (B4).
