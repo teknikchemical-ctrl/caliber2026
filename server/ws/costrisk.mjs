@@ -17,7 +17,7 @@ export function portfolioParts(db, sc) {
   const ty = list(sc.type).map((x) => x.toUpperCase()); if (ty.length) { w.push(`t.item_type in (${ty.map(() => "?").join(",")})`); a.push(...ty); }
   const dc = list(sc.dclass); if (dc.length) { w.push(`p.demand_class in (${dc.map(() => "?").join(",")})`); a.push(...dc); }
   if (sc.q) { w.push("t.descr like ?"); a.push("%" + String(sc.q).slice(0, 60) + "%"); }
-  return db.prepare(`select p.material_no, t.descr, t.item_type, t.mrp_type, coalesce(p.crit_max,'C') crit, p.demand_class, p.stock, p.min_qty, p.max_qty, p.unit_price_idr price, p.lt_median, p.total_qty, p.n_issues,
+  return db.prepare(`select p.material_no, t.descr, t.item_type, t.mrp_type, t.unit, p.lt_p90, p.supplier_count, p.months_since_last, p.last_issue, coalesce(p.crit_max,'C') crit, p.demand_class, p.stock, p.min_qty, p.max_qty, p.unit_price_idr price, p.lt_median, p.total_qty, p.n_issues,
     (select coalesce(sum(qty*qty),0) from demand_month d where d.material_no = p.material_no) sq from part_profile p join material t using(material_no) where ${w.join(" and ")}`).all(...a);
 }
 /* one part under one policy: yearly figures */
@@ -33,7 +33,7 @@ export function evalPart(p, pol, A) {
   const price = p.price || 0, hold = avgStock * price * A.carrying_rate, order = cycles * A.order_cost_idr, shortCost = shortUnits * price * A.emergency_premium + events * (A.downtime_share[p.crit] ?? 0) * (A.hours_per_stockout[p.crit] || 0) * (A.downtime_idr_h[p.crit] || 0);
   return { rop, max, avgStock, value: avgStock * price, hold, order, shortUnits, events, shortCost, total: hold + order + shortCost, priced: price > 0, demand: D };
 }
-function sum(parts, pol, A) { const t = { parts: parts.length, priced: 0, value: 0, hold: 0, order: 0, shortCost: 0, events: 0, shortUnits: 0, total: 0, byCrit: {} };
+export function sum(parts, pol, A) { const t = { parts: parts.length, priced: 0, value: 0, hold: 0, order: 0, shortCost: 0, events: 0, shortUnits: 0, total: 0, byCrit: {} };
   parts.forEach((p) => { const r = evalPart(p, pol, A); if (r.priced) t.priced++; ["value", "hold", "order", "shortCost", "events", "shortUnits", "total"].forEach((k) => (t[k] += r[k])); const c = t.byCrit[p.crit] = t.byCrit[p.crit] || { parts: 0, value: 0, hold: 0, shortCost: 0, events: 0, total: 0 }; c.parts++; c.value += r.value; c.hold += r.hold; c.shortCost += r.shortCost; c.events += r.events; c.total += r.total; });
   return t; }
 export default guard(async (req, res) => {
