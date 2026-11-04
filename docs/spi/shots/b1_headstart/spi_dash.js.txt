@@ -1,0 +1,43 @@
+/* =====================================================================================================
+   SPARE PART OVERVIEW (owner: Claude B)  page id spi_dash
+   Data: GET /api/data/summary (stock value, criticality split, KPIs, top lists), GET /api/engine/health (recommendation counts).
+   ===================================================================================================== */
+regMod("spi_dash","1.0",["spi_core"],"Spare part overview");
+spiPage("spi_dash",{pos:1,nav:"Overview",icon:"M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z",
+ title:"Spare part overview",
+ sub:"Stock position, risk and excess across the plant, with the next action for each part. Values are estimates where a unit price comes from the last purchase order.",
+ load:async()=>{const [s,h]=await Promise.all([spiApi("/api/data/summary"),spiApi("/api/engine/health").catch(()=>null)]);return{s,h}},
+ view:({s,h})=>{
+  if(!s||!s.by_crit)return spiEmpty("No summary yet","The data service returned no stock summary.");
+  const k=s.kpi||{},hc=(h&&h.counts)||{},
+   reorder=spiHas(hc.reorder)?hc.reorder:k.reorder,reduce=spiHas(hc.reduce)?hc.reduce:k.reduce,dead=spiHas(hc.dead)?hc.dead:k.dead,
+   within=c=>Math.max(0,(c.stock_value_idr||0)-(c.excess_value_idr||0)),
+   tiles=[
+    spiKpi(spiIdr(s.stock_value_idr),"Stock value, estimate",{go:"spi_health",note:"Parts with a purchase price only"}),
+    spiKpi(spiIdr(s.excess_value_idr),"Value above Max, estimate",{tone:"gry",go:"spi_health"}),
+    spiKpi(spiN(k.below_min),"Parts below Min",{tone:"warn",go:"spi_reco",x:{filter:"below_min"}}),
+    spiKpi(spiN(k.zero_stock_sa),"S and A parts at zero stock",{tone:"bad",go:"spi_reco",x:{filter:"zero_sa"}}),
+    spiKpi(spiN(reorder),"Parts to reorder",{tone:"bad",go:"spi_reco",x:{filter:"REORDER"}}),
+    spiKpi(spiN(reduce),"Parts to reduce",{tone:"gry",go:"spi_reco",x:{filter:"REDUCE"}}),
+    spiKpi(spiN(dead),"Dead stock",{tone:"gry",go:"spi_health",note:"No issue and no planned use"})],
+   rows=s.by_crit.map(c=>({label:"Criticality "+c.crit,ok:within(c),ex:c.excess_value_idr||0,parts:c.parts,total:c.stock_value_idr})),
+   chart=spiBars(rows,[{key:"ok",label:"Within Max",cls:"s1"},{key:"ex",label:"Above Max",cls:"s2"}],{aria:"Stock value by criticality, split into within Max and above Max"}),
+   tbl=spiTable("spi_crit",[{h:"Criticality",f:r=>r.label},{h:"Parts",k:"parts",num:1,fmt:v=>spiN(v)},{h:"Stock value",k:"total",num:1,fmt:v=>spiIdr(v)},{h:"Within Max",k:"ok",num:1,fmt:v=>spiIdr(v)},{h:"Above Max",k:"ex",num:1,fmt:v=>spiIdr(v)}],rows,{sort:0,dir:1}),
+   riskCols=[{h:"Part",f:r=>r.material_no,fmt:(v,r)=>spiPart(r)},{h:"Crit.",k:"crit",fmt:v=>spiCrit(v)},{h:"Stock",k:"stock",num:1,fmt:v=>spiN(v)},{h:"Min",k:"min_qty",num:1,fmt:v=>spiN(v)},{h:"Stockout risk",k:"stockout_risk",num:1,fmt:v=>spiHas(v)?`<span class="spi-risk" data-tip="Probability of a stockout before the next delivery. Estimate.">${spiPct(v)}</span>`:SPI_NA},{h:"Action",k:"action",fmt:v=>spiAct(v)}],
+   excCols=[{h:"Part",f:r=>r.material_no,fmt:(v,r)=>spiPart(r)},{h:"Crit.",k:"crit",fmt:v=>spiCrit(v)},{h:"Stock",k:"stock",num:1,fmt:v=>spiN(v)},{h:"Max",k:"max_qty",num:1,fmt:v=>spiN(v)},{h:"Excess value",k:"excess_value_idr",num:1,fmt:v=>spiIdr(v)},{h:"Action",k:"action",fmt:v=>spiAct(v)}],
+   go=[["spi_forecast","Forecast","Pick a part, see the forecast band, the drivers and how the AI reasoned"],["spi_opt","Optimisation","Current Min and Max against dynamic parameters"],["spi_health","Inventory health","Excess, slow-moving, non-moving, obsolete"],["spi_reco","Recommendations","The action queue with reasons"],["spi_scn","Scenario simulator","Raise or lower stock, see cost and risk"],["spi_ask","Ask the AI","Ask an inventory question, see the evidence"],["spi_arch","Data and architecture","Sources, joins, data quality, methods, standards"]].filter(g=>SPI.pages[g[0]]);
+  return `<div class="spi-kpis">${tiles.join("")}</div>
+  <div class="spi-two">
+   ${spiCard("Stock value by criticality",esc(s.value_basis||"")+(s.data_cutoff?` Data to ${esc(s.data_cutoff)}.`:""),chart,tbl)}
+   <section class="card spi-card"><h3>Where the data stands</h3><div class="spi-facts">
+    <div><b>${spiN(s.counts&&s.counts.materials)}</b><span>materials on a bill of materials</span></div>
+    <div><b>${spiN(s.counts&&s.counts.with_issue)}</b><span>ever had an issue</span></div>
+    <div><b>${spiN(s.counts&&s.counts.stock_items)}</b><span>are stock items</span></div>
+    <div><b>${spiN(s.counts&&s.counts.price_known)}</b><span>have a purchase price</span></div></div>
+    <p class="muted spi-sub">Demand is mostly intermittent and history is 17 months, so no seasonality is claimed. Every figure with a price is an estimate. Data problems are listed on the data page.</p></section>
+  </div>
+  <div class="spi-two">
+   <section class="card spi-card"><h3>Top 10 stockout risks</h3><div class="muted spi-sub">Highest estimated chance of running out before the next delivery.</div>${spiTable("spi_risk",riskCols,s.top_risk||[],{limit:10,click:"spiOpenPart",empty:"No parts are at risk of a stockout."})}</section>
+   <section class="card spi-card"><h3>Top 10 excess</h3><div class="muted spi-sub">Largest value held above Max. Estimate.</div>${spiTable("spi_exc",excCols,s.top_excess||[],{limit:10,click:"spiOpenPart",empty:"No parts are held above Max."})}</section>
+  </div>
+  ${go.length?`<div class="spi-go">${go.map(g=>`<button class="card click" onclick="spiGo('${g[0]}')"><b>${g[1]}</b><span class="muted">${g[2]}</span></button>`).join("")}</div>`:""}`}});

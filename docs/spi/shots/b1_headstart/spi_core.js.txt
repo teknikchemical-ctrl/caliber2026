@@ -1,0 +1,86 @@
+/* =====================================================================================================
+   SPARE PART PAGES, CORE (owner: Claude B)
+   - spiApi(path, body): the ONLY place that calls fetch for the spare part pages. In a file:// view or with ?stub=1 it answers from
+     spiStub() (spi_stub.js, sample data in the shape of the API) and every page shows a "Fixture data" banner.
+   - SPI.pages: one entry per page {nav, title, sub, icon, load(), view(data), after(data)}. Registered with spiPage(id, def).
+   - Pages need no build.py patch: render() is wrapped here and the navigation group "Spare parts" is added at run time.
+   - Helpers: spiN, spiIdr, spiPct, spiCard (chart or table toggle), spiTable (sortable), spiBars (stacked bars), spiKpi, tooltips.
+   Rule: a number that the API does not give is shown as "Not in baseline data", never invented.
+   ===================================================================================================== */
+regMod("spi_core","1.0",[],"Spare part pages: API access, helpers, navigation");
+const SPI={pages:{},order:[],cache:{},tbl:{},tok:0,
+ fixture:(()=>{try{return location.protocol==="file:"||/[?&]stub=1/.test(location.search)||window.SPI_STUB===1}catch(e){return false}})()};
+const SPI_NA="Not in baseline data";
+async function spiApi(path,body,opt){
+ const post=body!==undefined&&body!==null,key=post?null:path;
+ if(key&&SPI.cache[key]&&!(opt&&opt.fresh))return SPI.cache[key];
+ let out;
+ if(SPI.fixture){if(typeof spiStub!=="function")throw new Error("No sample data is available in this view.");out=await spiStub(path,body)}
+ else{let r;try{r=await fetch(path,{method:post?"POST":"GET",headers:post?{"Content-Type":"application/json"}:undefined,body:post?JSON.stringify(body):undefined})}
+  catch(e){throw new Error("The server could not be reached. Check the connection and try again.")}
+  let j=null;try{j=await r.json()}catch(e){}
+  if(!r.ok)throw new Error((j&&j.error)||("The server answered "+r.status+"."));
+  if(j===null)throw new Error("The server did not return data.");out=j}
+ if(key)SPI.cache[key]=out;return out}
+/* ---------- number formats: units after a space, % symbol, no invented values ---------- */
+const spiHas=v=>v!==null&&v!==undefined&&v!==""&&!(typeof v==="number"&&isNaN(v));
+const spiN=(v,d)=>spiHas(v)?Number(v).toLocaleString("en-US",{minimumFractionDigits:d||0,maximumFractionDigits:d||0}):SPI_NA;
+function spiIdr(v){if(!spiHas(v))return SPI_NA;const a=Math.abs(v);return "IDR "+(a>=1e9?(v/1e9).toFixed(1)+" bn":a>=1e6?(v/1e6).toFixed(1)+" M":spiN(v))}
+const spiPct=(v,d)=>spiHas(v)?(Number(v)*100).toFixed(d==null?0:d)+"%":SPI_NA;
+const spiMonths=v=>spiHas(v)?(v>=999?"no demand":Number(v).toFixed(1)+" months"):SPI_NA;
+/* ---------- states ---------- */
+const spiBanner=()=>SPI.fixture?`<div class="spi-fix" role="note"><b>Fixture data.</b> The API is not connected in this view, so every number on this page is a sample in the shape of the API. It is not plant data.</div>`:"";
+const spiError=(e,p)=>`<div class="card spi-state" role="alert"><h3>This page could not load its data</h3><p class="muted">${esc(e&&e.message||"Unexpected error")}</p><div class="row" style="gap:8px"><button onclick="SPI.cache={};render()">Try again</button></div></div>`;
+const spiEmpty=(t,x)=>`<div class="card spi-state"><h3>${esc(t)}</h3><p class="muted">${esc(x||"")}</p></div>`;
+/* ---------- pages ---------- */
+function spiPage(id,def){SPI.pages[id]=def;if(!SPI.order.includes(id))SPI.order.push(id);SPI.order.sort((a,b)=>(SPI.pages[a].pos||99)-(SPI.pages[b].pos||99));spiNavSoon()}
+function spiGo(id,x){if(SPI.pages[id]){go(id,Object.assign({set:null,doc:null,opl:null,wo:null},x||{}));return true}return false}
+const _rSpi=render;
+render=function(){const p=st.page;if(typeof p==="string"&&SPI.pages[p])return spiShow(p);return _rSpi.apply(this,arguments)};
+function spiShow(p){const pg=SPI.pages[p],tok=++SPI.tok;
+ app.innerHTML=`<div class="phead"><div><h1>${pg.title}</h1>${pg.sub?`<p class="sub">${pg.sub}</p>`:""}</div></div><div id="spi_body" class="spi">${typeof skeleton==="function"?skeleton(4):"Loading"}</div>`;
+ Promise.resolve().then(()=>pg.load?pg.load():{}).then(d=>{if(SPI.tok!==tok)return;const b=document.getElementById("spi_body");if(!b)return;b.innerHTML=spiBanner()+pg.view(d);if(pg.after)pg.after(d,b)})
+  .catch(e=>{if(SPI.tok!==tok)return;const b=document.getElementById("spi_body");if(b)b.innerHTML=spiBanner()+spiError(e,p);console.error(e)})}
+/* navigation group, inserted above the first group once the sidebar has been grouped by ui.js */
+let spiNavT=0;
+function spiNavSoon(){if(spiNavT)return;let n=0;spiNavT=setInterval(()=>{if(spiNav()||++n>50){clearInterval(spiNavT);spiNavT=0}},100)}
+function spiNav(){const aside=document.querySelector("aside");if(!aside||!SPI.order.length)return false;const sec=aside.querySelector(".navsec");if(!sec)return false;
+ aside.querySelectorAll("[data-spi]").forEach(n=>n.remove());
+ const lab=document.createElement("div");lab.className="navsec";lab.dataset.spi="1";lab.textContent="Spare parts";sec.parentNode.insertBefore(lab,sec);
+ SPI.order.forEach(p=>{const pg=SPI.pages[p],n=document.createElement("div");n.className="nav"+(st.page===p?" active":"");n.dataset.page=p;n.dataset.spi="1";n.setAttribute("role","link");n.tabIndex=0;
+  n.innerHTML=`<svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><path d="${pg.icon||"M4 6h16M4 12h16M4 18h16"}"/></svg><span>${pg.nav}</span>`;
+  n.onclick=()=>go(p,{set:null,doc:null,opl:null,wo:null});n.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();n.click()}};sec.parentNode.insertBefore(n,sec)});return true}
+/* ---------- tooltip (one element, filled from data-tip on any mark) ---------- */
+{let tip=null;const show=(t,x,y)=>{if(!tip){tip=document.createElement("div");tip.className="spi-tip";tip.setAttribute("role","tooltip");document.body.appendChild(tip)}tip.innerHTML=t;tip.style.display="block";
+  const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.max(8,Math.min(innerWidth-w-8,x+14))+"px";tip.style.top=Math.max(8,y-h-10)+"px"};
+ document.addEventListener("mousemove",e=>{const m=e.target.closest&&e.target.closest("[data-tip]");if(m)show(m.getAttribute("data-tip"),e.clientX,e.clientY);else if(tip)tip.style.display="none"},{passive:true});
+ document.addEventListener("focusin",e=>{const m=e.target.closest&&e.target.closest("[data-tip]");if(m){const r=m.getBoundingClientRect();show(m.getAttribute("data-tip"),r.left+r.width/2,r.top)}});
+ document.addEventListener("focusout",()=>{if(tip)tip.style.display="none"})}
+/* ---------- KPI tile ---------- */
+function spiKpi(big,label,o){o=o||{};const tag=o.go&&SPI.pages[o.go]?"button":"div";
+ return `<${tag} class="spi-kpi ${o.tone||""}" ${tag==="button"?`onclick="spiGo('${o.go}',${esc(JSON.stringify(o.x||{}))})"`:""}><span class="v">${big}</span><span class="l">${esc(label)}</span>${o.note?`<span class="n">${esc(o.note)}</span>`:""}</${tag}>`}
+/* ---------- card with a chart / table switch (every chart has a table view) ---------- */
+let spiSeq=0;
+function spiCard(title,sub,chart,table,o){const id="spic"+(++spiSeq);o=o||{};
+ return `<section class="card spi-card ${o.cls||""}" id="${id}"><div class="spi-ch"><div><h3>${esc(title)}</h3>${sub?`<div class="muted spi-sub">${sub}</div>`:""}</div>${table?`<div class="spi-sw" role="group" aria-label="View"><button class="on" onclick="spiView('${id}','c',this)">Chart</button><button onclick="spiView('${id}','t',this)">Table</button></div>`:""}</div><div class="spi-v c">${chart}</div>${table?`<div class="spi-v t" hidden>${table}</div>`:""}</section>`}
+function spiView(id,v,btn){const c=document.getElementById(id);if(!c)return;c.querySelectorAll(".spi-v").forEach(x=>x.hidden=!x.classList.contains(v));c.querySelectorAll(".spi-sw button").forEach(b=>b.classList.toggle("on",b===btn))}
+/* ---------- sortable table: cols [{h, k or f(row), fmt(v,row), num, cls}] ---------- */
+function spiTable(id,cols,rows,o){o=o||{};SPI.tbl[id]={cols,rows,o,sort:o.sort||null,dir:o.dir||-1};return spiTableHtml(id)}
+function spiTableHtml(id){const T=SPI.tbl[id],{cols,rows,o}=T;let list=rows.slice();
+ if(T.sort!==null){const c=cols[T.sort],val=r=>c.f?c.f(r):r[c.k];list.sort((a,b)=>{const x=val(a),y=val(b);if(!spiHas(x))return 1;if(!spiHas(y))return -1;return (typeof x==="number"&&typeof y==="number"?x-y:String(x).localeCompare(String(y)))*T.dir})}
+ if(o.limit)list=list.slice(0,o.limit);
+ if(!list.length)return `<div class="muted spi-empty">${esc(o.empty||"No rows to show.")}</div>`;
+ return `<div class="spi-tw" id="${id}"><table class="spi-t"><thead><tr>${cols.map((c,i)=>`<th class="${c.num?"num":""}" aria-sort="${T.sort===i?(T.dir>0?"ascending":"descending"):"none"}"><button class="spi-th" onclick="spiSort('${id}',${i})">${esc(c.h)}${T.sort===i?(T.dir>0?" ▲":" ▼"):""}</button></th>`).join("")}</tr></thead><tbody>${list.map((r,ri)=>`<tr ${o.click?`class="click" tabindex="0" onclick="${o.click}(${esc(JSON.stringify(r[o.key||"material_no"]))})" onkeydown="if(event.key==='Enter')this.click()"`:""}>${cols.map(c=>{const v=c.f?c.f(r):r[c.k];return `<td class="${c.num?"num":""} ${c.cls||""}">${c.fmt?c.fmt(v,r):(spiHas(v)?esc(v):`<span class="muted">${SPI_NA}</span>`)}</td>`}).join("")}</tr>`).join("")}</tbody></table></div>`}
+function spiSort(id,i){const T=SPI.tbl[id];if(!T)return;if(T.sort===i)T.dir=-T.dir;else{T.sort=i;T.dir=T.cols[i].num?-1:1}const el=document.getElementById(id);if(el)el.outerHTML=spiTableHtml(id)}
+/* ---------- stacked horizontal bars, one axis, 2 px gaps, direct labels. rows [{label, a, b}], parts [{key,label,cls}] ---------- */
+function spiBars(rows,parts,o){o=o||{};const fmt=o.fmt||spiIdr,mx=Math.max(1,...rows.map(r=>parts.reduce((s,p)=>s+(r[p.key]||0),0)));
+ return `<div class="spi-bars" role="img" aria-label="${esc(o.aria||"Bar chart")}">${rows.map(r=>{const tot=parts.reduce((s,p)=>s+(r[p.key]||0),0);
+  return `<div class="spi-bar"><span class="lab">${esc(r.label)}</span><span class="trk">${parts.map(p=>{const v=r[p.key]||0;return v>0?`<i class="${p.cls}" style="width:${(v/mx*100).toFixed(2)}%" tabindex="0" data-tip="${esc(r.label)}<br>${esc(p.label)}: <b>${esc(fmt(v))}</b>"></i>`:""}).join("")}</span><span class="val">${esc(fmt(tot))}</span></div>`}).join("")}
+  <div class="spi-legend">${parts.map(p=>`<span><i class="${p.cls}"></i>${esc(p.label)}</span>`).join("")}</div></div>`}
+/* criticality labels used by every page */
+const SPI_CRIT={S:"S, safety or production critical",A:"A, high",B:"B, medium",C:"C, low"};
+const spiCrit=c=>spiHas(c)?`<span class="spi-crit c${esc(c)}" title="${esc(SPI_CRIT[c]||"")}">${esc(c)}</span>`:`<span class="muted">${SPI_NA}</span>`;
+const SPI_ACT={REORDER:["Reorder","bad"],REDUCE:["Reduce","gry"],MAINTAIN:["Maintain","ok"],MONITOR:["Monitor","warn"],REVIEW_OBSOLETE:["Review obsolete","gry"],KEEP_INSURANCE:["Keep as insurance","ok"]};
+const spiAct=a=>SPI_ACT[a]?`<span class="spi-act ${SPI_ACT[a][1]}">${SPI_ACT[a][0]}</span>`:`<span class="muted">${SPI_NA}</span>`;
+const spiPart=r=>`<b>${esc(r.material_no)}</b><span class="spi-d">${esc(r.descr||"")}</span>`;
+function spiOpenPart(m){if(!spiGo("spi_forecast",{mat:m}))toast("The Forecast page is not available yet.")}

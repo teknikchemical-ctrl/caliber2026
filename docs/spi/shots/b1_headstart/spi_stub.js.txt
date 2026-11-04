@@ -1,0 +1,39 @@
+/* =====================================================================================================
+   SPARE PART PAGES, SAMPLE DATA (owner: Claude B)
+   Used only in a file:// view or with ?stub=1 (see spiApi in spi_core.js). The shapes follow the API in docs/spi/ARCHITECTURE.md.
+   These are samples, not plant data: every page that uses them shows a "Fixture data" banner. Remove nothing here when the API goes live.
+   ===================================================================================================== */
+regMod("spi_stub","1.0",["spi_core"],"Spare part pages: sample data in the shape of the API");
+const SPI_FIX=(()=>{
+ const D=["BEARING,BALL,ANGULAR,NU319BDB","SEAL,LABYRINTH,DWG.108-6739,FOR KT-264A","GASKET,RING,8IN,600#,GRAPHITE","VALVE,GATE,6IN,300#,A216 WCB","SEAL,MECHANICAL,API 682,FOR PP-1604A","TRANSMITTER,PRESSURE,0-60 BARG","FILTER ELEMENT,LUBE OIL,10 MICRON","BUSHING,THRUST,FOR KC-101","SPIRAL WOUND GASKET,10IN,300#","ROTOR BLADE SET,FOR KT-264A","IMPELLER,CASING,FOR PP-1701B","TUBE BUNDLE,FOR HE-2201","POSITIONER,DIGITAL,FOR FCV-301","COUPLING,GEAR,FOR KC-102"],
+  C=["S","A","S","B","A","C","B","S","A","S"],row=(i,k)=>({material_no:100200+i*37,descr:D[(i+k)%D.length],crit:C[(i+k)%C.length]});
+ const risk=Array.from({length:10},(_,i)=>Object.assign(row(i,0),{stock:i%3?0:1,min_qty:2+i%3,months_cover:i%3?0:1.5,stockout_risk:Math.max(.35,.92-i*.05),action:"REORDER"}));
+ const exc=Array.from({length:10},(_,i)=>Object.assign(row(i,5),{stock:40-i*3,max_qty:12,excess_value_idr:(9.6-i*.7)*1e8,months_cover:60+i*6,action:i%4===3?"REVIEW_OBSOLETE":"REDUCE"}));
+ return {
+  summary:{source:"fixture",data_cutoff:"2026-09-30",
+   counts:{materials:300,with_issue:84,stock_items:176,price_known:121},
+   stock_value_idr:3.2e10,excess_value_idr:2.7e10,value_basis:"Estimate: last PO amount divided by PR quantity, only for parts that have a purchase price",
+   by_crit:[{crit:"S",parts:42,stock_value_idr:1.1e10,excess_value_idr:8.5e9},{crit:"A",parts:77,stock_value_idr:9.4e9,excess_value_idr:8.2e9},{crit:"B",parts:101,stock_value_idr:7.6e9,excess_value_idr:7.1e9},{crit:"C",parts:80,stock_value_idr:4.0e9,excess_value_idr:3.2e9}],
+   kpi:{below_min:21,zero_stock_sa:9,reorder:17,reduce:58,dead:44},top_risk:risk,top_excess:exc},
+  health:{source:"fixture",counts:{excess:96,slow:41,non_moving:112,obsolete:31,insurance:12,reorder:17,reduce:58,dead:44},lists:{}},
+  dq:{source:"fixture",issues:[
+   {issue:"Duplicate BoM rows",table:"bom",severity:"warn",count:230,action:"Merged, installed quantity kept once",example:"Same location and material twice"},
+   {issue:"Negative or over-long lead time",table:"po_line",severity:"warn",count:207,action:"Excluded from the lead time statistics",example:"6 negative, 201 above 365 days"},
+   {issue:"Zero or absurd unit price",table:"material",severity:"warn",count:null,action:"Value shown as Not in baseline data",example:""},
+   {issue:"Mixed currencies",table:"po_line",severity:"info",count:97,action:"Kept in the original currency, value in IDR only for IDR lines",example:"JPY, USD, EUR, SGD"},
+   {issue:"Stock held at material level, listed under every location",table:"bom",severity:"info",count:null,action:"Stock counted once per material",example:""},
+   {issue:"Locations without criticality",table:"funcloc",severity:"warn",count:33,action:"Treated as C and flagged",example:""}]},
+  architecture:{source:"fixture",
+   sources:[{id:"funcloc",name:"FuncLoc list",rows:14484,one:"a functional location",key:"Functional Location"},{id:"bom",name:"BoM",rows:20653,one:"a material installed at a location",key:"Functional Location + Material No"},{id:"movement",name:"Movement Material",rows:17518,one:"an issue transaction",key:"Material Number, Order"},{id:"notif",name:"Notif History",rows:5795,one:"a maintenance notification",key:"Notification, Order, Functional Location"},{id:"mitem",name:"Mitem and Mplan",rows:10153,one:"a planned maintenance item",key:"Maintenance Item, Functional Location"},{id:"po",name:"PR PO",rows:11609,one:"a purchase requisition line with its PO",key:"Purchase Requisition + PR Item"}],
+   joins:[["funcloc","bom","Functional Location","1:N"],["funcloc","notif","Functional Location","1:N"],["funcloc","mitem","Functional Location","1:N"],["bom","movement","Material No","1:N"],["bom","po","Material No","1:N"],["notif","movement","Order","1:N, about 16% of issues link"]],
+   tables:[{name:"material",rows:7481,layer:"clean"},{name:"bom",rows:20653,layer:"clean"},{name:"demand_month",rows:null,layer:"derived"},{name:"part_profile",rows:7481,layer:"derived"},{name:"spec_family",rows:null,layer:"derived"},{name:"equipment_set",rows:null,layer:"derived"},{name:"dq_issue",rows:null,layer:"derived"},{name:"forecast, inventory_param, recommendation",rows:null,layer:"results"}],
+   policy:[{name:"Holding cost rate",value:"22% of unit value per year",basis:"Policy, editable in the scenario page"},{name:"Slow-moving threshold",value:"more than 24 months of cover",basis:"Policy"},{name:"Insurance spare rule",value:"no demand, criticality S or A, lead time above 90 days",basis:"Policy"}]}
+ }})();
+async function spiStub(path,body){
+ await new Promise(r=>setTimeout(r,60));
+ const p=path.split("?")[0];
+ if(p==="/api/data/summary")return SPI_FIX.summary;
+ if(p==="/api/engine/health")return SPI_FIX.health;
+ if(p==="/api/data/dq")return SPI_FIX.dq;
+ if(p==="/api/data/architecture")return SPI_FIX.architecture;
+ throw new Error("The sample data has no answer for "+p+".")}

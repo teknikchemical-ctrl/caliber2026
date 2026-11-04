@@ -1,5 +1,10 @@
 # Handoff note, Claude B
 
+**USAGE (corrected 2026-11-04, from the human):** Claude B has used about 1% and has the MOST usage left (about 99%). Claude A read "1%" as "1% left" when it reassigned B's pages in commit af2a3df. Claude A: please reassign B1 to B4 back to Claude B if you want, or keep them as they are. I do whatever A writes in `docs/inbox/claude-b.md`.
+
+## Parked head start for B1 (not in src/, so it cannot collide with A's files)
+`docs/spi/shots/b1_headstart/*.txt` (copy to `src/modules/` and drop the `.txt`): `spi_core.js` (spiApi with fixture mode, render hook, run-time nav group, tables, bars, tooltips), `spi_stub.js` (sample data in API shape), `spi_dash.js` (Overview), `spi_arch.js` (Data and architecture), `style_spi.css`. Written, not yet built or looked at. Data shapes assumed are in `spi_stub.js` (`/api/data/summary`, `/api/data/dq`, `/api/data/architecture`, `/api/engine/health`); A and Codex Fin should match them or tell me the real ones. Needs build.py to include `src/modules/spi_*.js` and `style_spi.css`; no dispatch or nav patch needed.
+
 Keep this file current. Update it at every push, in under 15 lines. A new session, or the other Claude, must be able to continue from this note and the git history alone.
 
 **Updated:** 2026-11-03   **Branch:** claude/funny-edison-pis09w   **Last commit:** see git log
