@@ -23,3 +23,12 @@ if(window.SPI_MODE){KB.docs=KB.docs.filter(d=>d.type!=="Interlock Logic");KB.chu
 /* Professional display form of a location description ("TURBINE FOR KC-383A" becomes "Turbine for KC-383A"): words with digits or tag patterns stay as they are. */
 const spiName=s=>{if(!s)return"";return String(s).trim().split(/\s+/).map((w,i)=>/\d/.test(w)||/^[A-Z]{1,4}-[A-Z0-9]/.test(w)||/^(TLE|KO|LP|MP|HP|DCS|API|ASME|FCC)$/.test(w)?w:(i===0?w.charAt(0)+w.slice(1).toLowerCase():w.toLowerCase())).join(" ")};
 const spiStatus=r=>r.mrp_type==="Non Stock"&&r.stock>0?spiBadge("Non Stock, holds stock","warn"):r.stock===0&&r.max_qty>0?spiBadge("Zero stock","bad"):(r.min_qty>0&&r.stock<r.min_qty)?spiBadge("Below Min","warn"):(r.max_qty>0&&r.stock>r.max_qty)?spiBadge("Above Max","n"):r.stock===0?spiBadge("No stock","n"):spiBadge("In range","ok");
+/* Last-line clean-up of old plant case controls that the generic engine renders on drawing pages (simulated live data, trip and interlock shortcuts, lesson links).
+   Runs after each render in this case only; the drawings themselves are Claude B's, the generic P&ID is replaced per class when time allows. */
+function spiPrune(){const hide=e=>{if(e)e.style.display="none"},short=e=>(e.textContent||"").trim();
+ document.querySelectorAll("#app .pbar").forEach(e=>{if(/simulated|all items healthy/i.test(short(e)))hide(e)});
+ document.querySelectorAll("#app .tag").forEach(e=>{if(/simulated live data/i.test(short(e)))hide(e)});
+ document.querySelectorAll("#app button, #app .chip, #app .btn, #app label").forEach(e=>{const t=short(e);if(t.length<90&&(/^Values$/.test(t)||/interlock|\bOPLs?\b|lessons?|start-?up|simulate trip|live condition|\btrips?\b/i.test(t)))hide(e)});
+ document.querySelectorAll("#app p, #app .muted").forEach(e=>{if(e.children.length<4&&/simulate trip|interlock effects|live condition/i.test(short(e))){e.textContent="Select a part on the drawing for its stock, Min, Max and forecast."}});
+ document.querySelectorAll("#app svg text").forEach(e=>{const t=short(e);if(/^Health\s*(NaN|\d)|^RUNNING$|^TRIPPED$|^ALARM$/.test(t)){const g=e.closest("g");hide(g||e)}})}
+if(window.SPI_MODE){const _rP=render;render=function(){const r=_rP.apply(this,arguments);setTimeout(spiPrune,60);setTimeout(spiPrune,500);setTimeout(spiPrune,1500);return r}}
