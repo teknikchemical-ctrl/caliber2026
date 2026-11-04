@@ -1,0 +1,6 @@
+{
+  "data_cutoff": "2026-09-30",
+  "engine_version": "spi-engine-1.1",
+  "parts": 7481,
+  "source": "Rules replay: no per-month timelines in fast cache"
+}
