@@ -1,0 +1,33 @@
+// Tests for Claude A's data layer: schema, row counts against the raw files, API handlers against the fixture or the full database.
+// Usage: node tests/spi_data.js [fixture|full]   (default fixture: handlers run on spi/fixtures/mini.sqlite)
+const path = require("path"), fs = require("fs"), assert = require("assert");
+const mode = process.argv[2] || "fixture", ROOT = path.resolve(__dirname, "..");
+process.env.SPI_DB = path.join(ROOT, mode === "full" ? "spi/db/spi.sqlite" : "spi/fixtures/mini.sqlite"); process.env.SPI_RES = "/nonexistent";
+const run = async (file, query = {}) => { const m = await import(path.join(ROOT, file)); return new Promise(r => { const res = { statusCode: 200, h: {}, setHeader(k, v) { this.h[k] = v; }, end(b) { r({ s: this.statusCode, j: JSON.parse(b) }); } }; m.default({ url: "/x?" + new URLSearchParams(query), query }, res); }); };
+let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); };
+(async () => {
+  const D = require("better-sqlite3"), db = new D(process.env.SPI_DB, { readonly: true });
+  const cnt = t => db.prepare(`select count(*) c from ${t}`).get().c;
+  if (mode === "full") {
+    ok(cnt("material") === 7481 && cnt("movement") === 17518 && cnt("notification") === 5795 && cnt("po_line") === 11609 && cnt("maint_item") === 10153 && cnt("funcloc") === 14484, "row counts equal the raw files");
+    ok(cnt("bom") === 20423, "BoM: 20,653 rows minus 230 duplicates");
+    ok(cnt("part_profile") === cnt("material"), "every part has a profile");
+    ok(db.prepare("select count(*) c from movement where material_no not in (select material_no from material)").get().c === 0, "every issue joins to a part");
+    ok(db.prepare("select sum(n_issues) s from demand_month").get().s === 17518, "demand_month holds every issue");
+  }
+  ok(db.prepare("pragma foreign_key_check").all().length === 0, "foreign keys resolve");
+  ok(db.prepare("select count(*) c from dq_issue").get().c > 10, "data quality log is filled");
+  let r = await run("api/data/health.mjs"); ok(r.s === 200 && r.j.ok && r.j.parts > 100, "health endpoint reads the database");
+  r = await run("api/data/summary.mjs"); ok(r.s === 200 && r.j.parts.parts > 100 && r.j.by_criticality.length >= 3 && r.j.by_demand_class.length >= 4, "summary has KPIs, criticality and demand classes");
+  r = await run("api/data/parts.mjs", { limit: "5", sort: "demand" }); ok(r.s === 200 && r.j.rows.length === 5 && r.j.total > 100, "parts list pages");
+  const top = r.j.rows[0].material_no;
+  r = await run("api/data/parts.mjs", { q: "BEARING", limit: "3" }); ok(r.j.rows.every(x => /BEARING/.test(x.descr)), "parts text search");
+  r = await run("api/data/parts.mjs", { q: "'; drop table material;--" }); ok(r.s === 200 && r.j.total === 0, "search text is parameterised");
+  r = await run("api/data/part/[id].mjs", { id: String(top) }); ok(r.s === 200 && r.j.series.length === 17 && r.j.part.material_no === top && Array.isArray(r.j.served_by_bom), "part detail has a 17-month series and equipment served");
+  r = await run("api/data/part/[id].mjs", { id: "1" }); ok(r.s === 404 && r.j.error, "unknown part gives a readable 404");
+  const tag = db.prepare("select funcloc from bom limit 1").get().funcloc;
+  r = await run("api/data/equipment/[tag].mjs", { tag }); ok(r.s === 200 && r.j.parts.length > 0, "equipment endpoint lists its parts");
+  r = await run("api/data/dq.mjs"); ok(r.s === 200 && r.j.issues.length > 10 && r.j.counts.material > 100, "dq endpoint");
+  r = await run("api/data/architecture.mjs"); ok(r.s === 200 && r.j.sources.length === 6 && r.j.joins.length >= 4, "architecture endpoint lists six sources");
+  console.log(`\nAll ${n} data checks passed (${mode})`);
+})().catch(e => { console.error("FAIL", e.message); process.exit(1); });
