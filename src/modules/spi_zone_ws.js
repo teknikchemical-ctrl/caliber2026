@@ -9,7 +9,7 @@ function spiWsSet(id,o){SPIWS.views[id]=Object.assign(SPIWS.views[id]||{},o,{upd
 function spiWsSnapshot(){return JSON.parse(JSON.stringify({assumptions:SPA,views:SPIWS.views}))}
 /* for the AI: run a tool with inputs (the tool must be on screen or registered) */
 async function spiWsRun(id,inputs){const f=SPIWS.run[id];if(!f)throw new Error("No tool named "+id);return f(inputs||{})}
-const SPA_DEF={downtime_idr_h:{S:4200000,A:1250000,B:330000,C:42000},hours_per_stockout:{S:72,A:48,B:24,C:12},emergency_premium:0.35,carrying_rate:0.22,lead_default:60,service:{S:0.98,A:0.95,B:0.9,C:0.85},order_cost_idr:750000};
+const SPA_DEF={downtime_idr_h:{S:4200000,A:1250000,B:330000,C:42000},hours_per_stockout:{S:72,A:48,B:24,C:12},downtime_share:{S:0.5,A:0.25,B:0.1,C:0.02},emergency_premium:0.35,carrying_rate:0.22,lead_default:60,service:{S:0.98,A:0.95,B:0.9,C:0.85},order_cost_idr:750000};
 const SPA=(()=>{try{const s=JSON.parse(localStorage.getItem("spa")||"null");if(s)return Object.assign(JSON.parse(JSON.stringify(SPA_DEF)),s)}catch(e){}return JSON.parse(JSON.stringify(SPA_DEF))})();
 function spiSpaSave(){try{localStorage.setItem("spa",JSON.stringify(SPA))}catch(e){}}
 function spiSpaReset(){Object.assign(SPA,JSON.parse(JSON.stringify(SPA_DEF)));spiSpaSave()}
@@ -41,6 +41,7 @@ const wsPrioTone={Emergency:"bad",High:"warn",Medium:"acc",Low:"n"};
 function wsAssump(on,keys){keys=keys||["downtime","hours","premium","carry","lead"];const crit=["S","A","B","C"],inp=(path,v,step)=>`<input type="number" step="${step||"any"}" value="${v}" onchange="spiSpaEdit('${path}',this.value);${on}()">`;
  return `<details class="ws-as" open><summary>Assumptions <span>editable, saved in this browser</span></summary>
  ${keys.includes("downtime")?`<div class="ws-at"><b>Cost of downtime per hour (IDR)</b>${crit.map(c=>`<label>${c}${inp("downtime_idr_h."+c,SPA.downtime_idr_h[c],100000)}</label>`).join("")}</div>`:""}
+ ${keys.includes("share")?`<div class="ws-at"><b>Share of stockouts that stop equipment</b>${crit.map(c=>`<label>${c}${inp("downtime_share."+c,SPA.downtime_share[c],0.05)}</label>`).join("")}</div>`:""}
  ${keys.includes("hours")?`<div class="ws-at"><b>Hours lost per stockout</b>${crit.map(c=>`<label>${c}${inp("hours_per_stockout."+c,SPA.hours_per_stockout[c],1)}</label>`).join("")}</div>`:""}
  ${keys.includes("service")?`<div class="ws-at"><b>Target service level</b>${crit.map(c=>`<label>${c}${inp("service."+c,SPA.service[c],0.01)}</label>`).join("")}</div>`:""}
  <div class="ws-at">${keys.includes("premium")?`<label>Emergency purchase premium ${inp("emergency_premium",SPA.emergency_premium,0.05)}</label>`:""}${keys.includes("carry")?`<label>Carrying rate per year ${inp("carrying_rate",SPA.carrying_rate,0.01)}</label>`:""}${keys.includes("lead")?`<label>Lead time without history (days) ${inp("lead_default",SPA.lead_default,1)}</label>`:""}${keys.includes("order")?`<label>Cost per purchase order (IDR) ${inp("order_cost_idr",SPA.order_cost_idr,50000)}</label>`:""}</div>
