@@ -5,3 +5,4 @@ export {classify} from './classify.js';
 export {backtest,replay,replayCompare} from './backtest.js';
 export {workbookPolicy,policyReplay,comparePart,comparePolicies} from './compare.js';
 export {purchasePlanRows,cashPlan} from './cashplan.js';
+export {economicSource,economics} from './economics.js';
