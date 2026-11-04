@@ -35,6 +35,7 @@ ex("insert into material select * from f.material where material_no in (select m
 ex("insert into movement select * from f.movement where material_no in (select m from pk)")
 ex("insert into demand_month select * from f.demand_month where material_no in (select m from pk)")
 ex("insert into part_equipment select * from f.part_equipment where material_no in (select m from pk)")
+ex("insert into location_profile select * from f.location_profile where funcloc in (select x from fl)")
 ex("insert into part_profile select * from f.part_profile where material_no in (select m from pk)")
 ex("insert into notification select * from f.notification where funcloc in (select x from fl)")
 ex("insert into maint_item select * from f.maint_item where funcloc in (select x from fl)")
@@ -42,5 +43,5 @@ ex("insert into po_line select * from f.po_line where material_no in (select m f
 ex("insert into dq_issue select * from f.dq_issue"); ex("insert into meta select * from f.meta"); ex("insert or replace into meta values('fixture','mini: about 300 parts, same schema as the full database')")
 o.commit(); o.execute("detach database f"); o.execute("vacuum")
 n = lambda t: o.execute(f"select count(*) from {t}").fetchone()[0]
-print("fixture", OUT, round(os.path.getsize(OUT) / 1e6, 2), "MB", {t: n(t) for t in ["material", "bom", "funcloc", "movement", "po_line", "notification", "maint_item", "part_profile"]})
+print("fixture", OUT, round(os.path.getsize(OUT) / 1e6, 2), "MB", {t: n(t) for t in ["material", "bom", "funcloc", "movement", "po_line", "notification", "maint_item", "part_profile", "location_profile"]})
 print(dict(o.execute("select demand_class, count(*) from part_profile group by 1").fetchall()), dict(o.execute("select coalesce(crit_max,'-'), count(*) from part_profile group by 1").fetchall()))

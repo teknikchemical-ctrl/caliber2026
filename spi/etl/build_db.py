@@ -243,8 +243,25 @@ cols = ["material_no", "crit_max", "crit_rank", "n_funcloc", "installed_total", 
 put("part_profile", prof, cols)
 for cl, k in prof.demand_class.value_counts().items(): dq("part_profile", "*", f"demand class {cl}", "info", f"{int(k)} parts", "ADI cut-off 1.32 and CV2 cut-off 0.49 over {T} months")
 
+# ---------------- location_profile ----------------
+CUT = "(select value from meta where key='data_cutoff')"
+con.execute("insert or replace into meta values('data_cutoff', ?)", (cut.isoformat(),)); con.commit()
+con.execute(f"""insert into location_profile
+ select f.funcloc, f.tag, f.descr, f.criticality, f.eq_class, f.eq_class_name, f.system_code,
+  coalesce(a.n_parts,0), coalesce(a.n_used,0), coalesce(a.sv,0), coalesce(a.ev,0), coalesce(a.nz,0), coalesce(a.nb,0), coalesce(a.ncz,0),
+  coalesce(n.n_all,0), coalesce(n.n12,0), coalesce(n.h12,0), coalesce(n.op,0), coalesce(m.pm12,0), m.pmn
+ from funcloc f
+ left join (select b.funcloc, count(*) n_parts, sum(p.months_active>0) n_used, sum(coalesce(p.stock_value_idr,0)) sv, sum(coalesce(p.excess_value_idr,0)) ev,
+    sum(mt.mrp_type='Stock Item' and p.stock=0 and p.max_qty>0) nz, sum(mt.mrp_type='Stock Item' and p.min_qty>0 and p.stock>0 and p.stock<p.min_qty) nb,
+    sum(mt.mrp_type='Stock Item' and p.stock=0 and p.months_active>0) ncz
+    from bom b join part_profile p using(material_no) join material mt using(material_no) group by b.funcloc) a on a.funcloc=f.funcloc
+ left join (select funcloc, count(*) n_all, sum(notif_date>date({CUT},'-12 months')) n12, sum(notif_date>date({CUT},'-12 months') and priority in ('High','Emergency')) h12, sum(status='In Progress') op
+    from notification group by funcloc) n on n.funcloc=f.funcloc
+ left join (select funcloc, count(*) pm12, min(next_due) pmn from maint_item where next_due between {CUT} and date({CUT},'+12 months') group by funcloc) m on m.funcloc=f.funcloc""")
+con.commit()
+
 # ---------------- dq, meta ----------------
 con.executemany("insert into dq_issue(table_name,key,issue,severity,detail,action) values(?,?,?,?,?,?)", DQ)
-con.executemany("insert into meta values(?,?)", [("data_cutoff", cut.isoformat()), ("history_months", str(T)), ("history_first_month", mlist[0]), ("etl_version", ETL_VERSION), ("source_files", "BoM, FuncLoc list, Mitem & Mplan, Movement Material, Notif History, PR PO (baseline dataset, synthetic)")])
+con.executemany("insert or replace into meta values(?,?)", [("data_cutoff", cut.isoformat()), ("history_months", str(T)), ("history_first_month", mlist[0]), ("etl_version", ETL_VERSION), ("source_files", "BoM, FuncLoc list, Mitem & Mplan, Movement Material, Notif History, PR PO (baseline dataset, synthetic)")])
 con.commit(); con.execute("vacuum"); con.close()
 print("wrote", a.out, round(os.path.getsize(a.out) / 1e6, 1), "MB;", len(mat), "materials,", len(f), "locations,", len(v), "issues,", len(DQ), "dq rows, months", T, "cutoff", cut)

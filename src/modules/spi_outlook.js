@@ -1,0 +1,18 @@
+/* SPI Demand outlook (owner: Claude A). Monthly consumption history and a 12 month rules based projection, by all parts, criticality or item type. Data: GET /api/data/projection.
+   This is the portfolio view: the per-part forecast with the AI reasoning is the Forecast page. */
+regMod("spi_outlook","1.0",["spi_core"],"Demand outlook");
+const SPIOUT={by:"all",g:0,unit:"qty"};
+function spiOutSet(k,v){SPIOUT[k]=v;if(k==="by")SPIOUT.g=0;render()}
+spiRegister("spi_outlook","Demand outlook",async host=>{
+ const d=await spiApi("/api/data/projection?by="+SPIOUT.by),G=d.groups,g=G[Math.min(SPIOUT.g,G.length-1)],qty=SPIOUT.unit==="qty",f=r=>qty?r.qty:r.value;
+ const labels=[...g.history.map(h=>h.month),...g.projection.map(p=>p.month)],H=g.history.map(f),last=H[H.length-1];
+ const hist=[...H,...g.projection.map(()=>null)],fc=[...H.map((v,i)=>i===H.length-1?last:null),...g.projection.map(f)];
+ const chg=(a,b)=>b>0?Math.round((a/b-1)*100):null,tab=(id,l)=>`<span class="spi-chip${SPIOUT.by===id?" on":""}" onclick="spiOutSet('by','${id}')">${l}</span>`;
+ host.innerHTML=`<h1>Demand outlook</h1><p class="spi-sub">Portfolio projection of spare part consumption for the 12 months after ${esc(d.cutoff)} (Estimate). Rules based: the per-part forecast, reasoned by the AI and checked by a backtest, is on the Forecast page.</p>
+ <div class="spi-bar">${tab("all","All parts")}${tab("crit","By equipment criticality")}${tab("item_type","By part type")}<span style="flex:1"></span><span class="spi-chip${qty?" on":""}" onclick="spiOutSet('unit','qty')">Quantity</span><span class="spi-chip${qty?"":" on"}" onclick="spiOutSet('unit','value')">Value (IDR, Estimate)</span></div>
+ ${G.length>1?`<div class="spi-bar">${G.map((x,i)=>`<span class="spi-chip${i===SPIOUT.g?" on":""}" onclick="spiOutSet('g',${i})">${esc(x.group)}</span>`).join("")}</div>`:""}
+ ${spiCard(g.group+": monthly consumption and projection ("+(qty?"quantity issued":"value of issues, IDR")+")",spiLine({labels,history:hist,forecast:fc,title:"Consumption history and projection",unit:qty?"units":"IDR"}),"Projected months where the maintenance plan shows a high load are lifted by the uplift measured in the last campaign: "+g.projection.filter(p=>p.campaign_load).map(p=>p.month).join(", ")+".")}
+ <div class="spi-grid4">${spiKpi(qty?spiNum(g.history.slice(-12).reduce((s,h)=>s+h.qty,0)):spiMoney(g.history_12m_value_idr),"Last 12 months")}${spiKpi(qty?spiNum(g.projected_12m_qty):spiMoney(g.projected_12m_value_idr),"Projected next 12 months","acc",chg(qty?g.projected_12m_qty:g.projected_12m_value_idr,qty?g.history.slice(-12).reduce((s,h)=>s+h.qty,0):g.history_12m_value_idr)+"% against the last 12 months")}${spiKpi(spiNum(g.base_qty_per_month),"Base per month (median, non-campaign)")}${spiKpi(g.campaign_uplift_qty+" x","Campaign uplift measured","warn",d.campaign_months.join(", "))}</div>
+ ${spiCard("All groups",spiTable(G,[{h:"Group",k:"group"},{h:"Last 12 months",f:r=>qty?spiNum(r.history.slice(-12).reduce((s,h)=>s+h.qty,0)):spiMoney(r.history_12m_value_idr),num:1},{h:"Projected 12 months",f:r=>qty?spiNum(r.projected_12m_qty):spiMoney(r.projected_12m_value_idr),num:1},{h:"Uplift",f:r=>r.campaign_uplift_qty+" x",num:1},{h:"Share of quantity with a price",f:r=>r.priced_share==null?"n/a":Math.round(r.priced_share*100)+"%",num:1}]),"Value covers only parts that have a purchase price.")}
+ <p class="spi-note"><b>Method:</b> ${esc(d.method)} ${d.notes.map(esc).join(" ")}</p>`;
+});
