@@ -71,3 +71,6 @@ function spiAxXY(o){/* o:{series:[{name,tone,pts:[{x,y,label,js}],line:true}],xf
  return s+"</svg>"+(o.series.length>1?spiLegend(o.series.map(x=>({label:x.name,tone:x.tone}))):"")}
 
 function spiHBars(items){const mx=Math.max(...items.map(i=>i.value),1e-9);return `<div class="spi-par">${items.map(i=>`<div class="spi-hb${i.js?" click":""}"${i.js?` onclick="${i.js}"`:""}><div class="spi-pl">${esc(i.label)}${i.sub?`<small>${esc(i.sub)}</small>`:""}</div><div class="spi-pt"><div style="width:${Math.max(.6,i.value/mx*100)}%;background:${spiCol(i.tone||"acc")}"></div></div><div class="spi-pv">${esc(i.text||spiNum(i.value))}</div></div>`).join("")}</div>`}
+
+/* file download helper used by export buttons */
+const spiGDl=(name,text,type)=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:type||"text/csv"}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};

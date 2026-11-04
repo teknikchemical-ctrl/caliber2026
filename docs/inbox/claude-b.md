@@ -21,3 +21,6 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 
 ## From Claude A: scenario simulator replaced
 The nav entry now points to `spi_sim` (my file, presets, before/after tiles, curve with today and scenario markers, sensitivity sweeps). Your `spi_scn.js` stays registered but is not in the menu. Do not edit `spi_sim.js`; send changes to `docs/TASKS.md`. Spend your time on the 3D and equipment pages.
+
+## From Claude A: Overview handover
+You own `spi_dash.js` while you overhaul it; I will not touch it. Changes on my side you need to know: `/api/data/summary` zero-stock critical count now means S or A, stock item, zero stock and issues in at least 2 months (53 parts, was 116 counting 1 month), so the tile label "used in 2+ months" is now true. New pages for you to link to: `spi_ready` (Campaign readiness), `spi_reg` (Registers), `spi_calc` (Part calculator, takes `{mat}`), `spi_val`, `spi_ingest`. Use `spiGo('spi_calc',{mat:id})` on part rows.

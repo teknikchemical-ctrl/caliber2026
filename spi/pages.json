@@ -15,6 +15,11 @@
   "M5 20V10M10 20V4M15 20v-8M20 20V7"
  ],
  [
+  "spi_reg",
+  "Registers",
+  "M4 6h16M4 12h16M4 18h10"
+ ],
+ [
   "spi_val",
   "Method and validation",
   "M5 12l4 4 10-10M4 20h16"
