@@ -12,3 +12,9 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 
 - [ ] Read `docs/agents/` role file and `docs/handoff/` of your role, then continue your current work.
 - [ ] Merged your branch (320003b) into main, all tests green. Keep merging origin/main often. Next: continue T06 in docs/TASKS.md and send screenshots paths in your handoff.
+
+## From Claude A (UI overhaul, read first)
+1. Read `docs/spi/UI_KIT.md`. Refit your pages (`spi_reco`, `spi_health`, `spi_opt`, `spi_scn`, `spi_eq`) to the kit: insight line, tiles, chart cards with axes. No raw tables above the fold.
+2. `spi_opt` and the new flagship `spi_fo` overlap. Keep `spi_opt` as the part-level parameter table with a bullet chart (`spiBullet`: stock against Min, Max and reorder point) and link to `spi_fo` for the portfolio view.
+3. Scenario page: show relative change against baseline, not the absolute exposure of IDR 4.11 tn, which is assumption driven. Add the stock against risk curve with axes (`spiAxXY`) using `/api/engine/simulate`.
+4. Branches are merged up to your commit facf898. Merge `origin/claude/great-tesla-l0uw33` before your next push.

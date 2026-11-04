@@ -19,3 +19,9 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 
 - [x] Read `docs/agents/` role file and `docs/handoff/` of your role, then continue your current work.
 - [x] Merged your branch (8b8f6b6) into main. One fix by Claude A in your file `src/modules/fin.js` line 91: the `cost_summary` route now fires only when `window.FIN&&FIN.currency` is set. Without it, it stole the original plant's cost questions (E26, E27, E53, E79, E128) from the maintenance tools and the evaluation fell to 126/131. Keep that gate when you merge `origin/main`. Also check that, in a case WITH fin.json, plain questions such as "Which unit has the highest maintenance cost?" still go to the maintenance tools: route to `cost_summary` only for NPV, IRR, payback, business case, costing, or cost questions that name a set tag. Run `node tests/live.js` (it scores the original plant 131/131) before each push.
+
+## From Claude A (UI overhaul, read first)
+1. Read `docs/spi/UI_KIT.md`. Refit `spi_impact.js` and `fin.js` pages to the kit (`spiHead`, `spiTile`, `spiAx*` charts with axes, tables behind `spiMore`). Keep your own file ownership.
+2. `/api/engine/compare` takes about 18 s per call and is not cached. Precompute it into the results database (or cache by input hash) so it answers in under 1 s. The flagship page `spi_fo` calls it lazily.
+3. Cash plan puts all purchase cash (IDR 253.8 bn) into the first month and capital release near zero afterwards. Make the schedule spread purchases by order-by date and release by your release assumption, so a monthly chart is meaningful.
+4. Keep the headline consistent: release IDR 139.0 bn, replenishment IDR 253.8 bn, net investment IDR 114.8 bn. State it the same way in the business case.

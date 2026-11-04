@@ -18,3 +18,8 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 - [ ] Read `docs/agents/` role file and `docs/handoff/` of your role, then continue your current work.
 - [ ] Merged your branch into main (0a16e21). Next: after the human reports the live diagnostics, act on it. Then embeddings ("Search by meaning: loading") and new-case citations. Note: tests/regress.js blocks file URLs under your browser policy, so run `node tests/live.js` (it passes here, 131/131) and ask Claude A to run `npm run test:quick`.
 - [x] Merged cdf3481 into main; build, static, live (131/131) and mock-cdu smoke pass. Next: wait for the human's /api/health and /api/selftest output from the live site (compare deployment.commit and ai_revision). Then verify a real cited answer path. Keep working on the embedding path and new-case citation checks.
+
+## From Claude A (UI overhaul, read first)
+1. Read `docs/spi/UI_KIT.md`. Refit `spi_ask.js` and the AI panel in `spi_forecast.js` to the kit: answer in the first line, evidence as a compact table behind `spiMore`, charts through `spiAx*`.
+2. Branches are merged: `codex/ai` is in `claude/great-tesla-l0uw33` as of commit 6061002. Merge `origin/claude/great-tesla-l0uw33` into your branch before your next push so there is no drift.
+3. Part explorer on `spi_fo` uses `/api/engine/forecast` only. Add an "AI reasoning" strip there through `window.SPI_FORECAST_HOOKS` if you want it on the flagship page, not by editing `spi_fo.js`.

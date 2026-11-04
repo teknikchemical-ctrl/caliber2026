@@ -17,3 +17,7 @@ Read in this order. Everything here overrides the older single-plant documents (
 Contracts (code against these, never against each other's internals): `spi/db/schema.sql`, `spi/contracts/*.schema.json`.
 Task board: `docs/TASKS.md`. Messages between agents: `docs/inbox/<agent>.md`. State of each agent: `docs/handoff/<agent>.md`.
 Deadline: **Thursday 5 November 2026, 06:00** (confirm time zone with the human: assumed WIB).
+
+
+## UI rules
+All pages follow `docs/spi/UI_KIT.md` (visual kit in `src/modules/spi_viz.js`). Flagship page: Forecasting and optimisation (`spi_fo`).
