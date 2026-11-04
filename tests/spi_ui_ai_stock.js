@@ -6,7 +6,7 @@ try{
  browser=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});const p=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[],payloads=[];
  p.on('pageerror',e=>errors.push(e.message));p.on('request',r=>{if(r.url().endsWith('/api/ai/ask'))payloads.push(r.postDataJSON())});
  await p.goto(`http://localhost:${port}/`);await p.waitForFunction(()=>typeof SPI!=='undefined');
- await p.evaluate(()=>{go('ai');AI.scope=1;render()});
+ await p.evaluate(()=>{AI.scope=1;st.page='spi_ask';document.getElementById('app').innerHTML=aiPage()});
  await p.fill('#ai-main-q','What if we cut stock by 20%?');await p.click('#ai-main-b');
  await p.waitForFunction(()=>!AI.busy.main&&AI.hist.main.some(m=>m.role==='a'&&!m.live&&m.text.includes('0.8')));
  assert.equal(payloads.at(-1).context.funcloc,'KT-383A');
