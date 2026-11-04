@@ -34,3 +34,20 @@ html[data-spi="1"] .p3key,html[data-spi="1"] .eq2c:has(.eqflow){display:none}
 .spi-gl{stroke:#e3e8f0;stroke-width:1}.spi-axl{stroke:#9aa7ba;stroke-width:1}.spi-vl{stroke:#8896ab;stroke-dasharray:3 3}.spi-axt{fill:#5a6a80;font-size:11px;font-weight:600}.spi-svg .spi-ax{font-size:11px}
 .spi-mini{min-width:0}.spi-mt{font-size:12.5px;font-weight:600;color:#35445c;margin-bottom:2px}.spi-chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}.spi-bar{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
 .spi-hb{display:grid;grid-template-columns:minmax(120px,190px) 1fr 100px;gap:10px;align-items:center;font-size:12.5px}.spi-hb.click{cursor:pointer}
+/* ===== enterprise shell: dark navy sidebar, light canvas, white cards ===== */
+html.spi{--acc:#3b5bdb;--bg:#f2f4f9;--line:#e1e6ee}
+html.spi body{background:#f2f4f9}
+html.spi aside{background:#0f1b33;border-right:0;color:#c9d3e6}
+html.spi aside .brand{color:#fff;border-bottom:1px solid #243354}html.spi aside .brand small{color:#8fa0c0}
+html.spi aside .nav{color:#b4c0d9;border-radius:8px;font-weight:500}html.spi aside .nav:hover{background:#1a2a4a;color:#fff}
+html.spi aside .nav.active{background:#3b5bdb;color:#fff;box-shadow:none}html.spi aside .nav.active .ni{color:#fff}
+html.spi aside .navsec{color:#6f82a8}
+html.spi aside input,html.spi aside .search,html.spi aside #gsbtn{background:#1a2a4a;border-color:#243354;color:#c9d3e6}
+html.spi .spi-card,html.spi .spi-tile,html.spi .spi-act,html.spi .spi-kpi{background:#fff;border:1px solid #e1e6ee;border-radius:10px;box-shadow:0 1px 2px rgba(15,27,51,.05)}
+html.spi .spi-card h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#35445c;font-weight:700}
+html.spi .spi-card{padding:14px 16px}
+html.spi .spi-head h1,html.spi main h1{font-size:22px;color:#0f1b33}
+html.spi .spi-tv{color:#0f1b33}
+html.spi .btn,html.spi button.btn{background:#3b5bdb;border-color:#3b5bdb;color:#fff}
+html.spi .spi-chip.on{background:#3b5bdb;border-color:#3b5bdb}
+html.spi .spi-t th{background:#f6f8fc;text-transform:uppercase;font-size:11px;letter-spacing:.04em}
