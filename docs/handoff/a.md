@@ -1,37 +1,22 @@
-# Handoff note, Claude A
+# Handoff note, Claude A (SPI case)
 
-Keep this file current. Update it at every push, in under 15 lines. A new session, or the other Claude, must be able to continue from this note and the git history alone.
+**Updated:** 2026-11-04   **Branch:** claude/great-tesla-l0uw33   **Deploy:** Vercel, `python3 build.py spi`, one function `api/router.mjs`
 
-**Updated:** 2026-11-03   **Branch:** claude/great-tesla-l0uw33   **Last commit:** see git log
+## Merged and deployed (main)
+- All of Claude B (last: d317aa4 Library, one block per designed class), Codex AI and Codex Fin branches.
+- Site is five tabs (`src/modules/spi_hub.js`, list `SPI_HUBS`): Overview, Inventory, Maintenance, Forecasting and Simulation, Costs. Every other page is a view in a hub; `spiGo('<page id>')` opens the hub and the view. B's views: Equipment library 3D (`spi_space`), Equipment 3D and drawings (`spi_eq`), Protective devices (`spi_prot`) under Maintenance; Find (`spi_find`), Parts (`spi_parts`), Stock health (`spi_health`) under Inventory; Recommendations, Parameters under Forecasting.
+- Tables of more than 5 rows stay hidden until searched (`spiTable`). Build stamp in the sidebar and `/api/data/health` (`commit`).
+- A pages: Overview (B is rebuilding it), Forecasting and optimisation, Method and validation, Campaign readiness, Registers, Locations, Maintenance board, Demand outlook, Cost reduction, Scenario simulator, Documents and log, floating assistant.
 
-## Done (works, pushed)
-- Case pack system, generators (P&ID, 2D drawing, 3D, layouts), equipment class library, compiler `tools/pack_build.py`, validator, smoke test, crawlers, docs, agent briefs, two-Claude setup. `main` is up to date.
-- Example case `cases/mock-cdu` (7 sets, generated geometry). The first plant is `cases/lldpe`.
+## Decisions that differ from the integration brief
+- Navigation is the five hubs, not one menu entry per page (owner decision). `spi_space` is the "Equipment library 3D" view under Maintenance, not the start page; the start page is the Overview hub (`build.py`: `st.page="spi_h_ov"`).
+- Old-plant pages are hidden by the menu prune in `spi_core.js`; their code is not deleted yet.
 
-## In progress (not finished: which files, what state)
-- 
+## Open
+- Delete old-plant pages and `spi_zone_clean.js` after B confirms (docs/TASKS.md). Replace `spiPlantOverview` with a link to the library.
+- `/api/engine/compare` about 18 s, `/api/engine/optimise` first call about 10 s: Codex Fin to cache (inbox).
+- Vercel: after each push check that the top deployment for main is Ready and the sidebar shows the build commit. Never use Redeploy on an old deployment.
 
-## Next, in order
-1. Tomorrow: the real case. `tools/new_case.sh`, split, enter sets from the documents in `cases/<id>/source/`, compile, validate, build, smoke test, push main. Then the brief's features and the assistant.
-2. Merge Claude B's branch every 1 to 2 hours and update `main`.
-
-## Gotchas (things that surprised me, decisions and why)
-- `python3` in the cloud container cannot import openpyxl, pillow or pptx; use `python3.13`.
-- Compiled pack files are overwritten on every compile: edit `plant/` and `eval_extra.json` only.
-- Only A writes to `main`; B pushes its own branch.
-
-## How to check my work
-- command or page to open:
-
-## Waiting on the other Claude / the human
-- 
-
-## AI assistant fix (latest)
-- Server no longer depends on one Gemini model name. Default chain: gemini-flash-latest, gemini-flash-lite-latest, gemini-2.5-flash, gemini-2.0-flash. If all are refused as unknown, `discoverModels` (in `_lib.mjs`) asks the key which models it offers and tries the best three.
-- System prompts use the case title (`plant` in the request) instead of a hard-coded LLDPE unit.
-- Settings "Test the AI connection" now shows the real server error, and the first failing diagnostic check.
-- Diagnostics make a real one-word call and name the model that answered.
-- Tests: `tests/live.js` covers retired models and the diagnostics call. Not yet run with a real Gemini key.
-
-## SPI planning done (Claude A)
-Contracts, schema, role files, task board, inboxes, ownership checks are in the repo (`docs/spi/`). Next: A1 (Vercel hello, needs the human to import the repo in Vercel), A2 (ETL and mini.sqlite within the first hour). The initial seeding commit touched files in other agents' folders (OWNER.md files, AI_REASONING.md, FORECASTING.md): that is expected once, ownership applies from now.
+## Gotchas
+- All spi modules share one global scope: prefix names (B: spiSp*, SPSP, SPSET, SPI_GONE; A: spmt*, SPSIM, SPIRG, spiG*). The static check flags duplicate CSS class names between style3d.css and style_spi.css.
+- Never run a build while a test that reads `dist/index.html` is running.
