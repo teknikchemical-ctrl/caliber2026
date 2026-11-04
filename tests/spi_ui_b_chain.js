@@ -66,6 +66,13 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => { document.getElementById("spi_fq").value = "PRV"; spiFndRun(true); }); await p.waitForTimeout(2500);
   await p.evaluate(() => [...document.querySelectorAll(".spi-fc .spi-fa button")].find(b => /Open in 3D/.test(b.textContent)).click()); await p.waitForTimeout(3500);
   ok("find: an equipment result opens in 3D", !!(await p.$(".spi-eq3")));
+  /* I. spatial library: opens in 3D, search flies to the matching set */
+  await p.evaluate(() => go("spi_space")); await p.waitForTimeout(3000);
+  ok("library: the 3D space with every set is shown", !!(await p.$("#p3 canvas")) && (await p.$$(".sp-rb")).length === (await p.evaluate(() => K.sets.length)));
+  await p.fill("#sp_q", "PP-411"); await p.waitForTimeout(2500);
+  ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#p3card button")));
+  await p.fill("#sp_q", "bearing"); await p.waitForTimeout(2500);
+  ok("library: a part search lists the sets that hold it", !!(await p.$("#sp_res .sp-r")) && await p.evaluate(() => !!P3.sel));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
