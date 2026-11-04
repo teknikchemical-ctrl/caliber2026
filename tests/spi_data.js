@@ -54,5 +54,7 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); 
     r = await post({ kind: "goods_issue", opening: { [top]: 5 }, rows: [{ material_no: String(top), qty: "9", date: "2026-10-02" }] }); ok(r.j.rows[0].stock_before === 5 && r.j.rows[0].stock_after === 0 && r.j.rows[0].warnings.some(w => /negative/.test(w)), "ingest check: opening balance and negative stock warning");
     r = await post({ kind: "nonsense", rows: [] }); ok(r.s === 400, "ingest check: unknown kind is a 400"); }
   r = await run("server/data/campaign-readiness.mjs", { crit: "S,A" }); ok(r.s === 200 && r.j.months >= 1 && r.j.parts_checked > 100 && r.j.rows.every(x => x.gap_qty > 0 && ["S", "A"].includes(x.crit)), "campaign readiness: gap list for critical parts in the high-load window");
+  r = await run("server/data/maint-board.mjs", { class: "PP" }); ok(r.s === 200 && r.j.kpis.total > 100 && r.j.timeline.length === r.j.kpis.total && r.j.month_priority.months.length >= 10, "maintenance board filters by equipment class");
+  r = await run("server/data/loc-board.mjs"); ok(r.s === 200 && r.j.tiles.locations > 10000 && r.j.heat.length > 10 && r.j.risk.every(x => ["S", "A"].includes(x.crit)), "location board: tiles, risk matrix and S and A risk list");
   console.log(`\nAll ${n} data checks passed (${mode})`);
 })().catch(e => { console.error("FAIL", e.message); process.exit(1); });

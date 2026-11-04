@@ -5,6 +5,7 @@ export default guard((req, res) => {
   const q = qs(req), db = openDb(), all = (s, ...a) => db.prepare(s).all(...a), one = (s, ...a) => db.prepare(s).get(...a), cut = one("select value v from meta where key='data_cutoff'").v;
   if (q.list === "1") {
     const w = [], a = []; if (q.status) { w.push("n.status = ?"); a.push(String(q.status)); } if (q.priority) { w.push("n.priority = ?"); a.push(String(q.priority)); } if (q.crit) { w.push("f.criticality = ?"); a.push(String(q.crit).toUpperCase().slice(0, 1)); }
+    if (q.class) { w.push("f.eq_class = ?"); a.push(String(q.class)); } if (/^\d{4}-\d{2}$/.test(q.from || "")) { w.push("substr(n.notif_date,1,7) >= ?"); a.push(q.from); } if (/^\d{4}-\d{2}$/.test(q.to || "")) { w.push("substr(n.notif_date,1,7) <= ?"); a.push(q.to); }
     const where = w.length ? "where " + w.join(" and ") : "", limit = num(q.limit, 50, 1, 200), offset = num(q.offset, 0, 0, 100000);
     const total = one(`select count(*) c from notification n left join funcloc f using(funcloc) ${where}`, ...a).c;
     const rows = all(`select n.notif_no, n.notif_date, n.type, n.priority, n.status, n.funcloc, f.descr loc_descr, f.criticality, n.descr, n.required_end, n.completed_on from notification n left join funcloc f using(funcloc) ${where} order by n.notif_date desc limit ? offset ?`.replace("n.required_end", "n.req_end"), ...a, limit, offset);
