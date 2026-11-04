@@ -1,0 +1,521 @@
+{
+ "note": "Answers computed by SQL on spi/db/spi.sqlite. Money is IDR and an Estimate. Score: numbers within tolerance (absolute units, 0 = exact), ids and text exact (case-insensitive).",
+ "questions": [
+  {
+   "id": "G01",
+   "question": "How many spare parts are in the baseline data?",
+   "sql": "select count(*) from material",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 7481,
+    "text": null
+   }
+  },
+  {
+   "id": "G02",
+   "question": "How many spare parts were issued at least once?",
+   "sql": "select count(*) from part_profile where months_active>0",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 1930,
+    "text": null
+   }
+  },
+  {
+   "id": "G03",
+   "question": "How many spare parts never had an issue in the history?",
+   "sql": "select count(*) from part_profile where months_active=0",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 5551,
+    "text": null
+   }
+  },
+  {
+   "id": "G04",
+   "question": "How many issue transactions are in the history?",
+   "sql": "select count(*) from movement",
+   "kind": "number",
+   "unit": "transactions",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 17518,
+    "text": null
+   }
+  },
+  {
+   "id": "G05",
+   "question": "What is the first month and the last month of the consumption history?",
+   "sql": "select min(month)||' to '||max(month) from movement",
+   "kind": "text",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": "2025-05 to 2026-09",
+    "text": null
+   }
+  },
+  {
+   "id": "G06",
+   "question": "How many spare parts serve equipment of criticality S?",
+   "sql": "select count(*) from part_profile where crit_max='S'",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 2740,
+    "text": null
+   }
+  },
+  {
+   "id": "G07",
+   "question": "How many spare parts serve equipment of criticality A?",
+   "sql": "select count(*) from part_profile where crit_max='A'",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 2745,
+    "text": null
+   }
+  },
+  {
+   "id": "G08",
+   "question": "How many stock items are at zero stock?",
+   "sql": "select count(*) from part_profile p join material m using(material_no) where m.mrp_type='Stock Item' and p.stock=0",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 472,
+    "text": null
+   }
+  },
+  {
+   "id": "G09",
+   "question": "How many stock items are below their Min but above zero?",
+   "sql": "select count(*) from part_profile p join material m using(material_no) where m.mrp_type='Stock Item' and p.min_qty>0 and p.stock<p.min_qty and p.stock>0",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 57,
+    "text": null
+   }
+  },
+  {
+   "id": "G10",
+   "question": "How many parts have stock above their Max (with a Max set)?",
+   "sql": "select count(*) from part_profile where max_qty>0 and stock>max_qty",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 1376,
+    "text": null
+   }
+  },
+  {
+   "id": "G11",
+   "question": "What is the total stock value of parts with a usable price, in IDR bn (Estimate)?",
+   "sql": "select round(sum(stock_value_idr)/1e9,1) from part_profile",
+   "kind": "number",
+   "unit": "IDR bn",
+   "tolerance": 0.5,
+   "expected": {
+    "value": 616.6,
+    "text": null
+   }
+  },
+  {
+   "id": "G12",
+   "question": "What is the excess stock value above Max for parts with a Max set, in IDR bn (Estimate)?",
+   "sql": "select round(sum(excess_value_idr)/1e9,1) from part_profile where max_qty>0",
+   "kind": "number",
+   "unit": "IDR bn",
+   "tolerance": 0.5,
+   "expected": {
+    "value": 415.1,
+    "text": null
+   }
+  },
+  {
+   "id": "G13",
+   "question": "Which part has the largest excess value (material number)?",
+   "sql": "select material_no from part_profile order by excess_value_idr desc limit 1",
+   "kind": "id",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 4300039461,
+    "text": null
+   }
+  },
+  {
+   "id": "G14",
+   "question": "Which part has the highest stock value (material number)?",
+   "sql": "select material_no from part_profile order by stock_value_idr desc limit 1",
+   "kind": "id",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 4300039461,
+    "text": null
+   }
+  },
+  {
+   "id": "G15",
+   "question": "Which part was issued in the most months (material number)?",
+   "sql": "select material_no from part_profile order by months_active desc, total_qty desc limit 1",
+   "kind": "id",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 4100073350,
+    "text": null
+   }
+  },
+  {
+   "id": "G16",
+   "question": "Which part has the largest total issued quantity (material number)?",
+   "sql": "select material_no from part_profile order by total_qty desc limit 1",
+   "kind": "id",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 4100073350,
+    "text": null
+   }
+  },
+  {
+   "id": "G17",
+   "question": "What is the median purchase lead time in days (PR date to PO delivery, valid lines only)?",
+   "sql": "select cast(round(avg(lead_days)) as integer) from (select lead_days from po_line where lead_days>0 and lead_days<=365 order by lead_days limit 2 - (select count(*) from po_line where lead_days>0 and lead_days<=365) % 2 offset (select (count(*)-1)/2 from po_line where lead_days>0 and lead_days<=365))",
+   "kind": "number",
+   "unit": "days",
+   "tolerance": 3,
+   "expected": {
+    "value": 41,
+    "text": null
+   }
+  },
+  {
+   "id": "G18",
+   "question": "How many PO lines have a lead time above 365 days?",
+   "sql": "select count(*) from po_line where lead_days>365",
+   "kind": "number",
+   "unit": "lines",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 201,
+    "text": null
+   }
+  },
+  {
+   "id": "G19",
+   "question": "How many different suppliers are in the purchase history?",
+   "sql": "select count(distinct supplier_code) from po_line",
+   "kind": "number",
+   "unit": "suppliers",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 124,
+    "text": null
+   }
+  },
+  {
+   "id": "G20",
+   "question": "Which supplier has the most PO lines?",
+   "sql": "select supplier from po_line group by supplier order by count(*) desc limit 1",
+   "kind": "text",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": "RAJAWALI INSTRUMEN INTERNASIONAL PT",
+    "text": null
+   }
+  },
+  {
+   "id": "G21",
+   "question": "How many maintenance notifications have priority Emergency?",
+   "sql": "select count(*) from notification where priority='Emergency'",
+   "kind": "number",
+   "unit": "notifications",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 135,
+    "text": null
+   }
+  },
+  {
+   "id": "G22",
+   "question": "How many maintenance notifications are still In Progress?",
+   "sql": "select count(*) from notification where status='In Progress'",
+   "kind": "number",
+   "unit": "notifications",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 1305,
+    "text": null
+   }
+  },
+  {
+   "id": "G23",
+   "question": "How many planned maintenance items fall due in the 12 months after the data cut-off?",
+   "sql": "select count(*) from maint_item where next_due between (select value from meta where key='data_cutoff') and date((select value from meta where key='data_cutoff'),'+12 months')",
+   "kind": "number",
+   "unit": "items",
+   "tolerance": 1,
+   "expected": {
+    "value": 5454,
+    "text": null
+   }
+  },
+  {
+   "id": "G24",
+   "question": "How many parts have an intermittent demand pattern?",
+   "sql": "select count(*) from part_profile where demand_class='intermittent'",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 414,
+    "text": null
+   }
+  },
+  {
+   "id": "G25",
+   "question": "How many parts have a lumpy demand pattern?",
+   "sql": "select count(*) from part_profile where demand_class='lumpy'",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 153,
+    "text": null
+   }
+  },
+  {
+   "id": "G26",
+   "question": "How many parts were issued in only one month?",
+   "sql": "select count(*) from part_profile where demand_class='single_event'",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 1220,
+    "text": null
+   }
+  },
+  {
+   "id": "G27",
+   "question": "How many parts are insurance spare candidates (no demand, S or A equipment, lead time above 90 days or unknown)?",
+   "sql": "select count(*) from part_profile where months_active=0 and crit_max in ('S','A') and (lt_median is null or lt_median>90)",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 3959,
+    "text": null
+   }
+  },
+  {
+   "id": "G28",
+   "question": "How many stock items are non-moving (stock on hand, no issue in the history)?",
+   "sql": "select count(*) from part_profile p join material m using(material_no) where m.mrp_type='Stock Item' and p.months_active=0 and p.stock>0",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 2174,
+    "text": null
+   }
+  },
+  {
+   "id": "G29",
+   "question": "How many Non Stock materials still hold stock?",
+   "sql": "select count(*) from part_profile p join material m using(material_no) where m.mrp_type='Non Stock' and p.stock>0",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 1683,
+    "text": null
+   }
+  },
+  {
+   "id": "G30",
+   "question": "How many functional locations have no criticality?",
+   "sql": "select count(*) from funcloc where criticality is null",
+   "kind": "number",
+   "unit": "locations",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 33,
+    "text": null
+   }
+  },
+  {
+   "id": "G31",
+   "question": "How many spare parts are installed on equipment KT-383A?",
+   "sql": "select count(*) from bom where funcloc='PX_KT-383A'",
+   "kind": "number",
+   "unit": "parts",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 227,
+    "text": null
+   }
+  },
+  {
+   "id": "G32",
+   "question": "How many notifications are recorded on location PX_BF-110?",
+   "sql": "select count(*) from notification where funcloc='PX_BF-110'",
+   "kind": "number",
+   "unit": "notifications",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 41,
+    "text": null
+   }
+  },
+  {
+   "id": "G33",
+   "question": "What is the current stock of material 4100073350?",
+   "sql": "select stock from part_profile where material_no=4100073350",
+   "kind": "number",
+   "unit": "units",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 18084.0,
+    "text": null
+   }
+  },
+  {
+   "id": "G34",
+   "question": "What are the Min and Max of material 4100073350?",
+   "sql": "select min_qty||' / '||max_qty from part_profile where material_no=4100073350",
+   "kind": "text",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": "2000.0 / 3296.0",
+    "text": null
+   }
+  },
+  {
+   "id": "G35",
+   "question": "What is the current stock of material 4100071521?",
+   "sql": "select stock from part_profile where material_no=4100071521",
+   "kind": "number",
+   "unit": "units",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 0.0,
+    "text": null
+   }
+  },
+  {
+   "id": "G36",
+   "question": "What are the Min and Max of material 4100071521?",
+   "sql": "select min_qty||' / '||max_qty from part_profile where material_no=4100071521",
+   "kind": "text",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": "0.0 / 0.0",
+    "text": null
+   }
+  },
+  {
+   "id": "G37",
+   "question": "What is the current stock of material 4100091448?",
+   "sql": "select stock from part_profile where material_no=4100091448",
+   "kind": "number",
+   "unit": "units",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 22300.0,
+    "text": null
+   }
+  },
+  {
+   "id": "G38",
+   "question": "What are the Min and Max of material 4100091448?",
+   "sql": "select min_qty||' / '||max_qty from part_profile where material_no=4100091448",
+   "kind": "text",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": "2000.0 / 3344.0",
+    "text": null
+   }
+  },
+  {
+   "id": "G39",
+   "question": "What is the current stock of material 4200000138?",
+   "sql": "select stock from part_profile where material_no=4200000138",
+   "kind": "number",
+   "unit": "units",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 2569.0,
+    "text": null
+   }
+  },
+  {
+   "id": "G40",
+   "question": "What are the Min and Max of material 4200000138?",
+   "sql": "select min_qty||' / '||max_qty from part_profile where material_no=4200000138",
+   "kind": "text",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": "2000.0 / 3344.0",
+    "text": null
+   }
+  },
+  {
+   "id": "G41",
+   "question": "What is the median lead time in days of material 4100073350?",
+   "sql": "select lt_median from part_profile where material_no=4100073350",
+   "kind": "number",
+   "unit": "days",
+   "tolerance": 1,
+   "expected": {
+    "value": 51.0,
+    "text": null
+   }
+  },
+  {
+   "id": "G42",
+   "question": "In how many months did material 4100073350 have an issue?",
+   "sql": "select months_active from part_profile where material_no=4100073350",
+   "kind": "number",
+   "unit": "months",
+   "tolerance": 0.0,
+   "expected": {
+    "value": 17,
+    "text": null
+   }
+  },
+  {
+   "id": "G43",
+   "question": "What demand pattern class does material 4100073350 have?",
+   "sql": "select demand_class from part_profile where material_no=4100073350",
+   "kind": "text",
+   "unit": "",
+   "tolerance": 0.0,
+   "expected": {
+    "value": "erratic",
+    "text": null
+   }
+  }
+ ]
+}

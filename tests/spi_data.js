@@ -33,5 +33,8 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); 
   r = await run("api/data/stock-health.mjs", { cat: "excess", limit: "5" }); ok(r.s === 200 && r.j.rows.length > 0 && r.j.rows.every(x => x.stock > x.max_qty && x.max_qty > 0), "excess rows are above Max");
   r = await run("api/data/stock-health.mjs", { cat: "insurance", crit: "S", limit: "5" }); ok(r.s === 200 && r.j.rows.every(x => x.crit_max === "S" && x.months_active === 0), "insurance spares are S critical with no demand");
   r = await run("api/data/stock-health.mjs", { cat: "bogus" }); ok(r.s === 400 && r.j.error, "unknown category gives a readable 400");
+  r = await run("api/data/campaigns.mjs"); ok(r.s === 200 && r.j.history.length === 17 && r.j.campaign_months.length >= 2 && r.j.outlook.length >= 12 && r.j.overall_uplift > 2, "campaign model finds the shutdown months and the planned load outlook");
+  const cm = await import(path.join(ROOT, "spi/drivers/campaign.mjs")), dbm = new D(process.env.SPI_DB, { readonly: true }), pm = dbm.prepare("select material_no from part_profile where months_active>=3 limit 1").get().material_no, inp = cm.campaignInputs(dbm, pm);
+  ok(Array.isArray(inp) && inp.every(i => i.source === "rule" && i.driver === "turnaround" && i.value >= 1 && i.value <= 3 && i.evidence.length), "campaign inputs are ledger rows with source rule, bounded value and evidence");
   console.log(`\nAll ${n} data checks passed (${mode})`);
 })().catch(e => { console.error("FAIL", e.message); process.exit(1); });
