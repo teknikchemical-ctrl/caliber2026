@@ -5,6 +5,11 @@
   "M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z"
  ],
  [
+  "spi_fo",
+  "Forecasting and optimisation",
+  "M3 17l5-6 4 3 5-8 4 4M3 21h18M3 3v18"
+ ],
+ [
   "spi_loc",
   "Locations and equipment",
   "M4 20V9l8-5 8 5v11M9 20v-6h6v6"

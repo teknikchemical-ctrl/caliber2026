@@ -2,7 +2,7 @@
 // Usage: python3 build.py spi && node tests/spi_pages.js [fixture|full] [--shots dir]
 const { spawn } = require("child_process"), path = require("path"), fs = require("fs"), { chromium } = require("playwright");
 const ROOT = path.resolve(__dirname, ".."), mode = process.argv[2] && !process.argv[2].startsWith("--") ? process.argv[2] : "fixture", si = process.argv.indexOf("--shots"), shots = si > 0 ? process.argv[si + 1] : null, port = 8790 + Math.floor(Math.random() * 100);
-const MIN = { spi_dash: /Spare part overview/, spi_arch: /Six sources, one database/ };   // text each page must show
+const MIN = { spi_dash: /Spare part overview/, spi_arch: /Six sources, one database/i };   // text each page must show
 (async () => {
   if (shots) fs.mkdirSync(shots, { recursive: true });
   const srv = spawn("node", [path.join(ROOT, "tools/spi_dev.mjs"), String(port), mode], { stdio: "ignore" });

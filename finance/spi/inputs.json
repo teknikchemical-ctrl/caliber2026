@@ -51,10 +51,10 @@
       "source": "Eligible historical emergency purchase spend Not in baseline data; zero benefit until evidenced"
     },
     "emergency_premium": {
-      "value": 0.2,
+      "value": 0,
       "unit": "fraction",
       "basis": "Assumption",
-      "source": "Premium over normal purchase price, applied only to evidenced eligible emergency spend"
+      "source": "Baseline evidence: relative unit price 1.00 in every lead band and purchase type. No rush price premium supported; emergency saving locked at zero."
     },
     "emergency_avoidance": {
       "value": 0.25,
