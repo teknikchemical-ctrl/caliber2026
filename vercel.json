@@ -7,7 +7,7 @@
   ],
   "functions": {
     "api/router.mjs": {
-      "includeFiles": "{server,spi}/**",
+      "includeFiles": "{server,spi,finance/spi}/**",
       "maxDuration": 60
     }
   }
