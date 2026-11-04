@@ -7,8 +7,8 @@ const SPSIM_PRE=[["Today",{stock_multiplier:1,demand_multiplier:1,lead_time_mult
 spiRegister("spi_sim","Scenario simulator",async host=>{
  host.innerHTML=spiHead("Scenario simulator","Change stock, demand, supplier lead time or the service target and see the effect on stock value, holding cost and stockout risk.",`<span class="spi-sub">Engine | IDR, Estimate</span>`)+
  `<div class="spi-sim"><div class="spi-card spi-simc"><h3>Assumptions</h3>
-  <div class="spi-sl"><span>Scope</span><select onchange="SPSIM.crit=this.value;spiSimRun()"><option value="">All parts</option>${["S","A","B","C"].map(c=>`<option value="${c}"${SPSIM.crit===c?" selected":""}>Criticality ${c} only</option>`).join("")}</select></div>
-  ${SPSIM_DEF.map(([k,l,u,mn,mx,st,f])=>`<div class="spi-sl"><span>${l}<small>${u}</small></span><input type="range" min="${mn}" max="${mx}" step="${st}" value="${SPSIM.v[k]}" oninput="SPSIM.v.${k}=+this.value;document.getElementById('spim_${k}').textContent=SPSIM_DEF.find(x=>x[0]==='${k}')[6](+this.value);spiSimSoon()"><b id="spim_${k}">${f(SPSIM.v[k])}</b></div>`).join("")}
+  <div class="spi-slx"><span>Scope</span><select onchange="SPSIM.crit=this.value;spiSimRun()"><option value="">All parts</option>${["S","A","B","C"].map(c=>`<option value="${c}"${SPSIM.crit===c?" selected":""}>Criticality ${c} only</option>`).join("")}</select></div>
+  ${SPSIM_DEF.map(([k,l,u,mn,mx,st,f])=>`<div class="spi-slx"><span>${l}<small>${u}</small></span><input type="range" min="${mn}" max="${mx}" step="${st}" value="${SPSIM.v[k]}" oninput="SPSIM.v.${k}=+this.value;document.getElementById('spim_${k}').textContent=SPSIM_DEF.find(x=>x[0]==='${k}')[6](+this.value);spiSimSoon()"><b id="spim_${k}">${f(SPSIM.v[k])}</b></div>`).join("")}
   <div class="spi-mt" style="margin-top:12px">Presets</div><div class="spi-bar">${SPSIM_PRE.map((p,i)=>`<span class="spi-chip" onclick="spiSimPreset(${i})">${esc(p[0])}</span>`).join("")}</div></div>
   <div id="spim_r"><p class="spi-sub">Running the engine...</p></div></div><div id="spim_s"></div>`;
  spiSimRun()});
