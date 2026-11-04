@@ -131,7 +131,7 @@ P('<div class="nav" data-page="gov">Governance</div>','<div class="nav" data-pag
 P('p==="gov"?govPage():','p==="gov"?govPage():p==="fin"?finPage():')
 if SPI:  # spare part navigation group, routing and start page
     PG=json.load(open(os.path.join(ROOT,'spi','pages.json')))
-    P('<div class="nav active" data-page="dashboard">▦ Dashboard</div>',''.join('<div class="nav" data-page="%s">%s</div>\n  '%(pid,lab) for pid,lab,_ in PG)+'<div class="nav active" data-page="dashboard">Plant overview</div>')
+    P('<div class="nav active" data-page="dashboard">▦ Dashboard</div>',''.join('<div class="nav%s" data-page="%s">%s</div>\n  '%(' active' if i==0 else '',pid,lab) for i,(pid,lab,_) in enumerate(PG))+'<div class="nav" data-page="dashboard">Plant overview</div>')
     P('const NAVG=[["Operate",','const SPIPAGES='+json.dumps(PG)+';\nconst NAVG=[["Spare parts",SPIPAGES.map(r=>[r[0],r[2]])],["Operate",')
     P('app.innerHTML=p==="dashboard"?','app.innerHTML=p.startsWith("spi_")?spiRoute(p):p==="dashboard"?')
     P('let st={page:"dashboard",','let st={page:"spi_dash",')
