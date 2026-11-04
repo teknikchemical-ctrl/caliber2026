@@ -9,6 +9,9 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 
 **Updated:** 2026-11-04   **Branch:** claude/funny-edison-pis09w   **Last commit:** see git log
 
+## Round 10 (2026-11-04)
+- Action report tab (Overview, `spi_zone_report.js`, `/api/ws/report`): nine sections, print or PDF, CSV of every action. Part pop-up on the engine per part. Scenario in your words on every tool (`spi_zone_scn.js`, `/api/ws/intent`, Gemini via A's adapter with rule fallback). Tests in tests/spi_ui_b_chain.js.
+
 ## Round 9 (2026-11-04)
 - Secondary tabs on the one engine and without blunt tables: planner cost chart, simulator recommended policy (cheapest of engine, formula, cost-curve minimum; never dearer than today), purchase plan on engine orders, Summary tiles on the engine, Stock opens the first part, class names instead of codes, takeaways; consistency test for orders now.
 

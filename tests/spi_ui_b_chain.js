@@ -224,6 +224,15 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("action report: the sections, the ordered actions and the CSV export", await p.evaluate(() => document.querySelectorAll(".rp-s").length >= 8 && document.querySelectorAll(".rp-do li").length >= 5 && !!RP.csv && RP.csv.now.length > 0 && RP.csv.release.length > 0));
   await p.evaluate(() => spiPartOpen("", 4300039461)); await p.waitForFunction(() => /release/.test((document.querySelector(".pc-adv") || {}).textContent || ""), null, { timeout: 30000 }).catch(() => {});
   ok("part pop-up: a part with no use says what to keep and what to release", await p.evaluate(() => /keep \d+ as insurance/.test(document.querySelector(".pc-adv").textContent) && /release [\d,]+/.test(document.querySelector(".pc-adv").textContent) && !/NaN|undefined/.test(document.querySelector(".pc").textContent)));
+  /* round 10: scenario in words sets the inputs of the tool and re-runs it */
+  await p.evaluate(() => go("spi_golden")); await p.waitForSelector("#kbscn_gd", { timeout: 30000 }).catch(() => {}); await p.waitForTimeout(2500);
+  await p.fill("#kbscn_gd", "demand up 30% and suppliers two weeks late for S and A parts with a budget of 5 bn a month"); await p.click("#ws_gd .kb-scn button");
+  await p.waitForFunction(() => GD.view === "mine" && GD.mine.demand === 1.3, null, { timeout: 30000 }).catch(() => {});
+  ok("scenario in words: the sentence sets demand, supplier delay, budget and criticality and re-runs", await p.evaluate(() => GD.view === "mine" && GD.mine.demand === 1.3 && GD.mine.lead > 1.3 && GD.mine.budget === "5" && GD.mine.crit.join() === "S,A" && /Criticality S, A/.test(document.getElementById("kbscn_r_gd").textContent)));
+  await p.evaluate(() => go("spi_ssim")); await p.waitForSelector("#kbscn_ss", { timeout: 30000 }).catch(() => {}); await p.waitForTimeout(2500);
+  await p.fill("#kbscn_ss", "ceramic fiber blanket with demand at 150% and suppliers 30 days late, 18 months ahead"); await p.click("#ws_ss .kb-scn button");
+  await p.waitForFunction(() => SS.factor === 1.5 && SS.delay === 30, null, { timeout: 30000 }).catch(() => {});
+  ok("scenario in words: a part named by its description is found and simulated", await p.evaluate(() => SS.factor === 1.5 && SS.delay === 30 && SS.horizon === 18 && /CERAMIC FIBER/.test(SS.d.part.descr)));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
