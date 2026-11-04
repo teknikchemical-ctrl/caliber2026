@@ -28,8 +28,8 @@ export default guard(async (req, res) => {
   else issues.forEach((r) => { const k = idx[r.mo]; if (k == null) return; iss.n[k] = r.n; iss.qty[k] = r.q; iss.value[k] = r.v; });
   const plan = z(), planItems = S("select * from maint_item").filter((it) => inS(it.funcloc)), planEv = [];
   planItems.forEach((it) => occurrences(it, "2025-05", M.length).forEach((d) => { const k = idx[d.slice(0, 7)]; if (k != null) { plan[k]++; if (i.loc) planEv.push({ d, kind: "plan", text: it.descr, ref: it.cycle_text }); } }));
-  const po = scoped ? (() => { const ms = new Set(S("select funcloc, material_no from bom").filter((b) => LS.has(b.funcloc)).map((b) => b.material_no)); return S("select po_delivery d, qty, amount, material_no, supplier from po_line where po_delivery is not null").filter((r) => ms.has(r.material_no)); })()
-    : S("select substr(po_delivery,1,7) mo, count(*) n, sum(amount) v from po_line where po_delivery is not null group by 1");
+  const po = scoped ? (() => { const ms = new Set(S("select funcloc, material_no from bom").filter((b) => LS.has(b.funcloc)).map((b) => b.material_no)); return S("select po_delivery d, qty, amount, material_no, supplier from pol where po_delivery is not null").filter((r) => ms.has(r.material_no)); })()
+    : S("select substr(po_delivery,1,7) mo, count(*) n, sum(qty*amount) v from pol where po_delivery is not null group by 1");
   const buy = { n: z(), value: z() };
   if (scoped) po.forEach((r) => { const k = idx[String(r.d).slice(0, 7)]; if (k == null) return; buy.n[k]++; buy.value[k] += r.amount || 0; });
   else po.forEach((r) => { const k = idx[r.mo]; if (k == null) return; buy.n[k] = r.n; buy.value[k] = r.v || 0; });

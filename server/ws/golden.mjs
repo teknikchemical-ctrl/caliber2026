@@ -12,7 +12,7 @@ export default guard(async (req, res) => {
   const A = { carrying_rate: num(i.carrying_rate, ECON.carrying_rate ?? 0.22, 0, 1), order_cost_idr: ECON.order_cost_idr, emergency_premium: ECON.emergency_premium, lead_default: ECON.lead_default, lead_delay_days: 0, demand_factor: df, downtime_idr_h: { ...ECON.downtime_idr_h }, hours_per_stockout: { ...ECON.hours_per_stockout }, downtime_share: { ...ECON.downtime_share }, ...P(i.assumptions) };
   A.demand_factor = df;
   const svc = { ...(ECON.service || { ...ECON.service }), ...P(i.service) }, sc = P(i.scope);
-  const on = Object.fromEntries(db.prepare("select material_no, sum(qty) q from po_line where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q]));
+  const on = Object.fromEntries(db.prepare("select material_no, sum(qty) q from pol where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q]));
   let parts;
   if (i.set || i.loc) { const fl = i.loc ? String(i.loc) : (db.prepare("select funcloc from equipment_set where tag = ?").get(String(i.set)) || {}).funcloc || "PX_" + i.set; const mats = new Set(db.prepare("select material_no from bom where funcloc = ? or funcloc like ?").all(fl, fl + "-%").map((r) => r.material_no)); parts = portfolioParts(db, {}).filter((p) => mats.has(p.material_no)); }
   else parts = portfolioParts(db, { crit: list(sc.crit || i.crit), type: sc.type ? [String(sc.type).toUpperCase()] : [], q: sc.q });
@@ -38,7 +38,7 @@ export default guard(async (req, res) => {
     due.forEach((x) => { const c = x.value_idr || 0; if (c <= room) { room -= c; x.funded_month = m; spend[t] += c; } else { if (!x.deferred_from) x.deferred_from = x.month; carry.push(x); } }); });
   const z = 1.2816, band = val.rec.map((v, t) => [Math.max(0, v - z * Math.sqrt(val.var[t])), v + z * Math.sqrt(val.var[t])]);
   const hist = db.prepare("select substr(m.posting_date,1,7) mo, sum(m.qty * coalesce(p.unit_price_idr,0)) v from movement m left join part_profile p using(material_no) group by 1 order by 1").all();
-  const poh = db.prepare("select substr(pr_date,1,7) mo, sum(qty*amount) v, count(*) n from po_line where currency = 'IDR' group by 1 order by 1").all(), rch = db.prepare("select substr(po_delivery,1,7) mo, sum(qty*amount) v from po_line where currency = 'IDR' and po_delivery <= ? group by 1 order by 1").all(CUTOFF);
+  const poh = db.prepare("select substr(pr_date,1,7) mo, sum(qty*amount) v, count(*) n from pol where currency = 'IDR' group by 1 order by 1").all(), rch = db.prepare("select substr(po_delivery,1,7) mo, sum(qty*amount) v from pol where currency = 'IDR' and po_delivery <= ? group by 1 order by 1").all(CUTOFF);
   const spendCrit = Object.fromEntries(["S", "A", "B", "C"].map((c) => [c, M.map((m) => orders.filter((x) => x.crit === c && x.funded_month === m).reduce((s, x) => s + (x.value_idr || 0), 0))]));
   const funded = orders.filter((x) => x.funded_month), tot = { orders: orders.length, funded: funded.length, value_idr: orders.reduce((s, x) => s + (x.value_idr || 0), 0), funded_value_idr: funded.reduce((s, x) => s + (x.value_idr || 0), 0), saving_idr_yr: costCur - costRec, cost_current_yr: costCur, cost_recommended_yr: costRec, stockouts_current_yr: evCur, stockouts_recommended_yr: evRec, parts: parts.length };
   json(res, 200, pay("ws.golden", { scope: sc, set: i.set, loc: i.loc, service: svc, demand_factor: df, lead_factor: lf, budget_idr: budget, carrying_rate: A.carrying_rate, campaign_repeat: String(i.campaign_repeat) === "1", horizon: H },

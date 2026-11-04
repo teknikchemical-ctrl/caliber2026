@@ -1,7 +1,9 @@
 // Shared helpers of the workspace endpoints (owner: Claude B). Not an endpoint: the router never serves a file without a default export.
 // Every ws endpoint answers {tool, inputs, outputs, figures:[{id,label,value,unit,basis}], sources:[...]} so that the page and the AI read one payload.
-import { openDb } from "../_lib/db.mjs";
+import { openDb as openDb0 } from "../_lib/db.mjs";
 import { json, fail, qs, num, guard } from "../_lib/http.mjs";
+/* PR PO repeats 5,420 rows as exact copies (11,609 rows, 6,189 distinct PR, PR item, PO, PO item lines): every B endpoint reads the view pol, one row per line. */
+function openDb() { const d = openDb0(); if (!d.__pol) { d.exec("create temp view if not exists pol as select * from po_line where id in (select min(id) from po_line group by pr_no, pr_item, po_no, po_item)"); d.__pol = 1; } return d; }
 export { openDb, json, fail, qs, num, guard };
 export const CUTOFF = "2026-09-30";
 export const meta = (db) => Object.fromEntries(db.prepare("select key, value from meta").all().map((r) => [r.key, r.value]));

@@ -8,7 +8,7 @@ let cache = null;
 export default guard((req, res) => {
   const db = openDb();
   if (!cache) { const A = { carrying_rate: ECON.carrying_rate ?? 0.22, order_cost_idr: ECON.order_cost_idr, emergency_premium: ECON.emergency_premium, lead_default: ECON.lead_default, lead_delay_days: 0, demand_factor: 1, downtime_idr_h: { ...ECON.downtime_idr_h }, hours_per_stockout: { ...ECON.hours_per_stockout }, downtime_share: { ...ECON.downtime_share } };
-    const on = Object.fromEntries(db.prepare("select material_no, sum(qty) q from po_line where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q]));
+    const on = Object.fromEntries(db.prepare("select material_no, sum(qty) q from pol where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q]));
     const R = portfolioParts(db, {}).map((p) => advise({ ...p, on_order: on[p.material_no] || 0 }, { horizon: 12, cover: 0, lead: "median", service: { ...(ECON.service || {}) } }, A));
     const crit = (a) => Object.fromEntries(["S", "A", "B", "C"].map((c) => [c, a.filter((x) => x.crit === c).length])), top = (a, k) => a.slice(0, 8).map((x) => ({ material_no: x.material_no, descr: x.descr, crit: x.crit, stock: x.stock, min_qty: x.min_qty, max_qty: x.max_qty, on_order: x.on_order, value_idr: k(x), order_qty: x.qty, order_by: x.order_by, stockout_chance: x.risk.stockout_in_lead_time, months_of_cover: x.risk.months_of_cover }));
     const G = [];

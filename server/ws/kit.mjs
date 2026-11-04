@@ -14,7 +14,7 @@ export default guard(async (req, res) => {
   const need = {}; bom.forEach((b) => { byLoc[b.funcloc].forEach((it) => it.occ.forEach((d) => { const n = need[b.material_no] = need[b.material_no] || { qty_inst: 0, occ: 0, first: d, locs: new Set(), tasks: new Set() }; n.qty_inst += b.installed_qty || 1; n.occ++; if (d < n.first) n.first = d; n.locs.add(b.funcloc); n.tasks.add(it.item_no); })); });
   const mats = Object.keys(need).map(Number), info = {};
   for (let k = 0; k < mats.length; k += 500) { const ch = mats.slice(k, k + 500); db.prepare(`select t.material_no, t.descr, t.unit, t.item_type, t.mrp_type, p.stock, p.min_qty, p.max_qty, p.lt_median, p.unit_price_idr, p.crit_max, p.total_qty,
-    (select coalesce(sum(qty),0) from po_line o where o.material_no = t.material_no and o.po_delivery > ?) on_order,
+    (select coalesce(sum(qty),0) from pol o where o.material_no = t.material_no and o.po_delivery > ?) on_order,
     (select coalesce(sum(qty),0) from movement m where m.material_no = t.material_no and m.posting_date > date(?, '-12 months')) issued_12m
     from material t left join part_profile p on p.material_no = t.material_no where t.material_no in (${ch.map(() => "?").join(",")})`).all(CUTOFF, CUTOFF, ...ch).forEach((r) => { info[r.material_no] = r; }); }
   const types = {};

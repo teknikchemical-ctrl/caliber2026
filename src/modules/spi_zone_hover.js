@@ -52,6 +52,7 @@ function kbhMove(e){const svg=e.target&&e.target.closest?e.target.closest("svg[d
   const xu=/\(([^)]+)\)/.exec(String(o.xlabel||""));head=best.q.label||best.se.name;ov=`<circle cx="${X(best.q.x)}" cy="${G.Y(best.q.y)}" r="7" fill="none" stroke="#1b2733" stroke-width="2"/>`;
   rows=kbhRow(spiCol(best.se.tone||"acc"),o.xlabel||"x",kbhVal(best.q.x,xu?xu[1]:"",o.xfmt),"")+kbhRow(spiCol(best.se.tone||"acc"),o.ylabel||"y",kbhVal(best.q.y,u,o.yfmt),"")}
  g.innerHTML=ov;const t=kbhTip();t.innerHTML=`<div class="kbh-h">${esc(String(head||""))}</div>${cap?`<div class="kbh-c">${esc(cap)}</div>`:""}${rows}`;kbhPlace(t,e.clientX,e.clientY)}
+try{document.body.dataset.kbtip="1"}catch(e){}document.addEventListener("DOMContentLoaded",()=>{try{document.body.dataset.kbtip="1"}catch(e){}});
 document.addEventListener("pointermove",kbhMove,{passive:true});document.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")kbhMove(e)},{passive:true});
 document.addEventListener("scroll",()=>{if(KBH.on){KBH.on=0;kbhHide()}},{passive:true,capture:true});
 /* readout for the shared timeline: every visible series in the month under the pointer */

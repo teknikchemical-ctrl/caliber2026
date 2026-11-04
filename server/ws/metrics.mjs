@@ -20,10 +20,10 @@ function build(db) {
   add("issue_value", "Use", "Value issued in 17 months", iv.v, "IDR", "Estimate", "Issued quantity x last purchase unit price, IDR.", "Movement Material, PR PO");
   const camp = db.prepare("select substr(posting_date,1,7) m, count(*) n from movement group by 1").all(), cm = camp.filter((x) => x.m >= "2025-11" && x.m <= "2026-01"), rest = camp.filter((x) => !(x.m >= "2025-11" && x.m <= "2026-01"));
   add("campaign_ratio", "Use", "Campaign months against a normal month", (cm.reduce((t, x) => t + x.n, 0) / cm.length) / (rest.reduce((t, x) => t + x.n, 0) / rest.length), "times", "Data", "Issue lines per month in Nov 2025 to Jan 2026 against the other months.", "Movement Material");
-  const po = g("select count(*) n, sum(case when currency='IDR' then qty*amount else 0 end) v, sum(case when po_delivery > ? then 1 else 0 end) open, sum(case when po_delivery > ? and currency='IDR' then qty*amount else 0 end) ov, sum(case when po_delivery > pr_delivery then 1 else 0 end) late, count(distinct supplier) s from po_line", CUTOFF, CUTOFF);
-  const lt = db.prepare("select lead_days l from po_line where lead_days > 0 and lead_days < 720").all().map((r) => r.l);
+  const po = g("select count(*) n, sum(case when currency='IDR' then qty*amount else 0 end) v, sum(case when po_delivery > ? then 1 else 0 end) open, sum(case when po_delivery > ? and currency='IDR' then qty*amount else 0 end) ov, sum(case when po_delivery > pr_delivery then 1 else 0 end) late, count(distinct supplier) s from pol", CUTOFF, CUTOFF);
+  const lt = db.prepare("select lead_days l from pol where lead_days > 0 and lead_days < 720").all().map((r) => r.l);
   add("purchase_value", "Purchasing", "Purchase value in 17 months", po.v, "IDR", "Estimate", "PR quantity x PO-Item Amount read as a unit price (it stays the same on lines of very different quantity), IDR lines.", "PR PO");
-  add("po_lines", "Purchasing", "PR PO lines", po.n, "lines", "Data", "Rows of PR PO.", "PR PO");
+  add("po_lines", "Purchasing", "PR PO lines (each counted once)", po.n, "lines", "Data", "Distinct PR, PR item, PO and PO item lines; the sheet repeats 5,420 rows as exact copies.", "PR PO");
   add("lead_median", "Purchasing", "Median lead time", q(lt, 0.5), "days", "Data", "PR date to PO delivery date, lines between 1 and 720 days.", "PR PO");
   add("lead_p90", "Purchasing", "9 in 10 orders delivered within", q(lt, 0.9), "days", "Data", "90th percentile of the lead time.", "PR PO");
   add("late_share", "Purchasing", "Lines due after the requested date", po.late / po.n, "share", "Data", "PO delivery date later than the PR delivery date.", "PR PO");
