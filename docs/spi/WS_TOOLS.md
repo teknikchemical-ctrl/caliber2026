@@ -37,3 +37,10 @@ Every view is a tool: inputs on the left, results on the right, recalculated on 
 - Part: four numbered answers (stock now, projected use with range, recommendation with quantity, months covered and order-by date, cost reduction per year and over the horizon); projected stock with and without the recommendation (Monte Carlo, open orders on their delivery month); every cost line today against the recommendation; nine risk measures; use history and projection; purchase history.
 - Set or location: every part of its bill of materials with decision, stock, use, order, cost reduction and risk level; select a part to open it with the set in the trail.
 - Endpoint `/api/ws/advice` (mat, mats, set or loc). The recommendation is the cheapest of order sizes 1 to 24 months and service levels at or above the target, with today's Min and Max as a candidate, so it never costs more than today.
+
+## Coverage of the case (third round)
+- Four impacts of the case (emergency procurement, purchasing and carrying cost, tied-up working capital, downtime and production losses): `impacts()` in `server/ws/advice.mjs`, per part and summed; shown as the impact panel (`wsImpact`) in the Inventory planner (part, set, all parts) and in Costs > Impact reduction (`spi_cimp`). Inputs: scope, where the recommendation is applied (by criticality), cap at today's Max, release unused stock, use factor, lead time, assumptions.
+- Inventory planner: demand drivers (planned maintenance at the part's locations, failure-driven use scaled, campaign months, abnormal months left out), demand pattern panel (ADI, CV squared, method, installed population and issue rate, failures and plan tasks at its locations), all-parts mode ranked (criticality, decision, risk) with export.
+- Suppliers and lead time (`spi_sup`, `/api/ws/suppliers`): lead time against on-time share per supplier, lead-time histogram, supplier detail.
+- Stock view: categories "At risk of a stockout" and "Becoming slow-moving".
+- `/api/ws/questions?q=<id>`: one structured answer per point of the case (no page; for the AI). Each tool's SPIWS state carries `answers:[point ids]`.

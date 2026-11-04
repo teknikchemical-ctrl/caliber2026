@@ -78,4 +78,4 @@ function exBlocks(){return `<div class="ex-pad"><div class="ex-zh"><b>Blocks</b>
 /* hub tabs: the explorer first, the stock view first in Inventory */
 if(typeof SPI_HUBS!=="undefined"){const ov=SPI_HUBS.find(h=>h.id==="spi_h_ov"),iv=SPI_HUBS.find(h=>h.id==="spi_h_inv");
  if(ov)ov.tabs=ov.tabs.map(t=>t[0]==="spi_space"?["spi_space","Equipment explorer"]:t);
- if(iv)iv.tabs=[["spi_iplan","Inventory planner"],["spi_inv","Stock"],["spi_find","Find"],["spi_loc","Locations and equipment"],["spi_parts","Part types"],["spi_reg","Registers"],["spi_ingest","Documents and log"]]}
+ if(iv)iv.tabs=[["spi_iplan","Inventory planner"],["spi_inv","Stock"],["spi_sup","Suppliers and lead time"],["spi_find","Find"],["spi_loc","Locations and equipment"],["spi_parts","Part types"],["spi_reg","Registers"],["spi_ingest","Documents and log"]]}
