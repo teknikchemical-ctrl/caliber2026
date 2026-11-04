@@ -63,3 +63,6 @@ html.spi aside .nav.active{background:#e8f1fc;color:#1c5cab;box-shadow:inset 3px
 html.spi .btn,html.spi button.btn{background:#2a78d6;border-color:#2a78d6}html.spi .spi-chip.on{background:#2a78d6;border-color:#2a78d6}
 html.spi input[type=range]{accent-color:#2a78d6}.spi-eq>div{border-left-color:#2a78d6}
 .spi-stack>div{border-right:2px solid #fff}
+.spi-ff{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin:8px 0}.spi-ff label{display:grid;gap:4px;font-size:12px;color:#52514e;font-weight:600}.spi-ff input,.spi-ff select{font:inherit;font-weight:400;padding:7px 9px;border:1px solid #c3c2b7;border-radius:7px;background:#fff;color:#0b0b0b}
+.spi-msg{padding:9px 12px;border-radius:8px;font-size:13px;margin-top:8px}.spi-msg.ok{background:#e8f6e8;border:1px solid #9fd39f}.spi-msg.bad{background:#fbeaea;border:1px solid #e3a3a3}
+.btn.ghost{background:#fff;color:#2a78d6;border:1px solid #2a78d6}@media(max-width:700px){.spi-ff{grid-template-columns:1fr}}

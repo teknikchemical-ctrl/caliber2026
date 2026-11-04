@@ -25,3 +25,9 @@ Pages render the first screen from fast endpoints, then fill slow sections (for 
 
 ## Flagship page
 `spi_fo` (Forecasting and optimisation) is the page the jury should open second. Its sections: trade-off curve, action mix, out-of-sample policy test, capital, part explorer. Codex Fin owns the engine numbers behind it, Claude A the page.
+
+## Colour update
+Chart colours now follow the validated palette of the dataviz method: categorical blue, violet, aqua, yellow, magenta; status good, warning, critical; criticality as a blue sequential scale (S darkest). Neutral surfaces `#fcfcfb`, grid `#e1e0d9`. Tokens live in `SPI_TONE` (`spi_viz.js`); never hard-code a chart colour.
+
+## Documents and log (spi_ingest)
+Logging form and file check. Server: `POST /api/data/ingest-check` (stateless; kinds goods_issue, goods_receipt, stock_count, stockout_observed; optional `opening` balances). The host database is read only, so the log is kept in the browser and exported as CSV or JSON for the ETL.

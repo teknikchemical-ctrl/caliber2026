@@ -48,5 +48,10 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); 
   r = await viaRouter("/api/router?path=data%2Fpart%2F" + top); ok(r.s === 200 && r.j.part.material_no === top, "router: dynamic segment (part id) through the rewrite");
   r = await viaRouter("/api/router?path=data%2Flocations&crit=S&limit=2"); ok(r.s === 200 && r.j.rows.length === 2, "router: query string is passed through the rewrite");
   r = await viaRouter("/api/router?path=nothing%2Fhere"); ok(r.s === 404 && r.j.error, "router: unknown endpoint gives a JSON 404");
+  { const m = await import(path.join(ROOT, "server/data/ingest-check.mjs")), post = (body) => new Promise(rs => { const res = { statusCode: 200, setHeader() {}, end(b) { rs({ s: this.statusCode, j: JSON.parse(b) }); } }; m.default({ url: "/x", method: "POST", body }, res); });
+    r = await post({ kind: "goods_issue", rows: [{ material_no: String(top), qty: "1", date: "2026-10-02" }, { material_no: "1", qty: "1", date: "2026-10-02" }, { material_no: String(top), qty: "-3", date: "bad" }] });
+    ok(r.s === 200 && r.j.summary.ok === 1 && r.j.summary.rejected === 2 && r.j.rows[0].stock_after === r.j.rows[0].stock_before - 1, "ingest check: accepts a valid issue, rejects unknown material and bad rows");
+    r = await post({ kind: "goods_issue", opening: { [top]: 5 }, rows: [{ material_no: String(top), qty: "9", date: "2026-10-02" }] }); ok(r.j.rows[0].stock_before === 5 && r.j.rows[0].stock_after === 0 && r.j.rows[0].warnings.some(w => /negative/.test(w)), "ingest check: opening balance and negative stock warning");
+    r = await post({ kind: "nonsense", rows: [] }); ok(r.s === 400, "ingest check: unknown kind is a 400"); }
   console.log(`\nAll ${n} data checks passed (${mode})`);
 })().catch(e => { console.error("FAIL", e.message); process.exit(1); });
