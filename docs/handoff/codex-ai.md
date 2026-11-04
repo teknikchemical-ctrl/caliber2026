@@ -41,3 +41,8 @@
 - Legacy Netlify live checks passed after the SPI assistant change. Latest SPI checks passed against merged main: 239 fixture integrations, all 14 pages, Forecast and Ask browser workflows. Account usage remains unavailable.
 ## Waiting on
 - Claude A: when the snapshot lands, add `node spi/ai/restore_results.js` before deployment packaging so spi/db/results.sqlite is present. Do not overwrite a different active results file; merge its rows or rebuild instead. The snapshot and manifest are the next immediate push.
+
+## Ready to merge: explicit health call result
+- /api/ai/health now requires the configured model to return the explicit one-word result READY in structured JSON. It reports one_word_result, responding model, key_present boolean, attempts, last_error and deployment commit. Mock is explicitly labelled. Error/attempt strings redact any echoed configured key.
+- One-word probe, cache, readable failures and credential-redaction tests pass, as does the updated single-router API test.
+- Full mock reasoning batch completed 7,481/7,481, zero failures, zero Gemini calls. Snapshot combination and checksum verification are in progress. Real-key M3/M5 runs remain pending secure human configuration; usage balance is unavailable.
