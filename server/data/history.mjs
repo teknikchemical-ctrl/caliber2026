@@ -10,6 +10,15 @@ const add = (ym, k) => { let [y, m] = ym.split("-").map(Number); m += k; y += Ma
 export default guard((req, res) => {
   const q = req.query || Object.fromEntries(new URL(req.url, "http://x").searchParams), db = openDb();
   const H = db.prepare("select distinct month from movement order by 1").all().map((r) => r.month), last = H[H.length - 1], F = Array.from({ length: 12 }, (_, i) => add(last, i + 1)), ALL = [...H, ...F];
+  // per-part series: ?parts=m1,m2 (at most 12) gives each part its own history and prediction
+  if (q.parts) { const ids = String(q.parts).split(",").map(Number).filter((x) => Number.isSafeInteger(x) && x > 0).slice(0, 12); if (!ids.length) return json(res, 400, { error: "Give one to twelve material numbers" });
+    const ph = ids.map(() => "?").join(","), meta = Object.fromEntries(db.prepare(`select material_no, descr, unit, stock, min_qty, max_qty from material where material_no in (${ph})`).all(...ids).map((r) => [r.material_no, r]));
+    const hq = {}, ml = {}, lo = {}, hi = {}, en = {};
+    for (const r of db.prepare(`select material_no m, month k, qty v from demand_month where material_no in (${ph})`).all(...ids)) (hq[r.m] = hq[r.m] || {})[r.k] = r.v;
+    try { for (const r of db.prepare(`select material_no m, month k, expected_qty e, p_issue p, qty_if_issued_low l, qty_if_issued_high h from ml_forecast where material_no in (${ph})`).all(...ids)) { (ml[r.m] = ml[r.m] || {})[r.k] = r.e; const sd = Math.sqrt(Math.max(0, r.p * (1 - r.p) * ((r.l + r.h) / 2) ** 2 + r.p * ((r.h - r.l) / 2.56) ** 2)); (lo[r.m] = lo[r.m] || {})[r.k] = Math.max(0, r.e - 1.28 * sd); (hi[r.m] = hi[r.m] || {})[r.k] = r.e + 1.28 * sd; } } catch {}
+    if (hasRes()) try { for (const r of db.prepare(`select material_no m, month k, p50 v from res.forecast where plan_id like 'ai-batch:%' and material_no in (${ph})`).all(...ids)) (en[r.m] = en[r.m] || {})[r.k] = r.v; } catch {}
+    const rr = (o, ms, z) => ms.map((m) => (o && o[m] != null ? Math.round(o[m] * 100) / 100 : z ? 0 : null));
+    return json(res, 200, { cutoff: last, months: H, future: F, series: ids.filter((i) => meta[i]).map((i) => ({ material_no: i, descr: meta[i].descr, unit: meta[i].unit, stock: meta[i].stock, min_qty: meta[i].min_qty, max_qty: meta[i].max_qty, history: rr(hq[i], H, 1), learned: rr(ml[i], F, 1), learned_low: rr(lo[i], F, 1), learned_high: rr(hi[i], F, 1), engine: rr(en[i], F, 0) })) }); }
   let scope, mats, locs, label;
   if (q.mat) { const m = db.prepare("select material_no, descr, unit, stock, min_qty, max_qty from material where material_no=?").get(Number(q.mat)); if (!m) return json(res, 404, { error: "Not in baseline data: material " + q.mat });
     scope = "part"; label = m.descr; mats = [m.material_no]; locs = db.prepare("select distinct funcloc from part_equipment where material_no=?").all(m.material_no).map((r) => r.funcloc); scope = { kind: "part", ...m }; }
@@ -45,10 +54,14 @@ export default guard((req, res) => {
   if (scope.kind === "part") { let s = scope.stock || 0; const open = byMonth(db.prepare("select substr(po_delivery,1,7) m, sum(qty) v from po_line where material_no=? and po_delivery>? group by 1").all(scope.material_no, last + "-31"));
     stock = F.map((m) => { s = s + (open[m] || 0) - (mlE[m] || 0); return Math.round(s * 10) / 10; }); }
   const z0 = (o, ms) => ms.map((m) => Math.round((o[m] || 0) * 100) / 100);
+  const plist = (() => { const qq = String(q.q || "").trim().toUpperCase(), lim = Math.min(400, Number(q.limit) || 200);
+    const rows = db.prepare(`select m.material_no, m.descr, m.unit, coalesce(p.total_qty,0) q17, (select coalesce(sum(qty),0) from demand_month d where d.material_no=m.material_no and d.month>?) q12, (select coalesce(sum(expected_qty),0) from ml_forecast f where f.material_no=m.material_no) f12 from material m left join part_profile p using(material_no) where ${inM("m.material_no")} ${qq ? "and (upper(m.descr) like ? or cast(m.material_no as text) like ?)" : ""} order by f12 desc, q17 desc limit ${lim}`).all(H[H.length - 13] || H[0], ...aM, ...(qq ? ["%" + qq + "%", qq + "%"] : []));
+    return rows.map((r) => ({ material_no: r.material_no, descr: r.descr, unit: r.unit, issued_12m: r.q12, forecast_12m: Math.round(r.f12 * 10) / 10 })); })();
   const r0 = (o, ms) => ms.map((m) => (o[m] == null ? null : Math.round(o[m] * 100) / 100));
   const sum = (o, ms) => ms.reduce((t, m) => t + (o[m] || 0), 0);
   const out = { scope, label, parts: mats ? mats.length : db.prepare("select count(*) n from material").get().n, cutoff: last, history: { months: H, qty: z0(qty, H), lines: z0(lines, H), value: z0(val, H), notifications: z0(notif, H), planned: H.map((m) => plan[m]), receipts: z0(rec, H) },
     prediction: { months: F, learned: r0(mlE, F), learned_low: r0(mlLo, F), learned_high: r0(mlHi, F), engine: r0(eng, F), engine_low: scope.kind === "part" ? r0(engLo, F) : null, engine_high: scope.kind === "part" ? r0(engHi, F) : null, planned: F.map((m) => plan[m]), campaign_scenario: r0(scen, F), campaign_uplift: Math.round(uplift * 100) / 100, stock },
+    part_list: plist,
     min_qty: scope.kind === "part" ? scope.min_qty : null, max_qty: scope.kind === "part" ? scope.max_qty : null,
     totals: { history_12m: sum(qty, H.slice(-12)), history_17m: sum(qty, H), learned_12m: sum(mlE, F), engine_12m: sum(eng, F), scenario_12m: sum(scen, F), planned_12m: F.reduce((t, m) => t + plan[m], 0), notifications_17m: sum(notif, H) },
     basis: "History is Data. Learned and engine forecasts are Estimates. The campaign scenario is an Assumption: the measured Dec 2025 and Jan 2026 uplift recurs a year later." };
