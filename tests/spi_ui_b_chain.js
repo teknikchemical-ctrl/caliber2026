@@ -154,7 +154,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => go("spi_space")); await p.waitForTimeout(2500); await p.fill("#kbs_ex_q input", "BF-105"); await p.waitForTimeout(2500);
   await p.evaluate(() => [...document.querySelectorAll("#kbs_ex_q .kb-o")].find(x => /BF-105/.test(x.textContent)).dispatchEvent(new MouseEvent("mousedown", { bubbles: true }))); await p.waitForFunction(() => EXP.eq && document.querySelector("#ex_eco .ip-risk"), null, { timeout: 30000 }).catch(() => {});
   ok("explorer: a location found by search opens in 3D with its economics", await p.evaluate(() => EXP.eq && !!document.querySelector("#ex_eco .ip-risk")));
-  ok("overview has the explorer, the status, the summary and the link map; inventory has five tabs", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_status,spi_summ,spi_link" && SPI_HUBS.find(h => h.id === "spi_h_inv").tabs.length === 5));
+  ok("overview has the explorer, the status, the summary, the action report and the link map; inventory has five tabs", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_status,spi_summ,spi_report,spi_link" &&SPI_HUBS.find(h => h.id === "spi_h_inv").tabs.length === 5));
   /* explorer: the 2D drawing and the 3D model follow the same zone */
   await p.evaluate(() => { go("spi_space") }); await p.waitForTimeout(2500); await p.evaluate(() => exOpenFunc("PX_PP-148A")); await p.waitForFunction(() => EXP.eq && document.getElementById("ex_svg"), null, { timeout: 30000 }).catch(() => {});
   await p.evaluate(() => { exView("both"); const z = spiPrep(EXP.key).zones.find(q => q.lines.length); document.querySelector('#ex_svg [data-k="' + z.key + '"]').dispatchEvent(new MouseEvent("click", { bubbles: true })) }); await p.waitForTimeout(1200);
@@ -219,6 +219,11 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => go("spi_status")); await p.waitForFunction(() => document.querySelectorAll(".st-c").length >= 5, null, { timeout: 40000 }).catch(() => {});
   const stNow = await p.evaluate(() => { const c = [...document.querySelectorAll(".st-c")].find(e => /Order now/.test(e.textContent)); return c ? c.querySelector("b").textContent.trim() : "" });
   ok("one figure for parts to order now: Summary, landing band and Status agree", smNow && bandNow.startsWith(smNow) && stNow === smNow, `${smNow} | ${bandNow} | ${stNow}`);
+  /* round 10: the action report and the part pop-up on the one engine */
+  await p.evaluate(() => go("spi_report")); await p.waitForFunction(() => document.querySelectorAll(".rp-s").length >= 8, null, { timeout: 60000 }).catch(() => {});
+  ok("action report: the sections, the ordered actions and the CSV export", await p.evaluate(() => document.querySelectorAll(".rp-s").length >= 8 && document.querySelectorAll(".rp-do li").length >= 5 && !!RP.csv && RP.csv.now.length > 0 && RP.csv.release.length > 0));
+  await p.evaluate(() => spiPartOpen("", 4300039461)); await p.waitForFunction(() => /release/.test((document.querySelector(".pc-adv") || {}).textContent || ""), null, { timeout: 30000 }).catch(() => {});
+  ok("part pop-up: a part with no use says what to keep and what to release", await p.evaluate(() => /keep \d+ as insurance/.test(document.querySelector(".pc-adv").textContent) && /release [\d,]+/.test(document.querySelector(".pc-adv").textContent) && !/NaN|undefined/.test(document.querySelector(".pc").textContent)));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
