@@ -10,6 +10,11 @@
   "M3 17l5-6 4 3 5-8 4 4M3 21h18M3 3v18"
  ],
  [
+  "spi_ready",
+  "Campaign readiness",
+  "M5 20V10M10 20V4M15 20v-8M20 20V7"
+ ],
+ [
   "spi_val",
   "Method and validation",
   "M5 12l4 4 10-10M4 20h16"

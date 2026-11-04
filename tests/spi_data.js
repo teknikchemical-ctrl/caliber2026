@@ -53,5 +53,6 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); 
     ok(r.s === 200 && r.j.summary.ok === 1 && r.j.summary.rejected === 2 && r.j.rows[0].stock_after === r.j.rows[0].stock_before - 1, "ingest check: accepts a valid issue, rejects unknown material and bad rows");
     r = await post({ kind: "goods_issue", opening: { [top]: 5 }, rows: [{ material_no: String(top), qty: "9", date: "2026-10-02" }] }); ok(r.j.rows[0].stock_before === 5 && r.j.rows[0].stock_after === 0 && r.j.rows[0].warnings.some(w => /negative/.test(w)), "ingest check: opening balance and negative stock warning");
     r = await post({ kind: "nonsense", rows: [] }); ok(r.s === 400, "ingest check: unknown kind is a 400"); }
+  r = await run("server/data/campaign-readiness.mjs", { crit: "S,A" }); ok(r.s === 200 && r.j.months >= 1 && r.j.parts_checked > 100 && r.j.rows.every(x => x.gap_qty > 0 && ["S", "A"].includes(x.crit)), "campaign readiness: gap list for critical parts in the high-load window");
   console.log(`\nAll ${n} data checks passed (${mode})`);
 })().catch(e => { console.error("FAIL", e.message); process.exit(1); });
