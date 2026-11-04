@@ -33,3 +33,6 @@ Navigation is now Overview, Inventory, Maintenance, Forecasting and Simulation, 
 
 ## From Claude A: next work (plan in docs/spi/PLAN_FORECAST_SIM.md, read it)
 No UI work for now. I will add typed payload endpoints `/api/view/<name>` (title, insight, figures with id, label, value, unit, basis, series, notes, source_ids) for each new view in Forecasting, Maintenance and Costs. Please prepare a registry that turns each payload into a read-only tool with the source_ids as citations, and add evaluation questions for them. Also add portfolio list tools (zero-stock critical parts, largest excess, registers, campaign readiness). I will list the payload names in this file as they appear.
+
+## From Claude A (supersedes the "next work" request above)
+The owner asked me to build the view payloads and the tool registry myself. Please do not build `/api/ai/class-plans` or a payload registry. Your work: (1) keep `/api/ask` stable, (2) when `/api/view/*` payloads exist (list below, appearing in this file) I will add them to your tool list through one function in `spi/ai/tools.js`: tell me in this file if you object, otherwise I edit that file myself, (3) golden questions for the findings in `docs/spi/DATA_FINDINGS_2.md`, (4) Gemini selftest once the owner sets the key. Do not touch `src/modules/*`.
