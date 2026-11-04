@@ -13,7 +13,7 @@ Baseline priced stock is **IDR 616,617,267,812**. Stock above static Max is **ID
 - Active critical S/A stock above a positive Max: **IDR 117,879,258,941**. A 10% after-review hypothesis is shown as an Assumption but is disabled in base cash flow. A scenario toggle does not grant approval.
 - Insurance stock protected: **IDR 398,717,822,756**. This includes S/A non-moving stock and OEM Max-zero reserves. It is broader than the source page's S/A no-demand category.
 
-Independent SQL found 12 materials shared by the B/C excess and non-moving groups, and 27 S/A insurance materials also above a set Max (IDR 285,253,164,604 excess). **Do not add overlapping categories or count insurance stock as released capital.** The source savings page belongs to the integrator; this correction is applied in the finance engine and flagged in the handoff.
+Independent SQL found 12 materials shared by the B/C excess and non-moving groups, and 27 S/A insurance materials also above a set Max (IDR 285,253,164,604 excess). **Do not add overlapping categories or count insurance stock as released capital.** The integrator has now made the counted source categories mutually exclusive; the source B/C total reconciles exactly with Finance. The engine protects a broader strategic cohort (all S/A no-demand and OEM Max-zero) than the source page's lead-time-based insurance category, so their insurance/review reference values are deliberately distinguished.
 
 ## Financial assumptions and result
 
