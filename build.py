@@ -135,6 +135,11 @@ if SPI:  # spare part navigation group, routing and start page
     P('const NAVG=[["Operate",','const SPIPAGES='+json.dumps(PG)+';\nconst NAVG=[["Spare parts",SPIPAGES.map(r=>[r[0],r[2]])],["Operate",')
     P('app.innerHTML=p==="dashboard"?','app.innerHTML=p.startsWith("spi_")?spiRoute(p):p==="dashboard"?')
     P('let st={page:"dashboard",','let st={page:"spi_dash",')
+    P('Each set = P&ID + GA drawing + datasheet + plot plan + interlock logic + OPLs + maintenance history, for one main equipment item','Each set = schematic P&ID, equipment drawing and 3D model, datasheet, spare parts list and maintenance notifications, for one main equipment item')
+    P('<span class="tag">🧩 ${cnt(K.opl,o=>o.set===s.n)} lessons</span>','')
+    h=h.replace('Ask about procedures, interlocks, equipment details, locations or maintenance history.','Ask about spare parts, stock, equipment details or maintenance history.').replace('plot plans, interlock documents, OPLs, instrument data and ','spare part records, datasheets and ')
+    P('window.NW=n=>','window.SPI_MODE=true;window.NW=n=>')
+    P('All ${NW(K.sets.length)} units as laid out on the plot plan, joined by their process, gas, water, nitrogen and steam lines. Drag to look around. Select a unit to fly to it and see its figures, then open its equipment set from the card.','All ${NW(K.sets.length)} equipment sets in a schematic site layout generated from the data. Drag to look around. Select a unit to fly to it, then open its equipment set from the card.')
 
 # ---------- 4. theme + cleanup ----------
 h=remap(h)
