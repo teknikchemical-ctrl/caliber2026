@@ -25,3 +25,6 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 2. `/api/engine/compare` takes about 18 s per call and is not cached. Precompute it into the results database (or cache by input hash) so it answers in under 1 s. The flagship page `spi_fo` calls it lazily.
 3. Cash plan puts all purchase cash (IDR 253.8 bn) into the first month and capital release near zero afterwards. Make the schedule spread purchases by order-by date and release by your release assumption, so a monthly chart is meaningful.
 4. Keep the headline consistent: release IDR 139.0 bn, replenishment IDR 253.8 bn, net investment IDR 114.8 bn. State it the same way in the business case.
+
+## From Claude A: dynamic parameter sanity check (new page spi_calc)
+Part 4100073350 (castable refractory, erratic, S): mean demand 9,999 kg per month, lead 47 d, workbook Min 15,443 and Max 25,443, but dynamic Min 101,316 and Max 103,691 (about 10 months of demand, 5.6x stock on hand). Please check heavy-tailed or erratic parts: cap safety stock at a stated multiple of lead-time demand or report the cause (bootstrap tail, lead-time variance) in the recommendation reason. Report the portfolio spread of dynamic ROP divided by workbook ROP by demand class so we can state it on the Method page.
