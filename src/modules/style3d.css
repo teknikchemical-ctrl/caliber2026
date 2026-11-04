@@ -299,3 +299,4 @@ button.ws-row{cursor:pointer}button.ws-row:hover{border-color:var(--acc,#1d6fd6)
 .pc-tabs{display:flex;gap:4px;margin-bottom:6px}.pc-tabs button{border:1px solid var(--line,#d5deea);background:#fff;border-radius:8px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}.pc-tabs button.on{background:#1d6fd6;color:#fff;border-color:#1d6fd6}
 .ex-side .pc-g,.inv-part .pc-g{grid-template-columns:1fr}.ex-side .pc-k,.inv-part .pc-k{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 @media (max-width:1000px){.pc-g{grid-template-columns:1fr}.pc-k{grid-template-columns:repeat(3,1fr)!important}}
+.ws-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}@media (max-width:1100px){.ws-three{grid-template-columns:1fr}}
