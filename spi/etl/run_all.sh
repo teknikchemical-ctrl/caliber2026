@@ -5,4 +5,6 @@ python3.13 spi/etl/build_db.py && python3.13 spi/etl/make_case.py | grep -v '^wa
 python3 spi/etl/polish_db.py
 python3.13 spi/ml/train.py
 python3.13 spi/ml/train_more.py
+python3.13 spi/ml/train_price.py
+python3.13 spi/etl/enrich_db.py
 node tools/spi_review_bake.mjs
