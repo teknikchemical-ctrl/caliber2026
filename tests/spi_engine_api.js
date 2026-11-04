@@ -7,6 +7,7 @@ r=await call('forecast','POST',{material_no:id,horizon:99});assert.equal(r.statu
 r=await call('forecast','POST',{});assert.equal(r.status,400);n++;
 r=await call('forecast','POST',{material_no:1});assert.equal(r.status,404);n++;
 r=await call('forecast','GET',{});assert.equal(r.status,405);n++;
+r=await call('forecast','POST',{material_no:id,plan:{...(await import('../spi/engine/runPlan.js')).defaultPlan((await import('../spi/engine/context.js')).contextFor(db,id)),evidence:['series:invented']}});assert.equal(r.status,400);n++;
 r=await call('optimise','POST',{filters:{material_no:id},limit:1});assert.equal(r.status,200);assert.equal(r.data.total,1);assert.equal(r.data.rows.length,1);n++;
 r=await call('health','GET',null,{q:String(id)});assert.equal(r.status,200);assert.ok(r.data.groups.insurance);n++;
 r=await call('simulate','POST',{material_no:id,include_rows:true});assert.equal(r.status,200);assert.equal(r.data.rows.length,1);assert.ok(r.data.curve.length>=5);n++;

@@ -1,0 +1,50 @@
+# SPI business case and prototype financial basis
+
+## Scope and evidence
+
+This case is Spare Part Intelligence and Inventory Optimization. The base financial view is a **low-risk B/C stock-keeping pilot**, not approval to execute every forecast order and not a promise to sell strategic spares. The data cut-off is 2026-09-30; history covers 17 months. All monetary inventory values are **Estimates** from the last IDR purchase-order item amount read as a unit price. Strictly positive prices exist for 1,229 of 7,481 materials; unpriced requirements are excluded from value totals.
+
+Baseline priced stock is **IDR 616,617,267,812**. Stock above static Max is **IDR 546,420,437,310**. The ten largest materials are **72.1%** of that static excess. The number is not a disposal budget. A Max of zero on an OEM part means no ceiling was set, not that every unit is excess.
+
+## Mutually exclusive opportunity cohorts
+
+- Low-risk B/C candidates: **IDR 14,733,770,130 across 72 materials**. A material in both excess and non-moving lists is counted once, using the larger eligible quantity.
+- Double-counted B/C excess removed from the summed source categories: **IDR 1,258,628,365**. This is why the finance ceiling differs from adding the category tiles on the source savings page.
+- Active critical S/A stock above a positive Max: **IDR 117,879,258,941**. A 10% after-review hypothesis is shown as an Assumption but is disabled in base cash flow. A scenario toggle does not grant approval.
+- Insurance stock protected: **IDR 398,717,822,756**. This includes S/A non-moving stock and OEM Max-zero reserves. It is broader than the source page's S/A no-demand category.
+
+Independent SQL found 12 materials shared by the B/C excess and non-moving groups, and 27 S/A insurance materials also above a set Max (IDR 285,253,164,604 excess). **Do not add overlapping categories or count insurance stock as released capital.** The source savings page belongs to the integrator; this correction is applied in the finance engine and flagged in the handoff.
+
+## Financial assumptions and result
+
+The editable input register is `finance/spi/inputs.json`. Every input carries unit, basis and source. Base realisation is **30%**, the total economic carrying indicator is **22%/year**, and the conditional critical review share is **10%**. These are Assumptions, not measured performance. Insurance is excluded before applying them.
+
+The base realisation scenario is **IDR 4,420,131,039**, phased 20%, 40%, 40% over years 1 to 3. It could arise from approved transfers, disposal recovery or avoided replenishment. Those channels and timing are not established by the snapshot and require finance validation. There is no assumed emergency-purchase or downtime saving because baseline incremental cost and production-loss data are absent.
+
+One-off solution cost is **IDR 480,000,000** and annual operation **IDR 408,000,000**, both Estimates. The one-off allowance covers integration, data QA, security and training with 20% contingency. Managed inference and existing browser clients need no new GPU in this prototype scope. Hosting/model/database/logs/support/evaluation budgets are editable allowances, not supplier quotations.
+
+At **12% discount** over **5 years**, before tax and at constant prices, the scenario cash NPV is **IDR 1,961,180,418**, simple payback **0.94 years**, and BCR **2.01**. IRR is not reported when the cash flow changes sign more than once; the base has later operating costs after the finite capital release. Use NPV.
+
+The **4% avoidable cash storage/handling rate** is separate from the 22% economic carrying indicator. The latter includes capital/opportunity components and is never added again to cash NPV. Capital release is a balance-sheet cash movement, not recurring operating profit. The post-release cash operating balance is **IDR -231,194,758/year**. A positive project NPV does not establish a profitable perpetual service: revalidate the ongoing budget or additional operational benefits after the cleanup phase.
+
+## Full availability programme is a separate decision
+
+The engine also calculates a complete service-policy backlog. Its gross reduction ceiling is **IDR 138,801,669,148**, while proposed priced replenishment is **IDR 252,509,001,164**. Unknown open orders, approved baseline buying and unpriced items prevent calling all of this incremental project spend. It is not charged automatically to the narrow B/C pilot and is not approved procurement. Include only the reviewed incremental fraction when modelling an availability programme.
+
+The primary inventory value is readiness for the maintenance campaign, not blanket stock reduction. Historical issue campaigns are December 2025 and January 2026; the known October 2026 maintenance load has 1,123 planned items. Campaign multipliers are dated Estimates, not annual seasonality or proof of demand for each spare.
+
+## Validation and limitations
+
+`spi/engine` is the single JavaScript calculator for forecasting and policy; `finance/spi/model.mjs` is the single JavaScript cash calculator used by the saved impact and live API. An independent hand-calculation test verifies NPV and the break-even equation. The Business Impact page changes its assumptions through a stateless API, recalculates scenarios and sensitivity, and does not mutate SQLite.
+
+Demand backtesting uses the last four monthly origins only for parts with at least three active months. Ties are not called wins; zero training-scale origins are unscored. Pinball loss is scaled by training mean for comparison across part units. Most of the baseline is too sparse for a defensible per-part score. The report is `finance/spi/engine_report.json`; no held-out service claim is made.
+
+The 17-month inventory replay is an **in-sample Estimate**: the current stock snapshot is used as a common initial condition, completed-history lead time is assumed and dynamic parameters are fit on the full history. It is not observed service improvement and cannot prove causal savings. Part-level exposures overlap on shared equipment and are not added as actual plant downtime benefit.
+
+## Prototype status
+
+Forecast, optimisation, simulation, health and impact APIs run against the real SQLite data. The identical dependency-free simulator can be imported by the browser from `/api/engine/simulate?module=1`. The AI owner's validated rules plans execute in this engine on every fixture part. Gemini-backed planning and the other inventory pages remain with their respective owners. No real API key or Vercel deployment is claimed by this financial milestone.
+
+**The human deferred deck work and requested prototype focus with about ten hours remaining.** New workbook/deck rendering is not on the critical prototype path. The cash model and input register are ready for later workbook reconciliation without duplicating the calculator.
+
+Financial source snapshot generated at 2026-11-04T03:32:08.486Z (UTC). Rebuild the engine report and impact JSON when baseline data or model policy changes.
