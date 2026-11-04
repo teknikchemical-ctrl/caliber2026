@@ -15,12 +15,15 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 - Fixed a layering bug in `plant3d.js` (ground slab had the same layer as equipment, so far units vanished behind it). The plant 3D tank of the first plant is switched off for this case (`window.P3SITE`).
 - Screenshots for the deck: `cases/spi/geo/shots/` (sheets, 3D models, plant 3D). Codex Fin may copy them to `docs/spi/shots/`.
 
+## Done since (plan 2, see docs/spi/DRAWINGS_BRIEF.md status)
+- Part models for all 53 types (`spi_draw_parts.js`), Part library page, `spi_health.js`, `spi_reco.js`, `spi_opt.js`, `spi_scn.js`; renderer solids `a` and `s` in g3d.js; CSS in style3d.css.
+
 ## In progress (not finished: which files, what state)
 - Nothing half done. Next candidates: B3 Recommendations and Inventory health pages (`spi_reco.js`, `spi_health.js`).
 
 ## Next, in order
-1. B3: Recommendations and Inventory health pages (read `docs/inbox/claude-b.md` for the UI conventions first).
-2. B4: Optimisation and Scenario simulator pages.
+1. P4: drawings and 3D for the other equipment classes (relief valve, shutdown valve, level control valve, transmitters, gauge, thermocouple), equipment timeline lane chart, plant explorer.
+2. P6: supplier and lead time views (needs the endpoints listed in the brief).
 3. Drawing polish if time remains: end elevation view on the sheets, part labels on the sheet, P&ID per class (`geo/pid.js`, the auto P&ID is generic), plot plan footprints from the model size (`ppFP`).
 
 ## Gotchas (things that surprised me, decisions and why)

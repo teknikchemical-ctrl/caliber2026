@@ -16,8 +16,8 @@ Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer no
 | A8 | A | todo | Ship: zip script, final deploy, screenshot steps, final audits | M5 | tools/spi_zip.sh |
 | B1 | A | todo | App shell `spi_core.js`, Overview, Data and architecture pages, nav group (took over from B) | M1 | src/modules/spi_core.js, spi_dash.js, spi_arch.js |
 | B2 | codex-ai | todo | Forecast page (chart with bands, ledger with source badges, how the AI reasoned) (took over from B) | M2 | src/modules/spi_forecast.js |
-| B3 | B | todo | Recommendations and Inventory health pages (the brief's named outputs), live by M3. Back to B: B has about 99% usage left | M3 | src/modules/spi_reco.js, spi_health.js |
-| B4 | B / codex-ai | todo | Optimisation and Scenario simulator pages (B, M4); Ask AI page (codex-ai) | M3 to M4 | spi_opt.js, spi_scn.js (B); spi_ask.js (codex-ai) |
+| B3 | B | done | Recommendations and Inventory health pages (the brief's named outputs), live by M3. Back to B: B has about 99% usage left | M3 | src/modules/spi_reco.js, spi_health.js |
+| B4 | B / codex-ai | doing | Optimisation and Scenario simulator pages (B, M4); Ask AI page (codex-ai) | M3 to M4 | spi_opt.js, spi_scn.js (B); spi_ask.js (codex-ai) |
 | B5 | B | done | Drawings and 3D for all 8 equipment sets to engineering standards (API, ASME, TEMA, ISA), with stock overlay; see docs/spi/DRAWINGS_BRIEF.md | M3 | cases/spi/geo, g3*.js, auto3d.js, spi_overlay.js | first complete version pushed; polish items in handoff b |
 | C1 | codex-ai | todo | Providers (gemini, mock), model chain, tests with fake Gemini | M1 | spi/ai/providers |
 | C2 | codex-ai | todo | Evidence pack and rules planner and validator | M1 | spi/ai |
