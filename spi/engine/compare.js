@@ -39,7 +39,7 @@ export function comparePart(ctx,{workbook={},train_months=13}={}) {
  }
  return {material_no:ctx.part.material_no,descr:ctx.part.descr,crit_max:ctx.part.crit_max,unit_price_idr:ctx.part.unit_price_idr,initial_stock:ctx.part.stock||0,in_sample:experiment(ctx.series.length,0),holdout:experiment(train_months,train_months)};
 }
-function summarise(rows,key){return Object.fromEntries(['current','workbook','dynamic'].map(name=>{
+export function summarise(rows,key){return Object.fromEntries(['current','workbook','dynamic'].map(name=>{
  const r=rows.map(p=>p[key][name]),sum=k=>r.reduce((s,v)=>s+(v[k]||0),0),demand=sum('total_demand'),periods=sum('n_months');
  return [name,{avg_stock_value_idr:sum('avg_stock_value_idr'),unpriced_parts:r.filter(p=>p.avg_stock_value_idr==null).length,orders:sum('orders'),ordered_qty:sum('ordered_qty'),stockout_part_months:sum('months_stockout'),shortage_qty:sum('shortage_qty'),total_demand:demand,filled_qty:sum('filled_qty'),fill_rate:demand?sum('filled_qty')/demand:null,service_level:periods?1-sum('months_stockout')/periods:null,part_months:periods}];
 }));}
@@ -55,4 +55,11 @@ export function comparePolicies(db,{filters={},workbook={},limit=50,offset=0}={}
  'Fill rate is units filled / units demanded. Service level is 1 minus stockout part-months / all part-months, including zero-demand months. Mixed material units make aggregate fill rate a descriptive indicator; inspect per-part results.',
  'Stock held is mean month-end on-hand valued at snapshot positive IDR unit prices, not a recoverable cash amount. Unpriced parts remain in service metrics. No emergency price premium, downtime or PO-spend saving is claimed. Criticality S > A > B > C is assumed.'
  ]};
+}
+
+// Fast default-policy summaries from batch-generated per-part metrics. Timelines
+// remain available through an explicit live request, not a first-screen dependency.
+export function compareCached(snapshot,{filters={},limit=50,offset=0,ids=null}={}){
+ const rows=snapshot.rows.filter(p=>(!ids||ids.has(p.material_no))&&(!filters.material_no||p.material_no===Number(filters.material_no))&&(!filters.crit||p.crit_max===filters.crit)&&(!filters.class||p.demand_class===filters.class)&&(!filters.family||p.family_id===filters.family)&&(!filters.q||(String(p.material_no)+' '+p.descr).toLowerCase().includes(String(filters.q).toLowerCase().slice(0,150))));
+ return {...snapshot,total:rows.length,rows:rows.slice(offset,offset+limit),in_sample:{...snapshot.in_sample,policies:summarise(rows,'in_sample')},holdout:{...snapshot.holdout,policies:summarise(rows,'holdout')},cache:{basis:'Precomputed full rules batch',timelines_included:false}};
 }

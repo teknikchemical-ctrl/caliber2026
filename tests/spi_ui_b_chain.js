@@ -68,16 +68,35 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("find: an equipment result opens in 3D", !!(await p.$(".spi-eq3")));
   /* I. spatial library: opens in 3D, search flies to the matching set */
   await p.evaluate(() => go("spi_space")); await p.waitForTimeout(3000);
-  ok("library: the 3D space with every set is shown", !!(await p.$("#p3 canvas")) && (await p.$$(".sp-rb")).length === (await p.evaluate(() => K.sets.length)));
+  ok("library: the 3D space with every set is shown", !!(await p.$("#p3 canvas")) && (await p.$$(".sp-ni")).length === (await p.evaluate(() => p3Units().length)) && (await p.evaluate(() => new Set(p3Units().map(u => u.tpl ? u.cls : spiSpCls(u.n))).size === p3Units().length)));
   await p.fill("#sp_q", "PP-411"); await p.waitForTimeout(2500);
-  ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#p3card button")));
+  ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === P3.rep[K.sets.find(s => s.tag === "PP-411A").n] && SPSP.act[P3.sel] === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#p3card button")));
   await p.fill("#sp_q", "bearing"); await p.waitForTimeout(2500);
   ok("library: a part search lists the sets that hold it", !!(await p.$("#sp_res .sp-r")) && await p.evaluate(() => !!P3.sel));
   const tags = await p.evaluate(() => K.sets.map(s => s.tag)); let found = 0;
-  for (const t of tags) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(700); if (await p.evaluate(t => P3.sel === K.sets.find(s => s.tag === t).n, t)) found++; }
-  ok("library: every equipment set is found by its tag (" + found + " of " + tags.length + ")", found === tags.length);
-  await p.evaluate(() => spiSpClear()); await p.waitForTimeout(1800);
-  ok("library: the whole plant view shows every set label inside the stage", await p.evaluate(() => { const r = document.querySelector(".p3stage").getBoundingClientRect(); return K.sets.every(s => { const e = P3.labs[s.n].getBoundingClientRect(); return e.width > 0 && e.x >= r.x && e.right <= r.right && e.y >= r.y && e.bottom <= r.bottom }) }));
+  for (const t of tags) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(700); if (await p.evaluate(t => { const n = K.sets.find(s => s.tag === t).n; return P3.sel === P3.rep[n] && SPSP.act[P3.sel] === n }, t)) found++; }
+  ok("library: every equipment set is found by its tag and opens in its block, no double blocks (" + found + " of " + tags.length + ")", found === tags.length);
+  const tpl = await p.evaluate(() => P3.tpl.map(u => u.tag)); let tf = 0;
+  for (const t of tpl) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(500); if (await p.evaluate(t => !!P3.sel && p3Units().find(u => u.n === P3.sel).tag === t, t)) tf++; }
+  ok("library: every class template is in the space and found by search (" + tf + " of " + tpl.length + ")", tpl.length >= 15 && tf === tpl.length);
+  await p.evaluate(() => { P3.orbit = false; spiSpClear(); }); await p.waitForTimeout(2600);
+  ok("library: the whole plant view shows every unit label inside the stage", await p.evaluate(() => { const r = document.querySelector(".p3stage").getBoundingClientRect(); return p3Units().every(s => { const e = P3.labs[s.n].getBoundingClientRect(); return e.width > 0 && e.x >= r.x && e.right <= r.right && e.y >= r.y && e.bottom <= r.bottom }) }));
+  /* every unit opens its card with the locations of its class; a location opens in Equipment 3D */
+  await p.evaluate(() => spiSpClear()); await p.waitForTimeout(1500);
+  await p.click('.sp-ni[data-n="' + (await p.evaluate(() => K.sets.find(s => s.tag === "PP-148A").n)) + '"]'); await p.waitForTimeout(3500);
+  ok("library: the unit card lists the locations of its class and each opens in 3D", await p.evaluate(() => document.querySelectorAll("#p3card .sp-lr").length >= 10));
+  await p.evaluate(() => document.querySelector("#p3card .sp-lr").click()); await p.waitForTimeout(3500);
+  ok("library: a location of the class opens in Equipment 3D", !!(await p.$(".spi-eq3")));
+  /* equipment set tab: every location and every material is listed and clickable */
+  await p.evaluate(() => go("equipment", { set: 2, tab: "overview" })); await p.waitForTimeout(4500);
+  const nm = await p.evaluate(() => SPSET[2] && SPSET[2].parts.length); await p.evaluate(() => { SPSET[2].lim = 99999; spiSetRows(2); });
+  ok("set tab: every material of the bill of materials is listed (" + nm + ")", nm > 0 && (await p.evaluate(() => document.querySelectorAll("#spset_rows2 tbody tr").length)) === nm);
+  ok("set tab: the functional locations are listed", (await p.evaluate(() => document.querySelectorAll("#spset_locs2 .spi-lc").length)) >= 1);
+  await p.evaluate(() => document.querySelector("#spset_rows2 tbody tr").click()); await p.waitForTimeout(2500);
+  ok("set tab: a material opens the part pop-up", !!(await p.$("#spi_pm .g3box")));
+  await p.keyboard.press("Escape"); await p.waitForTimeout(300);
+  await p.evaluate(() => document.querySelector("#spset_locs2 .spi-lc").click()); await p.waitForTimeout(3500);
+  ok("set tab: a functional location opens in Equipment 3D", !!(await p.$(".spi-eq3")));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();

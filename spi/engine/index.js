@@ -7,3 +7,5 @@ export {workbookPolicy,policyReplay,comparePart,comparePolicies} from './compare
 export {purchasePlanRows,cashPlan} from './cashplan.js';
 export {economicSource,economics} from './economics.js';
 export {financeToolDefinitions,runFinanceTool,createFinanceTools,cleanupThresholds,availabilityFunding,cleanupCandidates} from './financeTools.js';
+export {inventoryLoss,inventoryDecision,empiricalDistribution} from './inventoryMath.js';
+export {ropDiagnostics,ropSpread} from './ropDiagnostics.js';
