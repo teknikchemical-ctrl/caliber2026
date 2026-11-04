@@ -18,7 +18,8 @@
     "deploymentEnabled": {
       "claude/funny-edison-pis09w": false,
       "codex/ai": false,
-      "codex/finance": false
+      "codex/finance": false,
+      "claude/great-tesla-l0uw33": false
     }
   }
 }
