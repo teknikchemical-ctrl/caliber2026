@@ -154,11 +154,34 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => go("spi_space")); await p.waitForTimeout(2500); await p.fill("#kbs_ex_q input", "BF-105"); await p.waitForTimeout(2500);
   await p.evaluate(() => [...document.querySelectorAll("#kbs_ex_q .kb-o")].find(x => /BF-105/.test(x.textContent)).dispatchEvent(new MouseEvent("mousedown", { bubbles: true }))); await p.waitForFunction(() => EXP.eq && document.querySelector("#ex_eco .ip-risk"), null, { timeout: 30000 }).catch(() => {});
   ok("explorer: a location found by search opens in 3D with its economics", await p.evaluate(() => EXP.eq && !!document.querySelector("#ex_eco .ip-risk")));
-  ok("overview has only the explorer and the summary", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_dash"));
+  ok("overview has the explorer, the status and the summary", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_status,spi_summ"));
   /* explorer: the 2D drawing and the 3D model follow the same zone */
   await p.evaluate(() => { go("spi_space") }); await p.waitForTimeout(2500); await p.evaluate(() => exOpenFunc("PX_PP-148A")); await p.waitForFunction(() => EXP.eq && document.getElementById("ex_svg"), null, { timeout: 30000 }).catch(() => {});
   await p.evaluate(() => { exView("both"); const z = spiPrep(EXP.key).zones.find(q => q.lines.length); document.querySelector('#ex_svg [data-k="' + z.key + '"]').dispatchEvent(new MouseEvent("click", { bubbles: true })) }); await p.waitForTimeout(1200);
   ok("explorer: a zone selected on the 2D drawing selects it in 3D and lists its parts", await p.evaluate(() => EXP.zone != null && document.querySelectorAll("#ex_svg .sel").length > 0 && document.querySelectorAll("#ex_side .ex-pr").length > 0));
+  /* round 5: dropdown while typing, timeline drag and zoom, recommended toggle, AI box, status, summary, part card */
+  await p.evaluate(() => { IP.mode = "part"; go("spi_iplan") }); await p.waitForSelector("#kbs_ip_part input", { timeout: 20000 }).catch(() => {});
+  await p.fill("#kbs_ip_part input", "bearing 63"); await p.waitForSelector("#kbs_ip_part .kb-o", { timeout: 10000 }).catch(() => {});
+  ok("search: a dropdown of matches appears while typing", (await p.$$("#kbs_ip_part .kb-o")).length > 0);
+  await p.press("#kbs_ip_part input", "ArrowDown"); await p.press("#kbs_ip_part input", "Enter"); await p.waitForTimeout(3500);
+  ok("search: choosing a match with the keyboard opens that part", await p.evaluate(() => !!IP.d && !!document.querySelector(".ip-steps")));
+  await p.evaluate(() => go("spi_golden")); await p.waitForFunction(() => window.KBT && KBT.gd_tl, null, { timeout: 30000 }).catch(() => {});
+  const v0 = await p.evaluate(() => KBT.gd_tl.v0); const bx = await p.evaluate(() => { const r = document.querySelector("#gd_tl .kb-svg").getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height * 0.7 } });
+  await p.mouse.move(bx.x, bx.y); await p.mouse.down(); await p.mouse.move(bx.x + 220, bx.y, { steps: 6 }); await p.mouse.up(); await p.waitForTimeout(300);
+  ok("timeline: dragging moves the time window", await p.evaluate(v0 => KBT.gd_tl.v0 !== v0, v0));
+  const w0 = await p.evaluate(() => KBT.gd_tl.v1 - KBT.gd_tl.v0); await p.mouse.move(bx.x, bx.y); await p.mouse.wheel(0, -300); await p.waitForTimeout(300);
+  ok("timeline: the wheel zooms in", await p.evaluate(w0 => KBT.gd_tl.v1 - KBT.gd_tl.v0 < w0, w0));
+  await p.evaluate(() => { const m = document.querySelector("#gd_tl .kb-m"); if (m) m.dispatchEvent(new MouseEvent("click", { bubbles: true })) }); await p.waitForTimeout(300);
+  ok("timeline: a marker opens its details", await p.evaluate(() => { const P = document.querySelector("#gd_tl .kb-pop"); return !!P && !P.hidden }));
+  await p.evaluate(() => { GD.mine.demand = 1.5; gdMine() }); await p.waitForTimeout(3500);
+  ok("golden path: my inputs re-run the model and differ from the recommended run", await p.evaluate(() => GD.view === "mine" && GD.d.mine && GD.d.mine.outputs.totals.value_idr !== GD.d.rec.outputs.totals.value_idr));
+  ok("AI box host is filled after a run", await p.evaluate(() => !!document.querySelector("#wsai_gd") && document.querySelector("#wsai_gd").innerHTML.length > 0));
+  await p.evaluate(() => go("spi_status")); await p.waitForSelector(".st-c", { timeout: 20000 }).catch(() => {});
+  ok("status: five groups are shown", (await p.$$(".st-c")).length === 5);
+  await p.evaluate(() => go("spi_summ")); await p.waitForTimeout(5000);
+  ok("summary: a tile with a figure for each of the 20 case points", await p.evaluate(() => [...document.querySelectorAll(".sm-t .sm-v")].filter(e => e.textContent !== "...").length === 20));
+  await p.evaluate(() => go("spi_cimp")); await p.waitForSelector(".kb-wf", { timeout: 20000 }).catch(() => {});
+  ok("costs: the waterfall and the impact bars are drawn", !!(await p.$(".kb-wf")) && (await p.$$(".kb-hbr")).length > 3);
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
