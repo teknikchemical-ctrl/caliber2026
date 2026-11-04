@@ -38,8 +38,8 @@ const wsMonth=m=>{const t=new Date(m+"-01T00:00:00Z");return isNaN(t)?m:t.toLoca
 function wsNotifText(d){const m=/^\s*\[([^\]]+)\]\s*(.*)$/.exec(d||"");return m?{ref:m[1],text:m[2]}:{ref:"",text:d||""}}
 const wsPrioTone={Emergency:"bad",High:"warn",Medium:"acc",Low:"n"};
 /* shared assumptions panel (editable everywhere it is shown) */
-function wsAssump(on,keys){keys=keys||["downtime","hours","premium","carry","lead"];const crit=["S","A","B","C"],inp=(path,v,step)=>`<input type="number" step="${step||"any"}" value="${v}" onchange="spiSpaEdit('${path}',this.value);${on}()">`;
- return `<details class="ws-as" open><summary>Assumptions <span>editable, saved in this browser</span></summary>
+function wsAssump(on,keys){keys=keys||["downtime","hours","premium","carry","lead"];const crit=["S","A","B","C"],inp=(path,v,step)=>`<input type="number" step="${step||"any"}" value="${Math.abs(v)>=100?Math.round(v):v}" onchange="spiSpaEdit('${path}',this.value);${on}()">`;
+ return `<details class="ws-as"><summary>Assumptions <span>editable, saved in this browser</span></summary>
  ${keys.includes("downtime")?`<div class="ws-at"><b>Cost of downtime per hour (IDR)</b>${crit.map(c=>`<label>${c}${inp("downtime_idr_h."+c,SPA.downtime_idr_h[c],100000)}</label>`).join("")}</div>`:""}
  ${keys.includes("share")?`<div class="ws-at"><b>Share of stockouts that stop equipment</b>${crit.map(c=>`<label>${c}${inp("downtime_share."+c,SPA.downtime_share[c],0.05)}</label>`).join("")}</div>`:""}
  ${keys.includes("hours")?`<div class="ws-at"><b>Hours lost per stockout</b>${crit.map(c=>`<label>${c}${inp("hours_per_stockout."+c,SPA.hours_per_stockout[c],1)}</label>`).join("")}</div>`:""}

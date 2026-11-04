@@ -84,7 +84,7 @@ spiRegister("spi_mkit","Work-pack calculator",async host=>{host.innerHTML=wsFram
 function mkInputsDraw(){const e=document.getElementById("mk_in");if(e)e.innerHTML=mkInputsHtml()}
 function mkInputsHtml(){return wsField("Window starts",wsSel(WS_FROM.map(m=>[m,wsMonth(m)]),WSK.from,"WSK.from=this.value;mkRun()"))+
  wsField("Window length",wsRange(1,12,1,WSK.horizon,"WSK.horizon=+this.value;mkRun()","this.value+' months'"))+
- wsField("Location or text","<input type=\"search\" placeholder=\"For example PX_BF-108 or COMPRESSOR\" value=\""+wsE(WSK.loc||WSK.q)+"\" onchange=\"if(/^PX_|^SITE_/.test(this.value)){WSK.loc=this.value;WSK.q=''}else{WSK.q=this.value;WSK.loc=''};mkRun()\">")+
+ wsField("Location or equipment",kbSearchHtml("mk_loc",{kinds:["set","loc","class"],value:WSK.loc||WSK.q,placeholder:"For example BF-108 or compressor",onPick:x=>{if(x.kind==="class"){WSK.class=x.id;WSK.loc="";WSK.q=""}else{WSK.loc=x.kind==="set"?"PX_"+S(x.id).tag:x.id;WSK.q=""}mkInputsDraw();mkRun()}}))+
  wsField("ABC indicator",wsChips("ABC",["S","A","B","C"],WSK.abc,"mkTog('abc',"))+wsField("Location criticality",wsChips("Criticality",["S","A","B","C"],WSK.crit,"mkTog('crit',"))+
  wsField("Equipment class",wsSel(WS_CLASSES,WSK.class,"WSK.class=this.value;mkRun()","Equipment class"))+
  wsField("Share of the installed quantity replaced per task",wsRange(0,1,0.05,WSK.factor,"WSK.factor=+this.value;mkRun()","Math.round(this.value*100)+'%'"),"Assumption: the plan file does not list parts per task")+
@@ -136,7 +136,7 @@ function mtInputs(){const e=document.getElementById("mt_in");if(!e)return;const 
  e.innerHTML=wsField("Scope",wsChips("Scope",[["plant","Whole plant"],["class","Equipment class"],["crit","Criticality"],["loc","One location"]],WST.scope,"mtSet('scope',",true))+
  (WST.scope==="class"?wsField("Equipment class",wsSel(WS_CLASSES.slice(1),WST.class||"PP","WST.class=this.value;mtRun()","Equipment class")):"")+
  (WST.scope==="crit"?wsField("Criticality",wsChips("Criticality",["S","A","B","C"],WST.crit||"S","mtSet('crit',",true)):"")+
- (WST.scope==="loc"?wsField("Location",`<input type="search" placeholder="Tag or description, for example BF-105" value="${wsE(WST.locLab)}" oninput="mtFind(this.value)"><div id="mt_found" class="ws-found"></div>`):"")+
+ (WST.scope==="loc"?wsField("Location",kbSearchHtml("mt_loc",{kinds:["set","loc"],value:WST.locLab,placeholder:"Tag or description, for example BF-105",onPick:x=>{WST.loc=x.kind==="set"?"PX_"+S(x.id).tag:x.id;WST.locLab=x.label;mtInputs();mtRun()}})):"")+
  wsField("Months ahead from the plan",wsRange(0,24,1,WST.ahead,"WST.ahead=+this.value;mtRun()","this.value+' months'"))+
  `<div class="ws-f"><label>Layers</label>${cb("created","Notifications created, by priority")}${cb("completed","Notifications completed")}${cb("backlog","Open and overdue backlog")}${cb("issues","Parts issued")}${cb("planned","Planned task occurrences")}${cb("purchases","Purchase deliveries")}</div>`+
  wsField("Parts issued shown as",wsChips("Issued as",[["value","Value (IDR)"],["qty","Quantity"],["n","Number of issues"]],WST.issueBy,"mtSet2('issueBy',",true))}
