@@ -26,7 +26,7 @@ const cases=[
  ['What is in the reliability explorer?','get_page',/286 failure events/],
  ['Explain this view: Cost-risk scenarios','get_page',/average stock value falls/,null,{page:'spi_scr'}],
  ['Explain this view: Registers','get_page',/2,502 insurance spares/,null,{page:'spi_reg'}],
- ['Explain this view: Inventory planner',' read_screen'.trim(),/Inventory planner[\s\S]*recommended order 120 EA/,null,{page:'spi_iplan',view:{title:'Inventory planner',inputs:{mat:4100000129},figures:[{label:'Recommended order',value:120,unit:'EA',basis:'Estimate'}]}}],
+ ['Explain this view: Inventory planner',' read_screen'.trim(),/With your selection \(part 4100000129\), the Inventory planner shows a recommended order of \*\*120 EA\*\*/,null,{page:'spi_iplan',view:{title:'Inventory planner',inputs:{mat:4100000129},figures:[{label:'Recommended order',value:120,unit:'EA',basis:'Estimate'}]}}],
  ['How variable is procurement lead time?','case_question',/median lead time is \*\*42 days\*\*/],
  ['Is there seasonality in consumption?','case_question',/cannot be proven/],
  ['How does the installed equipment population affect demand?','case_question',/installed across/],
@@ -41,6 +41,9 @@ const cases=[
  ['How many high priority notifications are open?','query_records',/85 notifications\*\* of high priority that are still open/],
  ['How many maintenance items for PP-1323B?','query_records',/1 maintenance item\*\* on PP-1323B/],
  ['What tables are in the database?','describe_database',/spare parts \(7,481\)/],
+ ['Which suppliers are the slowest?','get_page',/median lead time is \*\*42 days\*\*[\s\S]*slowest large supplier/],
+ ['Explain this view: Impact reduction','get_page',/1,118 parts\*\* now/,null,{page:'spi_cimp'}],
+ ['Explain this view: Suppliers and lead time','get_page',/119 suppliers/,null,{page:'spi_sup'}],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
  if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100||(r.answer.match(/[.!?](\s|$)/g)||[]).length>7&&tool==='get_page')fails.push('too long '+r.answer.length);

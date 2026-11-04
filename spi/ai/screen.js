@@ -4,12 +4,16 @@
 const N=v=>typeof v==='number'?v.toLocaleString('en-US',{maximumFractionDigits:Math.abs(v)<10?2:0}):String(v);
 const money=(v,u)=>/idr/i.test(u||'')&&typeof v==='number'&&Math.abs(v)>=1e6?'IDR '+(Math.abs(v)>=1e9?(v/1e9).toFixed(2)+' bn':(v/1e6).toFixed(1)+' mn')+(/year/i.test(u)?' per year':''):N(v)+(u?' '+u:'');
 export function checkView(v){if(v==null)return;if(typeof v!=='object'||Array.isArray(v))throw new Error('Context view must be an object');if(JSON.stringify(v).length>12000)throw new Error('Context view is too large')}
-function inputsInWords(inp){if(!inp||typeof inp!=='object')return '';const parts=Object.entries(inp).filter(([k,v])=>v!=null&&v!==''&&typeof v!=='object').slice(0,5).map(([k,v])=>k.replace(/_/g,' ')+' '+v);return parts.length?' for '+parts.join(', '):''}
+const KEY={mat:v=>'part '+v,material_no:v=>'part '+v,set:v=>'equipment set '+v,loc:v=>'location '+String(v).replace(/^PX_/,''),funcloc:v=>'location '+String(v).replace(/^PX_/,''),horizon:v=>v+' months ahead',crit:v=>'criticality '+v,scope:v=>'scope '+v,service:v=>'service level '+(v<=1?Math.round(v*100)+'%':v),factor:v=>'demand at '+Math.round(v*100)+'%',demand_factor:v=>'demand at '+Math.round(v*100)+'%',lead:v=>v+' lead time',q:v=>'search "'+v+'"',supplier:v=>'supplier '+v,type:v=>'item type '+v,mode:()=>''};
+function inputsInWords(inp){if(!inp||typeof inp!=='object')return '';const parts=Object.entries(inp).filter(([k,v])=>v!=null&&v!==''&&typeof v!=='object'&&KEY[k]).map(([k,v])=>KEY[k](v)).filter(Boolean).slice(0,4);return parts.length?' ('+parts.join(', ')+')':''}
+const art=w=>/^[aeiou]/i.test(w)?'an':'a';
 export function readScreen(view){const title=String(view.title||'This view').slice(0,80),figs=(Array.isArray(view.figures)?view.figures:[]).filter(f=>f&&f.label!=null&&f.value!=null).slice(0,12);
- const head=title+inputsInWords(view.inputs)+(figs.length?':':' shows no figures yet.');
- const said=figs.slice(0,4).map(f=>String(f.label).replace(/\.$/,'').toLowerCase()+' '+money(f.value,f.unit)+(f.basis&&f.basis!=='Data'?' ('+f.basis+')':''));
- const body=said.length?' '+said.slice(0,-1).join(', ')+(said.length>1?' and ':'')+said[said.length-1]+'.':'';
- return {id:'screen:'+title.toLowerCase().replace(/[^a-z0-9]+/g,'_'),title,inputs:view.inputs||{},figures:figs,notes:(view.notes||[]).slice(0,3),answer:head+body}}
+ if(!figs.length)return {id:'screen:'+title.toLowerCase().replace(/[^a-z0-9]+/g,'_'),title,figures:[],answer:'The '+title+' has no result on screen yet. Choose a part, set or filter and run it, and I will explain the result.'};
+ const est=figs.slice(0,4).some(f=>f.basis&&f.basis!=='Data');
+ const said=figs.slice(0,4).map(f=>{const l=String(f.label).replace(/\.$/,'').replace(/^./,c=>c.toLowerCase());return art(l)+' '+l+' of **'+money(f.value,f.unit)+'**'});
+ const list=said.length>1?said.slice(0,-1).join(', ')+' and '+said[said.length-1]:said[0];
+ const notes=(view.notes||[]).map(String).filter(n=>n.length<220).slice(0,1);
+ return {id:'screen:'+title.toLowerCase().replace(/[^a-z0-9]+/g,'_'),title,inputs:view.inputs||{},figures:figs,notes,answer:'With your selection'+inputsInWords(view.inputs)+', the '+title+' shows '+list+(est?' (Estimates)':'')+'.'+(notes.length?' '+notes[0].replace(/^./,c=>c.toUpperCase()).replace(/([^.])$/,'$1.'):'')}}
 export function screenFor(question,context={}){const v=context.view;if(!v||!v.title)return false;return /\b(this|these|here|on screen|current|my selection|the result)\b|^explain this/i.test(question)}
 // Action buttons: parts, equipment and tabs named in the answer or the evidence. Each is {label,kind,page,args}.
 export function buildActions(db,final,results){const out=[],seen=new Set(),add=a=>{const k=a.kind+':'+(a.args.mat||a.args.funcloc||a.page);if(seen.has(k)||out.length>=5)return;seen.add(k);out.push(a)};

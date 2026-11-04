@@ -12,10 +12,10 @@ export default guard((req, res) => {
       { file: "PR PO.xlsx", table: "po_line", rows: c("po_line"), role: "Procurement and lead time: dates, quantity, supplier, amount, used for lead-time statistics and unit price" },
       { file: "Mitem & Mplan.xlsx", table: "maint_item", rows: c("maint_item"), role: "Maintenance plan: known future work per location (next due dates) as a planned-demand driver" }],
     joins: [
-      { from: "funcloc", to: "bom / notification / maint_item", on: "Functional Location", cardinality: "1:N" },
-      { from: "bom", to: "movement / po_line", on: "Material No", cardinality: "1:N" },
-      { from: "notification", to: "movement", on: "Order", cardinality: "1:N (about 16% of issues link)" },
-      { from: "maint_item", to: "bom", on: "Functional Location (indirect: maintenance items carry no parts)", cardinality: "N:M through the location" }],
+      { from: "Functional locations", to: "BoM lines, notifications, maintenance items", on: "Functional location", cardinality: "One to many" },
+      { from: "BoM lines", to: "Material issues, PR and PO lines", on: "Material number", cardinality: "One to many" },
+      { from: "Notifications", to: "Material issues", on: "Maintenance order", cardinality: "One to many (about 16% of issues link)" },
+      { from: "Maintenance items", to: "BoM lines", on: "Functional location (indirect: maintenance items carry no parts)", cardinality: "Many to many through the location" }],
     derived: [{ table: "part_profile", what: "one row per part: demand class (ADI, CV2), criticality served, lead-time statistics, planned work due, stock value, excess" }, { table: "spec_family", what: "interchangeable parts by specification, or OEM parts pooled by item type and equipment class" }, { table: "dq_issue", what: "every data quality problem found, with the rule applied" }],
-    principle: "No external data added: the six baseline files carry every driver the brief lists (consumption, failures, planned maintenance, lead time, criticality). Every added table is derived from them." });
+    principle: "No outside data is added. The six baseline files already carry every driver the brief lists (consumption, failures, planned maintenance, lead time and criticality), and every added table is derived from them." });
 });
