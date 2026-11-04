@@ -1,22 +1,19 @@
 # Handoff note, Claude A (SPI case)
 
-**Updated:** 2026-11-04   **Branch:** claude/great-tesla-l0uw33   **Deploy:** Vercel, `python3 build.py spi`, one function `api/router.mjs`
+**Updated:** 2026-11-04 (afternoon UTC)   **Branch:** claude/great-tesla-l0uw33   **Deploy:** Vercel, `python3 build.py spi`, one function `api/router.mjs`, push to `main` only at checkpoints (free plan, one deployment per push; `vercel.json` stops builds of the other branches).
 
-## Merged and deployed (main)
-- All of Claude B (last: d317aa4 Library, one block per designed class), Codex AI and Codex Fin branches.
-- Site is five tabs (`src/modules/spi_hub.js`, list `SPI_HUBS`): Overview, Inventory, Maintenance, Forecasting and Simulation, Costs. Every other page is a view in a hub; `spiGo('<page id>')` opens the hub and the view. B's views: Equipment library 3D (`spi_space`), Equipment 3D and drawings (`spi_eq`), Protective devices (`spi_prot`) under Maintenance; Find (`spi_find`), Parts (`spi_parts`), Stock health (`spi_health`) under Inventory; Recommendations, Parameters under Forecasting.
-- Tables of more than 5 rows stay hidden until searched (`spiTable`). Build stamp in the sidebar and `/api/data/health` (`commit`).
-- A pages: Overview (B is rebuilding it), Forecasting and optimisation, Method and validation, Campaign readiness, Registers, Locations, Maintenance board, Demand outlook, Cost reduction, Scenario simulator, Documents and log, floating assistant.
-
-## Decisions that differ from the integration brief
-- Navigation is the five hubs, not one menu entry per page (owner decision). `spi_space` is the "Equipment library 3D" view under Maintenance, not the start page; the start page is the Overview hub (`build.py`: `st.page="spi_h_ov"`).
-- Old-plant pages are hidden by the menu prune in `spi_core.js`; their code is not deleted yet.
+## State
+- Five tabs (`spi_hub.js`, `SPI_HUBS`). Overview: Equipment library 3D, Summary (B), Brief coverage, Method and validation, Data and architecture. Inventory: Find, Stock health, Locations, Parts, Registers, Documents and log. Maintenance: board, Equipment and failures, Maintenance-driven demand, Turnaround readiness, Open work and spares, Equipment 3D, Protective devices. Forecasting and Simulation: Demand predictability, Portfolio forecast, Decision board, Part forecast, Parameters, Cost-risk optimiser, Scenario simulator, Policy backtest, Ask the AI. Costs: Cost-risk balance, Cost reduction, Cash plan, Business impact, Engine finance detail.
+- Every new view draws from one payload `GET /api/view/<name>` (`server/_lib/views.mjs`, list in `docs/spi/VIEW_PAYLOADS.md`); the assistant reads the same payloads (`get_view` tool, `spi/ai/views_route.js`). Forecast results come from `spi/db/views.sqlite` (slim copy of the validated batch plans, `tools/spi_slim_results.py`). `results.sqlite` (168 MB) is untracked.
+- Findings behind the views: `docs/spi/DATA_FINDINGS_2.md`. Plan: `docs/spi/PLAN_FORECAST_SIM.md`.
+- Tests: `node tests/spi_views.js` (30), `tests/spi_data.js full` (40), `tests/spi_pages.js full`, `tests/spi_ai_views.js` (16), all spi_ai*/spi_engine* tests, `tests/live.js` after `python3 build.py lldpe`.
 
 ## Open
-- Delete old-plant pages and `spi_zone_clean.js` after B confirms (docs/TASKS.md). Replace `spiPlantOverview` with a link to the library.
-- `/api/engine/compare` about 18 s, `/api/engine/optimise` first call about 10 s: Codex Fin to cache (inbox).
-- Vercel: after each push check that the top deployment for main is Ready and the sidebar shows the build commit. Never use Redeploy on an old deployment.
+- Gemini not connected (owner sets AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel, then selftest).
+- Dynamic Min outliers (424 parts above 3 times lead-time demand) are flagged on Parameters, not capped.
+- Engine finance detail (Codex Fin) shows a different release figure (IDR 139 bn policy) from the Cost reduction view (B and C 14.7 bn gross, S and A under review): both are labelled; reconcile in the deck.
+- Old-plant pages are hidden, not deleted. Deck and zip (`tools/spi_zip.sh`) still to do.
 
 ## Gotchas
-- All spi modules share one global scope: prefix names (B: spiSp*, SPSP, SPSET, SPI_GONE; A: spmt*, SPSIM, SPIRG, spiG*). The static check flags duplicate CSS class names between style3d.css and style_spi.css.
-- Never run a build while a test that reads `dist/index.html` is running.
+- All spi modules share one global scope; prefix names (A: spfs, spmv, spcv, spmt, SPSIM). Static check flags duplicate CSS classes with style3d.css.
+- Never run a build while a test that reads `dist/index.html` is running. Never `git add -A` with results.sqlite present (168 MB, GitHub rejects it); it is in .gitignore.
