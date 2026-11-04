@@ -24,3 +24,16 @@ Every view is a tool: inputs on the left, results on the right, recalculated on 
 - Demand over the lead time: normal approximation with the mean and spread of the 17 monthly totals. Calculated policy: reorder point = demand over lead time + z x spread over lead time (z from the service target of the criticality); order up to = reorder point + max(EOQ, one month).
 - Shortage cost = units short x price x emergency premium + stockout events x share that stops equipment x hours per stockout x downtime cost per hour (all Assumptions by criticality).
 - Lead time = PR date to PO delivery median; unit price = last PO amount read as a unit price (Estimate). Parts without a price add risk but no IDR.
+
+## Added (second round)
+- Maintenance timeline (`spi_mtime`, `/api/ws/timeline`): whole plant, a class, a criticality or one location. Layers switch on and off: notifications created by priority, completed, open and overdue backlog at month end, parts issued (value, quantity or count), planned task occurrences before and after the cut-off, purchase deliveries. One location also lists every dated event, filterable by kind.
+- Every tool shows "Your selection": the inputs behind the result, in words.
+- Replenishment simulator: reference run with the default inputs and the change of each result against it; monthly demand chart (17 months issued, simulated months with band); total cost and stockout chance against the reorder point (sweep), with the three policies marked.
+- Cost-risk scenarios: sensitivity of the total cost to each assumption (25% lower and higher).
+- Test `tests/spi_ui_b_handlers.js`: compiles every inline event handler on every page (the chip handlers were broken before this fix).
+
+## Inventory planner (`spi_iplan`, first view of Inventory)
+- Choose a part number, an equipment set (8 chips) or any location with parts. Inputs: look-ahead 6 to 24 months, order size (cheapest, or fixed months of use), use compared with the history, lead time (median, slow p90, own days), service targets and cost assumptions.
+- Part: four numbered answers (stock now, projected use with range, recommendation with quantity, months covered and order-by date, cost reduction per year and over the horizon); projected stock with and without the recommendation (Monte Carlo, open orders on their delivery month); every cost line today against the recommendation; nine risk measures; use history and projection; purchase history.
+- Set or location: every part of its bill of materials with decision, stock, use, order, cost reduction and risk level; select a part to open it with the set in the trail.
+- Endpoint `/api/ws/advice` (mat, mats, set or loc). The recommendation is the cheapest of order sizes 1 to 24 months and service levels at or above the target, with today's Min and Max as a candidate, so it never costs more than today.
