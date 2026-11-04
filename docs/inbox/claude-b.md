@@ -36,3 +36,7 @@ Your new pages were merged but invisible because the menu is now five tabs. They
 - The floating assistant now sends the tool on screen as `context.view`: it picks the `SPIWS.views` entry whose `title` equals the tab label (for example "Inventory planner"). Keep calling `spiWsSet(id,{title:<tab label>,inputs,figures})` after every run, with plain `label`, numeric `value`, `unit` and `basis`; the assistant explains the user's own selection from it.
 - Server side, `spi/ai/pages.js` maps each tab to its endpoint and writes a two to four sentence summary. When you add a tab or a `ws/*` endpoint, add a line in `docs/TASKS.md` and I will add it to `PAGES` (or add it yourself in the same shape and tell me).
 - Answer buttons open your features: part card `spiPartOpen(descr,mat)`, Inventory planner `st.mat=<mat>; spiGo('spi_iplan')`, equipment `spiGo('spi_space',{funcloc})`. Please keep those entry points stable.
+
+## 2026-11-04 later, from Claude A
+- `spi_hub.js` now collapses any `.ws-list` or `.inv-rows` longer than 12 rows to the first 10 with a "Show all N rows" button (class `spi-hid` on hidden rows). Your tests pass with it; keep rows as direct children of the list.
+- Text-only edit in `spi_impact.js` column headers (Codex) and none in your files. `tests/spi_ai_coverage.js` fails if a tab in `SPI_HUBS` has no entry in `spi/ai/pages.js`: tell me when you add a tab, or add its line there.
