@@ -8,11 +8,11 @@ const spiSpLab=n=>{const c=spiSpCls(n);return (typeof SPI_CLASSLAB!=="undefined"
 const spiSpBomN=n=>((GA[n]&&GA[n].bom)||[]).length;
 const spiSpMat=b=>{const m=/(\d{5,})/.exec(b.mat||"");return m?+m[1]:null};
 spiRegister("spi_space","Equipment library",async host=>{
- const h=Math.max(520,(window.innerHeight||800)-70);
+ const h=Math.max(520,(window.innerHeight||800)-205);
  host.classList.add("sp-wrap");
- host.innerHTML=`<div class="sp-top"><div class="sp-search"><input id="sp_q" type="search" autocomplete="off" placeholder="Search a tag, part or location, e.g. KT-383A or bearing" aria-label="Search the equipment library" oninput="spiSpType(this.value)" onkeydown="if(event.key==='Enter')spiSpEnter();if(event.key==='Escape')spiSpClear()"><div id="sp_res" class="sp-res" hidden></div></div></div>
- <div class="sp-rail" role="group" aria-label="Equipment sets">${K.sets.map(s=>`<button class="sp-rb" data-n="${s.n}" onclick="spiSpGo(${s.n})"><b>${esc(s.tag)}</b><span>${esc(spiSpLab(s.n))}</span></button>`).join("")}</div>
- ${p3Hero({embed:true,h,fn:()=>"ok",lab:n=>`${esc(spiSpLab(n))} | ${spiNum(spiSpBomN(n))} parts`})}`;
+ host.innerHTML=`<div class="sp-top"><div class="sp-search"><input id="sp_q" type="search" autocomplete="off" placeholder="Search a tag, part or location, e.g. KT-383A or bearing" aria-label="Search the equipment library" oninput="spiSpType(this.value)" onkeydown="if(event.key==='Enter')spiSpEnter();if(event.key==='Escape')spiSpClear()"><div id="sp_res" class="sp-res" hidden></div></div><div class="sp-count">All <b>${K.sets.length}</b> equipment sets are in the space below. Select one, or search.</div></div>
+ <div class="sp-rail" role="group" aria-label="Equipment sets">${K.sets.map(s=>`<button class="sp-rb" data-n="${s.n}" onclick="spiSpGo(${s.n})"><b>${esc(s.tag)}</b><span>${esc(spiSpLab(s.n))} | ${spiNum(spiSpBomN(s.n))} parts</span></button>`).join("")}</div>
+ ${p3Hero({embed:true,h,fn:()=>"ok"})}`;
  {const q=(c,k)=>{const e=host.querySelector(c);if(e)e.classList.add(k)};q(".p3head","sp-ph");q(".p3tools","sp-pt");q(".p3key","sp-pk")}
  const hint=document.createElement("div");hint.className="sp-hint";hint.textContent="Drag to look around. Select a unit to fly to it. Type above to search: the camera moves to the set that matches. Schematic layout, not a surveyed plot plan.";host.appendChild(hint);
  if(st.focus){const q=String(st.focus);st.focus=null;const i=document.getElementById("sp_q");if(i){i.value=q;spiSpType(q)}}

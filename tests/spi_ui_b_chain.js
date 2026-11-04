@@ -73,6 +73,11 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#p3card button")));
   await p.fill("#sp_q", "bearing"); await p.waitForTimeout(2500);
   ok("library: a part search lists the sets that hold it", !!(await p.$("#sp_res .sp-r")) && await p.evaluate(() => !!P3.sel));
+  const tags = await p.evaluate(() => K.sets.map(s => s.tag)); let found = 0;
+  for (const t of tags) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(700); if (await p.evaluate(t => P3.sel === K.sets.find(s => s.tag === t).n, t)) found++; }
+  ok("library: every equipment set is found by its tag (" + found + " of " + tags.length + ")", found === tags.length);
+  await p.evaluate(() => spiSpClear()); await p.waitForTimeout(1800);
+  ok("library: the whole plant view shows every set label inside the stage", await p.evaluate(() => { const r = document.querySelector(".p3stage").getBoundingClientRect(); return K.sets.every(s => { const e = P3.labs[s.n].getBoundingClientRect(); return e.width > 0 && e.x >= r.x && e.right <= r.right && e.y >= r.y && e.bottom <= r.bottom }) }));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
