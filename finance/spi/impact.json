@@ -1,0 +1,1974 @@
+{
+  "title": "Spare part inventory business case",
+  "data_cutoff": "2026-09-30",
+  "source": "spi/db/spi.sqlite via engine batch; prices are last IDR PO item amounts read as unit prices",
+  "engine_version": "spi-engine-1.1",
+  "baseline": {
+    "parts": 7481,
+    "priced": 1229,
+    "stock_value_idr": 616617267812,
+    "static_excess_idr": 546420437310,
+    "consumed_parts": 1930,
+    "single_event_parts": 1220
+  },
+  "financial_basis": {
+    "low_risk_candidates_idr": 14733770130,
+    "low_risk_parts": 72,
+    "critical_review_candidates_idr": 117879258941,
+    "critical_review_parts": 207,
+    "insurance_stock_kept_idr": 398717822756,
+    "excluded_double_count_idr": 1258628365,
+    "candidates": [
+      {
+        "material_no": 4300060535,
+        "descr": "POSITIONER,VALVE,DWG.978-8170,FOR LCV-10",
+        "crit_max": "C",
+        "qty": 128,
+        "value_idr": 4266046208,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300041641,
+        "descr": "POSITIONER,VALVE,DWG.595-9766,FOR FCV-97",
+        "crit_max": "C",
+        "qty": 48,
+        "value_idr": 2525652000,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300035187,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.274-8443,FOR ",
+        "crit_max": "C",
+        "qty": 29,
+        "value_idr": 1397254684,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300071911,
+        "descr": "THERMOWELL,DWG.860-7559,FOR TEL-1476-15",
+        "crit_max": "B",
+        "qty": 69,
+        "value_idr": 805599288,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100043903,
+        "descr": "TRIM SET,CONTROL VALVE,TYPE LZ113,MONEL",
+        "crit_max": "C",
+        "qty": 12,
+        "value_idr": 545980872,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100037989,
+        "descr": "VALVE,GLOBE,1-1/2IN,150#,A216WCB,RF",
+        "crit_max": "C",
+        "qty": 121,
+        "value_idr": 533655254,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100055093,
+        "descr": "SWITCH,LIMIT,TYPE QS260,GRAPHITE",
+        "crit_max": "B",
+        "qty": 90,
+        "value_idr": 515836350,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100056408,
+        "descr": "TRANSMITTER,PRESS,TYPE FO290,SS304",
+        "crit_max": "B",
+        "qty": 9,
+        "value_idr": 467145621,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100031340,
+        "descr": "TEE,3IN,SCH80,A105,SW",
+        "crit_max": "B",
+        "qty": 311,
+        "value_idr": 411933806,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300063674,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.377-3855,FOR ",
+        "crit_max": "B",
+        "qty": 5,
+        "value_idr": 388387745,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300073931,
+        "descr": "POSITIONER,VALVE,DWG.833-5663,FOR TCV-14",
+        "crit_max": "B",
+        "qty": 7,
+        "value_idr": 314927067,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100056542,
+        "descr": "TRANSMITTER,PRESS,MODEL MC417,NBR",
+        "crit_max": "B",
+        "qty": 6,
+        "value_idr": 253259724,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100002246,
+        "descr": "BEARING,ROLLER,CYL,1ROW,7217BDB",
+        "crit_max": "C",
+        "qty": 53,
+        "value_idr": 250504182,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300039438,
+        "descr": "SEAT RING,VALVE,DWG.810-9979,FOR FCV-150",
+        "crit_max": "C",
+        "qty": 5,
+        "value_idr": 236305825,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100054282,
+        "descr": "SWITCH,LIMIT,MODEL GE636,MONEL",
+        "crit_max": "C",
+        "qty": 100,
+        "value_idr": 220183400,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300021089,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.946-5861,FOR ",
+        "crit_max": "C",
+        "qty": 5,
+        "value_idr": 215098215,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300049297,
+        "descr": "RING,WEAR,DWG.969-4928,FOR PP-1758A",
+        "crit_max": "C",
+        "qty": 12,
+        "value_idr": 166579692,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300063051,
+        "descr": "POSITIONER,VALVE,DWG.578-3598,FOR TCV-13",
+        "crit_max": "C",
+        "qty": 4,
+        "value_idr": 146207108,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300063598,
+        "descr": "IMPELLER,DWG.742-3894,FOR PP-474A",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 132296393,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300057046,
+        "descr": "POSITIONER,VALVE,DWG.789-7783,FOR TCV-12",
+        "crit_max": "C",
+        "qty": 2,
+        "value_idr": 115493746,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100043468,
+        "descr": "TRIM SET,CONTROL VALVE,SIZE QH233,GRAPHI",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 106034270,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100032929,
+        "descr": "FLANGE,WN,6IN,300#,SS316,RF",
+        "crit_max": "B",
+        "qty": 30,
+        "value_idr": 84338820,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100057598,
+        "descr": "TRANSMITTER,DIFF.PRESS,0~10000MMH2O,HART",
+        "crit_max": "C",
+        "qty": 1,
+        "value_idr": 66328612,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100060681,
+        "descr": "TRANSMITTER,TEMP,TYPE SN564,INCOLOY",
+        "crit_max": "B",
+        "qty": 3,
+        "value_idr": 63491223,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300010076,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.251-1444,FOR ",
+        "crit_max": "C",
+        "qty": 2,
+        "value_idr": 58840730,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100005648,
+        "descr": "SEAL,MECHANICAL,SIZE UU499,NBR",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 57460414,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200007259,
+        "descr": "FAN,COOLING MOTOR,SIZE DE861,NBR",
+        "crit_max": "B",
+        "qty": 59,
+        "value_idr": 52383681,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300067693,
+        "descr": "POSITIONER,VALVE,DWG.379-1328,FOR LCV-16",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 41803508,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300074394,
+        "descr": "SEAT RING,VALVE,DWG.469-8754,FOR LCV-146",
+        "crit_max": "C",
+        "qty": 5,
+        "value_idr": 38047715,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100048477,
+        "descr": "DIAPHRAGM,ACTUATOR,TYPE ZR602,A182F11",
+        "crit_max": "C",
+        "qty": 3,
+        "value_idr": 35523660,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100031262,
+        "descr": "TEE,10IN,3000#,A234WPB,SW",
+        "crit_max": "C",
+        "qty": 51,
+        "value_idr": 28880841,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100034824,
+        "descr": "VALVE,GATE,10IN,300#,A105,RF",
+        "crit_max": "C",
+        "qty": 3,
+        "value_idr": 28032792,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300054961,
+        "descr": "THERMOWELL,DWG.885-6188,FOR BF-105-BRN15",
+        "crit_max": "C",
+        "qty": 5,
+        "value_idr": 25691530,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300073868,
+        "descr": "COUPLING,DWG.939-2872,FOR PP-467A",
+        "crit_max": "B",
+        "qty": 3,
+        "value_idr": 17732568,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100101926,
+        "descr": "ANTIRUST,SPRAY TYPE,400ML/CAN,TYPE-B",
+        "crit_max": "C",
+        "qty": 197,
+        "value_idr": 16596265,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4200010291,
+        "descr": "FAN,COOLING MOTOR,DWG.121-7042,FOR PP-14",
+        "crit_max": "C",
+        "qty": 6,
+        "value_idr": 16523298,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100052805,
+        "descr": "SOLENOID VALVE,SIZE FG705,GRAPHITE",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 12564642,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300060332,
+        "descr": "SEAT RING,VALVE,DWG.704-8652,FOR TCV-514",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 10550540,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100034063,
+        "descr": "FLANGE,BLIND,4IN,150#,SS316,RF",
+        "crit_max": "B",
+        "qty": 3,
+        "value_idr": 6076875,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100101639,
+        "descr": "ANTIRUST,SPRAY TYPE,500ML/CAN,TYPE-A",
+        "crit_max": "C",
+        "qty": 114,
+        "value_idr": 5211852,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100091942,
+        "descr": "GREASE,COMPLEX,NLGI 2,0.4KG",
+        "crit_max": "C",
+        "qty": 46,
+        "value_idr": 4607912,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100028077,
+        "descr": "PIPE,1/2IN,SCH80,P11,SMLS,6M LG",
+        "crit_max": "B",
+        "qty": 7,
+        "value_idr": 4543826,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100034258,
+        "descr": "FLANGE,SO,1IN,600#,SS316,RF",
+        "crit_max": "B",
+        "qty": 29,
+        "value_idr": 4488881,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300039104,
+        "descr": "TRAY VALVE,DWG.167-6339,FOR CL-890",
+        "crit_max": "B",
+        "qty": 18,
+        "value_idr": 4374522,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200004765,
+        "descr": "LAMP,LED,36W,220VAC,FLOOD",
+        "crit_max": "B",
+        "qty": 5,
+        "value_idr": 4290095,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100065331,
+        "descr": "GAUGE,PRESSURE,0-10KG/CM2,6IN DIAL",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 4151704,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100031379,
+        "descr": "TEE,6IN,SCH80,A234WPB,BW",
+        "crit_max": "B",
+        "qty": 18,
+        "value_idr": 3832128,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300036717,
+        "descr": "RING,WEAR,DWG.377-5729,FOR PP-1157",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 3294699,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100064593,
+        "descr": "GAUGE,PRESSURE,0-16KG/CM2,4IN DIAL",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 2436628,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100030223,
+        "descr": "ELBOW,90DEG,1-1/2IN,SCH40,A234WPB,BW",
+        "crit_max": "C",
+        "qty": 9,
+        "value_idr": 2408787,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100108057,
+        "descr": "OIL,LUBRICANT,ISO VG 220,MINERAL,209L",
+        "crit_max": "B",
+        "qty": 22,
+        "value_idr": 1782968,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100038706,
+        "descr": "VALVE,NEEDLE,1/4IN NPT,6000PSI,SS316",
+        "crit_max": "C",
+        "qty": 3,
+        "value_idr": 1760325,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100029835,
+        "descr": "ELBOW,90DEG,10IN,SCH80,A234WPB,SW",
+        "crit_max": "C",
+        "qty": 11,
+        "value_idr": 1619145,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100030406,
+        "descr": "ELBOW,45DEG,10IN,SCH40,A234WPB,BW",
+        "crit_max": "C",
+        "qty": 42,
+        "value_idr": 1311618,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200006508,
+        "descr": "FAN,COOLING MOTOR,TYPE MT764,NBR",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 1277346,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200006341,
+        "descr": "LAMP,LED,18W,24VDC,T8",
+        "crit_max": "B",
+        "qty": 3,
+        "value_idr": 1137234,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200001644,
+        "descr": "GLAND,CABLE,TYPE LM902,NBR",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 962834,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100001810,
+        "descr": "BEARING,ROLLER,CYL,1ROW,7212BDB",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 765774,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200003035,
+        "descr": "TERMINAL BLOCK,SIZE AK895,NBR",
+        "crit_max": "C",
+        "qty": 25,
+        "value_idr": 624675,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100102065,
+        "descr": "ANTIRUST,SPRAY TYPE,350ML/CAN,TYPE-A",
+        "crit_max": "C",
+        "qty": 15,
+        "value_idr": 624210,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4200000384,
+        "descr": "TERMINAL,LUG,FORK,2X4MM,CRIMP",
+        "crit_max": "B",
+        "qty": 93,
+        "value_idr": 571578,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100093668,
+        "descr": "TUBE PLUG,EXCHANGER,TYPE HB648,A182F11",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 566188,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200008235,
+        "descr": "CABLE,INSTRUMENT,4PR X 0.75MM2,ARMOURED",
+        "crit_max": "C",
+        "qty": 9,
+        "value_idr": 384885,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100026344,
+        "descr": "STUDBOLT,7/8INX95MM,B7/2H",
+        "crit_max": "B",
+        "qty": 10,
+        "value_idr": 269420,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100094430,
+        "descr": "TUBE PLUG,EXCHANGER,MODEL FM276,MONEL",
+        "crit_max": "C",
+        "qty": 1,
+        "value_idr": 223352,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100101692,
+        "descr": "ANTIRUST,SPRAY TYPE,500ML/CAN,TYPE-B",
+        "crit_max": "C",
+        "qty": 4,
+        "value_idr": 222004,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200004430,
+        "descr": "TERMINAL BLOCK,TYPE LO541,VITON",
+        "crit_max": "C",
+        "qty": 1,
+        "value_idr": 170521,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200008403,
+        "descr": "CABLE,INSTRUMENT,1PR X 1.5MM2,ARMOURED",
+        "crit_max": "C",
+        "qty": 3,
+        "value_idr": 169920,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100020415,
+        "descr": "O-RING,NBR,198MM ID,3.5MM CS",
+        "crit_max": "B",
+        "qty": 9,
+        "value_idr": 153621,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100019942,
+        "descr": "O-RING,VITON,258MM ID,3.5MM CS",
+        "crit_max": "C",
+        "qty": 4,
+        "value_idr": 146020,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100103691,
+        "descr": "TAPE,PTFE,19MMX10M",
+        "crit_max": "C",
+        "qty": 4,
+        "value_idr": 105240,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4200003604,
+        "descr": "TERMINAL BLOCK,MODEL SJ486,SS304",
+        "crit_max": "C",
+        "qty": 1,
+        "value_idr": 31054,
+        "source": "excess above set Max"
+      }
+    ],
+    "notes": [
+      "Estimate: priced materials only, stock counted once per material.",
+      "B/C excess and non-moving candidates are unioned by taking the larger eligible quantity for each material, never adding it twice.",
+      "S/A non-moving insurance and OEM Max-zero reserves are excluded before any release cohort is formed.",
+      "Critical active-stock excess is a separate engineering-review cohort, not approved release."
+    ]
+  },
+  "global_portfolio": {
+    "baseline": {
+      "parts": 7481,
+      "priced": 1229,
+      "stock_value_idr": 616617267812,
+      "carrying_cost_idr_yr": 135655798918.63997,
+      "expected_stockouts_yr": 3408.0300556236575,
+      "exposure_idr": 4110168222880.7583,
+      "service_level": 0.932454405326828,
+      "target_stock_value_idr": 295450803090,
+      "ordering_cost_idr_yr": 29982450270.751125,
+      "annual_exposure_idr": 19577944520322.35,
+      "parts_meeting_service": 6172,
+      "service_target_basis": "Criticality policy by part",
+      "total_expected_cost_idr_yr": 19743582769511.742,
+      "settings": {
+        "stock_multiplier": 1,
+        "demand_multiplier": 1,
+        "lead_time_multiplier": 1,
+        "service_level": 0.95
+      },
+      "notes": [
+        "Estimate: scaled empirical lead-time demand, not a new sampling of lead-time uncertainty.",
+        "Stockout cycles per year assumes independent lead-time cycles; not observed annual failures.",
+        "Exposure sums part-level scores; shared equipment and correlated losses can overlap. Do not claim this sum as plant downtime loss.",
+        "Changing the service target changes target stock; existing-stock risk changes only when stock or demand is changed.",
+        "Held insurance reserves are not reduced below one; zero stock is not silently replenished by the baseline scenario."
+      ]
+    },
+    "dynamic": {
+      "parts": 7481,
+      "priced": 1229,
+      "stock_value_idr": 732291938779.9452,
+      "carrying_cost_idr_yr": 161104226531.5878,
+      "expected_stockouts_yr": 74.19839264643868,
+      "exposure_idr": 31018406718.454933,
+      "service_level": 0.9986047988236867,
+      "target_stock_value_idr": 295450803090,
+      "ordering_cost_idr_yr": 29982450270.751125,
+      "annual_exposure_idr": 185408342630.38696,
+      "parts_meeting_service": 7472,
+      "service_target_basis": "Criticality policy by part",
+      "total_expected_cost_idr_yr": 376495019432.7259,
+      "settings": {
+        "stock_multiplier": 1,
+        "demand_multiplier": 1,
+        "lead_time_multiplier": 1,
+        "service_level": 0.95
+      },
+      "notes": [
+        "Estimate: scaled empirical lead-time demand, not a new sampling of lead-time uncertainty.",
+        "Stockout cycles per year assumes independent lead-time cycles; not observed annual failures.",
+        "Exposure sums part-level scores; shared equipment and correlated losses can overlap. Do not claim this sum as plant downtime loss.",
+        "Changing the service target changes target stock; existing-stock risk changes only when stock or demand is changed.",
+        "Held insurance reserves are not reduced below one; zero stock is not silently replenished by the baseline scenario."
+      ]
+    },
+    "working_capital_release_idr": 138662471817.0548,
+    "replenishment_investment_idr": 254337142785,
+    "net_working_capital_release_idr": -115674670967.94519,
+    "risk_change_idr": -4079149816162.303,
+    "unpriced_parts": 6252
+  },
+  "top10_static_excess_share": 0.7214956428987599,
+  "actions": {
+    "REORDER": 1230,
+    "REDUCE": 642,
+    "MAINTAIN": 62,
+    "MONITOR": 456,
+    "KEEP_INSURANCE": 4747,
+    "REVIEW_OBSOLETE": 344
+  },
+  "campaign": {
+    "cutoff": "2026-09-30",
+    "assumption": {
+      "campaign_index": 1.6,
+      "rule": "campaign month = distinct issue orders at least 1.6 times the median month; future load index = planned items divided by the median of months 4 to 12 of the horizon"
+    },
+    "history": [
+      {
+        "month": "2025-05",
+        "orders": 236,
+        "issues": 668,
+        "qty": 60907,
+        "index": 0.97,
+        "campaign": false
+      },
+      {
+        "month": "2025-06",
+        "orders": 199,
+        "issues": 596,
+        "qty": 81261,
+        "index": 0.82,
+        "campaign": false
+      },
+      {
+        "month": "2025-07",
+        "orders": 234,
+        "issues": 948,
+        "qty": 109404,
+        "index": 0.96,
+        "campaign": false
+      },
+      {
+        "month": "2025-08",
+        "orders": 322,
+        "issues": 1388,
+        "qty": 174829,
+        "index": 1.32,
+        "campaign": false
+      },
+      {
+        "month": "2025-09",
+        "orders": 304,
+        "issues": 1043,
+        "qty": 143784,
+        "index": 1.25,
+        "campaign": false
+      },
+      {
+        "month": "2025-10",
+        "orders": 276,
+        "issues": 891,
+        "qty": 81851,
+        "index": 1.13,
+        "campaign": false
+      },
+      {
+        "month": "2025-11",
+        "orders": 337,
+        "issues": 1860,
+        "qty": 173796,
+        "index": 1.38,
+        "campaign": false
+      },
+      {
+        "month": "2025-12",
+        "orders": 684,
+        "issues": 2580,
+        "qty": 226414,
+        "index": 2.8,
+        "campaign": true
+      },
+      {
+        "month": "2026-01",
+        "orders": 644,
+        "issues": 2184,
+        "qty": 259110,
+        "index": 2.64,
+        "campaign": true
+      },
+      {
+        "month": "2026-02",
+        "orders": 263,
+        "issues": 843,
+        "qty": 85252,
+        "index": 1.08,
+        "campaign": false
+      },
+      {
+        "month": "2026-03",
+        "orders": 140,
+        "issues": 440,
+        "qty": 31558,
+        "index": 0.57,
+        "campaign": false
+      },
+      {
+        "month": "2026-04",
+        "orders": 229,
+        "issues": 660,
+        "qty": 63623,
+        "index": 0.94,
+        "campaign": false
+      },
+      {
+        "month": "2026-05",
+        "orders": 168,
+        "issues": 535,
+        "qty": 31631,
+        "index": 0.69,
+        "campaign": false
+      },
+      {
+        "month": "2026-06",
+        "orders": 213,
+        "issues": 824,
+        "qty": 66533,
+        "index": 0.87,
+        "campaign": false
+      },
+      {
+        "month": "2026-07",
+        "orders": 244,
+        "issues": 753,
+        "qty": 79365,
+        "index": 1,
+        "campaign": false
+      },
+      {
+        "month": "2026-08",
+        "orders": 176,
+        "issues": 568,
+        "qty": 45960,
+        "index": 0.72,
+        "campaign": false
+      },
+      {
+        "month": "2026-09",
+        "orders": 246,
+        "issues": 737,
+        "qty": 81857,
+        "index": 1.01,
+        "campaign": false
+      }
+    ],
+    "campaign_months": [
+      "2025-12",
+      "2026-01"
+    ],
+    "median_orders_per_month": 244,
+    "overall_uplift": 2.8,
+    "uplift_by_item_type": [
+      {
+        "item_type": "GASKET",
+        "campaign_issues": 328,
+        "normal_issues": 902,
+        "uplift": 2.73
+      },
+      {
+        "item_type": "BEARING",
+        "campaign_issues": 338,
+        "normal_issues": 867,
+        "uplift": 2.92
+      },
+      {
+        "item_type": "STUDBOLT",
+        "campaign_issues": 319,
+        "normal_issues": 838,
+        "uplift": 2.86
+      },
+      {
+        "item_type": "O-RING",
+        "campaign_issues": 244,
+        "normal_issues": 614,
+        "uplift": 2.98
+      },
+      {
+        "item_type": "VALVE",
+        "campaign_issues": 247,
+        "normal_issues": 609,
+        "uplift": 3.04
+      },
+      {
+        "item_type": "PIPE",
+        "campaign_issues": 198,
+        "normal_issues": 582,
+        "uplift": 2.55
+      },
+      {
+        "item_type": "OIL",
+        "campaign_issues": 184,
+        "normal_issues": 523,
+        "uplift": 2.64
+      },
+      {
+        "item_type": "FLANGE",
+        "campaign_issues": 181,
+        "normal_issues": 512,
+        "uplift": 2.65
+      },
+      {
+        "item_type": "TERMINAL",
+        "campaign_issues": 195,
+        "normal_issues": 498,
+        "uplift": 2.94
+      },
+      {
+        "item_type": "FILTER ELEMENT",
+        "campaign_issues": 182,
+        "normal_issues": 498,
+        "uplift": 2.74
+      },
+      {
+        "item_type": "TEE",
+        "campaign_issues": 180,
+        "normal_issues": 483,
+        "uplift": 2.8
+      },
+      {
+        "item_type": "ELBOW",
+        "campaign_issues": 171,
+        "normal_issues": 484,
+        "uplift": 2.65
+      },
+      {
+        "item_type": "GREASE",
+        "campaign_issues": 169,
+        "normal_issues": 471,
+        "uplift": 2.69
+      },
+      {
+        "item_type": "CASTABLE",
+        "campaign_issues": 143,
+        "normal_issues": 494,
+        "uplift": 2.17
+      },
+      {
+        "item_type": "CERAMIC FIBER",
+        "campaign_issues": 169,
+        "normal_issues": 467,
+        "uplift": 2.71
+      },
+      {
+        "item_type": "FIREBRICK",
+        "campaign_issues": 157,
+        "normal_issues": 474,
+        "uplift": 2.48
+      },
+      {
+        "item_type": "ANTIRUST",
+        "campaign_issues": 159,
+        "normal_issues": 407,
+        "uplift": 2.93
+      },
+      {
+        "item_type": "SCREW",
+        "campaign_issues": 130,
+        "normal_issues": 429,
+        "uplift": 2.27
+      },
+      {
+        "item_type": "LAMP",
+        "campaign_issues": 142,
+        "normal_issues": 397,
+        "uplift": 2.68
+      },
+      {
+        "item_type": "TAPE",
+        "campaign_issues": 154,
+        "normal_issues": 377,
+        "uplift": 3.06
+      },
+      {
+        "item_type": "TRANSMITTER",
+        "campaign_issues": 81,
+        "normal_issues": 209,
+        "uplift": 2.91
+      },
+      {
+        "item_type": "PACKING SET",
+        "campaign_issues": 83,
+        "normal_issues": 148,
+        "uplift": 4.21
+      },
+      {
+        "item_type": "TRIM SET",
+        "campaign_issues": 61,
+        "normal_issues": 160,
+        "uplift": 2.86
+      },
+      {
+        "item_type": "POSITIONER",
+        "campaign_issues": 38,
+        "normal_issues": 116,
+        "uplift": 2.46
+      },
+      {
+        "item_type": "DIAPHRAGM",
+        "campaign_issues": 45,
+        "normal_issues": 85,
+        "uplift": 3.97
+      },
+      {
+        "item_type": "SEAT RING",
+        "campaign_issues": 21,
+        "normal_issues": 105,
+        "uplift": 1.5
+      },
+      {
+        "item_type": "SEAL",
+        "campaign_issues": 42,
+        "normal_issues": 82,
+        "uplift": 3.84
+      },
+      {
+        "item_type": "GLAND",
+        "campaign_issues": 36,
+        "normal_issues": 84,
+        "uplift": 3.21
+      },
+      {
+        "item_type": "CONNECTOR",
+        "campaign_issues": 32,
+        "normal_issues": 77,
+        "uplift": 3.12
+      },
+      {
+        "item_type": "SWITCH",
+        "campaign_issues": 27,
+        "normal_issues": 59,
+        "uplift": 3.43
+      },
+      {
+        "item_type": "NOZZLE",
+        "campaign_issues": 26,
+        "normal_issues": 53,
+        "uplift": 3.68
+      },
+      {
+        "item_type": "COUPLING",
+        "campaign_issues": 26,
+        "normal_issues": 52,
+        "uplift": 3.75
+      },
+      {
+        "item_type": "IMPELLER",
+        "campaign_issues": 26,
+        "normal_issues": 52,
+        "uplift": 3.75
+      },
+      {
+        "item_type": "SPRING",
+        "campaign_issues": 26,
+        "normal_issues": 45,
+        "uplift": 4.33
+      },
+      {
+        "item_type": "TUBE PLUG",
+        "campaign_issues": 23,
+        "normal_issues": 45,
+        "uplift": 3.83
+      },
+      {
+        "item_type": "DISC",
+        "campaign_issues": 17,
+        "normal_issues": 50,
+        "uplift": 2.55
+      },
+      {
+        "item_type": "THERMOCOUPLE",
+        "campaign_issues": 24,
+        "normal_issues": 40,
+        "uplift": 4.5
+      },
+      {
+        "item_type": "THERMOWELL",
+        "campaign_issues": 19,
+        "normal_issues": 45,
+        "uplift": 3.17
+      }
+    ],
+    "outlook": [
+      {
+        "month": "2026-10",
+        "items": 1123,
+        "critical_items": 531,
+        "index": 3.62,
+        "high_load": true
+      },
+      {
+        "month": "2026-11",
+        "items": 527,
+        "critical_items": 250,
+        "index": 1.7,
+        "high_load": true
+      },
+      {
+        "month": "2026-12",
+        "items": 694,
+        "critical_items": 319,
+        "index": 2.24,
+        "high_load": true
+      },
+      {
+        "month": "2027-01",
+        "items": 463,
+        "critical_items": 209,
+        "index": 1.49,
+        "high_load": false
+      },
+      {
+        "month": "2027-02",
+        "items": 375,
+        "critical_items": 181,
+        "index": 1.21,
+        "high_load": false
+      },
+      {
+        "month": "2027-03",
+        "items": 424,
+        "critical_items": 186,
+        "index": 1.37,
+        "high_load": false
+      },
+      {
+        "month": "2027-04",
+        "items": 297,
+        "critical_items": 130,
+        "index": 0.96,
+        "high_load": false
+      },
+      {
+        "month": "2027-05",
+        "items": 288,
+        "critical_items": 137,
+        "index": 0.93,
+        "high_load": false
+      },
+      {
+        "month": "2027-06",
+        "items": 310,
+        "critical_items": 145,
+        "index": 1,
+        "high_load": false
+      },
+      {
+        "month": "2027-07",
+        "items": 311,
+        "critical_items": 143,
+        "index": 1,
+        "high_load": false
+      },
+      {
+        "month": "2027-08",
+        "items": 309,
+        "critical_items": 121,
+        "index": 1,
+        "high_load": false
+      },
+      {
+        "month": "2027-09",
+        "items": 277,
+        "critical_items": 116,
+        "index": 0.89,
+        "high_load": false
+      }
+    ],
+    "outlook_baseline_items_per_month": 310,
+    "outlook_peak": {
+      "month": "2026-10",
+      "items": 1123,
+      "critical_items": 531,
+      "index": 3.62,
+      "high_load": true
+    },
+    "reading": "Issue activity shows 2 campaign month(s) in 17: 2025-12, 2026-01. In those months issues ran 2.8 times the normal month across every item type. The maintenance plan puts 1123 planned items in 2026-10 against a run rate of about 310 per month later in the horizon (Estimate: next due dates are calculated from cycle starts)."
+  },
+  "backtest_by_class": {
+    "smooth": {
+      "parts": 31,
+      "candidate_error": 0.48420622230749066,
+      "baseline_error": 0.4857260931167536,
+      "deployed_error": 0.48420622230749066,
+      "candidate_wins": 5,
+      "pinball_loss": 0.16184969252747342
+    },
+    "erratic": {
+      "parts": 112,
+      "candidate_error": 0.7589188718507308,
+      "baseline_error": 0.7738672694457411,
+      "deployed_error": 0.7589188718507308,
+      "candidate_wins": 11,
+      "pinball_loss": 0.24030749957441613
+    },
+    "lumpy": {
+      "parts": 130,
+      "candidate_error": 0.9884378092941375,
+      "baseline_error": 1.0002204391106453,
+      "deployed_error": 0.9884378092941375,
+      "candidate_wins": 18,
+      "pinball_loss": 0.25691759754430077
+    },
+    "intermittent": {
+      "parts": 182,
+      "candidate_error": 1.6388611202522665,
+      "baseline_error": 1.6414920549298213,
+      "deployed_error": 1.6388611202522665,
+      "candidate_wins": 13,
+      "pinball_loss": 0.44556753523193227
+    }
+  },
+  "replay": {
+    "static": {
+      "filled": 574734,
+      "demand": 1797135,
+      "shortage": 1222401,
+      "held": 237099.70588235313,
+      "months_stockout": 2189,
+      "quantity_fill_rate": 0.319805690724403
+    },
+    "dynamic": {
+      "filled": 1694637,
+      "demand": 1797135,
+      "shortage": 102498,
+      "held": 1319948.235294116,
+      "months_stockout": 264,
+      "quantity_fill_rate": 0.9429658873707317
+    }
+  },
+  "replay_limitations": "Estimate, not achieved service: current stock snapshot is a common initial condition; constant lead time is estimated on complete history; dynamic parameters fitted on full history. Monthly lost-sales replay has no observed receipts; do not claim a causal or out-of-sample service improvement.",
+  "config": {
+    "currency": "IDR",
+    "status": "Estimate: low-risk B/C stock-keeping pilot; insurance excluded; all release requires review, not an approved disposition budget",
+    "inputs": {
+      "horizon": {
+        "value": 5,
+        "unit": "years",
+        "basis": "Assumption",
+        "source": "Evaluation horizon; no terminal salvage assumed"
+      },
+      "discount": {
+        "value": 0.12,
+        "unit": "fraction/year",
+        "basis": "Assumption",
+        "source": "Illustrative before-tax discount rate; finance approval required"
+      },
+      "scope": {
+        "value": 1,
+        "unit": "fraction",
+        "basis": "Assumption",
+        "source": "Share of the deduplicated B/C stock-keeping cohort, not all plant replenishment"
+      },
+      "release_realisation": {
+        "value": 0.3,
+        "unit": "fraction",
+        "basis": "Assumption",
+        "source": "Assumption aligned with the case savings page: 30% of deduplicated B/C candidates realised over three years; not observed cash"
+      },
+      "procurement_execution": {
+        "value": 0,
+        "unit": "fraction",
+        "basis": "Assumption",
+        "source": "Base stock-keeping pilot does not execute the full dynamic-order backlog. For a funded availability programme, enter the reviewed incremental share of that backlog separately."
+      },
+      "holding_cash_rate": {
+        "value": 0.04,
+        "unit": "fraction/year",
+        "basis": "Assumption",
+        "source": "Avoidable storage/handling/insurance cash cost only. Excludes financing return to avoid double counting capital release"
+      },
+      "holding_economic_rate": {
+        "value": 0.22,
+        "unit": "fraction/year",
+        "basis": "Assumption",
+        "source": "Total carrying-rate policy from engine; economic indicator, not added to cash NPV"
+      },
+      "emergency_spend": {
+        "value": 0,
+        "unit": "IDR/year",
+        "basis": "Assumption",
+        "source": "Eligible historical emergency purchase spend Not in baseline data; zero benefit until evidenced"
+      },
+      "emergency_premium": {
+        "value": 0.2,
+        "unit": "fraction",
+        "basis": "Assumption",
+        "source": "Premium over normal purchase price, applied only to evidenced eligible emergency spend"
+      },
+      "emergency_avoidance": {
+        "value": 0.25,
+        "unit": "fraction",
+        "basis": "Assumption",
+        "source": "Fraction of emergency purchasing avoided; requires pilot verification"
+      },
+      "downtime_days_S": {
+        "value": 0,
+        "unit": "plant-days/year",
+        "basis": "Assumption",
+        "source": "Incremental avoided production-critical-path days Not in baseline data; excludes overlap with other criticality classes"
+      },
+      "downtime_days_A": {
+        "value": 0,
+        "unit": "plant-days/year",
+        "basis": "Assumption",
+        "source": "Incremental avoided days Not in baseline data"
+      },
+      "downtime_days_B": {
+        "value": 0,
+        "unit": "plant-days/year",
+        "basis": "Assumption",
+        "source": "Incremental avoided days Not in baseline data"
+      },
+      "downtime_days_C": {
+        "value": 0,
+        "unit": "plant-days/year",
+        "basis": "Assumption",
+        "source": "Incremental avoided days Not in baseline data"
+      },
+      "cost_day_S": {
+        "value": 100000000,
+        "unit": "IDR/plant-day",
+        "basis": "Assumption",
+        "source": "Policy consequence only, not a measured plant contribution margin"
+      },
+      "cost_day_A": {
+        "value": 30000000,
+        "unit": "IDR/plant-day",
+        "basis": "Assumption",
+        "source": "Policy consequence only"
+      },
+      "cost_day_B": {
+        "value": 5000000,
+        "unit": "IDR/plant-day",
+        "basis": "Assumption",
+        "source": "Policy consequence only"
+      },
+      "cost_day_C": {
+        "value": 1000000,
+        "unit": "IDR/plant-day",
+        "basis": "Assumption",
+        "source": "Policy consequence only"
+      },
+      "integration": {
+        "value": 180000000,
+        "unit": "IDR",
+        "basis": "Estimate",
+        "source": "Implementation allowance, not a vendor quotation"
+      },
+      "data_review": {
+        "value": 100000000,
+        "unit": "IDR",
+        "basis": "Estimate",
+        "source": "Part master, ownership, Min/Max and procurement-price validation allowance"
+      },
+      "security": {
+        "value": 80000000,
+        "unit": "IDR",
+        "basis": "Estimate",
+        "source": "Identity, read-only service, logging and security review allowance"
+      },
+      "training": {
+        "value": 40000000,
+        "unit": "IDR",
+        "basis": "Estimate",
+        "source": "Buyer, planner and maintenance reviewer training allowance"
+      },
+      "hardware": {
+        "value": 0,
+        "unit": "IDR",
+        "basis": "Assumption",
+        "source": "Existing browser clients; no GPU required for deterministic engine or managed model API"
+      },
+      "contingency": {
+        "value": 0.2,
+        "unit": "fraction",
+        "basis": "Assumption",
+        "source": "Contingency on one-off solution cost"
+      },
+      "cloud_software": {
+        "value": 168000000,
+        "unit": "IDR/year",
+        "basis": "Estimate",
+        "source": "Hosting, model API, database, logs and backup budget; validate with workload and supplier pricing"
+      },
+      "owner_support": {
+        "value": 180000000,
+        "unit": "IDR/year",
+        "basis": "Estimate",
+        "source": "Incremental service ownership and support allowance"
+      },
+      "evaluation": {
+        "value": 60000000,
+        "unit": "IDR/year",
+        "basis": "Estimate",
+        "source": "Forecast backtesting, critical-spare review and ongoing data QA allowance"
+      },
+      "critical_review_share": {
+        "value": 0.1,
+        "unit": "fraction",
+        "basis": "Assumption",
+        "source": "10% after-review critical-cohort illustration, aligned with the savings page; excludes insurance and is not approved release"
+      },
+      "critical_scenario_enabled": {
+        "value": 0,
+        "unit": "0 or 1",
+        "basis": "Assumption",
+        "source": "Scenario toggle only: include the reviewed S/A cohort hypothesis. Zero in base case; changing this does not grant engineering approval."
+      }
+    },
+    "release_schedule": [
+      0.2,
+      0.4,
+      0.4,
+      0,
+      0
+    ],
+    "scenarios": [
+      {
+        "name": "Pessimistic",
+        "release_factor": 0.5,
+        "cost_factor": 1.25,
+        "benefit_factor": 0.5,
+        "basis": "Assumption"
+      },
+      {
+        "name": "Base",
+        "release_factor": 1,
+        "cost_factor": 1,
+        "benefit_factor": 1,
+        "basis": "Assumption"
+      },
+      {
+        "name": "Optimistic",
+        "release_factor": 1.5,
+        "cost_factor": 0.9,
+        "benefit_factor": 1.5,
+        "basis": "Assumption"
+      }
+    ]
+  },
+  "base": {
+    "gross_candidate_idr": 14733770130,
+    "currency": "IDR",
+    "horizon": 5,
+    "discount": 0.12,
+    "gross_release_idr": 4420131039,
+    "procurement_funding_idr": 0,
+    "solution_oneoff_idr": 480000000,
+    "solution_annual_idr": 408000000,
+    "steady_cash_operating_idr_yr": -231194758.44,
+    "economic_carrying_indicator_idr_yr": 972428828.58,
+    "net_capital_release_idr": 4420131039,
+    "cash": [
+      {
+        "year": 0,
+        "working_capital_release": 0,
+        "cumulative_release": 0,
+        "holding_cash": 0,
+        "holding_economic": 0,
+        "emergency": 0,
+        "downtime": 0,
+        "solution_cost": 480000000,
+        "inventory_funding": 0,
+        "benefit": 0,
+        "cost": 480000000,
+        "net": -480000000,
+        "cumulative": -480000000,
+        "discounted": -480000000
+      },
+      {
+        "year": 1,
+        "working_capital_release": 884026207.8000001,
+        "cumulative_release": 884026207.8000001,
+        "holding_cash": 35361048.31200001,
+        "holding_economic": 194485765.71600002,
+        "emergency": 0,
+        "downtime": 0,
+        "solution_cost": 408000000,
+        "inventory_funding": 0,
+        "benefit": 919387256.1120001,
+        "cost": 408000000,
+        "net": 511387256.1120001,
+        "cumulative": 31387256.112000108,
+        "discounted": 456595764.38571435
+      },
+      {
+        "year": 2,
+        "working_capital_release": 1768052415.6000001,
+        "cumulative_release": 2652078623.4,
+        "holding_cash": 106083144.936,
+        "holding_economic": 583457297.148,
+        "emergency": 0,
+        "downtime": 0,
+        "solution_cost": 408000000,
+        "inventory_funding": 0,
+        "benefit": 1874135560.5360003,
+        "cost": 408000000,
+        "net": 1466135560.5360003,
+        "cumulative": 1497522816.6480002,
+        "discounted": 1168794292.5191326
+      },
+      {
+        "year": 3,
+        "working_capital_release": 1768052415.6000001,
+        "cumulative_release": 4420131039,
+        "holding_cash": 176805241.56,
+        "holding_economic": 972428828.58,
+        "emergency": 0,
+        "downtime": 0,
+        "solution_cost": 408000000,
+        "inventory_funding": 0,
+        "benefit": 1944857657.16,
+        "cost": 408000000,
+        "net": 1536857657.16,
+        "cumulative": 3034380473.8080006,
+        "discounted": 1093904924.067283
+      },
+      {
+        "year": 4,
+        "working_capital_release": 0,
+        "cumulative_release": 4420131039,
+        "holding_cash": 176805241.56,
+        "holding_economic": 972428828.58,
+        "emergency": 0,
+        "downtime": 0,
+        "solution_cost": 408000000,
+        "inventory_funding": 0,
+        "benefit": 176805241.56,
+        "cost": 408000000,
+        "net": -231194758.44,
+        "cumulative": 2803185715.3680005,
+        "discounted": -146928448.6210579
+      },
+      {
+        "year": 5,
+        "working_capital_release": 0,
+        "cumulative_release": 4420131039,
+        "holding_cash": 176805241.56,
+        "holding_economic": 972428828.58,
+        "emergency": 0,
+        "downtime": 0,
+        "solution_cost": 408000000,
+        "inventory_funding": 0,
+        "benefit": 176805241.56,
+        "cost": 408000000,
+        "net": -231194758.44,
+        "cumulative": 2571990956.9280005,
+        "discounted": -131186114.84023026
+      }
+    ],
+    "npv_idr": 1961180417.5108416,
+    "irr": null,
+    "payback_years": 0.9386233119091926,
+    "benefit_cost_ratio": 2.005347550406969,
+    "additional_annual_cash_benefit_break_even_idr": 0,
+    "status": "Estimate: not realised savings; proposal requires engineering and finance approval"
+  },
+  "scenarios": [
+    {
+      "name": "Pessimistic",
+      "basis": "Assumption",
+      "gross_candidate_idr": 14733770130,
+      "currency": "IDR",
+      "horizon": 5,
+      "discount": 0.12,
+      "gross_release_idr": 2210065519.5,
+      "procurement_funding_idr": 0,
+      "solution_oneoff_idr": 600000000,
+      "solution_annual_idr": 510000000,
+      "steady_cash_operating_idr_yr": -421597379.22,
+      "economic_carrying_indicator_idr_yr": 486214414.29,
+      "net_capital_release_idr": 2210065519.5,
+      "cash": [
+        {
+          "year": 0,
+          "working_capital_release": 0,
+          "cumulative_release": 0,
+          "holding_cash": 0,
+          "holding_economic": 0,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 600000000,
+          "inventory_funding": 0,
+          "benefit": 0,
+          "cost": 600000000,
+          "net": -600000000,
+          "cumulative": -600000000,
+          "discounted": -600000000
+        },
+        {
+          "year": 1,
+          "working_capital_release": 442013103.90000004,
+          "cumulative_release": 442013103.90000004,
+          "holding_cash": 17680524.156000003,
+          "holding_economic": 97242882.85800001,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 510000000,
+          "inventory_funding": 0,
+          "benefit": 459693628.05600005,
+          "cost": 510000000,
+          "net": -50306371.943999946,
+          "cumulative": -650306371.944,
+          "discounted": -44916403.52142852
+        },
+        {
+          "year": 2,
+          "working_capital_release": 884026207.8000001,
+          "cumulative_release": 1326039311.7,
+          "holding_cash": 53041572.468,
+          "holding_economic": 291728648.574,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 510000000,
+          "inventory_funding": 0,
+          "benefit": 937067780.2680001,
+          "cost": 510000000,
+          "net": 427067780.2680001,
+          "cumulative": -223238591.67599988,
+          "discounted": 340455819.72895414
+        },
+        {
+          "year": 3,
+          "working_capital_release": 884026207.8000001,
+          "cumulative_release": 2210065519.5,
+          "holding_cash": 88402620.78,
+          "holding_economic": 486214414.29,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 510000000,
+          "inventory_funding": 0,
+          "benefit": 972428828.58,
+          "cost": 510000000,
+          "net": 462428828.58000004,
+          "cumulative": 239190236.90400016,
+          "discounted": 329147706.20273775
+        },
+        {
+          "year": 4,
+          "working_capital_release": 0,
+          "cumulative_release": 2210065519.5,
+          "holding_cash": 88402620.78,
+          "holding_economic": 486214414.29,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 510000000,
+          "inventory_funding": 0,
+          "benefit": 88402620.78,
+          "cost": 510000000,
+          "net": -421597379.22,
+          "cumulative": -182407142.31599987,
+          "discounted": -267932756.3024073
+        },
+        {
+          "year": 5,
+          "working_capital_release": 0,
+          "cumulative_release": 2210065519.5,
+          "holding_cash": 88402620.78,
+          "holding_economic": 486214414.29,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 510000000,
+          "inventory_funding": 0,
+          "benefit": 88402620.78,
+          "cost": 510000000,
+          "net": -421597379.22,
+          "cumulative": -604004521.5359999,
+          "discounted": -239225675.27000648
+        }
+      ],
+      "npv_idr": -482471309.1621504,
+      "irr": null,
+      "payback_years": 2.4827523239879055,
+      "benefit_cost_ratio": 0.8021390201627874,
+      "additional_annual_cash_benefit_break_even_idr": 133842236.54391909,
+      "status": "Estimate: not realised savings; proposal requires engineering and finance approval"
+    },
+    {
+      "name": "Base",
+      "basis": "Assumption",
+      "gross_candidate_idr": 14733770130,
+      "currency": "IDR",
+      "horizon": 5,
+      "discount": 0.12,
+      "gross_release_idr": 4420131039,
+      "procurement_funding_idr": 0,
+      "solution_oneoff_idr": 480000000,
+      "solution_annual_idr": 408000000,
+      "steady_cash_operating_idr_yr": -231194758.44,
+      "economic_carrying_indicator_idr_yr": 972428828.58,
+      "net_capital_release_idr": 4420131039,
+      "cash": [
+        {
+          "year": 0,
+          "working_capital_release": 0,
+          "cumulative_release": 0,
+          "holding_cash": 0,
+          "holding_economic": 0,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 480000000,
+          "inventory_funding": 0,
+          "benefit": 0,
+          "cost": 480000000,
+          "net": -480000000,
+          "cumulative": -480000000,
+          "discounted": -480000000
+        },
+        {
+          "year": 1,
+          "working_capital_release": 884026207.8000001,
+          "cumulative_release": 884026207.8000001,
+          "holding_cash": 35361048.31200001,
+          "holding_economic": 194485765.71600002,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 408000000,
+          "inventory_funding": 0,
+          "benefit": 919387256.1120001,
+          "cost": 408000000,
+          "net": 511387256.1120001,
+          "cumulative": 31387256.112000108,
+          "discounted": 456595764.38571435
+        },
+        {
+          "year": 2,
+          "working_capital_release": 1768052415.6000001,
+          "cumulative_release": 2652078623.4,
+          "holding_cash": 106083144.936,
+          "holding_economic": 583457297.148,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 408000000,
+          "inventory_funding": 0,
+          "benefit": 1874135560.5360003,
+          "cost": 408000000,
+          "net": 1466135560.5360003,
+          "cumulative": 1497522816.6480002,
+          "discounted": 1168794292.5191326
+        },
+        {
+          "year": 3,
+          "working_capital_release": 1768052415.6000001,
+          "cumulative_release": 4420131039,
+          "holding_cash": 176805241.56,
+          "holding_economic": 972428828.58,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 408000000,
+          "inventory_funding": 0,
+          "benefit": 1944857657.16,
+          "cost": 408000000,
+          "net": 1536857657.16,
+          "cumulative": 3034380473.8080006,
+          "discounted": 1093904924.067283
+        },
+        {
+          "year": 4,
+          "working_capital_release": 0,
+          "cumulative_release": 4420131039,
+          "holding_cash": 176805241.56,
+          "holding_economic": 972428828.58,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 408000000,
+          "inventory_funding": 0,
+          "benefit": 176805241.56,
+          "cost": 408000000,
+          "net": -231194758.44,
+          "cumulative": 2803185715.3680005,
+          "discounted": -146928448.6210579
+        },
+        {
+          "year": 5,
+          "working_capital_release": 0,
+          "cumulative_release": 4420131039,
+          "holding_cash": 176805241.56,
+          "holding_economic": 972428828.58,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 408000000,
+          "inventory_funding": 0,
+          "benefit": 176805241.56,
+          "cost": 408000000,
+          "net": -231194758.44,
+          "cumulative": 2571990956.9280005,
+          "discounted": -131186114.84023026
+        }
+      ],
+      "npv_idr": 1961180417.5108416,
+      "irr": null,
+      "payback_years": 0.9386233119091926,
+      "benefit_cost_ratio": 2.005347550406969,
+      "additional_annual_cash_benefit_break_even_idr": 0,
+      "status": "Estimate: not realised savings; proposal requires engineering and finance approval"
+    },
+    {
+      "name": "Optimistic",
+      "basis": "Assumption",
+      "gross_candidate_idr": 14733770130,
+      "currency": "IDR",
+      "horizon": 5,
+      "discount": 0.12,
+      "gross_release_idr": 6630196558.499999,
+      "procurement_funding_idr": 0,
+      "solution_oneoff_idr": 432000000,
+      "solution_annual_idr": 367200000,
+      "steady_cash_operating_idr_yr": -101992137.66000003,
+      "economic_carrying_indicator_idr_yr": 1458643242.87,
+      "net_capital_release_idr": 6630196558.499999,
+      "cash": [
+        {
+          "year": 0,
+          "working_capital_release": 0,
+          "cumulative_release": 0,
+          "holding_cash": 0,
+          "holding_economic": 0,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 432000000,
+          "inventory_funding": 0,
+          "benefit": 0,
+          "cost": 432000000,
+          "net": -432000000,
+          "cumulative": -432000000,
+          "discounted": -432000000
+        },
+        {
+          "year": 1,
+          "working_capital_release": 1326039311.6999998,
+          "cumulative_release": 1326039311.6999998,
+          "holding_cash": 53041572.467999995,
+          "holding_economic": 291728648.57399994,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 367200000,
+          "inventory_funding": 0,
+          "benefit": 1379080884.1679997,
+          "cost": 367200000,
+          "net": 1011880884.1679997,
+          "cumulative": 579880884.1679997,
+          "discounted": 903465075.1499997
+        },
+        {
+          "year": 2,
+          "working_capital_release": 2652078623.3999996,
+          "cumulative_release": 3978117935.0999994,
+          "holding_cash": 159124717.40399998,
+          "holding_economic": 875185945.7219999,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 367200000,
+          "inventory_funding": 0,
+          "benefit": 2811203340.8039994,
+          "cost": 367200000,
+          "net": 2444003340.8039994,
+          "cumulative": 3023884224.971999,
+          "discounted": 1948344500.0031881
+        },
+        {
+          "year": 3,
+          "working_capital_release": 2652078623.3999996,
+          "cumulative_release": 6630196558.499999,
+          "holding_cash": 265207862.33999997,
+          "holding_economic": 1458643242.87,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 367200000,
+          "inventory_funding": 0,
+          "benefit": 2917286485.74,
+          "cost": 367200000,
+          "net": 2550086485.74,
+          "cumulative": 5573970710.711999,
+          "discounted": 1815101190.7656472
+        },
+        {
+          "year": 4,
+          "working_capital_release": 0,
+          "cumulative_release": 6630196558.499999,
+          "holding_cash": 265207862.33999997,
+          "holding_economic": 1458643242.87,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 367200000,
+          "inventory_funding": 0,
+          "benefit": 265207862.33999997,
+          "cost": 367200000,
+          "net": -101992137.66000003,
+          "cumulative": 5471978573.051999,
+          "discounted": -64817847.33808422
+        },
+        {
+          "year": 5,
+          "working_capital_release": 0,
+          "cumulative_release": 6630196558.499999,
+          "holding_cash": 265207862.33999997,
+          "holding_economic": 1458643242.87,
+          "emergency": 0,
+          "downtime": 0,
+          "solution_cost": 367200000,
+          "inventory_funding": 0,
+          "benefit": 265207862.33999997,
+          "cost": 367200000,
+          "net": -101992137.66000003,
+          "cumulative": 5369986435.391999,
+          "discounted": -57873077.98043234
+        }
+      ],
+      "npv_idr": 4112219840.600318,
+      "irr": null,
+      "payback_years": 0.42692772119635797,
+      "benefit_cost_ratio": 3.3422459173449464,
+      "additional_annual_cash_benefit_break_even_idr": 0,
+      "status": "Estimate: not realised savings; proposal requires engineering and finance approval"
+    }
+  ],
+  "sensitivity": [
+    {
+      "input": "release_realisation",
+      "factor": 0.8,
+      "effective_value": 0.24,
+      "npv_idr": 1178794595.897321
+    },
+    {
+      "input": "release_realisation",
+      "factor": 1,
+      "effective_value": 0.3,
+      "npv_idr": 1961180417.5108416
+    },
+    {
+      "input": "release_realisation",
+      "factor": 1.2,
+      "effective_value": 0.36,
+      "npv_idr": 2743566239.124363
+    },
+    {
+      "input": "procurement_execution",
+      "factor": 0.8,
+      "effective_value": 0,
+      "npv_idr": 1961180417.5108416
+    },
+    {
+      "input": "procurement_execution",
+      "factor": 1,
+      "effective_value": 0,
+      "npv_idr": 1961180417.5108416
+    },
+    {
+      "input": "procurement_execution",
+      "factor": 1.2,
+      "effective_value": 0,
+      "npv_idr": 1961180417.5108416
+    },
+    {
+      "input": "integration",
+      "factor": 0.8,
+      "effective_value": 144000000,
+      "npv_idr": 2004380417.5108416
+    },
+    {
+      "input": "integration",
+      "factor": 1,
+      "effective_value": 180000000,
+      "npv_idr": 1961180417.5108416
+    },
+    {
+      "input": "integration",
+      "factor": 1.2,
+      "effective_value": 216000000,
+      "npv_idr": 1917980417.5108416
+    },
+    {
+      "input": "cloud_software",
+      "factor": 0.8,
+      "effective_value": 134400000,
+      "npv_idr": 2082300897.909634
+    },
+    {
+      "input": "cloud_software",
+      "factor": 1,
+      "effective_value": 168000000,
+      "npv_idr": 1961180417.5108416
+    },
+    {
+      "input": "cloud_software",
+      "factor": 1.2,
+      "effective_value": 201600000,
+      "npv_idr": 1840059937.1120498
+    }
+  ],
+  "limitations": [
+    "Gross excess is not immediately recoverable cash. Max 0 on OEM parts is not permission to dispose.",
+    "The top ten parts dominate static excess; validate their prices, interchangeability, ownership and strategic purpose first.",
+    "The base case is a B/C stock-keeping pilot; full recommended replenishment can cost more than the reduction candidate ceiling; no positive cash ROI is claimed without evidence of operational benefits.",
+    "Avoided downtime and emergency spend are zero until independently substantiated; part-level model exposures overlap and are not monetised as actual plant losses.",
+    "The 22% economic carrying indicator is not added to cash NPV; the 4% cash storage rate excludes financing cost to avoid double counting capital release."
+  ]
+}
