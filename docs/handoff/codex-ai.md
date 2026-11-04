@@ -30,3 +30,11 @@ Branch: codex/ai. Baseline merged: 25d993e. Current commit: see git log -1.
 5. Existing inbox entries are acknowledged here, including sample-CV2 golden changes and shared Forecast extension. Inbox is outside the human's file ownership list, so it was not edited. No unresolved implementation request from that inbox remains; live deployment/key steps require Claude A and the human.
 
 Remaining account usage is unavailable in this client. No main push and no pull request.
+
+## Ready to merge: brief 2, step A refresh
+- Merged main 98b1f5c and recomputed both complete AI/mock and Fin portfolio batches. All 7,481 materials completed, zero failures. Rebuilt results.sqlite.gz and checksum manifest; no old result rows were reused.
+- Manifest explicitly records sample-variance CV2, class counts (intermittent 336, lumpy 231), workbook reconciliation for 7,481 materials, and mutually exclusive B/C gross candidates IDR 14,733,770,130 (Estimate from /api/data/savings).
+- Golden evaluation: mock 43/43; fake Gemini REST 43/43; no failures. Workbook reconciliation passed using Python 3.13 with temporary dependencies. Real Gemini remains unverified.
+- Before this push: 263 AI core checks, 34 full API checks, all 14 SPI pages and legacy live suite passed. Snapshot integrity/horizon/quantile checks passed. The earlier page latency failure did not recur in this run.
+## Waiting on
+- Next: clean read-only data.js layer, shared by evidence and tools, then expanded tools and injection tests as specified in spi_codex_ai_2.md. No key requested. Remaining account usage is unavailable.

@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-11-04T04:05:12.849784+00:00",
+  "generated_at": "2026-11-04T04:36:17.572649+00:00",
   "source_sha256": "c5a8308d4816d6eec7e024567b261ec1bf7c7961e6ce9557c634c3d13b22b42f",
-  "snapshot_sha256": "0b771151eec116261cc23f82a27eb2329cc46bf9485f84171bc14bad578b85ca",
-  "archive_sha256": "80c84999f2f772af33d3f8b5b19157042825a370855502269c588b299cb73e67",
+  "snapshot_sha256": "80f727ac7b83a83e4b0687e80b64f542e2750a60d1d71c0fe670abd179c892fb",
+  "archive_sha256": "b50fe733fadc8a09e3a8df29a994c10270b5c5f1c596b76589da9e5576a0edf4",
   "snapshot_bytes": 168067072,
-  "archive_bytes": 7669284,
+  "archive_bytes": 7669541,
   "provider": "mock",
   "real_gemini_verified": false,
-  "ai_batch_id": "37e48c99a1b8c238e460168c8bb3541c990a6dc549eb48407f194b5d18494517",
-  "writer_commit": "ae77b32",
-  "baseline_commit": "25d993e",
+  "writer_commit": "98b1f5c",
+  "baseline_commit": "98b1f5c",
+  "ai_batch_id": "bd025c8947a7f7208b0a7e680e155b2860de8d72f884e7d274109696207908b8",
   "counts": {
     "ai_run": 7481,
     "forecast_plan": 7481,
@@ -18,12 +18,26 @@
     "inventory_param": 14962,
     "recommendation": 14962
   },
+  "demand_class_counts": {
+    "erratic": 116,
+    "intermittent": 336,
+    "lumpy": 231,
+    "no_demand": 5551,
+    "single_event": 1220,
+    "smooth": 27
+  },
+  "cv2_basis": "sample variance",
+  "golden_passes": {
+    "mock": 43,
+    "fake_gemini_rest": 43,
+    "total": 43
+  },
+  "workbook_reconciled_materials": 7481,
   "notes": [
+    "Fresh full recomputation after merge of sample-variance CV2 and current savings categories.",
     "Synthetic baseline. Monetary values are Estimates.",
-    "Contains namespaced AI reasoning results and Codex Fin rules portfolio rows.",
-    "Zero Gemini calls or billable tokens in this mock run.",
-    "Run node spi/ai/restore_results.js before Vercel packaging."
-  ],
-  "writer_code_sha256": "e64e6d3748d941a62d8e646737975136120a08ef0c5d46f9dacfa1ea5f57fb7b",
-  "resume_verified_parts": 7481
+    "Mock run made zero Gemini calls; real Gemini remains unverified.",
+    "Contains AI reasoning results and Codex Fin portfolio rows.",
+    "Restore with node spi/ai/restore_results.js before deployment packaging."
+  ]
 }
