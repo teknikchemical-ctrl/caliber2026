@@ -1,0 +1,1 @@
+Owner: Claude A. Python ETL: reads spi/data/raw (or spi/data/integrated) and writes spi/db/spi.sqlite and spi/fixtures/mini.sqlite. Also the equipment-set generator (pick_sets, make_case). See docs/spi/agents/A.md.

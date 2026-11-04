@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spi/forecast_plan",
+  "title": "ForecastPlan: what the reasoning agent returns for one part. Owner: Codex AI (producer), Codex Fin (consumer: engine.runPlan). Change only by agreement in docs/TASKS.md.",
+  "type": "object",
+  "required": ["material_no", "method", "horizon_months", "service_level", "lead_time_days", "rationale", "confidence", "evidence"],
+  "additionalProperties": false,
+  "properties": {
+    "material_no": { "type": "integer" },
+    "method": { "enum": ["ses", "croston", "sba", "tsb", "family_pooled_sba", "driver_based", "zero_demand_insurance"] },
+    "params": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "alpha": { "type": "number", "minimum": 0.02, "maximum": 0.5 },
+        "beta": { "type": "number", "minimum": 0.02, "maximum": 0.5, "description": "TSB probability smoothing" },
+        "window_months": { "type": "integer", "minimum": 6, "maximum": 24 },
+        "pool_family_id": { "type": ["string", "null"] },
+        "pool_weight": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "horizon_months": { "type": "integer", "minimum": 1, "maximum": 18 },
+    "service_level": { "type": "number", "minimum": 0.8, "maximum": 0.999, "description": "Policy table default by criticality: S 0.99, A 0.975, B 0.95, C 0.90. The agent may move it by at most one step and must say why." },
+    "lead_time_days": { "type": "number", "minimum": 1, "maximum": 400 },
+    "lead_time_basis": { "enum": ["median", "mean", "p90", "supplier_specific", "assumption"] },
+    "inputs": {
+      "type": "array", "maxItems": 12,
+      "description": "Driver adjustments the agent proposes. They are written to forecast_input with source='ai', status='proposed'. See forecast_input.schema.json.",
+      "items": { "$ref": "forecast_input.schema.json" }
+    },
+    "insurance_spare": { "type": "boolean", "description": "True when the part has little or no demand but serves S or A equipment with long lead time. Engine keeps min 1 and says so." },
+    "rationale": { "type": "string", "maxLength": 900, "description": "Plain engineering English. Every number in it must appear in the evidence pack." },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "evidence": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "type": "string" }, "description": "Evidence ids from the pack, e.g. 'series:4100101639', 'pm:PX_KT-383A#3', 'po:7711'. The validator rejects ids that are not in the pack." },
+    "flags": { "type": "array", "items": { "enum": ["sparse_history", "data_quality", "lead_time_outlier", "possible_obsolete", "price_missing", "conflicting_signals"] } }
+  }
+}

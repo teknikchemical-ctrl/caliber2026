@@ -1,3 +1,43 @@
+# Task board (SPI case: Spare Part Intelligence and Inventory Optimization)
+
+Branches: Claude A `claude/great-tesla-l0uw33`, Claude B `claude/funny-edison-pis09w`, Codex AI `codex/ai`, Codex Fin `codex/finance`. Case id `spi`. Deadline Thu 5 Nov 2026 06:00. Read `docs/spi/README.md` first, then your file in `docs/spi/agents/`.
+
+Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer notes go in your handoff file `docs/handoff/<a|b|codex-ai|codex>.md`. Messages from Claude A to you: `docs/inbox/<agent>.md`. A contract change (schema, JSON contracts, API names) is announced here and in the inbox of every agent it affects.
+
+| id | owner | status | task | milestone | files |
+|---|---|---|---|---|---|
+| A1 | A | todo | Vercel hello deploy with one DB endpoint (spikes S1, S2, S5); package.json, vercel.json, api/_lib/db.js | M0 | vercel.json, api/_lib, api/data/health.js |
+| A2 | A | todo | ETL v1: clean tables, dq_issue, `mini.sqlite` fixture pushed in the first hour | M0 | spi/etl, spi/fixtures |
+| A3 | A | todo | Derived layer: part_profile, part_equipment, spec parser, spec_family; commit spi.sqlite | M1 | spi/etl, spi/db |
+| A4 | A | todo | `api/data/*` endpoints | M1 | api/data |
+| A5 | A | todo | Equipment sets, case pack `cases/spi`, register spi modules in build.py | M2 | spi/etl, cases/spi, build.py |
+| A6 | A | todo | Golden questions (40) in spi/eval and eval_case | M3 | spi/eval |
+| A7 | A | todo | Integrate every 1 to 2 h, tests, deploy | all | main |
+| A8 | A | todo | Ship: zip script, final deploy, screenshot steps, final audits | M5 | tools/spi_zip.sh |
+| B1 | B | todo | App shell, `spiApi`, stubs, Overview and Data and architecture pages | M1 | src/modules/spi_*.js |
+| B2 | B | todo | Forecast page (chart with bands, ledger with source badges, how the AI reasoned) | M2 | src/modules/spi_forecast.js |
+| B3 | B | todo | Optimisation, Health and Recommendations pages | M3 | src/modules/spi_*.js |
+| B4 | B | todo | Scenario simulator and Ask AI pages | M3 | src/modules/spi_scn.js, spi_ask.js |
+| B5 | B | todo | Drawings with stock overlay for the demo sets; screenshots for the deck | M4 | cases/spi/geo, docs/spi/shots |
+| C1 | codex-ai | todo | Providers (gemini, mock), model chain, tests with fake Gemini | M1 | spi/ai/providers |
+| C2 | codex-ai | todo | Evidence pack and rules planner and validator | M1 | spi/ai |
+| C3 | codex-ai | todo | `POST /api/ai/plan` and `GET /api/ai/health` on Vercel | M2 | api/ai |
+| C4 | codex-ai | todo | Tools and Flow B `POST /api/ai/ask` (proposals into the ledger) | M3 | spi/ai, api/ai |
+| C5 | codex-ai | todo | Batch precompute to results.sqlite; golden question evaluation; key connection guide for Vercel | M3 to M5 | spi/ai, docs/AI_ASSISTANT.md |
+| F1 | codex | todo | Engine core: classify, methods, bootstrap quantiles, unit tests | M1 | spi/engine |
+| F2 | codex | todo | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
+| F3 | codex | todo | `api/engine/*` endpoints | M2 | api/engine |
+| F4 | codex | todo | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
+| F5 | codex | todo | Business case workbook, impact.json, BUSINESS_CASE.md | M4 | finance/spi |
+| F6 | codex | todo | 7-slide deck in competition format; team.json for the human | M4 to M5 | deck/spi |
+| H1 | human | todo | Import the repo in Vercel and send the URL; set AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel env vars; fill `deck/spi/team.json`; confirm deadline time zone; tell Claude A the clock | M0 to M5 | |
+
+## Open contract questions
+(none yet)
+
+---
+## Archive: previous case rows
+
 # Task board
 
 Branches: Claude A = `claude/great-tesla-l0uw33`, Claude B = `claude/funny-edison-pis09w`. Case id = `<fill in tomorrow>`.
