@@ -285,7 +285,7 @@
    "unit": "parts",
    "tolerance": 0.0,
    "expected": {
-    "value": 414,
+    "value": 336,
     "text": null
    }
   },
@@ -297,7 +297,7 @@
    "unit": "parts",
    "tolerance": 0.0,
    "expected": {
-    "value": 153,
+    "value": 231,
     "text": null
    }
   },

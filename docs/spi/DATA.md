@@ -29,3 +29,6 @@ duplicate BoM rows (230), negative and over-long lead times, zero or absurd unit
 
 ## Derived layer
 See `spi/db/schema.sql`: `part_profile` (one row per part with every feature the AI and the engine need), `demand_month`, `part_equipment`, `spec_family`, `equipment_set`, `dq_issue`, `eval_case`.
+
+## Independent reconciliation: the CALIBER Inventory Calculation Workbook
+`spi/data/reference/CALIBER_Inventory_Calculation_Workbook.xlsx` is a transparent baseline built from the same six files (see `PLAN_ECONOMICS.md` section 3). `python3.13 tests/spi_workbook_check.py` proves that our database equals it for all 7,481 materials (on-hand, Min, Max, issue events, total issued, active months, locations, ADI, CV2, demand class). Its cautions are adopted: procurement lead time is a proxy (PR date to PO delivery date), criticality order S, A, B, C is assumed, inventory position is on-hand only, zero observed demand is not zero need.
