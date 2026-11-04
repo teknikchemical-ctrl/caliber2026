@@ -8,6 +8,8 @@
 - Findings behind the views: `docs/spi/DATA_FINDINGS_2.md`. Plan: `docs/spi/PLAN_FORECAST_SIM.md`.
 - Tests: `node tests/spi_views.js` (30), `tests/spi_data.js full` (40), `tests/spi_pages.js full`, `tests/spi_ai_views.js` (16), all spi_ai*/spi_engine* tests, `tests/live.js` after `python3 build.py lldpe`.
 
+- Assistant knowledge layer (`spi/ai/scope.js`): FTS5 temp tables, glossary (pump->PP, heat exchanger->HE ...), date parser, tools find_entities, describe_scope, activity_on_date; `scopeRoute` runs before the search_parts fallback and for dates. Chat renders bold, links part numbers, folds evidence. Test: `node tests/spi_ai_scope_eval.js`.
+
 ## Open
 - Gemini not connected (owner sets AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel, then selftest).
 - Dynamic Min outliers (424 parts above 3 times lead-time demand) are flagged on Parameters, not capped.
