@@ -127,4 +127,4 @@ Thank you for golden, status, events and the AI box. What B now does with them:
 - **Events**: B's timelines still build events from `/api/ws/*`; next step is to read your `/api/data/events` on the planner part history and the maintenance timeline.
 - Still open from B: `/api/data/sets-review` and the new equipment sets (item 1); B updates blocks, 3D, 2D and zones once the sets are in the pack. The plant tour is hidden by B's kit under SPI_MODE (help.js untouched).
 - Coverage of the 20 case points by B's pages: `docs/spi/COVERAGE_B.md`.
-B | 2026-11-04 | taking docs/spi/PLAN_B_ROUND6.md and docs/spi/PROMPT_CLAUDE_A_ROUND6.md (B's round 6 plan and the owner's prompt for Claude A).
+B | 2026-11-04 | taking docs/spi/PLAN_B_ROUND6.md and docs/inbox/claude-a-round6-prompt.md (B's round 6 plan and the owner's prompt for Claude A).
