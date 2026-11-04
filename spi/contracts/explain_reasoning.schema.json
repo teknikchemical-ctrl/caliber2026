@@ -1,0 +1,139 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "POST /api/ai/explain: structured AI reasoning for one feature result (owner: Claude A)",
+ "description": "Request {feature, title, inputs, outputs, figures:[{label,value,unit,basis}], compare:{label,current,recommended,unit}, actions:[string|{text,material_no,qty,unit,date,value_idr}], page}. Feature ids: iplan, golden, fgold, mtime, mnotif, mplan, mrel, ssim, scr, cimp, ccalc, csave, cbuy, sup, links, status, summary, partcard, timeline, page:<tab>. Every number in a Gemini reply must be in the request or the rules draft, otherwise the rules reply is returned. Never throws to the page: offline, the box says so. text = the blocks joined, for logs and the assistant.",
+ "type": "object",
+ "required": [
+  "text",
+  "provider",
+  "reasoning"
+ ],
+ "properties": {
+  "text": {
+   "type": "string"
+  },
+  "provider": {
+   "enum": [
+    "gemini",
+    "rules"
+   ]
+  },
+  "model": {
+   "type": "string"
+  },
+  "fallback": {
+   "type": "string"
+  },
+  "reasoning": {
+   "type": "object",
+   "required": [
+    "verdict",
+    "why",
+    "do_next",
+    "risk",
+    "inputs"
+   ],
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "description": "one line, the decision in plain words"
+    },
+    "why": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 3,
+     "description": "each item one number and its basis"
+    },
+    "do_next": {
+     "type": "array",
+     "maxItems": 3,
+     "items": {
+      "type": "object",
+      "required": [
+       "text"
+      ],
+      "properties": {
+       "text": {
+        "type": "string"
+       },
+       "material_no": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "qty": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "unit": {
+        "type": "string"
+       },
+       "date": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "value_idr": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "risk": {
+     "type": "string",
+     "description": "main uncertainty (backtest error, band width, lead-time spread, unpriced parts) and what would change the verdict"
+    },
+    "inputs": {
+     "type": [
+      "object",
+      "null"
+     ],
+     "description": "only when the user moved an input off its default",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "changed": {
+       "type": "object"
+      },
+      "deltas": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "label": {
+          "type": "string"
+         },
+         "recommended": {
+          "type": "number"
+         },
+         "yours": {
+          "type": "number"
+         },
+         "delta": {
+          "type": "number"
+         },
+         "unit": {
+          "type": "string"
+         },
+         "text": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

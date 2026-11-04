@@ -1,0 +1,116 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "GET /api/data/events: dated events for the timelines (owner: Claude A)",
+ "description": "Query: mat | tag | set | cls | (plant), from=YYYY-MM, to=YYYY-MM, limit (default 2000, max 5000). The plant is aggregated per day (n = rows, material_no and funcloc null).",
+ "type": "object",
+ "required": [
+  "from",
+  "to",
+  "cutoff",
+  "counts",
+  "events",
+  "truncated"
+ ],
+ "properties": {
+  "from": {
+   "type": "string"
+  },
+  "to": {
+   "type": "string"
+  },
+  "cutoff": {
+   "type": "string"
+  },
+  "counts": {
+   "type": "object"
+  },
+  "truncated": {
+   "type": "boolean"
+  },
+  "events": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "date",
+     "kind",
+     "text",
+     "crit",
+     "value_idr",
+     "qty",
+     "unit",
+     "material_no",
+     "funcloc"
+    ],
+    "properties": {
+     "date": {
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "issue",
+       "notification",
+       "planned",
+       "pr",
+       "po_due",
+       "receipt",
+       "recommended_order",
+       "campaign"
+      ]
+     },
+     "text": {
+      "type": "string"
+     },
+     "crit": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "value_idr": {
+      "type": [
+       "number",
+       "null"
+      ]
+     },
+     "qty": {
+      "type": [
+       "number",
+       "null"
+      ]
+     },
+     "unit": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "material_no": {
+      "type": [
+       "number",
+       "null"
+      ]
+     },
+     "funcloc": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "priority": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "n": {
+      "type": "number"
+     },
+     "id": {
+      "type": "number"
+     }
+    }
+   }
+  }
+ }
+}

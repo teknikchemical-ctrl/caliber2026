@@ -31,3 +31,11 @@
 ## Gotchas
 - All spi modules share one global scope; prefix names (A: spfs, spmv, spcv, spmt, SPSIM). Static check flags duplicate CSS classes with style3d.css.
 - Never run a build while a test that reads `dist/index.html` is running. Never `git add -A` with results.sqlite present (168 MB, GitHub rejects it); it is in .gitignore.
+
+## 2026-11-04 round 6 (docs/spi/PROMPT_CLAUDE_A_ROUND6.md)
+- `/api/data/golden` is the single engine (Optimized Scenario): per-part policy search shared with B's evalPart, never dearer than today; steady-state totals (headline, IDR 145.25 bn a year, equal to B's ws/golden) and first-12-month Monte Carlo; per-order and per-part decision fields, history series, backtest (new table `ml_backtest` from spi/ml/train.py) and band calibration, `set=` scope, seed. Contract `spi/contracts/golden.schema.json`.
+- `/api/data/events`: common fields on every event, kinds receipt and campaign, `set=`. Contract `events.schema.json`.
+- AI box: structured blocks (verdict, why, do next, risk and confidence, your inputs against the recommended run), Gemini checked number by number, rules fallback. Contract `explain_reasoning.schema.json`.
+- Hover: `data-kb` on every point and bar of spiAxLine and spiAxBars, small readout when B's kit is absent.
+- "Golden path" renamed "Optimized Scenario" in all my text. Test: `node tests/spi_ai_reasoning.js`.
+- Data note: po_line repeats some lines; history and events count each once, open quantities still sum the repeats (noted to B).
