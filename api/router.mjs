@@ -1,4 +1,4 @@
-// The single Vercel function of the application (owner: Claude A). Vercel's free plan allows 12 functions per deployment, so every endpoint is a handler file under server/
+// The single Vercel function of the application (owner: Claude A). vercel.json rewrites /api/<anything> to /api/router?path=<anything>; the router also accepts the plain pathname (local dev server). Vercel's free plan allows 12 functions per deployment, so every endpoint is a handler file under server/
 // and this router dispatches /api/<area>/<name> to server/<area>/<name>.mjs and /api/<area>/<name>/<value> to server/<area>/<name>/[param].mjs. New endpoint = new file under server/<area>/, no change here.
 import fs from "node:fs"; import path from "node:path"; import { pathToFileURL } from "node:url";
 const SERVER = path.join(process.cwd(), "server"), cache = new Map(), SAFE = /^[A-Za-z0-9_-]+$/;
@@ -13,7 +13,8 @@ export function resolveRoute(segs) {
 }
 export default async function handler(req, res) {
   try {
-    const u = new URL(req.url || "/", "http://x"), segs = u.pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean).map((s) => decodeURIComponent(s)), r = resolveRoute(segs);
+    const u = new URL(req.url || "/", "http://x"), pq = u.searchParams.get("path"); u.searchParams.delete("path");
+    const raw = pq !== null ? pq : u.pathname.replace(/^\/api\/?/, ""), segs = raw.split("/").filter(Boolean).map((s) => { try { return decodeURIComponent(s); } catch { return s; } }), r = resolveRoute(segs);
     if (!r) return send(res, 404, { error: "no such endpoint" });
     req.query = { ...Object.fromEntries(u.searchParams), ...r.params };
     if (!cache.has(r.file)) cache.set(r.file, import(pathToFileURL(r.file).href));

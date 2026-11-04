@@ -4,7 +4,7 @@ import http from "node:http"; import fs from "node:fs"; import path from "node:p
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const port = Number(process.argv[2]) || 8765, mode = process.argv[3] || "full";
 if (!process.env.SPI_DB) process.env.SPI_DB = path.join(ROOT, mode === "fixture" ? "spi/fixtures/mini.sqlite" : "spi/db/spi.sqlite");
-const router = (await import(pathToFileURL(path.join(ROOT, "api/[...route].mjs")).href)).default;
+const router = (await import(pathToFileURL(path.join(ROOT, "api/router.mjs")).href)).default;
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".json": "application/json", ".css": "text/css", ".png": "image/png", ".webmanifest": "application/manifest+json" };
 http.createServer(async (req, res) => {
   const u = new URL(req.url, "http://x");
