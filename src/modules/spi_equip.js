@@ -4,7 +4,7 @@ regMod("spi_equip","1.0",["spi_core"],"Equipment spare parts views");
 const spiDesc=s=>{if(!s)return"";return String(s).split(",").map(x=>x.trim()).filter(Boolean).map((x,i)=>{if(/^FOR\s+/.test(x))return "for "+x.slice(4);if(/\d/.test(x)||/^[A-Z]{1,4}-[A-Z0-9]/.test(x))return x;const l=x.toLowerCase();return i===0?l.charAt(0).toUpperCase()+l.slice(1):l}).join(", ")};
 function spiPlantOverview(){
  const sets=K.sets.map(s=>`<tr class="click" onclick="go('equipment',{set:${s.n},tab:'overview'})"><td><b>${esc(s.tag)}</b></td><td>${esc(s.name)}</td><td>${esc(s.type||"")}</td><td>${spiCritBadge(s.crit==="HIGH CRITICAL"?"S":"A")}</td></tr>`).join("");
- return `${ph("Plant overview",`${K.sets.length} equipment sets selected from the baseline data by criticality and parts list size. The layout is a schematic generated from the data, not a surveyed plot plan.`)}${p3Hero()}
+ return `${ph("Plant overview",`${K.sets.length} equipment sets selected from the baseline data by criticality and parts list size. The layout is a schematic generated from the data.`)}${p3Hero()}
  <div class="card" style="margin-top:14px"><h3>Equipment sets</h3><p class="muted" style="margin-bottom:6px">Select a row to open the equipment set with its spare parts, schematic drawings and maintenance notifications.</p><table><tr><th>Tag</th><th>Description</th><th>Class</th><th>Criticality</th></tr>${sets}</table></div>
  <p class="spi-note">Spare part forecasts, stock health and recommendations are on the pages under Spare parts in the menu.</p>`}
 function spiEquipPanel(n){const s=S(n),id="speq"+n;
@@ -32,3 +32,7 @@ function spiPrune(){const hide=e=>{if(e)e.style.display="none"},short=e=>(e.text
  document.querySelectorAll("#app p, #app .muted").forEach(e=>{if(e.children.length<4&&/simulate trip|interlock effects|live condition/i.test(short(e))){e.textContent="Select a part on the drawing for its stock, Min, Max and forecast."}});
  document.querySelectorAll("#app svg text").forEach(e=>{const t=short(e);if(/^Health\s*(NaN|\d)|^RUNNING$|^TRIPPED$|^ALARM$/.test(t)){const g=e.closest("g");hide(g||e)}})}
 if(window.SPI_MODE){const _rP=render;render=function(){const r=_rP.apply(this,arguments);setTimeout(spiPrune,60);setTimeout(spiPrune,500);setTimeout(spiPrune,1500);return r}}
+
+/* The plot plan and hazard pages belong to the previous plant case and are removed: links go to the plant overview, plot plan documents are not listed. */
+if(window.SPI_MODE){const _goP=go;go=function(p,x){if(p==="plot"||p==="hazard")p="dashboard";return _goP.call(this,p,x)};
+ const rmPlot=new Set(KB.docs.filter(d=>d.type==="Plot Plan").map(d=>d.id));KB.docs=KB.docs.filter(d=>!rmPlot.has(d.id));KB.chunks=KB.chunks.filter(c=>!rmPlot.has(c.doc))}
