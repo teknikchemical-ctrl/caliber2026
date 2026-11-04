@@ -95,7 +95,7 @@ export function scopeRoute(db,q,resolved={}){
  if(r.date&&/happen|activity|event|issue|notif|order|record|everything|what|how many/i.test(q))return ['activity_on_date',{date:r.date}];
  if(/\b(min|max|forecast|reorder|safety|lead time|recommend|cost|saving|scenario|what if)\b/i.test(q))return null;
  if(resolved.funcloc&&!resolved.material_no&&r.tag){if(/vibration|measure|inspect|notif|\bpm\b|maintenance|schedule|due|task|failure|breakdown/i.test(q))return ['describe_scope',{funcloc:resolved.funcloc,focus:'maintenance'}];if(q.trim().split(/\s+/).length<=6||/part|spare|bom|bill|install|use|have|fit/i.test(q))return ['describe_scope',{funcloc:resolved.funcloc,focus:'parts'}]}
- if(!r.tag&&!r.material_no&&(r.classes.length||r.words.length)&&q.trim().split(/\s+/).length<=8&&!/\b(zero|below|excess|slow|dead|obsolete|insurance|critical|campaign|turnaround|shutdown|procure|supplier|spend|stockout|overstock|budget|cash|health)\b/i.test(q))return ['describe_scope',{text:q.slice(0,200)}];
+ if(!r.tag&&!r.material_no&&(r.classes.length||r.words.length)&&q.trim().split(/\s+/).length<=8&&!/\b(which|why|how|when|should|zero|below|excess|slow|dead|obsolete|insurance|critical|campaign|turnaround|shutdown|procure|supplier|spend|stockout|overstock|budget|cash|health|simulat|reorder|lead time|trend|season|pattern)\b/i.test(q))return ['describe_scope',{text:q.slice(0,200)}];
  return null}
 
 // ---- part card and code search (model, type, drawing numbers inside the description) ----

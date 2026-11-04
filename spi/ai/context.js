@@ -1,8 +1,10 @@
 // Conversation context is a selector for read-only tools, never an instruction or SQL.
 const invalid=message=>Object.assign(new Error(message),{status:400});
+import {checkView} from './screen.js';
 export function resolveContext(question,history=[],context={}){
- if(!context||typeof context!=='object'||Array.isArray(context))throw invalid('Context must be an object');for(const key of Object.keys(context))if(!['material_no','funcloc','page'].includes(key))throw invalid('Unknown context field: '+key);
- if(context.material_no!=null&&(!Number.isSafeInteger(context.material_no)||context.material_no<=0))throw invalid('Context material number must be a positive integer');for(const key of ['funcloc','page'])if(context[key]!=null&&(typeof context[key]!=='string'||context[key].length>160))throw invalid('Context '+key+' must be at most 160 characters');
+ if(!context||typeof context!=='object'||Array.isArray(context))throw invalid('Context must be an object');for(const key of Object.keys(context))if(!['material_no','funcloc','page','view'].includes(key))throw invalid('Unknown context field: '+key);
+ if(context.material_no!=null&&(!Number.isSafeInteger(context.material_no)||context.material_no<=0))throw invalid('Context material number must be a positive integer');try{checkView(context.view)}catch(e){throw invalid(e.message)}
+ for(const key of ['funcloc','page'])if(context[key]!=null&&(typeof context[key]!=='string'||context[key].length>160))throw invalid('Context '+key+' must be at most 160 characters');
  const explicit=Number((question.match(/\b\d{10}\b/)||[])[0]);if(explicit)return {material_no:explicit,source:'question'};
  const tag=(question.toUpperCase().match(/\b(?:[A-Z]{2}_)?[A-Z]{1,5}-\d+[A-Z]?\b/)||[])[0];if(tag)return {funcloc:tag,source:'question'};
  const refers=/\b(it|its|this|that|same|part|material|history|historical|trend|forecast|prediction|predict|next year|next month|last month|lead time|reorder|stock|why|explain|reason)\b/i.test(question);

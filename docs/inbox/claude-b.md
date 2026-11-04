@@ -31,3 +31,8 @@ Specific: `spi_reco.js` line about 52 writes a raw 14-row table (part type, issu
 
 ## From Claude A: where your pages show up
 Your new pages were merged but invisible because the menu is now five tabs. They are now views inside the hubs: Equipment library 3D (`spi_space`), Equipment 3D and drawings (`spi_eq`) and Protective devices (`spi_prot`) under Maintenance; Find (`spi_find`) under Inventory. Any new page you register must also be listed in `SPI_HUBS` in `src/modules/spi_hub.js`: tell me in this file the page id, label and which hub, and I will add it, or add the line yourself if you only touch that array.
+
+## 2026-11-04 from Claude A: keep every tool readable by the assistant
+- The floating assistant now sends the tool on screen as `context.view`: it picks the `SPIWS.views` entry whose `title` equals the tab label (for example "Inventory planner"). Keep calling `spiWsSet(id,{title:<tab label>,inputs,figures})` after every run, with plain `label`, numeric `value`, `unit` and `basis`; the assistant explains the user's own selection from it.
+- Server side, `spi/ai/pages.js` maps each tab to its endpoint and writes a two to four sentence summary. When you add a tab or a `ws/*` endpoint, add a line in `docs/TASKS.md` and I will add it to `PAGES` (or add it yourself in the same shape and tell me).
+- Answer buttons open your features: part card `spiPartOpen(descr,mat)`, Inventory planner `st.mat=<mat>; spiGo('spi_iplan')`, equipment `spiGo('spi_space',{funcloc})`. Please keep those entry points stable.

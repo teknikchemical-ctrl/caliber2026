@@ -13,7 +13,7 @@ const cases=[
  ['model dy707 what is it','describe_part',/4100055430[\s\S]*DY707/,/4300003237/],
  ['TYPE FO338 what is it','describe_part',/4100048715[\s\S]*FO338/,/no BoM/i],
  ['Part code 4300003237 what is it','describe_part',/BLADE,ROTOR[\s\S]*IDR 91\.19 bn/,/460551064|Figures are Estimates/],
- ['What are the largest excess stock items?','inventory_list',/1,376 matching materials[\s\S]*IDR 163\.28 bn/,/163,276,712,768|Figures are Estimates/],
+ ['What are the largest excess stock items?','inventory_list',/1,376 parts[\s\S]*IDR 163\.28 bn/,/163,276,712,768|Figures are Estimates/],
  ['what is KT-624A','describe_scope',/208 spare parts/,/6\+/],
  ['notification 101000000101','lookup_record',/Leak from packing/],
  ['PO 4300005214','lookup_record',/6 lines[\s\S]*CAHAYA/],
@@ -26,6 +26,17 @@ const cases=[
  ['What is in the reliability explorer?','get_page',/286 failure events/],
  ['Explain this view: Cost-risk scenarios','get_page',/average stock value falls/,null,{page:'spi_scr'}],
  ['Explain this view: Registers','get_page',/2,502 insurance spares/,null,{page:'spi_reg'}],
+ ['Explain this view: Inventory planner',' read_screen'.trim(),/Inventory planner[\s\S]*recommended order 120 EA/,null,{page:'spi_iplan',view:{title:'Inventory planner',inputs:{mat:4100000129},figures:[{label:'Recommended order',value:120,unit:'EA',basis:'Estimate'}]}}],
+ ['How variable is procurement lead time?','brief_topic',/median of \*\*42 days\*\*/],
+ ['Is there seasonality in consumption?','brief_topic',/cannot be proven/],
+ ['How does the installed equipment population affect demand?','brief_topic',/96\.4% were issued/],
+ ['Are there abnormal or unexpected consumption patterns?','brief_topic',/one-off spike/],
+ ['Which items should be reordered and when?','get_page',/order-by date/],
+ ['What are the recommended reorder quantities and dynamic Min-Max levels?','get_view',/dynamic policy raises Min/],
+ ['Simulate reducing inventory by 20%','simulate_scenario',/IDR 616\.62 bn[\s\S]*IDR 493\.68 bn/,/Figures are Estimates/],
+ ['Inventory for part 4100005111','plan_part',/Order \*\*38 SET\*\*[\s\S]*79%/,/not priced:/],
+ ['When should we order 4100000129?','plan_part',/No order is needed/],
+ ['Explain this view: Maintenance timeline','get_page',/5,795 notifications/,null,{page:'spi_mtime'}],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
  if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100||(r.answer.match(/[.!?](\s|$)/g)||[]).length>7&&tool==='get_page')fails.push('too long '+r.answer.length);
