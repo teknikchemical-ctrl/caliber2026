@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-04T03:46:12.274Z",
+  "generated_at": "2026-11-04T04:29:49.440Z",
   "engine_version": "spi-engine-1.1",
   "data_cutoff": "2026-09-30",
   "history_months": 17,
@@ -652,15 +652,15 @@
       "priced": 1229,
       "stock_value_idr": 616617267812,
       "carrying_cost_idr_yr": 135655798918.63997,
-      "expected_stockouts_yr": 3408.0300556236575,
-      "exposure_idr": 4110168222880.7583,
-      "service_level": 0.932454405326828,
-      "target_stock_value_idr": 295450803090,
-      "ordering_cost_idr_yr": 29982450270.751125,
-      "annual_exposure_idr": 19577944520322.35,
-      "parts_meeting_service": 6172,
+      "expected_stockouts_yr": 3391.330561428297,
+      "exposure_idr": 4104598329462.9243,
+      "service_level": 0.9329564584447266,
+      "target_stock_value_idr": 294492103150,
+      "ordering_cost_idr_yr": 29744414812.543003,
+      "annual_exposure_idr": 19562145416065.6,
+      "parts_meeting_service": 6173,
       "service_target_basis": "Criticality policy by part",
-      "total_expected_cost_idr_yr": 19743582769511.742,
+      "total_expected_cost_idr_yr": 19727545629796.785,
       "settings": {
         "stock_multiplier": 1,
         "demand_multiplier": 1,
@@ -678,17 +678,17 @@
     "dynamic": {
       "parts": 7481,
       "priced": 1229,
-      "stock_value_idr": 732291938779.9452,
-      "carrying_cost_idr_yr": 161104226531.5878,
-      "expected_stockouts_yr": 74.19839264643868,
-      "exposure_idr": 31018406718.454933,
-      "service_level": 0.9986047988236867,
-      "target_stock_value_idr": 295450803090,
-      "ordering_cost_idr_yr": 29982450270.751125,
-      "annual_exposure_idr": 185408342630.38696,
+      "stock_value_idr": 731397578517.1439,
+      "carrying_cost_idr_yr": 160907467273.77158,
+      "expected_stockouts_yr": 74.28250723142028,
+      "exposure_idr": 31174271866.386795,
+      "service_level": 0.9986045377456222,
+      "target_stock_value_idr": 294492103150,
+      "ordering_cost_idr_yr": 29744414812.543003,
+      "annual_exposure_idr": 186556955048.46048,
       "parts_meeting_service": 7472,
       "service_target_basis": "Criticality policy by part",
-      "total_expected_cost_idr_yr": 376495019432.7259,
+      "total_expected_cost_idr_yr": 377208837134.775,
       "settings": {
         "stock_multiplier": 1,
         "demand_multiplier": 1,
@@ -703,52 +703,52 @@
         "Held insurance reserves are not reduced below one; zero stock is not silently replenished by the baseline scenario."
       ]
     },
-    "working_capital_release_idr": 138662471817.0548,
-    "replenishment_investment_idr": 254337142785,
-    "net_working_capital_release_idr": -115674670967.94519,
-    "risk_change_idr": -4079149816162.303,
+    "working_capital_release_idr": 139003133759.8561,
+    "replenishment_investment_idr": 253783444465,
+    "net_working_capital_release_idr": -114780310705.14392,
+    "risk_change_idr": -4073424057596.5376,
     "unpriced_parts": 6252
   },
   "actions": {
-    "REORDER": 1230,
+    "REORDER": 1229,
     "REDUCE": 642,
-    "MAINTAIN": 62,
+    "MAINTAIN": 63,
     "MONITOR": 456,
     "KEEP_INSURANCE": 4747,
     "REVIEW_OBSOLETE": 344
   },
   "backtest_by_class": {
     "smooth": {
-      "parts": 31,
-      "candidate_error": 0.48420622230749066,
-      "baseline_error": 0.4857260931167536,
-      "deployed_error": 0.48420622230749066,
-      "candidate_wins": 5,
-      "pinball_loss": 0.16184969252747342
+      "parts": 27,
+      "candidate_error": 0.5004227242790251,
+      "baseline_error": 0.5011318990389805,
+      "deployed_error": 0.5004227242790251,
+      "candidate_wins": 4,
+      "pinball_loss": 0.16636560583487703
     },
     "erratic": {
-      "parts": 112,
-      "candidate_error": 0.7589188718507308,
-      "baseline_error": 0.7738672694457411,
-      "deployed_error": 0.7589188718507308,
+      "parts": 116,
+      "candidate_error": 0.7456714912351758,
+      "baseline_error": 0.7599776884956871,
+      "deployed_error": 0.7456714912351758,
       "candidate_wins": 11,
-      "pinball_loss": 0.24030749957441613
+      "pinball_loss": 0.23655094019952244
     },
     "lumpy": {
-      "parts": 130,
-      "candidate_error": 0.9884378092941375,
-      "baseline_error": 1.0002204391106453,
-      "deployed_error": 0.9884378092941375,
-      "candidate_wins": 18,
-      "pinball_loss": 0.25691759754430077
+      "parts": 155,
+      "candidate_error": 1.0441242476062396,
+      "baseline_error": 1.0481990818710516,
+      "deployed_error": 1.0441242476062396,
+      "candidate_wins": 22,
+      "pinball_loss": 0.2817122706605008
     },
     "intermittent": {
-      "parts": 182,
-      "candidate_error": 1.6388611202522665,
-      "baseline_error": 1.6414920549298213,
-      "deployed_error": 1.6388611202522665,
+      "parts": 157,
+      "candidate_error": 1.67127060148126,
+      "baseline_error": 1.6791416342077168,
+      "deployed_error": 1.67127060148126,
       "candidate_wins": 13,
-      "pinball_loss": 0.44556753523193227
+      "pinball_loss": 0.4474472101657239
     }
   },
   "replay": {
@@ -764,7 +764,7 @@
       "filled": 1694637,
       "demand": 1797135,
       "shortage": 102498,
-      "held": 1319948.235294116,
+      "held": 1319653.2941176458,
       "months_stockout": 264,
       "quantity_fill_rate": 0.9429658873707317
     }

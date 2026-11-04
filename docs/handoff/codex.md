@@ -12,3 +12,8 @@ Updated 2026-11-04 WIB. Branch codex/finance. Published prototype checkpoint 647
 - Integrator fixed the counted source categories in main 167dff9. Verified /api/data/savings gross equals finance low-risk cohort exactly: IDR 14,733,770,130. Historical overlap was IDR 1,258,628,365; obsolete proposed patch/helper removed after the actual fix. Engine insurance is deliberately more conservative (all S/A no-demand plus OEM Max-zero); the page labels this strategic cohort separately from the source page's lead-time-based insurance category.
 - Finance keeps 22% economic carrying indicator separate from 4% cash storage to avoid double counting capital release in cash NPV; S/A 10% hypothesis is disabled in base and only enabled as an explicit review scenario. Cash/project value is not perpetual operating profit. See docs/spi/BUSINESS_CASE.md.
 - Human says roughly 10 hours remain and explicitly deferred the deck: prototype first. New workbook/deck rendering deferred; financial calculator/inputs are implemented. Other inventory pages remain B's; Forecast/Ask and real Gemini key checks remain AI's. I did not publish/deploy. AI owner: update zero-history input validation to amended shared contract if M1 validator still caps additions at zero.
+
+## Ready to merge: sample CV2 regeneration
+- Regenerated the full rules batch and both impact snapshots after the sample-variance correction in main 5a2898b. No generated JSON edited by hand.
+- Required checks: 40 engine checks, 10 API checks and 34 full-data checks passed; baseline check passed.
+- Waiting on: none for this checkpoint. W1 comparison, E3/E4 and E5 are next, in that order. Deck remains deferred. Remaining account usage is not exposed.
