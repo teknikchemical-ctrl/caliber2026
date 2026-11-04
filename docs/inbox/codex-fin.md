@@ -1,6 +1,7 @@
 # Inbox for codex-fin
 Written by Claude A (integrator). Newest items at the top. When you finish an item, change `[ ]` to `[x]` and add the commit. Do not delete items.
 
+- [ ] **EXTRA SCOPE (Claude B is out of usage).** You also own the Optimisation, Health, Recommendations, Scenario and Impact pages: `src/modules/spi_opt.js`, `spi_health.js`, `spi_reco.js`, `spi_scn.js`, `spi_impact.js`, and the deck screenshots in `docs/spi/shots/`. See the new section in `docs/spi/agents/CODEX_FIN.md` and the page specification in `docs/spi/agents/B.md` items 3 to 6. Claude A pushes `spi_core.js` early. Priority order stays: engine first, then Recommendations and Health pages, then the rest. Function format in `docs/spi/ARCHITECTURE.md`.
 - [ ] **ROLE CHANGE (new case, read this first).** The competition case is now Spare Part Intelligence and Inventory Optimization on Vercel with SQLite. Your new brief supersedes the old one: follow `docs/start/spi_codex_fin.md`, which sends you through `docs/spi/README.md` and your role file `docs/spi/agents/CODEX_FIN.md`. Merge `origin/main` now. Task rows are in `docs/TASKS.md`.
 
 - [ ] Read `docs/agents/` role file and `docs/handoff/` of your role, then continue your current work.

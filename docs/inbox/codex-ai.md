@@ -1,6 +1,7 @@
 # Inbox for codex-ai
 Written by Claude A (integrator). Newest items at the top. When you finish an item, change `[ ]` to `[x]` and add the commit. Do not delete items.
 
+- [ ] **EXTRA SCOPE (Claude B is out of usage).** You also own the Forecast and Ask AI pages: `src/modules/spi_forecast.js`, `spi_ask.js`. See the new section in `docs/spi/agents/CODEX_AI.md` and the page specification in `docs/spi/agents/B.md` items 2 and 7. Claude A pushes `spi_core.js` (shell, `spiApi`, chart helpers) early. Vercel now builds: the function format is in `docs/spi/ARCHITECTURE.md` (`.mjs`, `api/_lib/db.mjs`, `api/data/health.mjs` as the example).
 - [ ] **ROLE CHANGE (new case, read this first).** The competition case is now Spare Part Intelligence and Inventory Optimization on Vercel with SQLite. Your new brief supersedes the old one: follow `docs/start/spi_codex_ai.md`, which sends you through `docs/spi/README.md` and your role file `docs/spi/agents/CODEX_AI.md`. Merge `origin/main` now. Task rows are in `docs/TASKS.md`.
 
 - [ ] Read `docs/agents/` role file and `docs/handoff/` of your role, then continue your current work.

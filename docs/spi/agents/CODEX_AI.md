@@ -16,6 +16,9 @@ Not yours: `spi/engine` (Codex Fin) and `spi/db` (Claude A). Call the engine thr
 7. **C7 Evaluate (M4).** Run `spi/eval` golden questions through the assistant (mock and Gemini); report the pass rate and failures in your handoff; fix what you own.
 8. **C8 Connect the key (M2, then M5).** `GET /api/ai/health` (provider, model, key present true or false, last error, a real one-word call with the model chain result, deployment commit). Write for a non-technical human the exact steps to set `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL` in Vercel and read the health page, in `docs/AI_ASSISTANT.md` (Vercel section). Never ask for the key in chat.
 
+## Pages you now also own (reassigned from Claude B, who is out of usage)
+`src/modules/spi_forecast.js` (Forecast page) and `src/modules/spi_ask.js` (Ask AI page), exactly as specified in items 2 and 7 of `docs/spi/agents/B.md`, using the shell of Claude A (`spi_core.js`: `spiApi(path, body)`, `spiCss(id, css)`, chart helpers, page registration). Keep them simple and readable: one chart, one table, one panel. Tests `tests/spi_ui_ai*.js`; `node tools/case_shots.js dist/index.html /tmp/shots --quick` must show 0 script errors. Order: after C3 (plan endpoint), build the Forecast page; after C4 the Ask page.
+
 ## Tests (`tests/spi_ai*.js`)
 As listed at the bottom of `AI_REASONING.md`. Run `AI_PROVIDER=mock node tests/spi_ai.js`, `node tests/live.js` (old Netlify path must still pass) and `npm run test:quick`; `bash tools/baseline_check.sh ai` before every push. Note: your browser policy blocks file URLs in `tests/regress.js`: Claude A runs it.
 

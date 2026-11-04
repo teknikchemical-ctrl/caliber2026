@@ -1,4 +1,6 @@
-# Role: Claude B, all spare-part pages, charts, drawings, UI
+# Role: Claude B, drawings and 3D only (REDUCED: B is at 1% weekly usage)
+
+**Update:** Claude B has almost no usage left. The spare-part pages below were reassigned: Claude A (shell, Overview, Data and architecture), Codex AI (Forecast, Ask AI), Codex Fin (Optimisation, Health, Recommendations, Scenario, Business impact). You keep only what is cheap and valuable if you still have usage: item 9 (drawings with stock overlay) for 2 or 3 demo sets, then 3D polish. If you cannot work, write one line in `docs/handoff/b.md` and stop; do not start anything you cannot finish. The page list below is the specification the new owners follow.
 
 Branch `claude/funny-edison-pis09w`. You were the 3D agent. For this case the 3D work is secondary: the pages come first. Check with the human how much usage you have left and write it at the top of `docs/handoff/b.md`.
 
