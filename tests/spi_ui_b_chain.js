@@ -166,7 +166,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.press("#kbs_ip_part input", "ArrowDown"); await p.press("#kbs_ip_part input", "Enter"); await p.waitForTimeout(3500);
   ok("search: choosing a match with the keyboard opens that part", await p.evaluate(() => !!IP.d && !!document.querySelector(".ip-steps")));
   await p.evaluate(() => go("spi_golden")); await p.waitForFunction(() => window.KBT && KBT.gd_tl, null, { timeout: 30000 }).catch(() => {});
-  const v0 = await p.evaluate(() => KBT.gd_tl.v0); const bx = await p.evaluate(() => { const r = document.querySelector("#gd_tl .kb-svg").getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height * 0.7 } });
+  const v0 = await p.evaluate(() => KBT.gd_tl.v0); const bx = await p.evaluate(() => { document.querySelector("#gd_tl").scrollIntoView({ block: "center" }); const r = document.querySelector("#gd_tl .kb-svg").getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height * 0.7 } });
   await p.mouse.move(bx.x, bx.y); await p.mouse.down(); await p.mouse.move(bx.x + 220, bx.y, { steps: 6 }); await p.mouse.up(); await p.waitForTimeout(300);
   ok("timeline: dragging moves the time window", await p.evaluate(v0 => KBT.gd_tl.v0 !== v0, v0));
   const w0 = await p.evaluate(() => KBT.gd_tl.v1 - KBT.gd_tl.v0); await p.mouse.move(bx.x, bx.y); await p.mouse.wheel(0, -300); await p.waitForTimeout(300);
