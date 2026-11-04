@@ -3,12 +3,22 @@
   "buildCommand": "python3 build.py spi",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/router?path=$1" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/router?path=$1"
+    }
   ],
   "functions": {
     "api/router.mjs": {
       "includeFiles": "{server,spi,finance/spi}/**",
       "maxDuration": 60
+    }
+  },
+  "git": {
+    "deploymentEnabled": {
+      "claude/funny-edison-pis09w": false,
+      "codex/ai": false,
+      "codex/finance": false
     }
   }
 }
