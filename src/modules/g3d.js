@@ -29,7 +29,8 @@ const g3Ladder=(x,y0,y1,z,ax)=>{const a=[],n=Math.floor((y1-y0)/.12);a.push(g3C(
 /*@@CASE:g3m@@*/
 /* ---------- geometry ---------- */
 const g3Seg=p=>Math.max(8,Math.round((p.seg||(p.r&&p.r<.07||p.len&&p.len<.06?14:34))*(G3.q||1)));
-function g3Parts(p){const F=[],C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#b4c0cf")),cen=[p.x,p.y,p.z],sm=p.t!=="r",mk=(pts,s,sc)=>F.push({p:pts,k:p.k,c:C,sh:p.sh,in:p.in,zb:p.zb||0,light:p.light,cen,anim:p.anim,m:p.m||.18,sm:s!==undefined?s:sm,sc:sc||0});
+function g3Parts(p){const F=[],C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#b4c0cf")),cen=[p.x,p.y,p.z],sm=p.t!=="r",mk=(pts,s,sc,cn)=>F.push({p:pts,k:p.k,c:C,sh:p.sh,in:p.in,zb:p.zb||0,light:p.light,cen:cn||cen,anim:p.anim,m:p.m||.18,sm:s!==undefined?s:sm,sc:sc||0});
+ if(p.t==="a"||p.t==="s")return g3Parts2(p,mk,F);
  if(p.t==="r"){const hx=p.w/2,hz=p.d/2,hy=p.h/2,rr=Math.min(p.r==null?Math.min(hx,hz)*.18:p.r,hx*.95,hz*.95),o=p.off||[0,0,0],prof=[];
   const cs=[[hx-rr,hz-rr,0],[-(hx-rr),hz-rr,1],[-(hx-rr),-(hz-rr),2],[hx-rr,-(hz-rr),3]],K=rr>.001?4:1;
   cs.forEach(([cx,cz,q])=>{for(let i=0;i<=K;i++){const a=(q+i/K)*Math.PI/2;prof.push([cx+(rr>.001?Math.cos(a)*rr:Math.sign(cx||1)*0),cz+(rr>.001?Math.sin(a)*rr:0)])}});
@@ -43,6 +44,24 @@ function g3Parts(p){const F=[],C=g3Parse(p.c.charAt(0)==="#"?p.c:(g3c[p.c]||"#b4
   [[-h,p.r],[h,p.r2]].forEach(([a,r])=>{if(r<=0)return;const f=[];for(let i=0;i<N;i++){const t=i/N*Math.PI*2;f.push(at(mp(a,r*Math.cos(t),r*Math.sin(t))))}mk(f,false,1)});return F}
  const LA=Math.max(6,Math.round(N/3)),LO=N,P=(a,t)=>at(mp(p.ra*Math.cos(a),p.rb*Math.sin(a)*Math.cos(t),p.rb*Math.sin(a)*Math.sin(t)));
  for(let i=0;i<LA;i++){const a0=p.a0+(p.a1-p.a0)*i/LA,a1=p.a0+(p.a1-p.a0)*(i+1)/LA;for(let j=0;j<LO;j++){const t0=j/LO*Math.PI*2,t1=(j+1)/LO*Math.PI*2;mk([P(a0,t0),P(a0,t1),P(a1,t1),P(a1,t0)],true,0)}}
+ return F}
+/* annulus (ring, tube, disc with a bore; optional angular range p.ang=[a0,a1] for sectors) and tube sweep along a polyline (torus, spring, bent pipe, wire). Used by the spare part models (spi_draw_parts.js). Per-face outward reference points keep the normals right on inner walls and loops. */
+function g3Parts2(p,mk,F){const N=Math.max(8,Math.round((p.seg||36)*(G3.q||1)));
+ if(p.t==="a"){const ax=p.ax,h=p.len/2,r=p.r,ri=Math.min(p.ri,r*.98),a0=p.ang?p.ang[0]:0,a1=p.ang?p.ang[1]:Math.PI*2,full=!p.ang||Math.abs(a1-a0-Math.PI*2)<1e-6,n=Math.max(2,Math.ceil(N*(a1-a0)/(Math.PI*2))),
+   mp=(a,u,v)=>ax==="x"?[a,u,v]:ax==="y"?[u,a,v]:[u,v,a],at=v=>[v[0]+p.x,v[1]+p.y,v[2]+p.z],P=(a,rr,t)=>at(mp(a,rr*Math.cos(t),rr*Math.sin(t))),c0=at(mp(0,0,0));
+  for(let i=0;i<n;i++){const t0=a0+(a1-a0)*i/n,t1=a0+(a1-a0)*(i+1)/n,tm=(t0+t1)/2;
+   mk([P(-h,r,t0),P(-h,r,t1),P(h,r,t1),P(h,r,t0)],true,0,c0);
+   if(ri>0)mk([P(-h,ri,t0),P(-h,ri,t1),P(h,ri,t1),P(h,ri,t0)],true,0,P(0,2*ri,tm));
+   mk([P(h,ri,t0),P(h,r,t0),P(h,r,t1),P(h,ri,t1)],false,1,c0);mk([P(-h,ri,t0),P(-h,r,t0),P(-h,r,t1),P(-h,ri,t1)],false,1,c0)}
+  if(!full){[a0,a1].forEach((t,j)=>{const m=P(0,(r+ri)/2,t),side=j?[Math.cos(t+1),Math.sin(t+1)]:[Math.cos(t-1),Math.sin(t-1)];mk([P(-h,ri,t),P(-h,r,t),P(h,r,t),P(h,ri,t)],false,1,P(0,(r+ri)/2,t+(j?-.3:.3)))})}
+  return F}
+ const pts=p.pts,S=Math.max(6,Math.round((p.seg||12)*Math.max(.6,G3.q||1))),r=p.r,n=pts.length,closed=!!p.closed,sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],nrm=v=>{const l=Math.hypot(v[0],v[1],v[2])||1;return[v[0]/l,v[1]/l,v[2]/l]},dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],cr=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+ const T=pts.map((q,i)=>nrm(sub(pts[closed?(i+1)%n:Math.min(n-1,i+1)],pts[closed?(i+n-1)%n:Math.max(0,i-1)])));
+ let N0=Math.abs(T[0][1])<.9?cr(T[0],[0,1,0]):cr(T[0],[1,0,0]);N0=nrm(N0);const Nn=[N0];
+ for(let i=1;i<n;i++){let v=Nn[i-1];const d=dot(v,T[i]);v=nrm([v[0]-d*T[i][0],v[1]-d*T[i][1],v[2]-d*T[i][2]]);Nn.push(v)}
+ const ring=i=>{const B=cr(T[i],Nn[i]),o=[];for(let j=0;j<S;j++){const a=j/S*Math.PI*2,c=Math.cos(a)*r,s=Math.sin(a)*r;o.push([pts[i][0]+c*Nn[i][0]+s*B[0],pts[i][1]+c*Nn[i][1]+s*B[1],pts[i][2]+c*Nn[i][2]+s*B[2]])}return o},R=pts.map((_,i)=>ring(i)),segs=closed?n:n-1;
+ for(let i=0;i<segs;i++){const j=(i+1)%n,mid=[(pts[i][0]+pts[j][0])/2,(pts[i][1]+pts[j][1])/2,(pts[i][2]+pts[j][2])/2];for(let k=0;k<S;k++){const k2=(k+1)%S;mk([R[i][k],R[i][k2],R[j][k2],R[j][k]],true,0,mid)}}
+ if(!closed){const cap=(i,dir)=>mk(R[i].slice(),false,1,[pts[i][0]+dir*T[i][0],pts[i][1]+dir*T[i][1],pts[i][2]+dir*T[i][2]]);cap(0,1);cap(n-1,-1)}
  return F}
 function g3Parse(h){const m=/^#?([0-9a-f]{6})$/i.exec(h||"");if(m){const n=parseInt(m[1],16);return[n>>16,(n>>8)&255,n&255]}const r=/rgba?\(([^)]+)\)/.exec(h||"");if(r){const q=r[1].split(",").map(Number);return[q[0],q[1],q[2],q[3]]}return[169,184,201]}
 /* flanges with bolt heads on every nozzle, added at the free end */
@@ -97,7 +116,7 @@ function g3KeyC(n,k){const M=g3Mesh(n);M.kc=M.kc||{};if(M.kc[k])return M.kc[k];l
 const g3Cl=(v,a,b)=>v<a?a:v>b?b:v;
 function g3Init(box){const id=box.id,o=G3.cfg[id];if(!o)return;box.setAttribute("data-ok","1");const mini=!!box.dataset.mini;
  box.innerHTML=(mini?"":`<div class="g3bar"><button class="ghost" data-v="iso">Isometric</button><button class="ghost" data-v="front">Front</button><button class="ghost" data-v="side">Side</button><button class="ghost" data-v="top">Top</button><button class="ghost" data-t="spin">Auto-rotate</button><button class="ghost" data-t="xray">X-ray</button>${(G3M[o.n]||[]).some(p=>p.anim)?'<button class="ghost on" data-t="run">Moving parts</button>':""}<button class="ghost" data-v="reset">Reset</button></div>`)+
- `<div class="g3stage"><canvas class="g3cv" width="900" height="500"></canvas><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(S(o.n).tag)}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><filter id="g3glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><g class="g3s"></g></svg><div class="g3fxb"></div><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
+ `<div class="g3stage"><canvas class="g3cv" width="900" height="500"></canvas><svg viewBox="0 0 900 500" class="g3svg" role="img" aria-label="3D model of ${esc(((typeof S==="function"&&S(o.n))||{}).tag||o.title||"part")}"><defs><filter id="g3b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><filter id="g3glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e4eaf2"/></linearGradient></defs><g class="g3s"></g></svg><div class="g3fxb"></div><div class="g3side"></div></div>${mini?"":'<div class="g3cap muted"></div>'}`;
  const I=G3.inst[id]={mini:mini,vis:true,qs:1,yaw:-.62,pit:.34,zoom:mini?1.05:1,px:0,py:0,spin:mini,xray:false,run:true,t:0,drag:null,hover:null,dirty:true,last:performance.now(),pin:null,cardKey:undefined};
  const svg=box.querySelector("svg"),dirty=()=>{I.dirty=true;I.lastMove=performance.now()},views={iso:[-.62,.34],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2-.001]};
  box.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==="reset"){I.yaw=-.62;I.pit=.34;I.zoom=1;I.px=I.py=0;I.userMoved=false}else{I.yaw=views[v][0];I.pit=views[v][1]}dirty()});
