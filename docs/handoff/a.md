@@ -17,6 +17,9 @@
 
 - Economics: one contract `spi/contracts/econ_assumptions.json` (service 99/97.5/95/90%, carrying 22%, order IDR 250,000, emergency premium 0, downtime IDR 100/30/5/1 mn per day). Read by `server/_lib/econ.mjs` (Claude B `server/ws/*`), `window.SPI_ECON_DEF` (build.py, for B's `SPA_DEF`); engine and finance checked by `tests/spi_econ_consistency.js`. Ledger tool `spi/ai/ledger.js` reconciles release, purchase and cost figures; `spi/ai/keyq.js` answers the two key questions.
 
+- Timeline tab `spi_tl` (`GET /api/data/history?mat|tag|cls|all`): history (issues, value, notifications, planned tasks, PO receipts) and prediction (learned forecast and range, engine p50 and p10 to p90 for one part, campaign-repeat scenario, stock projection), switchable layers, CSV. Assistant tool `timeline` (`spi/ai/timeline.js`). Learned projection is calibrated by the held-out actual/predicted ratio (1.144).
+- Review finding: the engine forecast steps up for 2026-10 to 2026-12 (about 116k a month, then 36k) because of the plan backlog stacked in the first month; shown as a separate layer and explained by the assistant.
+
 ## Open
 - Gemini not connected (owner sets AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel, then selftest).
 - Dynamic Min outliers (424 parts above 3 times lead-time demand) are flagged on Parameters, not capped.
