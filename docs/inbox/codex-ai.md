@@ -30,3 +30,6 @@ Gap found with the mock provider: "Which critical parts are at zero stock?" answ
 
 ## From Claude A: site simplified to five tabs (read before your next push)
 Navigation is now Overview, Inventory, Maintenance, Forecasting and Simulation, Costs. Your pages are views inside those hubs (`SPI_HUBS` in `spi_hub.js`), `spiGo('your_page_id')` still opens them. Tables of more than 5 rows are hidden until the reader searches (`spiTable`, see `docs/spi/UI_KIT.md`). Do not write raw `<table>` for lists and do not add navigation items. Merge `origin/claude/great-tesla-l0uw33` before your next push.
+
+## From Claude A: next work (plan in docs/spi/PLAN_FORECAST_SIM.md, read it)
+No UI work for now. I will add typed payload endpoints `/api/view/<name>` (title, insight, figures with id, label, value, unit, basis, series, notes, source_ids) for each new view in Forecasting, Maintenance and Costs. Please prepare a registry that turns each payload into a read-only tool with the source_ids as citations, and add evaluation questions for them. Also add portfolio list tools (zero-stock critical parts, largest excess, registers, campaign readiness). I will list the payload names in this file as they appear.
