@@ -25,11 +25,11 @@ Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer no
 | C4 | codex-ai | todo | Tools and Flow B `POST /api/ai/ask` (proposals into the ledger) | M3 | spi/ai, server/ai |
 | C5 | codex-ai | todo | Batch precompute to results.sqlite; golden question evaluation; key connection guide for Vercel | M3 to M5 | spi/ai, docs/AI_ASSISTANT.md |
 | F1 | codex | done | Engine core: classify, methods, bootstrap quantiles, unit tests | M1 | spi/engine |
-| F2 | codex | doing | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
+| F2 | codex | done | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
 | F3 | codex | done | `server/engine/*` endpoints | M2 | server/engine |
-| F4 | codex | doing | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
-| F5 | codex | todo | Business case workbook, impact.json, BUSINESS_CASE.md | M4 | finance/spi |
-| F6 | codex | todo | 7-slide deck in competition format; team.json for the human | M4 to M5 | deck/spi |
+| F4 | codex | done | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
+| F5 | codex | doing | Business case workbook, impact.json, BUSINESS_CASE.md | M4 | finance/spi |
+| F6 | codex | blocked | 7-slide deck in competition format; team.json for the human | M4 to M5 | deck/spi |
 | H1 | human | todo | Import the repo in Vercel and send the URL; set AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel env vars; fill `deck/spi/team.json`; confirm deadline time zone; tell Claude A the clock | M0 to M5 | |
 
 ## Open contract questions
@@ -73,3 +73,5 @@ B | Day-2 runbook, how I will make the 3D for the real case (nothing new to buil
   6. Scenario 3D and replay (`sim3d.js`) reuse the plant 3D, so they inherit step 4.
   7. Look at every screenshot, fix, re-run steps 3 and `node tools/profile_load.js` (needs `mkdir -p /tmp/claude-0/t` once). Commit and push my branch after each working step, then write the handoff line.
 B | Known limits to tell the integrator tomorrow: more than 8 sets crowd the 3D plant and plot; a set with no parts list or nozzle table gets the generic parts from `autoGaFill` (labelled schematic); no wording or data from the first plant is in my files except the hard-coded site items in point 4 and 5.
+
+Codex Finance | 2026-11-04 | Human deferred deck; prototype first. Engine/server APIs and Business Impact ready on codex/finance. Source savings overlap correction proposed in finance/spi/savings_source_correction.patch; source owners must reconcile it.

@@ -29,13 +29,13 @@ The **4% avoidable cash storage/handling rate** is separate from the 22% economi
 
 ## Full availability programme is a separate decision
 
-The engine also calculates a complete service-policy backlog. Its gross reduction ceiling is **IDR 138,801,669,148**, while proposed priced replenishment is **IDR 252,509,001,164**. Unknown open orders, approved baseline buying and unpriced items prevent calling all of this incremental project spend. It is not charged automatically to the narrow B/C pilot and is not approved procurement. Include only the reviewed incremental fraction when modelling an availability programme.
+The engine also calculates a complete service-policy backlog. Its gross reduction ceiling is **IDR 138,662,471,817**, while proposed priced replenishment is **IDR 254,337,142,785**. Unknown open orders, approved baseline buying and unpriced items prevent calling all of this incremental project spend. It is not charged automatically to the narrow B/C pilot and is not approved procurement. Include only the reviewed incremental fraction when modelling an availability programme.
 
 The primary inventory value is readiness for the maintenance campaign, not blanket stock reduction. Historical issue campaigns are December 2025 and January 2026; the known October 2026 maintenance load has 1,123 planned items. Campaign multipliers are dated Estimates, not annual seasonality or proof of demand for each spare.
 
 ## Validation and limitations
 
-`spi/engine` is the single JavaScript calculator for forecasting and policy; `finance/spi/model.mjs` is the single JavaScript cash calculator used by the saved impact and live API. An independent hand-calculation test verifies NPV and the break-even equation. The Business Impact page changes its assumptions through a stateless API, recalculates scenarios and sensitivity, and does not mutate SQLite.
+`spi/engine` is the single JavaScript calculator for forecasting and policy; `spi/engine/businessCase.js` (re-exported by `finance/spi/model.mjs`) is the single JavaScript cash calculator used by the saved impact and live API. An independent hand-calculation test verifies NPV and the break-even equation. The Business Impact page changes its assumptions through a stateless API, recalculates scenarios and sensitivity, and does not mutate SQLite.
 
 Demand backtesting uses the last four monthly origins only for parts with at least three active months. Ties are not called wins; zero training-scale origins are unscored. Pinball loss is scaled by training mean for comparison across part units. Most of the baseline is too sparse for a defensible per-part score. The report is `finance/spi/engine_report.json`; no held-out service claim is made.
 
@@ -47,4 +47,6 @@ Forecast, optimisation, simulation, health and impact APIs run against the real 
 
 **The human deferred deck work and requested prototype focus with about ten hours remaining.** New workbook/deck rendering is not on the critical prototype path. The cash model and input register are ready for later workbook reconciliation without duplicating the calculator.
 
-Financial source snapshot generated at 2026-11-04T03:32:08.486Z (UTC). Rebuild the engine report and impact JSON when baseline data or model policy changes.
+Financial source snapshot generated at 2026-11-04T03:46:12.274Z (UTC). Rebuild the engine report and impact JSON when baseline data or model policy changes.
+
+Runtime business-case data ships as `spi/engine/impact_data.json` within the existing Vercel include pattern; `finance/spi/impact.json` is the identical review copy. Rebuild both with `node finance/spi/build_impact.mjs`.

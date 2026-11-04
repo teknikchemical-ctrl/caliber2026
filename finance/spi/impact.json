@@ -21,6 +21,7 @@
     "candidates": [
       {
         "material_no": 4300060535,
+        "descr": "POSITIONER,VALVE,DWG.978-8170,FOR LCV-10",
         "crit_max": "C",
         "qty": 128,
         "value_idr": 4266046208,
@@ -28,6 +29,7 @@
       },
       {
         "material_no": 4300041641,
+        "descr": "POSITIONER,VALVE,DWG.595-9766,FOR FCV-97",
         "crit_max": "C",
         "qty": 48,
         "value_idr": 2525652000,
@@ -35,6 +37,7 @@
       },
       {
         "material_no": 4300035187,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.274-8443,FOR ",
         "crit_max": "C",
         "qty": 29,
         "value_idr": 1397254684,
@@ -42,6 +45,7 @@
       },
       {
         "material_no": 4300071911,
+        "descr": "THERMOWELL,DWG.860-7559,FOR TEL-1476-15",
         "crit_max": "B",
         "qty": 69,
         "value_idr": 805599288,
@@ -49,6 +53,7 @@
       },
       {
         "material_no": 4100043903,
+        "descr": "TRIM SET,CONTROL VALVE,TYPE LZ113,MONEL",
         "crit_max": "C",
         "qty": 12,
         "value_idr": 545980872,
@@ -56,6 +61,7 @@
       },
       {
         "material_no": 4100037989,
+        "descr": "VALVE,GLOBE,1-1/2IN,150#,A216WCB,RF",
         "crit_max": "C",
         "qty": 121,
         "value_idr": 533655254,
@@ -63,6 +69,7 @@
       },
       {
         "material_no": 4100055093,
+        "descr": "SWITCH,LIMIT,TYPE QS260,GRAPHITE",
         "crit_max": "B",
         "qty": 90,
         "value_idr": 515836350,
@@ -70,6 +77,7 @@
       },
       {
         "material_no": 4100056408,
+        "descr": "TRANSMITTER,PRESS,TYPE FO290,SS304",
         "crit_max": "B",
         "qty": 9,
         "value_idr": 467145621,
@@ -77,6 +85,7 @@
       },
       {
         "material_no": 4100031340,
+        "descr": "TEE,3IN,SCH80,A105,SW",
         "crit_max": "B",
         "qty": 311,
         "value_idr": 411933806,
@@ -84,6 +93,7 @@
       },
       {
         "material_no": 4300063674,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.377-3855,FOR ",
         "crit_max": "B",
         "qty": 5,
         "value_idr": 388387745,
@@ -91,6 +101,7 @@
       },
       {
         "material_no": 4300073931,
+        "descr": "POSITIONER,VALVE,DWG.833-5663,FOR TCV-14",
         "crit_max": "B",
         "qty": 7,
         "value_idr": 314927067,
@@ -98,6 +109,7 @@
       },
       {
         "material_no": 4100056542,
+        "descr": "TRANSMITTER,PRESS,MODEL MC417,NBR",
         "crit_max": "B",
         "qty": 6,
         "value_idr": 253259724,
@@ -105,6 +117,7 @@
       },
       {
         "material_no": 4100002246,
+        "descr": "BEARING,ROLLER,CYL,1ROW,7217BDB",
         "crit_max": "C",
         "qty": 53,
         "value_idr": 250504182,
@@ -112,6 +125,7 @@
       },
       {
         "material_no": 4300039438,
+        "descr": "SEAT RING,VALVE,DWG.810-9979,FOR FCV-150",
         "crit_max": "C",
         "qty": 5,
         "value_idr": 236305825,
@@ -119,6 +133,7 @@
       },
       {
         "material_no": 4100054282,
+        "descr": "SWITCH,LIMIT,MODEL GE636,MONEL",
         "crit_max": "C",
         "qty": 100,
         "value_idr": 220183400,
@@ -126,6 +141,7 @@
       },
       {
         "material_no": 4300021089,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.946-5861,FOR ",
         "crit_max": "C",
         "qty": 5,
         "value_idr": 215098215,
@@ -133,6 +149,7 @@
       },
       {
         "material_no": 4300049297,
+        "descr": "RING,WEAR,DWG.969-4928,FOR PP-1758A",
         "crit_max": "C",
         "qty": 12,
         "value_idr": 166579692,
@@ -140,6 +157,7 @@
       },
       {
         "material_no": 4300063051,
+        "descr": "POSITIONER,VALVE,DWG.578-3598,FOR TCV-13",
         "crit_max": "C",
         "qty": 4,
         "value_idr": 146207108,
@@ -147,6 +165,7 @@
       },
       {
         "material_no": 4300063598,
+        "descr": "IMPELLER,DWG.742-3894,FOR PP-474A",
         "crit_max": "B",
         "qty": 1,
         "value_idr": 132296393,
@@ -154,6 +173,7 @@
       },
       {
         "material_no": 4300057046,
+        "descr": "POSITIONER,VALVE,DWG.789-7783,FOR TCV-12",
         "crit_max": "C",
         "qty": 2,
         "value_idr": 115493746,
@@ -161,6 +181,7 @@
       },
       {
         "material_no": 4100043468,
+        "descr": "TRIM SET,CONTROL VALVE,SIZE QH233,GRAPHI",
         "crit_max": "B",
         "qty": 2,
         "value_idr": 106034270,
@@ -168,6 +189,7 @@
       },
       {
         "material_no": 4100032929,
+        "descr": "FLANGE,WN,6IN,300#,SS316,RF",
         "crit_max": "B",
         "qty": 30,
         "value_idr": 84338820,
@@ -175,6 +197,7 @@
       },
       {
         "material_no": 4100057598,
+        "descr": "TRANSMITTER,DIFF.PRESS,0~10000MMH2O,HART",
         "crit_max": "C",
         "qty": 1,
         "value_idr": 66328612,
@@ -182,6 +205,7 @@
       },
       {
         "material_no": 4100060681,
+        "descr": "TRANSMITTER,TEMP,TYPE SN564,INCOLOY",
         "crit_max": "B",
         "qty": 3,
         "value_idr": 63491223,
@@ -189,6 +213,7 @@
       },
       {
         "material_no": 4300010076,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.251-1444,FOR ",
         "crit_max": "C",
         "qty": 2,
         "value_idr": 58840730,
@@ -196,6 +221,7 @@
       },
       {
         "material_no": 4100005648,
+        "descr": "SEAL,MECHANICAL,SIZE UU499,NBR",
         "crit_max": "B",
         "qty": 1,
         "value_idr": 57460414,
@@ -203,6 +229,7 @@
       },
       {
         "material_no": 4200007259,
+        "descr": "FAN,COOLING MOTOR,SIZE DE861,NBR",
         "crit_max": "B",
         "qty": 59,
         "value_idr": 52383681,
@@ -210,6 +237,7 @@
       },
       {
         "material_no": 4300067693,
+        "descr": "POSITIONER,VALVE,DWG.379-1328,FOR LCV-16",
         "crit_max": "B",
         "qty": 1,
         "value_idr": 41803508,
@@ -217,6 +245,7 @@
       },
       {
         "material_no": 4300074394,
+        "descr": "SEAT RING,VALVE,DWG.469-8754,FOR LCV-146",
         "crit_max": "C",
         "qty": 5,
         "value_idr": 38047715,
@@ -224,6 +253,7 @@
       },
       {
         "material_no": 4100048477,
+        "descr": "DIAPHRAGM,ACTUATOR,TYPE ZR602,A182F11",
         "crit_max": "C",
         "qty": 3,
         "value_idr": 35523660,
@@ -231,6 +261,7 @@
       },
       {
         "material_no": 4100031262,
+        "descr": "TEE,10IN,3000#,A234WPB,SW",
         "crit_max": "C",
         "qty": 51,
         "value_idr": 28880841,
@@ -238,6 +269,7 @@
       },
       {
         "material_no": 4100034824,
+        "descr": "VALVE,GATE,10IN,300#,A105,RF",
         "crit_max": "C",
         "qty": 3,
         "value_idr": 28032792,
@@ -245,6 +277,7 @@
       },
       {
         "material_no": 4300054961,
+        "descr": "THERMOWELL,DWG.885-6188,FOR BF-105-BRN15",
         "crit_max": "C",
         "qty": 5,
         "value_idr": 25691530,
@@ -252,6 +285,7 @@
       },
       {
         "material_no": 4300073868,
+        "descr": "COUPLING,DWG.939-2872,FOR PP-467A",
         "crit_max": "B",
         "qty": 3,
         "value_idr": 17732568,
@@ -259,6 +293,7 @@
       },
       {
         "material_no": 4100101926,
+        "descr": "ANTIRUST,SPRAY TYPE,400ML/CAN,TYPE-B",
         "crit_max": "C",
         "qty": 197,
         "value_idr": 16596265,
@@ -266,6 +301,7 @@
       },
       {
         "material_no": 4200010291,
+        "descr": "FAN,COOLING MOTOR,DWG.121-7042,FOR PP-14",
         "crit_max": "C",
         "qty": 6,
         "value_idr": 16523298,
@@ -273,6 +309,7 @@
       },
       {
         "material_no": 4100052805,
+        "descr": "SOLENOID VALVE,SIZE FG705,GRAPHITE",
         "crit_max": "B",
         "qty": 1,
         "value_idr": 12564642,
@@ -280,6 +317,7 @@
       },
       {
         "material_no": 4300060332,
+        "descr": "SEAT RING,VALVE,DWG.704-8652,FOR TCV-514",
         "crit_max": "B",
         "qty": 1,
         "value_idr": 10550540,
@@ -287,6 +325,7 @@
       },
       {
         "material_no": 4100034063,
+        "descr": "FLANGE,BLIND,4IN,150#,SS316,RF",
         "crit_max": "B",
         "qty": 3,
         "value_idr": 6076875,
@@ -294,6 +333,7 @@
       },
       {
         "material_no": 4100101639,
+        "descr": "ANTIRUST,SPRAY TYPE,500ML/CAN,TYPE-A",
         "crit_max": "C",
         "qty": 114,
         "value_idr": 5211852,
@@ -301,6 +341,7 @@
       },
       {
         "material_no": 4100091942,
+        "descr": "GREASE,COMPLEX,NLGI 2,0.4KG",
         "crit_max": "C",
         "qty": 46,
         "value_idr": 4607912,
@@ -308,6 +349,7 @@
       },
       {
         "material_no": 4100028077,
+        "descr": "PIPE,1/2IN,SCH80,P11,SMLS,6M LG",
         "crit_max": "B",
         "qty": 7,
         "value_idr": 4543826,
@@ -315,6 +357,7 @@
       },
       {
         "material_no": 4100034258,
+        "descr": "FLANGE,SO,1IN,600#,SS316,RF",
         "crit_max": "B",
         "qty": 29,
         "value_idr": 4488881,
@@ -322,6 +365,7 @@
       },
       {
         "material_no": 4300039104,
+        "descr": "TRAY VALVE,DWG.167-6339,FOR CL-890",
         "crit_max": "B",
         "qty": 18,
         "value_idr": 4374522,
@@ -329,6 +373,7 @@
       },
       {
         "material_no": 4200004765,
+        "descr": "LAMP,LED,36W,220VAC,FLOOD",
         "crit_max": "B",
         "qty": 5,
         "value_idr": 4290095,
@@ -336,6 +381,7 @@
       },
       {
         "material_no": 4100065331,
+        "descr": "GAUGE,PRESSURE,0-10KG/CM2,6IN DIAL",
         "crit_max": "B",
         "qty": 2,
         "value_idr": 4151704,
@@ -343,6 +389,7 @@
       },
       {
         "material_no": 4100031379,
+        "descr": "TEE,6IN,SCH80,A234WPB,BW",
         "crit_max": "B",
         "qty": 18,
         "value_idr": 3832128,
@@ -350,6 +397,7 @@
       },
       {
         "material_no": 4300036717,
+        "descr": "RING,WEAR,DWG.377-5729,FOR PP-1157",
         "crit_max": "B",
         "qty": 1,
         "value_idr": 3294699,
@@ -357,6 +405,7 @@
       },
       {
         "material_no": 4100064593,
+        "descr": "GAUGE,PRESSURE,0-16KG/CM2,4IN DIAL",
         "crit_max": "B",
         "qty": 2,
         "value_idr": 2436628,
@@ -364,6 +413,7 @@
       },
       {
         "material_no": 4100030223,
+        "descr": "ELBOW,90DEG,1-1/2IN,SCH40,A234WPB,BW",
         "crit_max": "C",
         "qty": 9,
         "value_idr": 2408787,
@@ -371,6 +421,7 @@
       },
       {
         "material_no": 4100108057,
+        "descr": "OIL,LUBRICANT,ISO VG 220,MINERAL,209L",
         "crit_max": "B",
         "qty": 22,
         "value_idr": 1782968,
@@ -378,6 +429,7 @@
       },
       {
         "material_no": 4100038706,
+        "descr": "VALVE,NEEDLE,1/4IN NPT,6000PSI,SS316",
         "crit_max": "C",
         "qty": 3,
         "value_idr": 1760325,
@@ -385,6 +437,7 @@
       },
       {
         "material_no": 4100029835,
+        "descr": "ELBOW,90DEG,10IN,SCH80,A234WPB,SW",
         "crit_max": "C",
         "qty": 11,
         "value_idr": 1619145,
@@ -392,6 +445,7 @@
       },
       {
         "material_no": 4100030406,
+        "descr": "ELBOW,45DEG,10IN,SCH40,A234WPB,BW",
         "crit_max": "C",
         "qty": 42,
         "value_idr": 1311618,
@@ -399,6 +453,7 @@
       },
       {
         "material_no": 4200006508,
+        "descr": "FAN,COOLING MOTOR,TYPE MT764,NBR",
         "crit_max": "B",
         "qty": 2,
         "value_idr": 1277346,
@@ -406,6 +461,7 @@
       },
       {
         "material_no": 4200006341,
+        "descr": "LAMP,LED,18W,24VDC,T8",
         "crit_max": "B",
         "qty": 3,
         "value_idr": 1137234,
@@ -413,6 +469,7 @@
       },
       {
         "material_no": 4200001644,
+        "descr": "GLAND,CABLE,TYPE LM902,NBR",
         "crit_max": "B",
         "qty": 2,
         "value_idr": 962834,
@@ -420,6 +477,7 @@
       },
       {
         "material_no": 4100001810,
+        "descr": "BEARING,ROLLER,CYL,1ROW,7212BDB",
         "crit_max": "B",
         "qty": 2,
         "value_idr": 765774,
@@ -427,6 +485,7 @@
       },
       {
         "material_no": 4200003035,
+        "descr": "TERMINAL BLOCK,SIZE AK895,NBR",
         "crit_max": "C",
         "qty": 25,
         "value_idr": 624675,
@@ -434,6 +493,7 @@
       },
       {
         "material_no": 4100102065,
+        "descr": "ANTIRUST,SPRAY TYPE,350ML/CAN,TYPE-A",
         "crit_max": "C",
         "qty": 15,
         "value_idr": 624210,
@@ -441,6 +501,7 @@
       },
       {
         "material_no": 4200000384,
+        "descr": "TERMINAL,LUG,FORK,2X4MM,CRIMP",
         "crit_max": "B",
         "qty": 93,
         "value_idr": 571578,
@@ -448,6 +509,7 @@
       },
       {
         "material_no": 4100093668,
+        "descr": "TUBE PLUG,EXCHANGER,TYPE HB648,A182F11",
         "crit_max": "B",
         "qty": 1,
         "value_idr": 566188,
@@ -455,6 +517,7 @@
       },
       {
         "material_no": 4200008235,
+        "descr": "CABLE,INSTRUMENT,4PR X 0.75MM2,ARMOURED",
         "crit_max": "C",
         "qty": 9,
         "value_idr": 384885,
@@ -462,6 +525,7 @@
       },
       {
         "material_no": 4100026344,
+        "descr": "STUDBOLT,7/8INX95MM,B7/2H",
         "crit_max": "B",
         "qty": 10,
         "value_idr": 269420,
@@ -469,6 +533,7 @@
       },
       {
         "material_no": 4100094430,
+        "descr": "TUBE PLUG,EXCHANGER,MODEL FM276,MONEL",
         "crit_max": "C",
         "qty": 1,
         "value_idr": 223352,
@@ -476,6 +541,7 @@
       },
       {
         "material_no": 4100101692,
+        "descr": "ANTIRUST,SPRAY TYPE,500ML/CAN,TYPE-B",
         "crit_max": "C",
         "qty": 4,
         "value_idr": 222004,
@@ -483,6 +549,7 @@
       },
       {
         "material_no": 4200004430,
+        "descr": "TERMINAL BLOCK,TYPE LO541,VITON",
         "crit_max": "C",
         "qty": 1,
         "value_idr": 170521,
@@ -490,6 +557,7 @@
       },
       {
         "material_no": 4200008403,
+        "descr": "CABLE,INSTRUMENT,1PR X 1.5MM2,ARMOURED",
         "crit_max": "C",
         "qty": 3,
         "value_idr": 169920,
@@ -497,6 +565,7 @@
       },
       {
         "material_no": 4100020415,
+        "descr": "O-RING,NBR,198MM ID,3.5MM CS",
         "crit_max": "B",
         "qty": 9,
         "value_idr": 153621,
@@ -504,6 +573,7 @@
       },
       {
         "material_no": 4100019942,
+        "descr": "O-RING,VITON,258MM ID,3.5MM CS",
         "crit_max": "C",
         "qty": 4,
         "value_idr": 146020,
@@ -511,6 +581,7 @@
       },
       {
         "material_no": 4100103691,
+        "descr": "TAPE,PTFE,19MMX10M",
         "crit_max": "C",
         "qty": 4,
         "value_idr": 105240,
@@ -518,6 +589,7 @@
       },
       {
         "material_no": 4200003604,
+        "descr": "TERMINAL BLOCK,MODEL SJ486,SS304",
         "crit_max": "C",
         "qty": 1,
         "value_idr": 31054,
