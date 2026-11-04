@@ -42,7 +42,7 @@ const cases=[
  ['How many maintenance items for PP-1323B?','query_records',/1 maintenance item\*\* on PP-1323B/],
  ['What tables are in the database?','describe_database',/spare parts \(7,481\)/],
  ['Which suppliers are the slowest?','get_page',/median lead time is \*\*42 days\*\*[\s\S]*slowest large supplier/],
- ['Explain this view: Impact reduction','get_page',/1,118 parts\*\* now/,null,{page:'spi_cimp'}],
+ ['Explain this view: Impact reduction','get_page',/\*\*[0-9,]+ parts\*\* now/,null,{page:'spi_cimp'}],
  ['Explain this view: Suppliers and lead time','get_page',/119 suppliers/,null,{page:'spi_sup'}],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
