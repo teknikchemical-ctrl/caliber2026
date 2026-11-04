@@ -21,6 +21,8 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 ## In progress (not finished: which files, what state)
 - Nothing half done. Next candidates: B3 Recommendations and Inventory health pages (`spi_reco.js`, `spi_health.js`).
 
+## Chemical engineering features (real data only): process connections, installed spare letters, turnaround readiness by part type, protective devices page; no system map because the data has no membership.
+
 ## Search: `spi_find` page, part panel with where used and purchasing, Show in 3D, tests/spi_ui_b_chain.js (all pass).
 
 ## Plan 3: `spi_eq` page and 15 equipment templates are in (see the brief status). Remaining: sub-item assemblies, block flow explorer, timeline, corrections.
