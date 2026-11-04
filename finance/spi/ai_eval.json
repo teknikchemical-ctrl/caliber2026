@@ -1,0 +1,743 @@
+{
+  "version": "finance-ai-eval-1.0",
+  "data_cutoff": "2026-09-30",
+  "status": "Expected deterministic evidence only. AI owner must run actual assistant routing and answer checks.",
+  "cases": [
+    {
+      "id": "fin-summary",
+      "question": "What are the cleanup NPV, capital release and recurring annual cash balance?",
+      "tool": "get_financial_summary",
+      "args": {},
+      "expected_evidence_id": "finance:get_financial_summary:1313489463",
+      "expected_facts": [
+        {
+          "metric": "phased_capital_release_idr",
+          "value": 4420131039,
+          "display": "4,420,131,039 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "cleanup_cash_npv_idr",
+          "value": 1961180417.5108416,
+          "display": "1,961,180,418 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "recurring_cash_balance_idr_year",
+          "value": -231194758.44,
+          "display": "-231,194,758 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Do not call capital release perpetual annual profit."
+      ]
+    },
+    {
+      "id": "fin-cleanup-thresholds",
+      "question": "What realisation is needed for project NPV break-even and for recurring operating break-even?",
+      "tool": "assess_cleanup_case",
+      "args": {},
+      "expected_evidence_id": "finance:assess_cleanup_case:1313489463",
+      "expected_facts": [
+        {
+          "metric": "minimum_realisation_for_npv",
+          "value": 0.14960000322094671,
+          "display": "14.96%",
+          "unit": "fraction",
+          "missing_reason": null
+        },
+        {
+          "metric": "minimum_realisation_for_recurring_cash",
+          "value": 0.6922871681859203,
+          "display": "69.23%",
+          "unit": "fraction",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "The two break-even tests must be distinguished."
+      ]
+    },
+    {
+      "id": "fin-cleanup-15",
+      "question": "If we realise 15% of the B/C candidates, what is the cleanup NPV?",
+      "tool": "assess_cleanup_case",
+      "args": {
+        "release_realisation": 0.15
+      },
+      "expected_evidence_id": "finance:assess_cleanup_case:4107477740",
+      "expected_facts": [
+        {
+          "metric": "npv_idr",
+          "value": 5215863.477040023,
+          "display": "5,215,863 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "gross_release_idr",
+          "value": 2210065519.5,
+          "display": "2,210,065,520 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "This is a conditional scenario."
+      ]
+    },
+    {
+      "id": "fin-cleanup-50",
+      "question": "What happens to NPV and recurring cash if B/C realisation is 50%?",
+      "tool": "assess_cleanup_case",
+      "args": {
+        "release_realisation": 0.5
+      },
+      "expected_evidence_id": "finance:assess_cleanup_case:548661113",
+      "expected_facts": [
+        {
+          "metric": "npv_idr",
+          "value": 4569133156.222576,
+          "display": "4,569,133,156 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "steady_cash_operating_idr_yr",
+          "value": -113324597.39999998,
+          "display": "-113,324,597 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Positive NPV does not imply positive recurring cash."
+      ]
+    },
+    {
+      "id": "fin-cleanup-half-scope",
+      "question": "With half the cleanup scope and 30% realisation, what cash release is modelled?",
+      "tool": "assess_cleanup_case",
+      "args": {
+        "scope": 0.5,
+        "release_realisation": 0.3
+      },
+      "expected_evidence_id": "finance:assess_cleanup_case:3071470266",
+      "expected_facts": [
+        {
+          "metric": "npv_idr",
+          "value": 5215863.477040023,
+          "display": "5,215,863 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "gross_release_idr",
+          "value": 2210065519.5,
+          "display": "2,210,065,520 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "S/A remain excluded."
+      ]
+    },
+    {
+      "id": "fin-cleanup-no-scope",
+      "question": "Can realisation alone break even when cleanup scope is zero?",
+      "tool": "assess_cleanup_case",
+      "args": {
+        "scope": 0
+      },
+      "expected_evidence_id": "finance:assess_cleanup_case:508287505",
+      "expected_facts": [
+        {
+          "metric": "minimum_realisation_for_npv",
+          "value": null,
+          "display": "No NPV break-even within feasible realisation range",
+          "unit": "fraction",
+          "missing_reason": "No NPV break-even within feasible realisation range"
+        },
+        {
+          "metric": "npv_break_even_attainable",
+          "value": false,
+          "display": "false boolean",
+          "unit": "boolean",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "A null threshold is not zero; say infeasible within the allowed range."
+      ]
+    },
+    {
+      "id": "fin-cleanup-opex",
+      "question": "Assume annual solution costs are IDR 200000000. What NPV and recurring cash balance result?",
+      "tool": "assess_cleanup_case",
+      "args": {
+        "annual_solution_cost_idr": 200000000
+      },
+      "expected_evidence_id": "finance:assess_cleanup_case:104274948",
+      "expected_facts": [
+        {
+          "metric": "npv_idr",
+          "value": 2710973867.5986032,
+          "display": "2,710,973,868 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "solution_annual_idr",
+          "value": 200000000,
+          "display": "200,000,000 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "steady_cash_operating_idr_yr",
+          "value": -23194758.439999998,
+          "display": "-23,194,758 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "The supplied cost is an Assumption, not a quote."
+      ]
+    },
+    {
+      "id": "fin-cleanup-capex",
+      "question": "Assume the complete one-off budget is IDR 1000000000. What NPV results?",
+      "tool": "assess_cleanup_case",
+      "args": {
+        "oneoff_solution_cost_idr": 1000000000
+      },
+      "expected_evidence_id": "finance:assess_cleanup_case:1524219409",
+      "expected_facts": [
+        {
+          "metric": "npv_idr",
+          "value": 1441180417.5108416,
+          "display": "1,441,180,418 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "solution_oneoff_idr",
+          "value": 1000000000,
+          "display": "1,000,000,000 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Replacement budget includes contingency; do not add another cost layer."
+      ]
+    },
+    {
+      "id": "fin-cleanup-discount",
+      "question": "What is the cleanup NPV at an assumed 20% discount rate?",
+      "tool": "assess_cleanup_case",
+      "args": {
+        "discount": 0.2
+      },
+      "expected_evidence_id": "finance:assess_cleanup_case:3103305042",
+      "expected_facts": [
+        {
+          "metric": "npv_idr",
+          "value": 1649284585.8339975,
+          "display": "1,649,284,586 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "The rate is an Assumption."
+      ]
+    },
+    {
+      "id": "fin-budget-site",
+      "question": "What dynamic purchase cash and priced-value fill are projected for the whole site?",
+      "tool": "forecast_inventory_budget",
+      "args": {},
+      "expected_evidence_id": "finance:forecast_inventory_budget:1313489463",
+      "expected_facts": [
+        {
+          "metric": "purchase_cash_idr",
+          "value": 425010556836.3003,
+          "display": "425,010,556,836 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "unfilled_demand_value_idr",
+          "value": 38052665625.97455,
+          "display": "38,052,665,626 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "priced_value_fill_rate",
+          "value": 0.8353341765799589,
+          "display": "83.53%",
+          "unit": "fraction",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Forward budget is not the current recommendation backlog or realised savings."
+      ]
+    },
+    {
+      "id": "fin-budget-A",
+      "question": "If demand rises 20%, what dynamic funding and fill are projected for A parts?",
+      "tool": "forecast_inventory_budget",
+      "args": {
+        "criticality": "A",
+        "demand_factor": 1.2
+      },
+      "expected_evidence_id": "finance:forecast_inventory_budget:3514013189",
+      "expected_facts": [
+        {
+          "metric": "operating_funding_idr",
+          "value": 141523644253.70416,
+          "display": "141,523,644,254 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "priced_value_fill_rate",
+          "value": 0.9019281413650891,
+          "display": "90.19%",
+          "unit": "fraction",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "No automatic S/A release."
+      ]
+    },
+    {
+      "id": "fin-budget-C-current",
+      "question": "For C parts under current limits, what purchase cash and unfilled demand value are projected?",
+      "tool": "forecast_inventory_budget",
+      "args": {
+        "criticality": "C",
+        "policy": "current"
+      },
+      "expected_evidence_id": "finance:forecast_inventory_budget:1343674094",
+      "expected_facts": [
+        {
+          "metric": "purchase_cash_idr",
+          "value": 3163045956.514592,
+          "display": "3,163,045,957 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "unfilled_demand_value_idr",
+          "value": 4771702639.512989,
+          "display": "4,771,702,640 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "A cheap under-serving policy is not a saving."
+      ]
+    },
+    {
+      "id": "fin-budget-lead",
+      "question": "If receipt lead is 20% longer, what dynamic fill and funding are projected?",
+      "tool": "forecast_inventory_budget",
+      "args": {
+        "lead_factor": 1.2
+      },
+      "expected_evidence_id": "finance:forecast_inventory_budget:2114913544",
+      "expected_facts": [
+        {
+          "metric": "operating_funding_idr",
+          "value": 451950430925.3222,
+          "display": "451,950,430,925 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "priced_value_fill_rate",
+          "value": 0.8194166428383658,
+          "display": "81.94%",
+          "unit": "fraction",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Lead stress changes receipt timing only, not a recalibrated ROP."
+      ]
+    },
+    {
+      "id": "fin-budget-price",
+      "question": "Assume unit prices rise 20%. What does the workbook-policy budget show?",
+      "tool": "forecast_inventory_budget",
+      "args": {
+        "price_factor": 1.2,
+        "policy": "workbook"
+      },
+      "expected_evidence_id": "finance:forecast_inventory_budget:3749398345",
+      "expected_facts": [
+        {
+          "metric": "purchase_cash_idr",
+          "value": 294907712523.9637,
+          "display": "294,907,712,524 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "closing_stock_idr",
+          "value": 784103304928.437,
+          "display": "784,103,304,928 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Price revaluation is not profit or a quoted supplier price."
+      ]
+    },
+    {
+      "id": "fin-availability-full",
+      "question": "What verified annual operational benefit is required to justify the full current replenishment proposal?",
+      "tool": "assess_availability_funding",
+      "args": {},
+      "expected_evidence_id": "finance:assess_availability_funding:1313489463",
+      "expected_facts": [
+        {
+          "metric": "procurement_funding_idr",
+          "value": 253783444465,
+          "display": "253,783,444,465 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "required_annual_operational_benefit_idr",
+          "value": 81094491750.04343,
+          "display": "81094491750.04343 IDR/year",
+          "unit": "IDR/year",
+          "missing_reason": null
+        },
+        {
+          "metric": "required_avoided_hours_year",
+          "value": null,
+          "display": "Not in baseline data",
+          "unit": "hours/year",
+          "missing_reason": "Required evidence or feasible denominator is unavailable"
+        }
+      ],
+      "required_interpretation": [
+        "A required benefit is not an expected benefit; hours are unknown without margin."
+      ]
+    },
+    {
+      "id": "fin-availability-half",
+      "question": "What funding and annual benefit hurdle result from executing half the current replenishment proposal?",
+      "tool": "assess_availability_funding",
+      "args": {
+        "execution_share": 0.5
+      },
+      "expected_evidence_id": "finance:assess_availability_funding:4165863644",
+      "expected_facts": [
+        {
+          "metric": "procurement_funding_idr",
+          "value": 126891722232.5,
+          "display": "126,891,722,233 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "required_annual_operational_benefit_idr",
+          "value": 40817824210.68758,
+          "display": "40817824210.68758 IDR/year",
+          "unit": "IDR/year",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Do not net the cleanup reduction ceiling against procurement."
+      ]
+    },
+    {
+      "id": "fin-availability-margin",
+      "question": "Assume contribution margin is IDR 100000000 per hour. What avoided-hour threshold would justify availability funding?",
+      "tool": "assess_availability_funding",
+      "args": {
+        "contribution_margin_idr_hour": 100000000
+      },
+      "expected_evidence_id": "finance:assess_availability_funding:2405958598",
+      "expected_facts": [
+        {
+          "metric": "required_avoided_hours_year",
+          "value": 810.9449175004343,
+          "display": "810.9449175004343 hours/year",
+          "unit": "hours/year",
+          "missing_reason": null
+        },
+        {
+          "metric": "contribution_margin_idr_hour",
+          "value": 100000000,
+          "display": "100000000 IDR/hour",
+          "unit": "IDR/hour",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "This margin is explicitly hypothetical, not plant data."
+      ]
+    },
+    {
+      "id": "fin-availability-hours",
+      "question": "Assume margin IDR 100000000 per hour and 100 avoided hours per year. What NPV results?",
+      "tool": "assess_availability_funding",
+      "args": {
+        "contribution_margin_idr_hour": 100000000,
+        "avoided_downtime_hours_year": 100
+      },
+      "expected_evidence_id": "finance:assess_availability_funding:3683266423",
+      "expected_facts": [
+        {
+          "metric": "assumed_annual_operational_benefit_idr",
+          "value": 10000000000,
+          "display": "10000000000 IDR/year",
+          "unit": "IDR/year",
+          "missing_reason": null
+        },
+        {
+          "metric": "npv_idr",
+          "value": -256279731978.3698,
+          "display": "-256,279,731,978 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Do not add a second generic annual benefit."
+      ]
+    },
+    {
+      "id": "fin-validation-holdout",
+      "question": "Does the out-of-sample policy test show better fill with less stock?",
+      "tool": "get_policy_validation",
+      "args": {},
+      "expected_evidence_id": "finance:get_policy_validation:2046851029",
+      "expected_facts": [
+        {
+          "metric": "workbook_fill_rate",
+          "value": 0.6657910600442065,
+          "display": "66.58%",
+          "unit": "fraction",
+          "missing_reason": null
+        },
+        {
+          "metric": "workbook_average_stock_idr",
+          "value": 682302259521.75,
+          "display": "682,302,259,522 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "dynamic_fill_rate",
+          "value": 0.6892205396123705,
+          "display": "68.92%",
+          "unit": "fraction",
+          "missing_reason": null
+        },
+        {
+          "metric": "dynamic_average_stock_idr",
+          "value": 699833682481.75,
+          "display": "699,833,682,482 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Conditional snapshot-start simulation; do not claim historical savings."
+      ]
+    },
+    {
+      "id": "fin-validation-in-sample",
+      "question": "Show the full-history in-sample current, workbook and dynamic policy service comparison.",
+      "tool": "get_policy_validation",
+      "args": {
+        "sample": "in_sample"
+      },
+      "expected_evidence_id": "finance:get_policy_validation:1261028883",
+      "expected_facts": [
+        {
+          "metric": "current_fill_rate",
+          "value": 0.3801573059341674,
+          "display": "38.02%",
+          "unit": "fraction",
+          "missing_reason": null
+        },
+        {
+          "metric": "workbook_fill_rate",
+          "value": 0.7445422853597532,
+          "display": "74.45%",
+          "unit": "fraction",
+          "missing_reason": null
+        },
+        {
+          "metric": "dynamic_fill_rate",
+          "value": 0.9564712723306819,
+          "display": "95.65%",
+          "unit": "fraction",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "State in-sample explicitly."
+      ]
+    },
+    {
+      "id": "fin-rank-review",
+      "question": "Which three B/C candidates have the highest marginal review value, and what review-cost limits are supported?",
+      "tool": "rank_cleanup_candidates",
+      "args": {
+        "limit": 3
+      },
+      "expected_evidence_id": "finance:rank_cleanup_candidates:1946684545",
+      "expected_facts": [
+        {
+          "metric": "material_4300060535_maximum_review_cost_idr",
+          "value": 1132668026.593993,
+          "display": "1,132,668,027 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "material_4300060535_marginal_npv_idr",
+          "value": null,
+          "display": "Review cost Not in baseline data",
+          "unit": "IDR",
+          "missing_reason": "Review cost Not in baseline data"
+        },
+        {
+          "metric": "material_4300041641_maximum_review_cost_idr",
+          "value": 670580000.1271744,
+          "display": "670,580,000 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "material_4300041641_marginal_npv_idr",
+          "value": null,
+          "display": "Review cost Not in baseline data",
+          "unit": "IDR",
+          "missing_reason": "Review cost Not in baseline data"
+        },
+        {
+          "metric": "material_4300035187_maximum_review_cost_idr",
+          "value": 370981847.9245815,
+          "display": "370,981,848 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "material_4300035187_marginal_npv_idr",
+          "value": null,
+          "display": "Review cost Not in baseline data",
+          "unit": "IDR",
+          "missing_reason": "Review cost Not in baseline data"
+        }
+      ],
+      "required_interpretation": [
+        "Actual review cost is unknown; marginal NPV stays null.",
+        "Fixed programme costs are excluded; no disposal approval."
+      ]
+    },
+    {
+      "id": "fin-rank-cost",
+      "question": "Rank three cleanup candidates assuming a one-off review cost of IDR 500000 per material.",
+      "tool": "rank_cleanup_candidates",
+      "args": {
+        "limit": 3,
+        "review_cost_per_material_idr": 500000
+      },
+      "expected_evidence_id": "finance:rank_cleanup_candidates:829610114",
+      "expected_facts": [
+        {
+          "metric": "material_4300060535_maximum_review_cost_idr",
+          "value": 1132668026.593993,
+          "display": "1,132,668,027 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "material_4300060535_marginal_npv_idr",
+          "value": 1132168026.593993,
+          "display": "1,132,168,027 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "material_4300041641_maximum_review_cost_idr",
+          "value": 670580000.1271744,
+          "display": "670,580,000 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "material_4300041641_marginal_npv_idr",
+          "value": 670080000.1271744,
+          "display": "670,080,000 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "material_4300035187_maximum_review_cost_idr",
+          "value": 370981847.9245815,
+          "display": "370,981,848 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        },
+        {
+          "metric": "material_4300035187_marginal_npv_idr",
+          "value": 370481847.9245815,
+          "display": "370,481,848 IDR",
+          "unit": "IDR",
+          "missing_reason": null
+        }
+      ],
+      "required_interpretation": [
+        "Review cost is an explicit Assumption; no autonomous release."
+      ]
+    }
+  ],
+  "rejection_cases": [
+    {
+      "tool": "assess_availability_funding",
+      "args": {
+        "avoided_downtime_hours_year": 100
+      },
+      "reason": "Hours need an explicit hypothetical contribution margin"
+    },
+    {
+      "tool": "assess_availability_funding",
+      "args": {
+        "annual_operational_benefit_idr": 1,
+        "contribution_margin_idr_hour": 1,
+        "avoided_downtime_hours_year": 1
+      },
+      "reason": "Generic annual benefit cannot be added to margin times hours"
+    },
+    {
+      "tool": "assess_cleanup_case",
+      "args": {
+        "release_realisation": 1.1
+      },
+      "reason": "Realisation cannot exceed one"
+    }
+  ]
+}

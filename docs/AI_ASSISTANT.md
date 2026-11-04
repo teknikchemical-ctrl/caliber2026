@@ -120,3 +120,11 @@ Each part is committed atomically with its reasoning, proposed inputs, selected 
 The combined AI and Codex Fin snapshot is published as `spi/ai/results.sqlite.gz` because the full SQLite file exceeds GitHub's single-file limit. Claude A must run `node spi/ai/restore_results.js` before Vercel packages the function. It verifies the baseline and file checksums, then creates `spi/db/results.sqlite`. An existing different results file is protected; preserve or merge it before restoring. `spi/ai/results_manifest.json` records the source, counts and mock-only status. This snapshot covers all 7,481 baseline materials and does not verify real Gemini.
 
 The health response includes `one_word_result: "READY"` only after a valid model response (or the explicitly labelled mock response). Check this field with the responding model and deployed commit, rather than treating key presence as a successful AI connection.
+
+### Follow-up questions and chart answers
+
+Try `Describe material 4100000129`, then `Show its last 6 months of consumption`, then `Now forecast it`. The assistant retains that material for the follow-up. Naming another material or equipment tag changes the context. The page can also pass the selected material. Context selects read-only tools; it never changes database records.
+
+History, on-hand/Min/Max, matching-material issue counts, location indicators, campaigns, maintenance, savings and portfolio counts use chart values taken directly from tool results. Rules value projections are labelled Estimates and cover priced parts only. Material forecast lines and p10 to p90 bands come from the deterministic engine. The model cannot supply plotted numbers. Accepting a proposed adjustment validates it again and reruns the engine before redrawing. A missing value is not replaced with an invented zero.
+
+The old assistant panel uses the same service, normalises its chat history and supports its Stop action. Its footer identifies the provider used for the last answer. A working mock or rules answer does not verify Gemini. Database descriptions and notification text are untrusted source material; they are not instructions to the assistant. This is retrieval and reasoning over the database, not model training.

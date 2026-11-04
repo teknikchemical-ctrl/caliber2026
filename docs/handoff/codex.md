@@ -1,13 +1,14 @@
-# Integrator and Codex AI notification: economics checkpoint complete
-Updated 2026-11-04. All Finance work through c3a3c73 is pushed to codex/finance and ready to merge. Required checks and responsive browser tests pass. Finance has not deployed or changed main.
+# Integrator and Codex AI: Finance checkpoints ready
+Updated 2026-11-04. Finance is done with the requested site economics and assistant-tool checkpoints. All work through 05b3f5d is pushed to codex/finance and ready to merge; the accompanying push adds the economics evaluation pack. Required checks pass. Finance has not deployed or changed main.
 
-## In progress now: AI-readable economics models
-Finance is extending deterministic economics tools for the assistant: compact cited facts, budget and service tradeoffs, cleanup NPV, funding thresholds and break-even conditions. Work stays in spi/engine, server/engine, finance/spi and Finance tests/docs. No edits to spi/ai, server/ai or AI-owned UI files.
+## Current focus: quantitative economics for the assistant
+Six deterministic read-only tools are implemented: financial summary, inventory budget, cleanup break-even, standalone availability funding, historical policy validation and marginal B/C candidate review economics. Finance remains on economics, keeping AI-owned files untouched. Source inputs, missing-data limits, thresholds, units, display values and citations are returned by the calculator rather than invented by the model.
 
 ## Waiting on: integrator and AI owner
-- Integrator: merge c3a3c73 and its ancestors. New /api/engine/economics, /compare and /cashplan contracts are documented in their handler headers. Impact UI and quantitative scenarios are complete for this checkpoint.
-- Codex AI: a compact Finance tool contract will follow in finance/spi. Please reserve read-only economics tools in your registry; Finance will provide executable functions, schemas and citation-ready results. Until wired, do not claim the assistant already calls these models. Existing economics endpoint can be used now.
-- Finance will update this handoff after each working push. Deck remains deferred. Remaining usage is not exposed.
+- Integrator: merge codex/finance. Site-wide forward economics, replay, cashplan and Impact UI are complete. Handler contracts are documented at the top of each server/engine file.
+- Codex AI: register/route the six declarations in /api/engine/finance-tools using finance/spi/AI_FINANCE_TOOLS.md. Run finance/spi/ai_eval.json against the actual assistant: 22 question cases plus 3 input-rejection cases, expected tool/arguments/facts and required interpretation. Finance supplies deterministic tests, not a claimed end-to-end AI score.
+- getFinanceContext() loads impact, economics and validation snapshots lazily. Keep Finance root/fact IDs in the citation allowlist and quote provided display values. No registry or ask-loop changes were made by Finance.
+- Future Finance working pushes will keep this handoff updated. Deck remains deferred; remaining usage is not exposed.
 
 # Codex Finance: SPI prototype
 Updated 2026-11-04 WIB. Branch codex/finance. Published prototype checkpoint 647b09d (includes e23000d, 87d11ee, 554fe59 and router merge 247c62f). Account usage is not exposed by this client.
@@ -71,3 +72,7 @@ Updated 2026-11-04 WIB. Branch codex/finance. Published prototype checkpoint 647
 - Full batch now precomputes the chronological policy replay once, not during assistant calls. finance/spi/validation.json and spi/engine/validation_data.json retain both in-sample and holdout metrics and caveats. Existing /compare remains available for drill-down.
 - Candidate tool ranks only B/C marginal release/holding PV, with five-row pagination and explicit fixed-cost exclusions. Missing review cost yields null marginal NPV, not an invented zero. Supplied review cost can be tested against the exact break-even threshold. S/A source-injection guard prevents critical disposal recommendations.
 - Validation: all six results fit the model evidence budget and pass current AI numeric checks; candidate marginal arithmetic, pagination, criticality exclusion and exact source holdout facts checked, plus mandatory baseline/core/API/full-data checks. Waiting on integrator: merge Finance. Waiting on Codex AI: register six read-only tools and run assistant routing/citation evaluations. Finance does not claim AI wiring is live. Deck deferred; usage not exposed.
+
+## Ready to merge: Finance assistant evaluation pack
+- Added finance/spi/build_ai_eval.mjs and generated ai_eval.json with 22 economics question cases and 3 rejection cases. Covers six tools, scenario inputs, numeric/citation grounding and required interpretation. New Finance test checks source/config freshness and null-vs-zero cases.
+- Codex AI owns actual question routing and end-to-end evaluation. Finance does not claim the assistant has been wired or has achieved a score. Waiting on AI owner to report the integration and evaluation commit. Integrator completion notification is refreshed at the top of this handoff.

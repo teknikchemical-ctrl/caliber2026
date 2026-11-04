@@ -10,6 +10,11 @@
   "M3 17l5-6 4 3 5-8 4 4M3 21h18M3 3v18"
  ],
  [
+  "spi_val",
+  "Method and validation",
+  "M5 12l4 4 10-10M4 20h16"
+ ],
+ [
   "spi_loc",
   "Locations and equipment",
   "M4 20V9l8-5 8 5v11M9 20v-6h6v6"
@@ -50,7 +55,7 @@
   "M4 20V10M10 20V4M16 20v-7M22 20H2"
  ],
  [
-  "spi_scn",
+  "spi_sim",
   "Scenario simulator",
   "M5 4v16M5 6h9l-2 3 2 3H5M17 20l3-3-3-3M12 17h8"
  ],
@@ -63,6 +68,11 @@
   "spi_impact",
   "Business impact",
   "M12 3v18M17 7H9.500a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"
+ ],
+ [
+  "spi_ingest",
+  "Documents and log",
+  "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7"
  ],
  [
   "spi_arch",
