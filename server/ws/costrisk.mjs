@@ -18,12 +18,14 @@ export function portfolioParts(db, sc) {
   const ty = list(sc.type).map((x) => x.toUpperCase()); if (ty.length) { w.push(`t.item_type in (${ty.map(() => "?").join(",")})`); a.push(...ty); }
   const dc = list(sc.dclass); if (dc.length) { w.push(`p.demand_class in (${dc.map(() => "?").join(",")})`); a.push(...dc); }
   if (sc.q) { w.push("t.descr like ?"); a.push("%" + String(sc.q).slice(0, 60) + "%"); }
-  return db.prepare(`select p.material_no, t.descr, t.item_type, t.mrp_type, t.unit, p.lt_p90, p.supplier_count, p.months_since_last, p.last_issue, coalesce(p.crit_max,'C') crit, p.demand_class, p.stock, p.min_qty, p.max_qty, p.unit_price_idr price, p.lt_median, p.total_qty, p.n_issues,
+  return db.prepare(`select p.material_no, (select mu from ml_part x where x.material_no=p.material_no) ml_mu, (select sd from ml_part x where x.material_no=p.material_no) ml_sd, (select p_any from ml_part x where x.material_no=p.material_no) ml_p, t.descr, t.item_type, t.mrp_type, t.unit, p.lt_p90, p.supplier_count, p.months_since_last, p.last_issue, coalesce(p.crit_max,'C') crit, p.demand_class, p.stock, p.min_qty, p.max_qty, p.unit_price_idr price, p.lt_median, p.total_qty, p.n_issues,
     (select coalesce(sum(qty*qty),0) from demand_month d where d.material_no = p.material_no) sq from part_profile p join material t using(material_no) where ${w.join(" and ")}`).all(...a);
 }
 /* one part under one policy: yearly figures */
+/* learned demand (ml_part, Claude A's model) is used when the part has history or a likely issue; history otherwise. Set A.use_ml=false for history only. */
+export const useMl = (p, A) => A.use_ml !== false && p.ml_mu != null && ((p.total_qty || 0) > 0 || (p.ml_p || 0) >= 0.5);
 export function evalPart(p, pol, A) {
-  const f = A.demand_factor || 1, mu = (p.total_qty || 0) / M17 * f, varM = Math.max(0, (p.sq || 0) / M17 - ((p.total_qty || 0) / M17) ** 2) * f * f, sd = Math.sqrt(varM);
+  const f = A.demand_factor || 1, ml = useMl(p, A), mu = ml ? p.ml_mu * f : (p.total_qty || 0) / M17 * f, varM = ml ? (p.ml_sd * f) ** 2 : Math.max(0, (p.sq || 0) / M17 - ((p.total_qty || 0) / M17) ** 2) * f * f, sd = Math.sqrt(varM);
   const L = ((p.lt_median || A.lead_default) + (A.lead_delay_days || 0)) / MD, muL = mu * L, sdL = sd * Math.sqrt(L), D = mu * 12;
   let rop, max; if (pol.mode === "fixed") { rop = pol.rop; max = Math.max(pol.max, pol.rop); } else if (pol.mode === "current") { rop = p.min_qty || 0; max = Math.max(p.max_qty || 0, rop); } else if (pol.mode === "scale") { const k = pol.scale[p.crit] ?? 1; rop = Math.round((p.min_qty || 0) * k); max = Math.max(Math.round((p.max_qty || 0) * k), rop); }
   else { const z = zOf(pol.service[p.crit] ?? 0.95), eoq = p.price && D > 0 ? Math.sqrt(2 * D * A.order_cost_idr / (p.price * A.carrying_rate)) : mu; rop = D > 0 ? Math.ceil(muL + z * sdL) : 0; max = D > 0 ? Math.ceil(rop + Math.max(1, eoq, mu)) : 0; }

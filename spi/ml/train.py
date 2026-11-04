@@ -48,6 +48,13 @@ for fl, start, cyc in q("select funcloc, start_of_cycle, cast(cycle_months as in
 plan = np.zeros((P, len(ALL)))
 for mat, fl in q("select material_no, funcloc from part_equipment"):
     if mat in pid and fl in occ: plan[pid[mat]] += occ[fl]
+# failure signal: notifications per month on the part's locations (history only)
+nloc = defaultdict(lambda: np.zeros(T))
+for fl, m in q("select funcloc, substr(notif_date,1,7) from notification"):
+    if m in IDX and IDX[m] < T: nloc[fl][IDX[m]] += 1
+notif = np.zeros((P, T))
+for mat, fl in q("select material_no, funcloc from part_equipment"):
+    if mat in pid and fl in nloc: notif[pid[mat]] += nloc[fl]
 site_load = sum(occ.values()) if occ else np.zeros(len(ALL))
 base_load = np.median(site_load[T:]) if len(site_load) > T else np.median(site_load)
 hist_iss = np.array([r[0] for r in q("select count(*) from movement group by month order by month")], float)
@@ -71,9 +78,9 @@ def feats(t, h):
     since = np.where(act.any(1), np.argmax(act[:, ::-1], 1), 24)  # months since the last issue (24 = never)
     f += [np.minimum(since, 24) / 24, act.sum(1) / max(t, 1), np.log1p(past.sum(1)) / 6]
     tgt = t + h - 1
-    f += [np.log1p(plan[:, tgt]) / 3, np.full(P, camp[tgt]), np.full(P, h / 12)]
+    f += [np.log1p(plan[:, tgt]) / 3, np.full(P, camp[tgt]), np.full(P, h / 12), np.log1p(notif[:, max(0, t - 3):t].sum(1)) / 3, np.log1p(notif[:, :t].sum(1)) / 5]
     out = np.column_stack(f + [static]); return np.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0)
-DNAMES = ["log use last 1 m", "active share last 1 m", "log use last 3 m", "active share last 3 m", "log use last 6 m", "active share last 6 m", "log use last 12 m", "active share last 12 m", "months since last issue", "active share to date", "log use to date", "log planned tasks in target month", "campaign month", "horizon"] + SNAMES
+DNAMES = ["log use last 1 m", "active share last 1 m", "log use last 3 m", "active share last 3 m", "log use last 6 m", "active share last 6 m", "log use last 12 m", "active share last 12 m", "months since last issue", "active share to date", "log use to date", "log planned tasks in target month", "campaign month", "horizon", "failure notifications last 3 m", "failure notifications to date"] + SNAMES
 
 def dataset(origins, hs, last_target):
     X, y, z = [], [], []
@@ -208,6 +215,17 @@ try:
     con.executemany("insert or replace into data_dictionary values (?,?,?,?)", dd)
     for t in ("ml_model", "ml_eval", "ml_forecast", "ml_flag"):
         con.execute("update data_dictionary set rows=(select count(*) from " + t + ") where table_name=? and column_name=''", (t,))
+except sqlite3.OperationalError: pass
+# per-part summary used by every planner endpoint (Claude B's ws tools read it through portfolioParts)
+con.executescript("drop table if exists ml_part; create table ml_part (material_no integer primary key, mu real, sd real, p_any real, expected_12m real)")
+agg = {}
+for mat, p, e, lo, hi in con.execute("select material_no, p_issue, expected_qty, qty_if_issued_low, qty_if_issued_high from ml_forecast"):
+    m = (lo + hi) / 2; sdq = (hi - lo) / 2.56; a = agg.setdefault(mat, [0.0, 0.0, 1.0])
+    a[0] += e; a[1] += p * (1 - p) * m * m + p * sdq * sdq; a[2] *= (1 - p)
+con.executemany("insert into ml_part values (?,?,?,?,?)", [(k, v[0] / 12, (v[1] / 12) ** 0.5, 1 - v[2], v[0]) for k, v in agg.items()])
+try:
+    con.execute("delete from data_dictionary where table_name='ml_part'")
+    con.executemany("insert or replace into data_dictionary values (?,?,?,?)", [("ml_part", "", "Learned demand per part: monthly mean, monthly spread, chance of any issue in 12 months", len(agg)), ("ml_part", "mu", "Learned mean demand per month (Estimate)", None), ("ml_part", "sd", "Learned spread of monthly demand (Estimate)", None), ("ml_part", "p_any", "Chance of at least one issue in the next 12 months", None)])
 except sqlite3.OperationalError: pass
 con.commit(); con.execute("vacuum"); con.close()
 print(json.dumps({k: meta[k] for k in ("trained_rows", "brier_model", "brier_base_rate", "top10_capture", "auc_model", "calibration_factor")}), "| eval:", [(e[0], round(e[2], 3), round(e[3], 3), round(e[4], 3)) for e in evals], "| forecast rows", len(rows), "| flags", len(flags))

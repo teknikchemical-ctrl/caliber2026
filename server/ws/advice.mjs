@@ -6,7 +6,7 @@
 //   Position (stock + open orders) at or below the reorder point: order now. Position reaches the reorder point inside the horizon: order by (date the position reaches it minus the lead time). Otherwise no order in the horizon.
 import { openDb, json, fail, guard, body, num, list, fig, pay, CUTOFF } from "./_lib.mjs";
 import { ECON } from "../_lib/econ.mjs";
-import { evalPart, portfolioParts } from "./costrisk.mjs";
+import { evalPart, portfolioParts, useMl } from "./costrisk.mjs";
 const P = (v) => (typeof v === "string" ? (() => { try { return JSON.parse(v); } catch { return {}; } })() : v || {}), MD = 30.4375;
 const phi = (z) => Math.exp(-z * z / 2) / Math.sqrt(2 * Math.PI);
 const Phi = (z) => { const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = phi(z), p = d * t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429)))); return z >= 0 ? 1 - p : p; };
@@ -17,7 +17,7 @@ const addDays = (d, n) => new Date(Date.parse(d) + n * 864e5).toISOString().slic
 export function impacts(e, p, A) { const c = p.crit || "C", price = p.price || 0, dh = e.events * (A.downtime_share[c] ?? 0) * (A.hours_per_stockout[c] || 0);
   return { emergency_orders: e.events, emergency_cost: e.shortUnits * price * A.emergency_premium, purchase_carry: e.hold + e.order, working_capital: e.value, downtime_hours: dh, downtime_cost: dh * (A.downtime_idr_h[c] || 0) }; }
 export function advise(p, o, A) {
-  const f = A.demand_factor || 1, mu = p.mu_override != null ? p.mu_override : (p.total_qty || 0) / 17 * f, sd = p.sd_override != null ? p.sd_override : Math.sqrt(Math.max(0, (p.sq || 0) / 17 - ((p.total_qty || 0) / 17) ** 2)) * f, crit = p.crit || "C";
+  const f = A.demand_factor || 1, ml = useMl(p, A), mu = p.mu_override != null ? p.mu_override : ml ? p.ml_mu * f : (p.total_qty || 0) / 17 * f, sd = p.sd_override != null ? p.sd_override : ml ? p.ml_sd * f : Math.sqrt(Math.max(0, (p.sq || 0) / 17 - ((p.total_qty || 0) / 17) ** 2)) * f, crit = p.crit || "C";
   if (p.mu_override != null) { p = { ...p, total_qty: mu * 17 / f, sq: (sd * sd / (f * f) + (mu / f) ** 2) * 17 }; }
   const leadD = (o.lead === "p90" ? (p.lt_p90 || p.lt_median) : Number(o.lead) > 0 ? Number(o.lead) : p.lt_median) || A.lead_default, L = leadD / MD, muL = mu * L, sdL = sd * Math.sqrt(L), svc = (o.service || {})[crit] ?? ECON.service[crit], z = zOf(svc);
   const price = p.price || 0, D = mu * 12, eoq = price && D > 0 ? Math.sqrt(2 * D * A.order_cost_idr / (price * A.carrying_rate)) : mu, pos = (p.stock || 0) + (p.on_order || 0), H = o.horizon, cur = evalPart(p, { mode: "current" }, A);
@@ -53,7 +53,7 @@ export default guard(async (req, res) => {
     if (!scope) return fail(res, 404, "This location is not in the baseline data."); mats = db.prepare("select material_no from bom where funcloc = ?").all(fl).map((r) => r.material_no); }
   if (!mats.length && !all) return fail(res, 400, "Choose a part, an equipment set or a location.");
   const rows = []; if (all) { const on = Object.fromEntries(db.prepare("select material_no, sum(qty) q from po_line where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q])); portfolioParts(db, { crit: i.crit, type: i.type ? [String(i.type).toUpperCase()] : [], q: i.q }).forEach((p) => rows.push({ ...p, on_order: on[p.material_no] || 0 })); } else for (let k = 0; k < mats.length; k += 500) { const ch = mats.slice(k, k + 500); rows.push(...db.prepare(`select p.material_no, t.descr, t.unit, t.mrp_type, t.item_type, coalesce(p.crit_max,'C') crit, p.demand_class, p.stock, p.min_qty, p.max_qty, p.unit_price_idr price, p.lt_median, p.lt_p90, p.supplier_count, p.total_qty, p.n_issues,
-    (select coalesce(sum(qty*qty),0) from demand_month d where d.material_no = p.material_no) sq, (select coalesce(sum(qty),0) from po_line o where o.material_no = p.material_no and o.po_delivery > ?) on_order
+    (select coalesce(sum(qty*qty),0) from demand_month d where d.material_no = p.material_no) sq, (select coalesce(sum(qty),0) from po_line o where o.material_no = p.material_no and o.po_delivery > ?) on_order, (select mu from ml_part x where x.material_no=p.material_no) ml_mu, (select sd from ml_part x where x.material_no=p.material_no) ml_sd, (select p_any from ml_part x where x.material_no=p.material_no) ml_p
     from part_profile p join material t using(material_no) where p.material_no in (${ch.map(() => "?").join(",")})`).all(CUTOFF, ...ch)); }
   const o = { cap: String(i.cap) === "1", release_idle: String(i.release_idle) === "1", apply: list(i.apply).map((x) => x.toUpperCase()), horizon: H, cover, lead: i.lead || "median", service: { ...ECON.service, ...P(i.service) } };
   if (i.mu != null && i.mu !== "" && rows.length === 1) { rows[0].mu_override = Number(i.mu); rows[0].sd_override = Number(i.sd) || 0; }

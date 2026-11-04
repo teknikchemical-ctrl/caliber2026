@@ -43,7 +43,7 @@ function cvDraw(){const O=document.getElementById("wso_cv"),o=CV.d.outputs,mx=Ma
  wsCard("From releasable stock to the plan",`<div class="ws-bridge">${bridge}</div>`,"Each part is counted in one category only")+
  `<div class="ws-two">${wsCard("Release and cash by month",ph)}${wsCard("Largest releases in the plan",`<div class="ws-list">${o.top.slice(0,8).map(x=>wsPartRow(x,wsIdr(x.realisable))).join("")||'<p class="muted">Nothing selected.</p>'}</div>`)}</div>`}
 /* ===================== C3 Purchase plan ===================== */
-const CB={crit:[],type:"",policy:"service",service:{S:0.98,A:0.95,B:0.9,C:0.85},horizon:6,budget:"",d:null,limit:40};
+const CB={crit:[],type:"",policy:"service",service:(typeof SPI_ECON_DEF!=="undefined"&&SPI_ECON_DEF.service?{...SPI_ECON_DEF.service}:{S:0.99,A:0.975,B:0.95,C:0.9}),horizon:6,budget:"",d:null,limit:40};
 spiRegister("spi_cbuy","Purchase plan",async host=>{host.innerHTML=wsFrame("cb","Purchase plan","See which parts reach their reorder point in the months ahead, how much to order, the latest date to place each order and the cash needed per month. Set a monthly budget to see which orders it funds, with S and A parts funded first.",`<div id="cb_in"></div>`);SPIWS.run.cbuy=async i=>{Object.assign(CB,i);cbInputs();return cbRun()};cbInputs();cbRun()});
 function cbInputs(){const e=document.getElementById("cb_in");if(!e)return;e.innerHTML=wsField("Stocking policy",wsChips("Policy",[["current","Current Min and Max"],["service","Calculated from service targets"]],CB.policy,"cbSet('policy',",true))+
  (CB.policy==="service"?["S","A","B","C"].map(c=>wsField("Service target, criticality "+c,wsRange(0.5,0.995,0.005,CB.service[c],`CB.service.${c}=+this.value;cbRun()`,"(this.value*100).toFixed(1)+'%'"))).join(""):"")+
