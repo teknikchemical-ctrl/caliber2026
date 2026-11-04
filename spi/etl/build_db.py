@@ -40,6 +40,9 @@ f["parent"] = None
 f["has_bom"] = f.funcloc.isin(B["Functional Loc."]).astype(int)
 dups = int(f.funcloc.duplicated().sum()); f = f.drop_duplicates("funcloc")
 if dups: dq("funcloc", "*", "duplicate location", "warn", f"{dups} duplicates", "kept first")
+dq("funcloc", "criticality", "criticality code order is not verified by the case owner", "warn", "codes S, A, B, C are given without a definition; this solution reads S as the highest, then A, B, C (Assumption)", "service level and release rules use that order; confirm with the data owner")
+dq("po_line", "po_delivery", "PO delivery date is not a goods-receipt date", "warn", "procurement lead time is the elapsed days from PR date to PO delivery date: a proxy, not a realised supplier lead time", "labelled proxy everywhere it is shown")
+dq("bom", "stock", "inventory position is on-hand only", "warn", "open purchase orders and backorders are not supplied, so stock on order is unknown", "reorder recommendations say: confirm the purchase pipeline before release")
 for t, n in [("BoM", B["Functional Loc."]), ("Notif History", N["Functional Location"]), ("Mitem & Mplan", M["Functional Location"])]:
     k = int((~n.isin(f.funcloc)).sum())
     if k: dq(t, "*", "location not in FuncLoc list", "error", f"{k} rows", "kept, location row missing")
@@ -202,7 +205,7 @@ for mno, r in mat.set_index("material_no").iterrows():
     s = ser.loc[mno].values if mno in ser.index else np.zeros(T)
     nz = s[s > 0]; ma = int(len(nz)); tq = float(s.sum())
     adi = (T / ma) if ma else None
-    cv2 = float((nz.std(ddof=0) / nz.mean()) ** 2) if ma >= 2 else None
+    cv2 = float((nz.std(ddof=1) / nz.mean()) ** 2) if ma >= 2 else None   # sample variance, as in the engine and in the CALIBER calculation workbook
     cvall = float(s.std(ddof=0) / s.mean()) if ma else None
     if ma == 0: cls = "no_demand"
     elif ma == 1: cls = "single_event"

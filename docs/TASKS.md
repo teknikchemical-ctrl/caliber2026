@@ -30,6 +30,14 @@ Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer no
 | F4 | codex | doing | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
 | F5 | codex | todo | Business case workbook, impact.json, BUSINESS_CASE.md | M4 | finance/spi |
 | F6 | codex | todo | 7-slide deck in competition format; team.json for the human | M4 to M5 | deck/spi |
+| E1 | B | todo | Cost-risk frontier on the Scenario page (docs/spi/PLAN_ECONOMICS.md) | M4 | spi_scn.js |
+| E2 | A | todo | Campaign readiness gap (critical parts, order quantity and cost) | M4 | server/data, spi_dash or new page |
+| E3 | codex | todo | Capital waterfall and two programmes on the Impact page | M4 | spi_impact.js, finance/spi |
+| E5 | codex / A | todo | Purchase plan and cash timeline from batch results | M4 | spi/engine/batch.js, server/data |
+| E6 | A | todo | Lead time and supplier lever | M4 | server/data |
+| W1 | codex / B | todo | Three-way policy comparison (current, workbook baseline, dynamic) replayed over 17 months | M4 | spi/engine, page |
+| W2 | A | todo | Show-your-work panel with editable assumption cells on the Forecast page | M4 | spi_forecast.js |
+| W4 | A | todo | Validation page: the workbook's 12 test-plan rows with live status | M4 | server/data, new page |
 | H1 | human | todo | Import the repo in Vercel and send the URL; set AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel env vars; fill `deck/spi/team.json`; confirm deadline time zone; tell Claude A the clock | M0 to M5 | |
 
 ## Open contract questions
