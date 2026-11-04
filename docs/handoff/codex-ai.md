@@ -1,48 +1,32 @@
-**Branch:** codex/ai | **Baseline:** 18ceea9 | **Commit:** see git log -1.
+# Codex AI handoff
+
+Branch: codex/ai. Baseline merged: 25d993e. Current commit: see git log -1.
+
 ## Ready to merge
-- Database -> evidence -> mock/Gemini reasoning -> validator -> backtest gate -> deterministic engine -> Forecast chart is wired through spi/ai/execute.js and POST /api/ai/plan. Handlers are server/ai/plan.mjs and health.mjs behind the single router. GET /api/ai/health probes the configured provider, with deployment identity and no key disclosure. SPI sync no longer requests absent Netlify routes.
-- Forecast page: real part search, zero-filled history, direct engine p10/p50/p90 chart and table, selected plan/provider, evidence/validation/backtest trace, inventory/recommendation and driver Accept/Reject. Accepted inputs are revalidated before rerun; unaccepted AI proposals never alter the executed forecast. Stale predictions clear while rerunning.
-- Campaign evidence and rule inputs are integrated from Claude A's campaign module. Every retained input keeps matching evidence IDs; truncation drops unsupported inputs. Structural and numeric guards remain in force.
-- Codex Fin engine is now merged on main and integrated using its real exports. The normal production loader and all 237 fixture parts pass; six demand-class samples from the full database pass. No engine files edited. Claude A merges this branch and deploys for Vercel verification.
-- Tests: 258 core checks; all 237 fixture parts passed actual database -> reasoning -> real engine integration. Browser verified real history, exact engine chart/table quantiles, accepted-input redraw, and pending-engine honesty. All seven SPI pages load with full API. Old-site live passed; quick build/static passed and regression remains blocked by file-URL policy.
-## Interface notes
-- Engine contract used: contextFor(db,id), runPlan(plan,context), backtest(plan,context). Compare candidate error against an independently evaluated rules plan. Orchestration owns adoption and sets enforce_backtest:false; do not silently apply a second engine baseline. Sparse/missing backtests are not a pass.
-- No engine in production means result:null/status:engine_pending, never a fake forecast. Reasoning provider in the chart test was explicitly synthetic; ordinary mock/rules API mode was also tested with the real engine. Live Gemini and Vercel are not verified. Engine tests are tests/spi_ai_engine_integration.js; SPI_TEST_ENGINE may point to a published candidate for independent integration testing. The final browser test used the real merged engine.
-## Next / waiting on
-- Claude A: merge this branch and deploy Vercel; human: set AI_PROVIDER/AI_API_KEY/AI_MODEL securely and verify /api/ai/health plus a real part forecast. No key in chat, no main push, no PR.
-- Remaining wider-role work: Ask AI/tool loop, resumable AI batch/results.sqlite and golden question evaluation. Latest inbox resolves target persistence and zero-history add_qty bounds; zero-history add_qty validation is now updated and tested (261 core checks). Current inbox read and acknowledged here because inbox is outside the human's edit list.
 
-- Remaining account usage is not exposed by this client. Chart wiring is committed and pushed immediately; next pieces are Ask AI, batch and golden questions.
-- Ready to merge: zero-history additions require installed-capacity bounds, two independent origins and sparse_history. Scope target schema is consumed unchanged.
+- Database -> evidence -> mock/Gemini planner -> validator -> independently compared backtest -> real deterministic engine -> chart is implemented. Handlers are server/ai/health.mjs, plan.mjs and ask.mjs behind the single router. No new api/ functions, engine edits or baseline database edits.
+- Health requires a real structured READY result through the model chain. Reports provider, model, key_present boolean, one_word_result, last_error, attempts and deployment commit. Mock explicitly states that it is not a real Gemini call. Echoed keys are redacted.
+- Forecast preserves Claude A's base page and extends SPI_FORECAST_HOOKS with selected-plan chart/table, evidence, validator/backtest trace and Accept/Reject ledger. Base rules panels remain available. Accepted proposals are revalidated and rerun; selected chart values follow the engine response exactly. Unaccepted AI inputs never silently change the executed forecast.
+- Ask AI streams NDJSON trace/delta/inputs/result/done. Typed, bounded read-only SQL/data/engine tools make at most five calls. Final citations and numbers are checked. Model or validation trouble falls back to available database facts with a readable trace. Legacy assistant routes to SPI in SPI mode; safety refusal stays active. Prompt budgeting retains valid JSON.
+- Campaign module inputs and evidence are integrated. Workbook cautions appear in answers/docs: procurement lead time is a PR-to-PO-delivery proxy, S/A/B/C ordering is assumed, inventory position is on-hand only. Monetary values are Estimates; baseline data is synthetic.
+- Batch code is published and tested: deterministic order, fingerprinted resume, per-part transactions, source targets, preserved foreign rows, rollback and incomplete-result repair. Generated snapshot metadata is excluded from runtime fingerprints. Invalid batch limits are rejected.
+- Full mock reasoning batch: 7,481/7,481 completed, zero failures, zero Gemini calls/tokens. Full snapshot resume verified all 7,481 parts skipped with no duplicate results. Codex Fin's full portfolio batch also completed. Combined snapshot has 7,481 ai_run and forecast_plan rows, 22,443 forecast_input rows, 179,544 monthly forecasts, 14,962 inventory rows and 14,962 recommendations.
+- Compressed snapshot: spi/ai/results.sqlite.gz (7,669,284 bytes); uncompressed SQLite is 168,067,072 bytes, above GitHub's file limit. Manifest includes baseline/archive/SQLite SHA-256 checksums and exact counts. Restore refuses a different baseline or existing result file. Published-snapshot tests restore it and verify integrity, full horizons, quantiles, inventory bounds and ledger targets.
 
-## Ready to merge: Forecast extension after latest main
-- Preserved Claude A's Forecast base page and integrated AI planning through SPI_FORECAST_HOOKS. The selected AI/rules plan has its own labelled chart, validated Accept/Reject ledger, evidence and adoption trace. Base inventory, backtest and assumptions panels remain intact.
-- Browser verification passed against the real merged engine: exact SQL history and engine quantiles, malformed-response handling, accepted-input rerun and chart redraw.
-- Chart integration was already pushed in 9850fc1; this merge resolves the later base-page addition. Ask AI and batch are the next working pieces. Remaining account usage is unavailable in this client.
+## Validation
 
-## Ready to merge: Ask AI and golden evaluation
-- Added server/ai/ask.mjs, bounded read-only tool loop, typed data/engine tools, fixed parameterised SQL metric catalogue and NDJSON transport. No raw SQL accepted. Citation, number, schema and proposal bounds are checked; model failures fall back with readable trace. Prompt budgeting preserves valid JSON.
-- Ask page and legacy assistant in SPI mode use the new service. Safety refusal is preserved. Proposed inputs are never silently executed; browser Accept calls the validated plan endpoint and redraws from the real engine result.
-- Golden evaluation after main's sample-CV2 update: mock 43/43 and local fake Gemini REST 43/43. Real Gemini is not tested. Production does not load the golden answers. Added workbook cautions for procurement proxy, assumed criticality order and on-hand inventory.
-- Tests passed: Ask guardrails, NDJSON API, real-engine browser SQL answer/citations/acceptance/chart, all eight registered SPI pages. Prior chart test passed with the shared Forecast extension hook. Exact Vercel key setup is in docs/AI_ASSISTANT.md.
+- 263 core checks, including 239 fixture parts; all fixture database -> reasoning -> actual engine integrations pass.
+- 43/43 golden questions in mock mode; 43/43 through a local fake Gemini REST server. Production never imports golden answers. Real Gemini is unverified.
+- 34 full-database API checks pass. An earlier full run loaded all 14 SPI pages. Final cold-page checks with the combined snapshot failed: Optimisation remained Loading past the 20 s test wait, then Outlook and Recommendations were delayed. Forecast and Ask passed. No script errors. Browser tests verify database history, exact engine p10/p50/p90 chart values, Accept rerun/redraw, streamed SQL answers/citations, Ask chart acceptance and no stale predictions after invalid responses.
+- Ask guardrails, NDJSON API, one-word health/redaction, batch/resume/rollback and archive restore checks pass.
+- Legacy Netlify live suite passes. Claude A runs npm run test:quick because the environment browser policy blocks file URLs.
+
 ## Waiting on
-- Claude A: merge and deploy; run npm run test:quick. Human: set the key securely in Vercel, redeploy and verify /api/ai/health. No real key is available here, and the environment proxy does not permit this Vercel host.
-- Next: deterministic resumable batch and results persistence. Remaining account usage is unavailable in this client.
 
-## Ready to merge: resumable offline batch
-- Added spi/ai/batch.js. Deterministic material order, AI for demand/S/A eligibility when a key is configured, rules for the remaining portfolio. Namespaced identities fingerprint baseline data, code and provider settings. Each part transaction writes ai_run, forecast_plan, forecast_input (including scope target), forecast, inventory_param and recommendation through the existing engine output. Other writers' rows are preserved.
-- Tests cover all contract tables, idempotent resume, source-data invalidation, preserved foreign rows, transaction rollback, failed-run retry and incomplete-result repair. Gemini token usage is logged; unreliable accounting is marked incomplete.
-## Waiting on
-- Next working piece: run the complete mock portfolio and publish its generated results artifact. Real-key M3/M5 runs and live Vercel health still require the human's securely configured environment. Remaining account usage is unavailable.
+1. Claude A / Codex Fin: investigate cold full-portfolio Optimisation latency in server/engine/optimise.mjs -> portfolio before claiming the entire app is green. Final tests/spi_pages.js full failed on its Loading state and delayed later pages; owned AI pages and data/AI checks passed. No engine/page files outside AI ownership were changed.
+2. Claude A: merge codex/ai and deploy. Before Vercel packaging, run `node spi/ai/restore_results.js` to materialize spi/db/results.sqlite. This restores the combined AI and Fin snapshot; preserve or merge any different active result file instead of overwriting it. Build/router ownership stays with Claude A.
+3. Human: Vercel > project > Settings > Environment Variables: AI_PROVIDER=gemini, AI_API_KEY with Sensitive enabled, AI_MODEL=gemini-flash-latest. Select Production and Preview as needed, save, then Deployments > deployment menu > Redeploy. Open /api/ai/health and verify READY, model and deployed commit. Exact steps are in docs/AI_ASSISTANT.md. Never send the key in chat.
+4. Real Gemini answers, Vercel execution and real-key M3/M5 batches are not verified. No real key is available here. The managed environment's enforced outbound policy does not allow the supplied Vercel host; a proxy denial does not establish that the site itself failed.
+5. Existing inbox entries are acknowledged here, including sample-CV2 golden changes and shared Forecast extension. Inbox is outside the human's file ownership list, so it was not edited. No unresolved implementation request from that inbox remains; live deployment/key steps require Claude A and the human.
 
-## Ready to merge: checked snapshot restore
-- Added spi/ai/restore_results.js for the compressed batch snapshot. It verifies baseline, archive and restored SQLite SHA-256 checksums, restores atomically, and refuses to overwrite a different existing results file. Tests pass for restore, idempotence, baseline mismatch, archive corruption and another writer's file.
-- The complete mock batch is still running without failures. Codex Fin's full portfolio batch completed separately; its engine-owned rows will be combined with the AI-owned snapshot after completion. A compressed artifact avoids GitHub's single-file size limit without removing traceability.
-- Legacy Netlify live checks passed after the SPI assistant change. Latest SPI checks passed against merged main: 239 fixture integrations, all 14 pages, Forecast and Ask browser workflows. Account usage remains unavailable.
-## Waiting on
-- Claude A: when the snapshot lands, add `node spi/ai/restore_results.js` before deployment packaging so spi/db/results.sqlite is present. Do not overwrite a different active results file; merge its rows or rebuild instead. The snapshot and manifest are the next immediate push.
-
-## Ready to merge: explicit health call result
-- /api/ai/health now requires the configured model to return the explicit one-word result READY in structured JSON. It reports one_word_result, responding model, key_present boolean, attempts, last_error and deployment commit. Mock is explicitly labelled. Error/attempt strings redact any echoed configured key.
-- One-word probe, cache, readable failures and credential-redaction tests pass, as does the updated single-router API test.
-- Full mock reasoning batch completed 7,481/7,481, zero failures, zero Gemini calls. Snapshot combination and checksum verification are in progress. Real-key M3/M5 runs remain pending secure human configuration; usage balance is unavailable.
+Remaining account usage is unavailable in this client. No main push and no pull request.
