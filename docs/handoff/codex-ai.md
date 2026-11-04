@@ -34,3 +34,10 @@
 - Tests cover all contract tables, idempotent resume, source-data invalidation, preserved foreign rows, transaction rollback, failed-run retry and incomplete-result repair. Gemini token usage is logged; unreliable accounting is marked incomplete.
 ## Waiting on
 - Next working piece: run the complete mock portfolio and publish its generated results artifact. Real-key M3/M5 runs and live Vercel health still require the human's securely configured environment. Remaining account usage is unavailable.
+
+## Ready to merge: checked snapshot restore
+- Added spi/ai/restore_results.js for the compressed batch snapshot. It verifies baseline, archive and restored SQLite SHA-256 checksums, restores atomically, and refuses to overwrite a different existing results file. Tests pass for restore, idempotence, baseline mismatch, archive corruption and another writer's file.
+- The complete mock batch is still running without failures. Codex Fin's full portfolio batch completed separately; its engine-owned rows will be combined with the AI-owned snapshot after completion. A compressed artifact avoids GitHub's single-file size limit without removing traceability.
+- Legacy Netlify live checks passed after the SPI assistant change. Latest SPI checks passed against merged main: 239 fixture integrations, all 14 pages, Forecast and Ask browser workflows. Account usage remains unavailable.
+## Waiting on
+- Claude A: when the snapshot lands, add `node spi/ai/restore_results.js` before deployment packaging so spi/db/results.sqlite is present. Do not overwrite a different active results file; merge its rows or rebuild instead. The snapshot and manifest are the next immediate push.
