@@ -11,14 +11,17 @@ const P3={built:false,cam:{yaw:-.62,pit:.62,dist:68,tx:0,ty:1.5,tz:0},to:null,se
 /*@@CASE:p3@@*/
 const P3SKY=[[233,240,248],[203,218,236]],P3GR=[214,220,228];
 function p3Prim(list,u,layer,id){const out=[];list.forEach(p=>g3Parts(p).forEach(f=>{g3Orient(p,f);let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r;f.u=u;f.layer=layer==null?2:layer;f.pid=id||null;out.push(f)}));return out}
+/* the units of the plant: the equipment sets, plus (case spi) one template per designed equipment class that has no set of its own */
+function p3Units(){return P3.tpl?K.sets.concat(P3.tpl):K.sets}
 function p3Place(n){const M=g3Mesh(n,.5),s=P3SC[n],[x0,z0]=P3POS[n],cx=(M.mn[0]+M.mx[0])/2,cz=(M.mn[2]+M.mx[2])/2,out=[];
  const T=v=>[x0+(v[0]-cx)*s,(v[1]-M.ymin)*s+.25,z0+(v[2]-cz)*s];
  M.faces.forEach(f=>{if(f.in)return;if(f.rad==null){let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r}const g={p:f.p.map(T),n:f.n,mid:T(f.mid),rad:f.rad,c:f.c,m:f.m,sh:f.sh,k:f.k,u:n,layer:2,light:f.light,sm:f.sm,anim:f.anim?Object.assign({},f.anim,f.anim.at?{at:T(f.anim.at)}:{}, f.anim.type==="slide"?{amp:f.anim.amp*s}:{}):null};out.push(g)});
  P3.units[n]={x:x0,z:z0,s,top:(M.mx[1]-M.ymin)*s+.25,r:Math.hypot(M.mx[0]-M.mn[0],M.mx[2]-M.mn[2])*s/2,faces:out,lights:out.filter(f=>f.light)};return out}
 const p3B=(x,y,z,w,h,d,c,o)=>g3B("",x,y,z,w,h,d,c,o),p3C=(ax,x,y,z,len,r,c,o,r2)=>g3C("",ax,x,y,z,len,r,c,o,r2);
 function p3Scene(){const F=[],add=(list,u,layer,id)=>F.push(...p3Prim(list,u||0,layer==null?1:layer,id));
+ if(window.P3SITE&&P3SITE.world&&typeof spiWorldScene==="function"){add(spiWorldScene(),0,0);return F}
  add([p3B(-1,-.2,0,70,.4,42,"#cdd6e2",{r:1.5,zb:3})],0,0);
- K.sets.forEach(s=>{const [x,z]=P3POS[s.n];add([p3B(x,.06,z,11,.2,9.5,"#e3e9f1",{r:.4,zb:1.2}),p3B(x,.17,z-4.65,11,.02,.12,"amber"),p3B(x,.17,z+4.65,11,.02,.12,"amber")],0,1)});
+ p3Units().forEach(s=>{const [x,z]=P3POS[s.n];add([p3B(x,.06,z,11,.2,9.5,"#e3e9f1",{r:.4,zb:1.2}),p3B(x,.17,z-4.65,11,.02,.12,"amber"),p3B(x,.17,z+4.65,11,.02,.12,"amber")],0,1)});
  /* road */
  add([p3B(0,.02,-22,92,.1,5,"dark",{r:.2,zb:1}),p3B(0,.02,22,92,.1,5,"dark",{r:.2,zb:1}),...Array.from({length:14},(_,i)=>p3B(-40+i*6.2,.09,-22,2.6,.02,.18,"white")),...Array.from({length:14},(_,i)=>p3B(-40+i*6.2,.09,22,2.6,.02,.18,"white"))],0,1);
  /* pipe rack: portal frames, two beam levels and a walkway */
@@ -32,7 +35,7 @@ function p3Scene(){const F=[],add=(list,u,layer,id)=>F.push(...p3Prim(list,u||0,
  return F}
 /* pipes: from a unit's top, up to a lane in the rack, along the rack, and down to the next unit */
 const P3LANE=(L)=>({y:4.3+(L%3)*.8+(L>=3?.0:0),z:(L-4)*.52});
-function p3Routes(){const R=[],tops=n=>P3.units[n].top+.5,anch=(n,off)=>[P3POS[n][0]+Math.max(-3.4,Math.min(3.4,(off||0)/42)),P3POS[n][1]],pad=[];
+function p3Routes(){if(window.P3SITE&&P3SITE.world)return [];const R=[],tops=n=>P3.units[n].top+.5,anch=(n,off)=>[P3POS[n][0]+Math.max(-3.4,Math.min(3.4,(off||0)/42)),P3POS[n][1]],pad=[];
  const lanes={feed:0,slr:7,eff:1,pol:8,rg:2,rgr:9,cwk:3,cwf:10,sol:4,n2:5,stm:6};
  OVL.forEach(([id,lab,a,b,svc,ln_,off])=>{const L=P3LANE(lanes[id]);
   if(a===0){const tg=b.map((n,i)=>[...anch(n,off[1][i]),n]),xs=tg.map(t=>t[0]);const hdr=[[Math.min(...xs,-26),L.y,L.z],[Math.max(...xs),L.y,L.z]];
@@ -48,7 +51,7 @@ function p3PipeFaces(R){const out=[];
    const nf=Math.floor(L/5);for(let k=1;k<=nf;k++){const t=k/(nf+1),q=[a[0]+d[0]*t,a[1]+d[1]*t,a[2]+d[2]*t];out.push(...p3Prim([g3C("",ax,q[0],q[1],q[2],.12,r.r*1.45,"steel",{m:.7,seg:12})],0,2,r.id))}
    if(i>0)out.push(...p3Prim([g3E("","y",a[0],a[1],a[2],r.r*1.08,r.r*1.08,col,0,Math.PI,{m:.55,seg:10})],0,2,r.id))}
   r.len=len;r.total=len[len.length-1]});return out}
-function p3Build(){if(P3.built)return;if(window.P3SITE&&P3SITE.dist)P3.cam.dist=P3SITE.dist;K.sets.forEach(s=>{P3.faces.push(...p3Place(s.n))});P3.routes=p3Routes();const sc=p3Scene(),pf=p3PipeFaces(P3.routes);
+function p3Build(){if(P3.built)return;if(typeof spiSpTemplates==="function")spiSpTemplates();if(window.P3SITE&&P3SITE.world){P3SKY[0]=[22,38,76];P3SKY[1]=[10,20,46]}if(window.P3SITE&&P3SITE.dist)P3.cam.dist=P3SITE.dist;if(window.P3SITE&&P3SITE.cz)P3.cam.tz=P3SITE.cz;if(window.P3SITE&&P3SITE.pit)P3.cam.pit=P3SITE.pit;p3Units().forEach(s=>{P3.faces.push(...p3Place(s.n))});P3.routes=p3Routes();const sc=p3Scene(),pf=p3PipeFaces(P3.routes);
  P3.faces.push(...sc,...pf);P3.built=true;
  P3.faces.forEach((f,i)=>{if(f.layer==null)f.layer=2;f.i=i})}
 /* ---------- camera and drawing ---------- */
@@ -76,7 +79,7 @@ function p3Frame(now,tick){const cv=P3.cv;if(!cv||!cv.isConnected){P3.cv=null;re
  if(rebuild){P3.ckey=ck;if(!P3.oc)P3.oc=document.createElement("canvas");if(P3.oc.width!==cv.width||P3.oc.height!==cv.height){P3.oc.width=cv.width;P3.oc.height=cv.height}P3.octx=P3.oc.getContext("2d");P3.octx.setTransform(dpr,0,0,dpr,0,0);ctx=P3.octx;
  /* sky */
 
- const gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,"rgb("+P3SKY[1].join(",")+")");gr.addColorStop(.55,"rgb("+P3SKY[0].join(",")+")");gr.addColorStop(1,"rgb(244,247,251)");ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+ const gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,"rgb("+P3SKY[1].join(",")+")");gr.addColorStop(.55,"rgb("+P3SKY[0].join(",")+")");gr.addColorStop(1,(window.P3SITE&&P3SITE.world)?"rgb(24,40,78)":"rgb(244,247,251)");ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
  const L0=[-.42,.8,.38],ll=Math.hypot(...L0),Ls=[L0[0]/ll,L0[1]/ll,L0[2]/ll];const Lc=trn(Ls),Hv=(()=>{const h=[Lc[0],Lc[1],Lc[2]-1],l=Math.hypot(...h);return[h[0]/l,h[1]/l,h[2]/l]})();
  const list=P3.list=[],Q=P3.Q||(P3.Q=new Float64Array(3)),tx=cam.tx,ty=cam.ty,tz=cam.tz,D=cam.dist;
  const pq=v=>{const x=v[0]-tx,y=v[1]-ty,z=v[2]-tz,x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp+z1*sp,z2=-y*sp+z1*cp,d=D+z2;Q[0]=W/2+x1*F/d;Q[1]=H/2-y2*F/d;Q[2]=d;return d>=1};
@@ -118,11 +121,11 @@ function p3Frame(now,tick){const cv=P3.cv;if(!cv||!cv.isConnected){P3.cv=null;re
    for(let k=0;k<n;k++){let d=((t*sp0+k*r.total/n)%r.total);let i=1;while(i<r.len.length-1&&r.len[i]<d)i++;const a=r.pts[i-1],b=r.pts[i],seg=r.len[i]-r.len[i-1]||1,q=(d-r.len[i-1])/seg,w=[a[0]+(b[0]-a[0])*q,a[1]+(b[1]-a[1])*q+r.r*.0,a[2]+(b[2]-a[2])*q],pr=proj(w);if(!pr)continue;
     const rad=Math.max(1.4,r.r*F/pr[2]*.9);const g2=ctx.createRadialGradient(pr[0],pr[1],0,pr[0],pr[1],rad*2.2);g2.addColorStop(0,"rgba(255,255,255,.95)");g2.addColorStop(.35,col);g2.addColorStop(1,"rgba(255,255,255,0)");ctx.globalAlpha=foc&&!(r.to.includes(foc)||r.from===foc)?.15:.9;ctx.fillStyle=g2;ctx.beginPath();ctx.arc(pr[0],pr[1],rad*2.2,0,7);ctx.fill()}});ctx.globalAlpha=1}
  /* flare flame */
- {const q=proj([33,26.2,-17]);if(q){const h=Math.max(6,F/q[2]*1.4*(1+.2*Math.sin(t*14)+.1*Math.sin(t*23)));const g3=ctx.createRadialGradient(q[0],q[1]-h*.3,0,q[0],q[1]-h*.3,h);g3.addColorStop(0,"rgba(255,240,150,.95)");g3.addColorStop(.5,"rgba(255,140,40,.7)");g3.addColorStop(1,"rgba(255,90,20,0)");ctx.fillStyle=g3;ctx.beginPath();ctx.ellipse(q[0],q[1]-h*.3,h*.38,h*.62,0,0,7);ctx.fill()}}
+ if(!(window.P3SITE&&P3SITE.world)){const q=proj([33,26.2,-17]);if(q){const h=Math.max(6,F/q[2]*1.4*(1+.2*Math.sin(t*14)+.1*Math.sin(t*23)));const g3=ctx.createRadialGradient(q[0],q[1]-h*.3,0,q[0],q[1]-h*.3,h);g3.addColorStop(0,"rgba(255,240,150,.95)");g3.addColorStop(.5,"rgba(255,140,40,.7)");g3.addColorStop(1,"rgba(255,90,20,0)");ctx.fillStyle=g3;ctx.beginPath();ctx.ellipse(q[0],q[1]-h*.3,h*.38,h*.62,0,0,7);ctx.fill()}}
  /* pipe name flags */
  if((P3.sel||P3.pipe)&&cam.dist<44){ctx.font="600 11px system-ui,sans-serif";ctx.textAlign="center";P3.routes.forEach(r=>{if(r.stub||r.id==="sep")return;if(!P3.pipe&&!(r.from===P3.sel||r.to.includes(P3.sel)))return;const m=r.pts[Math.floor(r.pts.length/2)-1]||r.pts[0],m2=r.pts[Math.floor(r.pts.length/2)]||r.pts[0],mid=[(m[0]+m2[0])/2,(m[1]+m2[1])/2+.5,(m[2]+m2[2])/2],q=proj(mid);if(!q||q[0]<0||q[0]>W)return;const w=ctx.measureText(r.lab).width+12;ctx.globalAlpha=foc?.3:.92;ctx.fillStyle="#fff";ctx.strokeStyle=(SVC[r.svc]||SVC.proc)[1];ctx.lineWidth=1.2;ctx.beginPath();ctx.roundRect?ctx.roundRect(q[0]-w/2,q[1]-9,w,17,8):ctx.rect(q[0]-w/2,q[1]-9,w,17);ctx.fill();ctx.stroke();ctx.fillStyle="#1d2b3d";ctx.fillText(r.lab,q[0],q[1]+3.5)});ctx.globalAlpha=1}
  /* floating unit labels */
- K.sets.forEach(s=>{const el=P3.labs&&P3.labs[s.n];if(!el)return;const u=P3.units[s.n],q=proj([u.x,u.top+2.0+(cam.dist<30?.4:0),u.z]),base=proj([u.x,u.top+.2,u.z]);
+ p3Units().forEach(s=>{const el=P3.labs&&P3.labs[s.n];if(!el)return;const u=P3.units[s.n],q=proj([u.x,u.top+2.0+(cam.dist<30?.4:0),u.z]),base=proj([u.x,u.top+.2,u.z]);
   if(!q||!P3.labels||q[0]<-80||q[0]>W+80||q[1]<-40||q[1]>H+40){el.style.display="none";return}
   el.style.display="";el.style.transform="translate("+(q[0]|0)+"px,"+(q[1]|0)+"px) translate(-50%,-100%)";el.style.opacity=foc&&foc!==s.n?.25:1;el.classList.toggle("sel",P3.sel===s.n);el.classList.toggle("full",cam.dist<30||P3.sel===s.n||P3.hover===s.n);el.style.zIndex=1000-Math.round(q[2]);
   if(base){ctx.strokeStyle="rgba(21,94,163,.55)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(base[0],base[1]);ctx.stroke()}});
@@ -130,10 +133,10 @@ function p3Frame(now,tick){const cv=P3.cv;if(!cv||!cv.isConnected){P3.cv=null;re
 function p3State(){K.sets.forEach(s=>{let st="ok";try{st=P3.stateFn?P3.stateFn(s.n):ovState(s.n)}catch(e){}const u=pdmUnit(s.n),m=perfM(s.n);P3.st[s.n]={st,health:u.health,level:u.level,av:m.k.av,bd:m.k.bd};
   const el=P3.labs&&P3.labs[s.n];if(el){const T={ok:"Running",alarm:"Alarm",trip:"Trip",upset:"Upset"}[st];el.querySelector(".p3st").className="p3st "+st;el.querySelector(".p3st").textContent=T;el.querySelector("small").innerHTML=P3.labFn?P3.labFn(s.n):`Health <b>${u.health}</b> | ${m.k.av.toFixed(2)}% available`}});
  const tk=document.getElementById("p3tick");if(tk&&P3.tickFn)tk.innerHTML=P3.tickFn();
- const el=document.getElementById("p3card");if(el&&P3.sel)el.innerHTML=p3Card(P3.sel);else if(el&&P3.pipe)el.innerHTML=p3PipeCard(P3.pipe)}
+ const el=document.getElementById("p3card");if(window.P3SITE&&P3SITE.world){}else if(el&&P3.sel)el.innerHTML=p3Card(P3.sel);else if(el&&P3.pipe)el.innerHTML=p3PipeCard(P3.pipe)}
 /* ---------- interaction ---------- */
 function p3Fly(n,open){const u=P3.units[n];P3.orbit=false;P3.sel=n;P3.focus=n;P3.pipe=null;P3.pend=open?n:0;P3.to={tx:u.x,ty:u.top*.45,tz:u.z,dist:Math.max(13,u.r*5.2),yaw:P3.cam.yaw,pit:.42};p3Panel()}
-function p3Reset(){P3.sel=0;P3.focus=0;P3.pipe=null;P3.pend=0;P3.to={tx:0,ty:1.5,tz:0,dist:(window.P3SITE&&P3SITE.dist)||68,yaw:P3.cam.yaw,pit:.62};p3Panel()}
+function p3Reset(){P3.sel=0;P3.focus=0;P3.pipe=null;P3.pend=0;P3.to={tx:0,ty:1.5,tz:(window.P3SITE&&P3SITE.cz)||0,dist:(window.P3SITE&&P3SITE.dist)||68,yaw:P3.cam.yaw,pit:(window.P3SITE&&P3SITE.pit)||.62};p3Panel()}
 function p3Select(n,fly){if(P3.onPick){try{P3.onPick(n)}catch(e){}}if(fly)return p3Fly(n,P3.open);P3.sel=n;P3.focus=0;P3.pipe=null;P3.pend=0;P3.orbit=false;const u=P3.units[n];P3.to={tx:u.x,ty:2,tz:u.z,dist:Math.max(28,P3.cam.dist*.7),yaw:P3.cam.yaw,pit:P3.cam.pit};p3Panel()}
 function p3Card(n){const s=S(n),a=P3.st[n]||{st:"ok"},T={ok:"Running",alarm:"Alarm",trip:"Trip active",upset:"Upset from a supply loss"}[a.st];
  return `<div class="row between"><div><span class="tag acc">${esc(s.tag)}</span> <span class="p3st ${a.st}">${T}</span></div><button class="ghost g3x" onclick="p3Reset()" aria-label="Back to the whole plant">Whole plant</button></div><h3 style="margin:8px 0 2px">${esc(s.name)}</h3><div class="muted" style="font-size:12px;margin-bottom:8px">Area ${s.area}, ${esc(s.unit)}</div>
@@ -142,12 +145,12 @@ function p3Card(n){const s=S(n),a=P3.st[n]||{st:"ok"},T={ok:"Running",alarm:"Ala
 function p3PipeCard(id){const r=P3.routes.find(x=>x.id===id);if(!r)return"";const base=r.base?P3.routes.find(x=>x.id===r.base):r,src=base.from?S(base.from).tag:"Header or tank",dst=base.to.map(t=>S(t).tag).join(", ");
  return `<div class="row between"><span class="tag" style="border-color:${(SVC[r.svc]||SVC.proc)[1]};color:${(SVC[r.svc]||SVC.proc)[1]}">${(SVC[r.svc]||SVC.proc)[0]}</span><button class="ghost g3x" onclick="p3Reset()">Close</button></div><h3 style="margin:8px 0 4px">${esc(r.lab)}</h3><p class="muted" style="font-size:12.5px;margin:0">From <b>${esc(src)}</b> to <b>${esc(dst)}</b>. Stream links are taken from the battery limit notes on the P&amp;IDs; routing in the rack is schematic.</p>`}
 function p3Panel(){const el=document.getElementById("p3card");if(!el)return;el.style.display=(P3.sel||P3.pipe)?"":"none";el.innerHTML=P3.sel?p3Card(P3.sel):P3.pipe?p3PipeCard(P3.pipe):"";
- document.querySelectorAll(".p3chips button").forEach(b=>b.classList.toggle("on",+b.dataset.n===P3.sel));const live=document.getElementById("p3live");if(live)live.textContent=P3.sel?S(P3.sel).tag+" selected":""}
+ document.querySelectorAll(".p3chips button").forEach(b=>b.classList.toggle("on",+b.dataset.n===P3.sel));const live=document.getElementById("p3live");if(live)live.textContent=P3.sel?((p3Units().find(u=>u.n===P3.sel)||{}).tag||"")+" selected":""}
 function p3Pick(x,y){const L=P3.list,pq=P3.pq,Q=P3.Q;if(!L||!pq)return null;
  for(let i=L.length-1;i>=0;i--){const e=L[i],f=e.f;if(!(f.u||f.pid)||e.skip)continue;const xs=e.xs,ys=e.ys;if(!xs)continue;let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;for(let k=0;k<xs.length;k++){if(xs[k]<mnx)mnx=xs[k];if(xs[k]>mxx)mxx=xs[k];if(ys[k]<mny)mny=ys[k];if(ys[k]>mxy)mxy=ys[k]}
   if(x<mnx||x>mxx||y<mny||y>mxy)continue;let c=false;for(let a=0,b=xs.length-1;a<xs.length;b=a++){if(((ys[a]>y)!==(ys[b]>y))&&(x<(xs[b]-xs[a])*(y-ys[a])/(ys[b]-ys[a])+xs[a]))c=!c}if(c)return{u:f.u,pid:f.pid}}return null}
 function p3Init(root){if(root.dataset.ok)return;root.dataset.ok="1";p3Build();const cv=root.querySelector("canvas");P3.cv=cv;P3.last=0;P3.to=null;try{if(window.IntersectionObserver){if(P3.io)P3.io.disconnect();P3.io=new IntersectionObserver(es=>es.forEach(e=>{P3.vis=e.isIntersecting}));P3.io.observe(cv)}}catch(e){}
- P3.labs={};const lay=root.querySelector(".p3labs");K.sets.forEach(s=>{const el=document.createElement("div");el.className="p3lab";el.setAttribute("role","button");el.setAttribute("tabindex","0");el.setAttribute("aria-label",s.tag+" "+s.name);el.innerHTML=`<b>${esc(s.tag)}</b><span class="p3st ok">Running</span><small></small>`;
+ P3.labs={};const lay=root.querySelector(".p3labs");p3Units().forEach(s=>{const el=document.createElement("div");el.className="p3lab";el.setAttribute("role","button");el.setAttribute("tabindex","0");el.setAttribute("aria-label",s.tag+" "+s.name);el.innerHTML=`<b>${esc(s.tag)}</b><span class="p3st ok">Running</span><small></small>`;
   el.onclick=e=>p3Select(s.n,!e.shiftKey);el.onkeydown=e=>{if(e.key==="Enter")p3Select(s.n,!e.shiftKey)};lay.appendChild(el);P3.labs[s.n]=el});
  p3State();clearInterval(P3.timer);P3.timer=setInterval(()=>{if(!P3.cv||!P3.cv.isConnected)return clearInterval(P3.timer);p3State()},1000);
  const ptr=new Map();let down=null;
