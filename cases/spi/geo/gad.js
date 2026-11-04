@@ -6,15 +6,15 @@
    selection panel, the work order highlight and the stock overlay (spi_stock.js) work on it.
    ===================================================================================================== */
 const SPI_FILL={steel:"#d0d9e4",body:"#e4eaf1",paint:"#e4eaf1",dark:"#6b7a8c",gray:"#bcc6d2",blue:"#cfe0f5",brass:"#f3dfa6",amber:"#f6e3b4",red:"#f0c4c0",water:"#cfe5f7",green:"#a9d6b0",cat:"#d8c7b0",white:"#ffffff",black:"#6b7a8c"};
-const SPI_STD={turbine:"API 612 (steam turbine), API 614 (lube oil), ASME B16.5 (flanges)",furnace:"API 560 (fired heaters), ASME B31.3 (piping), ASME B16.5 (flanges)",pump:"API 610 OH2 layout, API 682 (seal and flush plan 11), ASME B16.5 (flanges)",hx:"TEMA and API 660 (shell and tube), ASME B16.5 (flanges)",valve:"ISA-75 and IEC 60534 (control valve), ASME B16.5 and B16.34 (flanges and bodies)"};
-const SPI_CLAXIS={turbine:.95,pump:.62,hx:1.1,valve:.45};
+const SPI_STD={turbine:"API 612 (steam turbine), API 614 (lube oil), ASME B16.5 (flanges)",furnace:"API 560 (fired heaters), ASME B31.3 (piping), ASME B16.5 (flanges)",pump:"API 610 OH2 layout, API 682 (seal and flush plan 11), ASME B16.5 (flanges)",hx:"TEMA and API 660 (shell and tube), ASME B16.5 (flanges)",valve:"ISA-75 and IEC 60534 (control valve), ASME B16.5 and B16.34 (flanges and bodies)",prv:"API 520 and API 526 (pressure relief valves), ASME B16.5",sdv:"IEC 61511 (safety instrumented systems), ASME B16.34, API 598",mov:"ASME B16.34, API 600 (gate valves), IEC 60034 (motor)",vessel:"ASME VIII (pressure vessels), ASME B16.5",column:"ASME VIII, API 650 not applicable; column internals per vendor",instr:"ISA-5.1 (identification), IEC 60584, ASME PTC 19.3 TW",blower:"API 617 and API 673 (compressors and fans), API 614 (lube oil)",orifice:"ISO 5167, ASME B16.36 (orifice flanges)",jbox:"IEC 60079-14 (electrical installations), IEC 62444 (cable glands)",line:"ASME B31.3 (process piping), B36.10M, B16.9, B16.5"};
+const SPI_CLAXIS={turbine:.95,pump:.62,hx:1.1,valve:.45,sdv:.4,mov:.4,blower:.8,orifice:.45,line:.45,instr:.4};
 GAD_SPI_INIT();
 function GAD_SPI_INIT(){KB.sets.forEach(s=>{const c=spiCls(s.n);if(!c)return;const P=spiPrep(s.n);
  GAD[s.n]={gy:410,dim:{x0:40,x1:860,yt:60},deco:[],bal:{},noz:GA[s.n].nz.map(z=>[z.m,0,0,"u"]),parts:P.zones.filter(z=>z.key).map(z=>({k:z.key,s:[]}))}})}
 /* ---------- projection of one primitive into a view (f = front elevation x,y ; p = plan x,z). Returns {pts:[[u,w],...]} or {circle:[u,w,r]} in model metres ---------- */
-function spiShape(p,v){const f=v==="f",X=p.x,W=f?p.y:p.z,rect=(cu,cw,du,dw)=>({pts:[[cu-du/2,cw-dw/2],[cu+du/2,cw-dw/2],[cu+du/2,cw+dw/2],[cu-du/2,cw+dw/2]]});
+function spiShape(p,v){const f=v==="f",X=p.x,W=f?p.y:p.z;if(p.t==="s")return{line:p.pts.map(q=>[q[0],f?q[1]:q[2]]),r:p.r};const rect=(cu,cw,du,dw)=>({pts:[[cu-du/2,cw-dw/2],[cu+du/2,cw-dw/2],[cu+du/2,cw+dw/2],[cu-du/2,cw+dw/2]]});
  if(p.t==="r")return rect(X,W,p.w,f?p.h:p.d);
- if(p.t==="c"){const r1=p.r,r2=p.r2==null?p.r:p.r2,L=p.len,ax=p.ax;
+ if(p.t==="c"||p.t==="a"){const r1=p.r,r2=p.r2==null?p.r:p.r2,L=p.len,ax=p.ax;
   if(ax==="x")return r1===r2?rect(X,W,L,2*r1):{pts:[[X-L/2,W-r1],[X+L/2,W-r2],[X+L/2,W+r2],[X-L/2,W+r1]]};
   if(ax==="y"){if(!f)return{circle:[X,W,Math.max(r1,r2)]};return r1===r2?rect(X,W,2*r1,L):{pts:[[X-r1,W-L/2],[X+r1,W-L/2],[X+r2,W+L/2],[X-r2,W+L/2]]}}
   if(f)return{circle:[X,W,Math.max(r1,r2)]};return rect(X,W,2*r1,L)}
@@ -31,7 +31,8 @@ function spiGaSvg(n){const P=spiPrep(n),prims=G3M[n]||[],ZK=new Set(P.zones.filt
  const out={f:[],p:[]},anch={},tags=[];
  ["f","p"].forEach(v=>{const list=prims.map((p,i)=>({p,i,d:v==="f"?p.z:p.y})).sort((a,b)=>(!!a.p.in-!!b.p.in)||(a.d-b.d));
   list.forEach(({p})=>{const sh=spiShape(p,v),k=p.k||"",sel=k&&(ZK.has(k)||/^N\d+$/.test(k)||k==="M"),fill=SPI_FILL[p.c]||(/^#/.test(p.c)?p.c:"#e4eaf1"),cl="gs spi-sh"+(p.in?" spi-in":"")+(sel?" gp":""),at=sel?` data-k="${k}" onclick="gSel('${k}')"`:"";
-   let el;if(sh.circle){const[u,w,r]=sh.circle;el=`<circle class="${cl}"${at} cx="${X(u).toFixed(1)}" cy="${(v==="f"?YF(w):YP(w)).toFixed(1)}" r="${Math.max(.6,r*s).toFixed(1)}" style="fill:${fill}"/>`}
+   let el;if(sh.line){el=`<polyline class="${cl}"${at} points="${sh.line.map(q=>X(q[0]).toFixed(1)+","+(v==="f"?YF(q[1]):YP(q[1])).toFixed(1)).join(" ")}" style="fill:none;stroke:#1c2733;stroke-width:${Math.max(1,sh.r*2*s).toFixed(1)}"/>`}
+   else if(sh.circle){const[u,w,r]=sh.circle;el=`<circle class="${cl}"${at} cx="${X(u).toFixed(1)}" cy="${(v==="f"?YF(w):YP(w)).toFixed(1)}" r="${Math.max(.6,r*s).toFixed(1)}" style="fill:${fill}"/>`}
    else el=`<polygon class="${cl}"${at} points="${sh.pts.map(q=>pt(v,q)).join(" ")}" style="fill:${fill}"/>`;
    out[v].push(el);
    if(v==="f"&&k){const a0=p.in?.2:1,a=a0*(p.t==="r"?p.w*p.h:p.t==="c"?(p.ax==="x"?p.len*2*p.r:p.ax==="y"?p.len*2*p.r:Math.PI*p.r*p.r):p.ra*p.rb)||0;if(!anch[k]||a>anch[k].a)anch[k]={a,u:p.x,w:p.y}}
