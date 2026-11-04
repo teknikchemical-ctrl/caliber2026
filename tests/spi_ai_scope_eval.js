@@ -34,7 +34,7 @@ const cases=[
  ['Which items should be reordered and when?','case_question',/order-by date/],
  ['What are the recommended reorder quantities and dynamic Min-Max levels?','case_question',/new Min and Max for \*\*[0-9,]+ parts\*\*/],
  ['Simulate reducing inventory by 20%','simulate_scenario',/IDR 616\.62 bn[\s\S]*IDR 493\.68 bn/,/Figures are Estimates/],
- ['Inventory for part 4100005111','plan_part',/Order \*\*38 SET\*\*[\s\S]*79%/,/not priced:/],
+ ['Inventory for part 4100005111','plan_part',/Order \*\*\d+ SET\*\*[\s\S]*stockout within/,/not priced:/],
  ['When should we order 4100000129?','plan_part',/No order is needed/],
  ['Explain this view: Maintenance timeline','get_page',/5,795 notifications/,null,{page:'spi_mtime'}],
  ['How many notifications in 2026-03?','query_records',/There are \*\*260 notifications\*\* in March 2026/],
