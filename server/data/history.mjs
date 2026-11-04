@@ -5,6 +5,7 @@
 // a campaign-repeat scenario (Assumption: the Dec 2025 and Jan 2026 uplift measured on these parts recurs a year later) and, for one part,
 // the stock projection from stock, open PO receipts and expected use, against Min and Max.
 import { openDb, hasRes } from "../_lib/db.mjs";
+import { golden } from "./golden.mjs";
 import { json, guard } from "../_lib/http.mjs";
 const add = (ym, k) => { let [y, m] = ym.split("-").map(Number); m += k; y += Math.floor((m - 1) / 12); m = ((m - 1) % 12 + 12) % 12 + 1; return `${y}-${String(m).padStart(2, "0")}`; };
 export default guard((req, res) => {
@@ -43,6 +44,13 @@ export default guard((req, res) => {
   let mlE = {}, mlLo = {}, mlHi = {}; const hasMl = !!db.prepare("select 1 from sqlite_master where name='ml_forecast'").get();
   if (hasMl) for (const r of db.prepare(`select month m, sum(expected_qty) e, sum(p_issue*(1-p_issue)*((qty_if_issued_low+qty_if_issued_high)/2)*((qty_if_issued_low+qty_if_issued_high)/2) + p_issue*((qty_if_issued_high-qty_if_issued_low)/2.56)*((qty_if_issued_high-qty_if_issued_low)/2.56)) var from ml_forecast where ${inM("material_no")} group by 1`).all(...aM)) {
     const sd = Math.sqrt(Math.max(0, r.var)); mlE[r.m] = r.e; mlLo[r.m] = Math.max(0, r.e - 1.28 * sd); mlHi[r.m] = r.e + 1.28 * sd; }
+  // the AI projection review (spi/ai/review.js, applied in the engine) adjusts the learned forecast of the parts it flagged; the page draws the reviewed series
+  const rawE = { ...mlE }; let rvSum = null;
+  try { const gq = scope.kind === "part" ? { mat: String(scope.material_no) } : scope.kind === "equipment" ? { tag: scope.tag } : scope.kind === "class" ? { cls: scope.eq_class } : {}, G = golden(db, gq), RF = G.review_factors || {}, ids = Object.keys(RF).map(Number).filter((i) => !mats || mats.includes(i));
+    if (ids.length) { const per = db.prepare(`select material_no m, month k, expected_qty e from ml_forecast where material_no in (${ids.map(() => "?").join(",")})`).all(...ids), seen = {};
+      for (const r of per) { const f = RF[r.m]; if (!f || f.basis === "history") continue; const d = (f.factor - 1) * r.e; mlE[r.k] = (mlE[r.k] || 0) + d; mlLo[r.k] = Math.max(0, (mlLo[r.k] || 0) + Math.min(0, d)); mlHi[r.k] = (mlHi[r.k] || 0) + Math.max(0, d); }
+      for (const i of ids) { const f = RF[i]; if (f.basis === "history" && f.hist12) for (const m of F) { mlE[m] = (mlE[m] || 0) + f.hist12; mlHi[m] = (mlHi[m] || 0) + f.hist12; } } }
+    rvSum = G.review ? { text: G.review.text, parts: G.review.parts, flagged: G.review.flagged, basis: G.review.basis, insurance: G.review.insurance, adjusted_parts: ids.length } : null; } catch { rvSum = null; }
   let eng = {}, engLo = {}, engHi = {};
   if (hasRes()) try { for (const r of db.prepare(`select month m, sum(p50) e, sum(p10) l, sum(p90) h from res.forecast where plan_id like 'ai-batch:%' and ${inM("material_no")} group by 1`).all(...aM)) { eng[r.m] = r.e; engLo[r.m] = r.l; engHi[r.m] = r.h; } } catch { eng = {}; }
   // campaign-repeat scenario: uplift of these parts in Dec 2025 and Jan 2026 against their other months, applied to Dec 2026 and Jan 2027
@@ -60,7 +68,8 @@ export default guard((req, res) => {
   const r0 = (o, ms) => ms.map((m) => (o[m] == null ? null : Math.round(o[m] * 100) / 100));
   const sum = (o, ms) => ms.reduce((t, m) => t + (o[m] || 0), 0);
   const out = { scope, label, parts: mats ? mats.length : db.prepare("select count(*) n from material").get().n, cutoff: last, history: { months: H, qty: z0(qty, H), lines: z0(lines, H), value: z0(val, H), notifications: z0(notif, H), planned: H.map((m) => plan[m]), receipts: z0(rec, H) },
-    prediction: { months: F, learned: r0(mlE, F), learned_low: r0(mlLo, F), learned_high: r0(mlHi, F), engine: r0(eng, F), engine_low: scope.kind === "part" ? r0(engLo, F) : null, engine_high: scope.kind === "part" ? r0(engHi, F) : null, planned: F.map((m) => plan[m]), campaign_scenario: r0(scen, F), campaign_uplift: Math.round(uplift * 100) / 100, stock },
+    prediction: { months: F, basis: "Estimate: learned model after the AI projection review", learned: r0(mlE, F), learned_raw: r0(rawE, F), learned_low: r0(mlLo, F), learned_high: r0(mlHi, F), engine: r0(eng, F), engine_low: scope.kind === "part" ? r0(engLo, F) : null, engine_high: scope.kind === "part" ? r0(engHi, F) : null, planned: F.map((m) => plan[m]), campaign_scenario: r0(scen, F), campaign_uplift: Math.round(uplift * 100) / 100, stock },
+    review: rvSum,
     part_list: plist,
     min_qty: scope.kind === "part" ? scope.min_qty : null, max_qty: scope.kind === "part" ? scope.max_qty : null,
     totals: { history_12m: sum(qty, H.slice(-12)), history_17m: sum(qty, H), learned_12m: sum(mlE, F), engine_12m: sum(eng, F), scenario_12m: sum(scen, F), planned_12m: F.reduce((t, m) => t + plan[m], 0), notifications_17m: sum(notif, H) },

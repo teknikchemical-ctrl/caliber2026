@@ -171,7 +171,26 @@ def _q(p, m, u):
 for i in range(P):
     for h in range(HOLD):
         if pred[i, h] >= 0.005 or act[i, h] > 0:
-            bt_rows.append((parts[i][0], MONTHS[t0 + h], float(act[i, h]), round(float(pred[i, h]), 3), round(_q(prob[i, h], mul[i, h], 0.1), 2), round(_q(prob[i, h], mul[i, h], 0.9), 2)))
+            bt_rows.append([parts[i][0], MONTHS[t0 + h], float(act[i, h]), round(float(pred[i, h]), 3), round(_q(prob[i, h], mul[i, h], 0.1), 2), round(_q(prob[i, h], mul[i, h], 0.9), 2), i, h])
+# size band (quantity if issued, 10% to 90%): widen the residual quantiles until 80% of held-out months with an issue fall inside (with the calibration factor)
+_iss = [(r[6], r[7]) for r in bt_rows if r[2] > 0]
+_cal = float(np.clip(act[issued].sum() / max(pred[issued].sum(), 1e-9), 0.7, 1.5))
+def _cover(sc):
+    if not _iss: return 0.0
+    return float(np.mean([_cal * math.exp(mul[i, h] + sc * rq[0]) <= act[i, h] <= _cal * math.exp(mul[i, h] + sc * rq[1]) for i, h in _iss]))
+band_cover_raw = _cover(1.0); band_scale = 1.0
+while band_scale < 4 and _cover(band_scale) < 0.8: band_scale = round(band_scale + 0.05, 2)
+band_cover = _cover(band_scale)
+for r in bt_rows:
+    i, h = r[6], r[7]; r[6] = round(_cal * math.exp(mul[i, h] + band_scale * rq[0]), 2); r[7] = round(_cal * math.exp(mul[i, h] + band_scale * rq[1]), 2)
+# learned campaign uplift per part: use in the history's campaign months against the other months, shrunk to the plant ratio
+_mo_n = np.array([len(q("select 1 from movement where month=?", (m,))) for m in MONTHS], float); _med = float(np.median(_mo_n))
+camp_idx = [k for k in range(T) if _mo_n[k] >= 1.5 * _med]; oth_idx = [k for k in range(T) if k not in camp_idx]
+g_ratio = float(qty[:, camp_idx].sum() / max(1e-9, len(camp_idx)) / max(1e-9, qty[:, oth_idx].sum() / max(1, len(oth_idx)))) if camp_idx else 1.0
+_k = 3.0
+_ro = qty[:, oth_idx].mean(1) if oth_idx else np.zeros(P); _sc = qty[:, camp_idx].sum(1) if camp_idx else np.zeros(P); _nc = max(1, len(camp_idx))
+camp_uplift = np.where(_ro > 0, (_sc / np.maximum(_ro, 1e-9) + _k * g_ratio) / (_nc + _k), np.where(_sc > 0, 5.0, g_ratio))
+camp_uplift = np.where(qty[:, :T].sum(1) > 0, np.clip(camp_uplift, 0.5, 5.0), g_ratio)
 # calibration: the hurdle model under-predicts totals on held-out months; scale the projection by actual / predicted on them (clipped)
 calib = float(np.clip(act[issued].sum() / max(pred[issued].sum(), 1e-9), 0.7, 1.5))
 # --- final model on all months, projection for the next 12 months
@@ -179,7 +198,7 @@ wc, ws, sig2, rq, nrow, npos = fit(range(6, T), T - 1)
 proj = []
 for h in range(1, 13):
     X = feats(T, h); pr = logit_pred(wc, X); mu = ridge_pred(ws, X)
-    proj.append((pr, calib * pr * np.exp(mu + sig2 / 2), calib * np.exp(mu + rq[0]), calib * np.exp(mu + rq[1])))
+    proj.append((pr, calib * pr * np.exp(mu + sig2 / 2), calib * np.exp(mu + band_scale * rq[0]), calib * np.exp(mu + band_scale * rq[1])))
 
 coef = sorted(zip(DNAMES, wc[0][1:].tolist()), key=lambda x: -abs(x[1]))  # standardised coefficients
 con.executescript("""
@@ -192,7 +211,8 @@ meta = {"method": "hurdle model: penalised logistic regression for occurrence (s
         "trained_rows": nrow, "rows_with_issue": npos, "features": len(DNAMES), "history": MONTHS[0] + " to " + MONTHS[-1],
         "holdout": MONTHS[t0] + " to " + MONTHS[-1], "brier_model": round(brier, 4), "brier_base_rate": round(brier0, 4),
         "top10_capture": round(capture, 3), "auc_model": round(auc_model, 3), "occurrence_drivers": [[n, round(v, 3)] for n, v in coef[:8]],
-        "campaign_months_ahead": [ALL[i] for i in range(T, len(ALL)) if camp[i]], "calibration_factor": round(calib, 3)}
+        "campaign_months_ahead": [ALL[i] for i in range(T, len(ALL)) if camp[i]], "calibration_factor": round(calib, 3),
+        "band_scale": band_scale, "band_cover_before": round(band_cover_raw, 3), "band_cover_after": round(band_cover, 3), "campaign_months_history": [MONTHS[k] for k in camp_idx], "campaign_ratio_plant": round(g_ratio, 3)}
 con.executemany("insert into ml_model values (?,?)", [(k, json.dumps(v)) for k, v in meta.items()])
 con.executemany("insert into ml_eval values (?,?,?,?,?,?,?,?)", evals)
 rows = []
@@ -200,8 +220,8 @@ for h, (pr, ex, lo, hi) in enumerate(proj):
     for i, r in enumerate(parts):
         if ex[i] >= 0.005 or pr[i] >= 0.01: rows.append((r[0], FUT[h], round(float(pr[i]), 4), round(float(ex[i]), 3), round(float(lo[i]), 2), round(float(hi[i]), 2)))
 con.executemany("insert into ml_forecast values (?,?,?,?,?,?)", rows)
-con.executescript("drop table if exists ml_backtest; create table ml_backtest (material_no integer, month text, actual real, forecast real, band_low real, band_high real, primary key (material_no, month))")
-con.executemany("insert into ml_backtest values (?,?,?,?,?,?)", bt_rows)
+con.executescript("drop table if exists ml_backtest; create table ml_backtest (material_no integer, month text, actual real, forecast real, band_low real, band_high real, size_low real, size_high real, primary key (material_no, month))")
+con.executemany("insert into ml_backtest values (?,?,?,?,?,?,?,?)", bt_rows)
 
 # --- flaws: where the learned demand and today's settings disagree
 y12 = np.sum([p[1] for p in proj], 0); flags = []
@@ -231,12 +251,13 @@ try:
         con.execute("update data_dictionary set rows=(select count(*) from " + t + ") where table_name=? and column_name=''", (t,))
 except sqlite3.OperationalError: pass
 # per-part summary used by every planner endpoint (Claude B's ws tools read it through portfolioParts)
-con.executescript("drop table if exists ml_part; create table ml_part (material_no integer primary key, mu real, sd real, p_any real, expected_12m real)")
+con.executescript("drop table if exists ml_part; create table ml_part (material_no integer primary key, mu real, sd real, p_any real, expected_12m real, campaign_uplift real)")
+_cu = {r[0]: float(camp_uplift[i]) for i, r in enumerate(parts)}
 agg = {}
 for mat, p, e, lo, hi in con.execute("select material_no, p_issue, expected_qty, qty_if_issued_low, qty_if_issued_high from ml_forecast"):
     m = (lo + hi) / 2; sdq = (hi - lo) / 2.56; a = agg.setdefault(mat, [0.0, 0.0, 1.0])
     a[0] += e; a[1] += p * (1 - p) * m * m + p * sdq * sdq; a[2] *= (1 - p)
-con.executemany("insert into ml_part values (?,?,?,?,?)", [(k, v[0] / 12, (v[1] / 12) ** 0.5, 1 - v[2], v[0]) for k, v in agg.items()])
+con.executemany("insert into ml_part values (?,?,?,?,?,?)", [(k, v[0] / 12, (v[1] / 12) ** 0.5, 1 - v[2], v[0], round(_cu.get(k, g_ratio), 3)) for k, v in agg.items()])
 try:
     con.execute("delete from data_dictionary where table_name='ml_part'")
     con.executemany("insert or replace into data_dictionary values (?,?,?,?)", [("ml_part", "", "Learned demand per part: monthly mean, monthly spread, chance of any issue in 12 months", len(agg)), ("ml_part", "mu", "Learned mean demand per month (Estimate)", None), ("ml_part", "sd", "Learned spread of monthly demand (Estimate)", None), ("ml_part", "p_any", "Chance of at least one issue in the next 12 months", None)])

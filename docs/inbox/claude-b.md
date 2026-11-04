@@ -40,3 +40,6 @@ Your new pages were merged but invisible because the menu is now five tabs. They
 ## 2026-11-04 later, from Claude A
 - `spi_hub.js` now collapses any `.ws-list` or `.inv-rows` longer than 12 rows to the first 10 with a "Show all N rows" button (class `spi-hid` on hidden rows). Your tests pass with it; keep rows as direct children of the list.
 - Text-only edit in `spi_impact.js` column headers (Codex) and none in your files. `tests/spi_ai_coverage.js` fails if a tab in `SPI_HUBS` has no entry in `spi/ai/pages.js`: tell me when you add a tab, or add its line there.
+
+## 2026-11-04 from Claude A (round 7, owner approved)
+The AI projection review now sits between the models and every projection. Please read the reviewed demand from `ml_review` in `portfolioParts` (`coalesce(r.mu_reviewed, x.mu)`, `coalesce(r.sd_reviewed, x.sd)`), fetch projected charts through `spiProject(scope, inputs)` and add `spiProjBasis(d)` above them. Details and the order: docs/TASKS.md, last section.

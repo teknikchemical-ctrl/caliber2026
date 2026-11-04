@@ -1,0 +1,966 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "GET /api/data/project: the one projection service (owner: Claude A)",
+ "description": "Flow: inputs -> learned models (ml_forecast, ml_part, ml_equip_risk, ml_leadtime) -> AI projection review (spi/ai/review.js, decides each part's demand basis and insurance spare, factor 0.5 to 2) -> engine (/api/data/golden) -> pages. Same query as /api/data/golden, plus adj (JSON {material_no: factor}, accepted Gemini factors from /api/ai/review). axis = history months then 12 projected months; series values are null where they do not apply. Client: spiProject(scope, inputs) in src/modules/spi_proj.js; spiProjBasis(payload) draws the basis strip.",
+ "type": "object",
+ "required": [
+  "scope",
+  "parts",
+  "axis",
+  "history_months",
+  "series",
+  "review",
+  "model_check",
+  "totals",
+  "decisions",
+  "flow"
+ ],
+ "properties": {
+  "scope": {
+   "type": "object"
+  },
+  "parts": {
+   "type": "number"
+  },
+  "cutoff": {
+   "type": "string"
+  },
+  "axis": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "history_months": {
+   "type": "number"
+  },
+  "inputs": {
+   "type": "object"
+  },
+  "flow": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "series": {
+   "type": "object",
+   "properties": {
+    "issue_qty": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "issue_value": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "po_value": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "receipt_value": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "demand_qty": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "demand_value": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "stock_value_optimized": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "stock_value_today": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "purchase_optimized": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "purchase_today": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "cost_optimized": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "cost_today": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "stockout_optimized": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "stockout_today": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "notifications": {
+     "type": "object",
+     "required": [
+      "name",
+      "values",
+      "unit",
+      "basis"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "basis": {
+       "type": "string"
+      },
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "review": {
+   "anyOf": [
+    {
+     "type": "object",
+     "required": [
+      "parts",
+      "flagged",
+      "basis",
+      "insurance",
+      "flags",
+      "text",
+      "guardrail",
+      "parts_flagged"
+     ],
+     "properties": {
+      "parts": {
+       "type": "number"
+      },
+      "flagged": {
+       "type": "number"
+      },
+      "basis": {
+       "type": "object"
+      },
+      "insurance": {
+       "type": "number"
+      },
+      "flags": {
+       "type": "object"
+      },
+      "text": {
+       "type": "string"
+      },
+      "guardrail": {
+       "type": "object",
+       "properties": {
+        "min": {
+         "type": "number"
+        },
+        "max": {
+         "type": "number"
+        }
+       }
+      },
+      "scope_check": {
+       "type": [
+        "object",
+        "null"
+       ],
+       "properties": {
+        "forecast_12m": {
+         "type": "number"
+        },
+        "issued_12m": {
+         "type": "number"
+        },
+        "ratio": {
+         "type": "number"
+        },
+        "campaign_share": {
+         "type": "number"
+        },
+        "text": {
+         "type": "string"
+        }
+       }
+      },
+      "parts_flagged": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "material_no",
+         "basis",
+         "factor",
+         "insurance",
+         "flags",
+         "reason"
+        ],
+        "properties": {
+         "material_no": {
+          "type": "number"
+         },
+         "basis": {
+          "enum": [
+           "learned",
+           "blend",
+           "history",
+           "ai"
+          ]
+         },
+         "factor": {
+          "type": "number"
+         },
+         "insurance": {
+          "type": "boolean"
+         },
+         "flags": {
+          "type": "array",
+          "items": {
+           "type": "object",
+           "properties": {
+            "code": {
+             "type": "string"
+            },
+            "severity": {
+             "enum": [
+              "warn",
+              "info"
+             ]
+            },
+            "text": {
+             "type": "string"
+            }
+           }
+          }
+         },
+         "reason": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "type": "null"
+    }
+   ]
+  },
+  "equipment": {
+   "type": "object",
+   "properties": {
+    "locations": {
+     "type": "number"
+    },
+    "expected_notifs_12m": {
+     "type": "number"
+    },
+    "high_risk_locations": {
+     "type": "number"
+    },
+    "top": {
+     "type": "array",
+     "items": {
+      "type": "object"
+     }
+    }
+   }
+  },
+  "model_check": {
+   "type": "object",
+   "properties": {
+    "backtest": {
+     "type": "object"
+    },
+    "calibration": {
+     "type": "object"
+    },
+    "models": {
+     "type": [
+      "object",
+      "null"
+     ]
+    },
+    "lead_basis": {
+     "type": [
+      "object",
+      "null"
+     ]
+    },
+    "unpriced": {
+     "type": [
+      "number",
+      "null"
+     ]
+    }
+   }
+  },
+  "totals": {
+   "type": "object"
+  },
+  "simulated_12m": {
+   "type": "object"
+  },
+  "decisions": {
+   "type": "object"
+  },
+  "by_month": {
+   "type": "array",
+   "items": {
+    "type": "object"
+   }
+  },
+  "part": {
+   "type": [
+    "object",
+    "null"
+   ]
+  },
+  "sets": {
+   "type": "array",
+   "items": {
+    "type": "object"
+   }
+  },
+  "basis": {
+   "type": "string"
+  }
+ }
+}

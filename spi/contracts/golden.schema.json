@@ -1,7 +1,7 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "title": "GET /api/data/golden: the Optimized Scenario, the single decision engine (owner: Claude A)",
- "description": "Query: scope mat | tag | set | cls, optional crit=S,A; inputs (Assumptions) service_S..service_C, demand (0.2 to 3), lead (0.3 to 3), carrying, budget (IDR per month), campaign=1, runs, seed. Cached per input set. Plant run about 1.2 s cold, 0 ms cached. totals = steady state per year with the policy in place (same cost function as /api/ws/advice); simulated_12m = first 12 months from today's stock (Monte Carlo). saving_per_year = totals.saving. golden = Optimized Scenario, current = today's Min and Max.",
+ "description": "Query: scope mat | tag | set | cls, optional crit=S,A; inputs (Assumptions) service_S..service_C, demand (0.2 to 3), lead (0.3 to 3), carrying, budget (IDR per month), campaign=1, runs, seed. Cached per input set. Plant run about 1.2 s cold, 0 ms cached. totals = steady state per year with the policy in place (same cost function as /api/ws/advice); simulated_12m = first 12 months from today's stock (Monte Carlo). saving_per_year = totals.saving. golden = Optimized Scenario, current = today's Min and Max. The AI projection review runs inside every call before the policy (review=0 switches it off, adj applies accepted Gemini factors); each part carries review {basis, factor, insurance, flags, reason}.",
  "type": "object",
  "required": [
   "months",
@@ -846,6 +846,144 @@
   },
   "saving_first_12m": {
    "type": "number"
+  },
+  "review": {
+   "anyOf": [
+    {
+     "type": "object",
+     "required": [
+      "parts",
+      "flagged",
+      "basis",
+      "insurance",
+      "flags",
+      "text",
+      "guardrail",
+      "parts_flagged"
+     ],
+     "properties": {
+      "parts": {
+       "type": "number"
+      },
+      "flagged": {
+       "type": "number"
+      },
+      "basis": {
+       "type": "object"
+      },
+      "insurance": {
+       "type": "number"
+      },
+      "flags": {
+       "type": "object"
+      },
+      "text": {
+       "type": "string"
+      },
+      "guardrail": {
+       "type": "object",
+       "properties": {
+        "min": {
+         "type": "number"
+        },
+        "max": {
+         "type": "number"
+        }
+       }
+      },
+      "scope_check": {
+       "type": [
+        "object",
+        "null"
+       ],
+       "properties": {
+        "forecast_12m": {
+         "type": "number"
+        },
+        "issued_12m": {
+         "type": "number"
+        },
+        "ratio": {
+         "type": "number"
+        },
+        "campaign_share": {
+         "type": "number"
+        },
+        "text": {
+         "type": "string"
+        }
+       }
+      },
+      "parts_flagged": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "material_no",
+         "basis",
+         "factor",
+         "insurance",
+         "flags",
+         "reason"
+        ],
+        "properties": {
+         "material_no": {
+          "type": "number"
+         },
+         "basis": {
+          "enum": [
+           "learned",
+           "blend",
+           "history",
+           "ai"
+          ]
+         },
+         "factor": {
+          "type": "number"
+         },
+         "insurance": {
+          "type": "boolean"
+         },
+         "flags": {
+          "type": "array",
+          "items": {
+           "type": "object",
+           "properties": {
+            "code": {
+             "type": "string"
+            },
+            "severity": {
+             "enum": [
+              "warn",
+              "info"
+             ]
+            },
+            "text": {
+             "type": "string"
+            }
+           }
+          }
+         },
+         "reason": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "type": "null"
+    }
+   ]
+  },
+  "review_factors": {
+   "type": "object",
+   "description": "material_no -> {basis, factor, hist12} for parts the review moved off the learned forecast"
+  },
+  "demand": {
+   "type": "object",
+   "description": "demand after the AI review: mean_qty per month, fan_qty and fan_value {p10,p50,p90}"
   }
  }
 }

@@ -1,0 +1,71 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "GET|POST /api/ai/review: Gemini review of the flagged parts (owner: Claude A)",
+ "description": "Scope as /api/data/golden. Returns the rules review and, with Gemini, proposals [{material_no, factor, reason}] checked against the guardrail (0.5 to 2), the flagged list and the evidence numbers. adj holds the accepted factors; pass it to /api/data/project or /api/data/golden as adj to apply. effect compares saving, stockouts and order value before and after.",
+ "type": "object",
+ "required": [
+  "provider",
+  "proposals",
+  "accepted",
+  "adj",
+  "text"
+ ],
+ "properties": {
+  "provider": {
+   "enum": [
+    "gemini",
+    "rules"
+   ]
+  },
+  "review": {
+   "type": [
+    "object",
+    "null"
+   ]
+  },
+  "proposals": {
+   "type": "array",
+   "items": {
+    "type": "object"
+   }
+  },
+  "accepted": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "material_no": {
+      "type": "string"
+     },
+     "factor": {
+      "type": "number"
+     },
+     "reason": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "rejected": {
+   "type": "array",
+   "items": {
+    "type": "object"
+   }
+  },
+  "adj": {
+   "type": "object"
+  },
+  "effect": {
+   "type": [
+    "object",
+    "null"
+   ]
+  },
+  "text": {
+   "type": "string"
+  },
+  "fallback": {
+   "type": "string"
+  }
+ }
+}

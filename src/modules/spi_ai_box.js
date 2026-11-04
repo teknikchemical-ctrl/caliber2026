@@ -10,6 +10,7 @@ function spiAiLink(t,m){let h=spiAiFmt(t);if(m&&!h.includes(m))h=`<a href="#" on
 /* the five blocks: verdict, why, do next (each opens the part card), risk and confidence, your inputs against the recommended run (only on a change) */
 function spiAiBlocks(r){const R=r.reasoning;if(!R||!R.verdict)return `<p class="spi-aibox-t">${spiAiFmt(r.text||"")}</p>`;const sec=(h,body,cls="")=>body?`<div class="ab-s ${cls}"><h6>${h}</h6>${body}</div>`:"";
  return `<p class="ab-v">${spiAiFmt(R.verdict)}</p>`+sec("Why",(R.why||[]).length?`<p>${spiAiFmt(R.why.join(" "))}</p>`:"")
+  +sec("How the AI checked the projection",R.review?`<p>${spiAiFmt(R.review)}</p>`:"","ab-r")
   +sec("Do next",(R.do_next||[]).length?`${R.do_intro?`<p>${spiAiFmt(R.do_intro)}</p>`:""}<ul class="ab-do">${R.do_next.map(a=>`<li>${spiAiLink(a.text,a.material_no)}</li>`).join("")}</ul>`:"")
   +sec("Risk and confidence",R.risk?`<p>${spiAiFmt(R.risk)}</p>`:"")
   +sec("Your inputs against the recommended run",R.inputs&&R.inputs.text?`<p>${spiAiFmt(R.inputs.text)}</p>${(R.inputs.deltas||[]).length?`<ul>${R.inputs.deltas.map(d=>`<li>${spiAiFmt(d.text)}</li>`).join("")}</ul>`:""}`:"","ab-in")
