@@ -50,3 +50,4 @@ function spiRoute(p){const pg=SPI.pages[p];if(!pg)return `<h1>${esc((SPIPAGES.fi
   const id="spih"+Date.now();setTimeout(async()=>{const h=document.getElementById(id);if(!h)return;try{await pg.fn(h)}catch(e){if(document.getElementById(id))h.innerHTML=`<div class="spi-err"><b>This page could not load.</b><p>${esc(e.message)}</p><button class="btn" onclick="render()">Try again</button></div>`}},0);
   return `<div id="${id}" class="spi-page"><h1>${esc(pg.label)}</h1><p class="spi-sub">Loading</p></div>`}
 if(typeof document!=="undefined"){document.documentElement.dataset.spi="1";const prune=()=>{const reg=SPI.pages;document.querySelectorAll(".nav[data-page^=spi_]").forEach(n=>{if(!reg[n.dataset.page])n.style.display="none"})};setTimeout(prune,300);setTimeout(prune,1500)}
+if(typeof document!=="undefined"&&window.SPI_MODE)document.documentElement.classList.add("spi");

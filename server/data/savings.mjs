@@ -13,7 +13,7 @@ const CATS = [
   { id: "nonstock_stock", label: "Non Stock items holding stock (data finding)", action: "Clean the master data: decide whether to keep, stock-manage or release.", counted: 0 },
   { id: "insurance", label: "Insurance spares kept on purpose (S and A, no demand)", action: "Keep. Not a saving.", counted: 0 }
 ];
-const WITH = `with b as (select p.material_no, m.descr, p.crit_max, p.stock, p.min_qty, p.max_qty, p.unit_price_idr, p.months_active, p.last_issue, p.excess_value_idr, p.stock_value_idr, p.total_qty,
+export const WITH = `with b as (select p.material_no, m.descr, p.crit_max, p.stock, p.min_qty, p.max_qty, p.unit_price_idr, p.months_active, p.last_issue, p.excess_value_idr, p.stock_value_idr, p.total_qty,
   case
     when p.months_active = 0 and p.crit_max in ('S','A') and (p.lt_median is null or p.lt_median > 90) then 'insurance'
     when p.max_qty > 0 and p.stock > p.max_qty and p.crit_max in ('S','A') then 'excess_crit'
