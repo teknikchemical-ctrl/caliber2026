@@ -140,7 +140,12 @@ if SPI:  # spare part navigation group, routing and start page
     P('Each set = P&ID + GA drawing + datasheet + plot plan + interlock logic + OPLs + maintenance history, for one main equipment item','Each set = schematic P&ID, equipment drawing and 3D model, datasheet, spare parts list and maintenance notifications, for one main equipment item')
     P('<span class="tag">🧩 ${cnt(K.opl,o=>o.set===s.n)} lessons</span>','')
     h=h.replace('Ask about procedures, interlocks, equipment details, locations or maintenance history.','Ask about spare parts, stock, equipment details or maintenance history.').replace('plot plans, interlock documents, OPLs, instrument data and ','spare part records, datasheets and ')
-    P('window.NW=n=>','window.SPI_MODE=true;window.NW=n=>')
+    _sha=(os.environ.get('VERCEL_GIT_COMMIT_SHA') or '').strip()
+    if not _sha:
+        try: _sha=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True,cwd=ROOT).stdout.strip()
+        except Exception: _sha=''
+    import datetime
+    P('window.NW=n=>','window.SPI_MODE=true;window.SPI_BUILD={sha:"%s",time:"%s"};window.NW=n=>'%(_sha[:7] or 'local',datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')))
     P('All ${NW(K.sets.length)} units as laid out on the plot plan, joined by their process, gas, water, nitrogen and steam lines. Drag to look around. Select a unit to fly to it and see its figures, then open its equipment set from the card.','All ${NW(K.sets.length)} equipment sets in a schematic site layout generated from the data. Drag to look around. Select a unit to fly to it, then open its equipment set from the card.')
 
 # ---------- 4. theme + cleanup ----------

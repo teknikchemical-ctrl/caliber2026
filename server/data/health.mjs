@@ -2,7 +2,7 @@
 import { openDb, DB_PATH, hasRes, DRIVER } from "../_lib/db.mjs";
 import { json } from "../_lib/http.mjs";
 export default function handler(req, res) {
-  const out = { ok: false, node: process.version, db_path: DB_PATH.replace(process.cwd(), "."), results_db: hasRes(), driver: DRIVER };
+  const out = { ok: false, node: process.version, db_path: DB_PATH.replace(process.cwd(), "."), results_db: hasRes(), driver: DRIVER, commit: (process.env.VERCEL_GIT_COMMIT_SHA || "").slice(0, 7) || null };
   try {
     const db = openDb();
     out.tables = db.prepare("select count(*) c from sqlite_master where type='table'").get().c;
