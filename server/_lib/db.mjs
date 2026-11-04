@@ -11,7 +11,9 @@ export const DRIVER = BS ? "better-sqlite3" : NS ? "node:sqlite" : "none";
 
 const ROOT = process.cwd();
 export const DB_PATH = process.env.SPI_DB || path.join(ROOT, "spi", "db", "spi.sqlite");
-export const RES_PATH = process.env.SPI_RES || path.join(ROOT, "spi", "db", "results.sqlite");
+const RES_FULL = path.join(ROOT, "spi", "db", "results.sqlite"), RES_SLIM = path.join(ROOT, "spi", "db", "views.sqlite");
+// results.sqlite (168 MB, restored from the committed .gz) is used when present; otherwise the slim views.sqlite (validated plans only, built by tools/spi_slim_results.py) is attached as "res".
+export const RES_PATH = process.env.SPI_RES || (fs.existsSync(RES_FULL) ? RES_FULL : RES_SLIM);
 let db = null;
 
 export function openDb() {
