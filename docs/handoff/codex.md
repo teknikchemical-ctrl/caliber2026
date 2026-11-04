@@ -1,3 +1,7 @@
+## In progress: research-backed inventory economics and integrator requests
+Finance is researching intermittent-demand methods and inventory risk metrics. Crossref/arXiv access is blocked; verified accessible implementation references will be distinguished from unread full papers. Planned model: empirical lead-demand service, expected shortage, tail risk and explicit-cost stock optimisation. No unsupported shortage penalty or downtime saving will be invented.
+Integrator UI-overhaul notes were read: Finance is first adding precomputed comparison caching, a separate forward purchase schedule and consistent IDR 139.0 bn reduction / 253.8 bn replenishment / 114.8 bn net investment headline. Impact will adopt the shared chart kit. Existing actual recommendation dates will be preserved; spreading will be an explicit forward planning scenario, never falsified dates.
+
 # Integrator and Codex AI: Finance checkpoints ready
 Updated 2026-11-04. Finance is done with the requested site economics and assistant-tool checkpoints. All work through 05b3f5d is pushed to codex/finance and ready to merge; the accompanying push adds the economics evaluation pack. Required checks pass. Finance has not deployed or changed main.
 
@@ -76,3 +80,10 @@ Updated 2026-11-04 WIB. Branch codex/finance. Published prototype checkpoint 647
 ## Ready to merge: Finance assistant evaluation pack
 - Added finance/spi/build_ai_eval.mjs and generated ai_eval.json with 22 economics question cases and 3 rejection cases. Covers six tools, scenario inputs, numeric/citation grounding and required interpretation. New Finance test checks source/config freshness and null-vs-zero cases.
 - Codex AI owns actual question routing and end-to-end evaluation. Finance does not claim the assistant has been wired or has achieved a score. Waiting on AI owner to report the integration and evaluation commit. Integrator completion notification is refreshed at the top of this handoff.
+
+## Ready to merge: catch-up, research record and fast comparison
+- Synced main 31b24e4 and explicitly fetched/merged origin/claude/great-tesla-l0uw33. Case DB unchanged: 7,481 parts, 1,930 active, IDR 616.62 bn priced stock. Five-hub navigation and latest UI kit read.
+- AI owner has now wired Finance: reran actual ask-flow evaluation, mock 22/22 and fake Gemini REST 22/22 pass, including invalid inputs. Previous Waiting on registration notes above are historical; integration is present on main. Real Gemini remains unverified.
+- Default /api/engine/compare now reads batch-generated compressed per-part summaries; measured 241 ms cold, under the integrator's 1 s target. Filtering/pagination and totals reconcile with the full historical validation. include_timeline:true or non-default workbook parameters retain live detailed replay. No silent timeline fabrication.
+- Research record: finance/spi/research/inventory_methods.md. Five paper references verified in accessible author/maintainer sources. Crossref/arXiv denied by network policy, full paper texts not claimed read. Planned metrics: empirical loss functions, explicit-cost critical fractile, tail shortfall and ROP-cause diagnostics.
+- Next Finance work: ROP sanity analysis by class, meaningful separate forward cash schedule and shared-kit Impact refit, preserving factual current order dates. Headline remains IDR 139.0 bn reduction ceiling / 253.8 bn replenishment / 114.8 bn net investment. Remaining usage not exposed; deck deferred.
