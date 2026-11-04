@@ -47,7 +47,9 @@ for t, n in [("BoM", B["Functional Loc."]), ("Notif History", N["Functional Loca
 # ---------------- PO lines ----------------
 p = P.rename(columns={"Purchase Requisition": "pr_no", "PR-Item": "pr_item", "PR-Type": "pr_type", "PR-Date": "pr_date", "PR-Material": "material_no", "PR-Quantity": "qty", "PR-UoM": "uom", "PR-Delivery Date": "pr_delivery", "PR-Plant": "plant", "PR-Purchasing Group": "purch_group", "Purchase Order": "po_no", "PO-Item": "po_item", "PO-Supplier Code": "supplier_code", "PO-Supplier Name": "supplier", "PO-Item Amount": "amount", "PO-Currency": "currency", "PO-Delivery Date": "po_delivery"})
 p["lead_days"] = (p.po_delivery - p.pr_date).dt.days
-p["unit_price"] = np.where(p.qty > 0, p.amount / p.qty, np.nan)
+# PO-Item Amount is a UNIT price, not a line total: within the same material the amount does not change with the ordered quantity
+# (log-log slope 0.001, correlation 0.02 over 350 materials with 3 or more different quantities). So unit_price = amount.
+p["unit_price"] = np.where(p.qty > 0, p.amount, np.nan)
 def flags(r):
     fl = []
     if r.lead_days < 0: fl.append("NEG_LT")
@@ -84,8 +86,9 @@ mat["schedule"] = d.str.extract(r"\bSCH\s?(\d+S?|XXS|XS|STD)\b")[0]
 mat["dwg_no"] = d.str.extract(r"DWG\.\s*([\d\-]+)")[0]
 mat["for_tag"] = d.str.extract(r",\s*FOR\s+([A-Z]{1,4}-[A-Z0-9\-]+)")[0]
 mat["last_unit_price_idr"] = mat.material_no.map(lastp)
-mat["price_basis"] = np.where(mat.last_unit_price_idr.notna(), "last PO amount / PR quantity, IDR lines only (estimate)", None)
-k = int(mat.last_unit_price_idr.isna().sum()); dq("material", "*", "no usable purchase price", "warn", f"{k} of {len(mat)} materials have no IDR PO line with a positive amount", "stock value left empty for these, never guessed")
+mat["price_basis"] = np.where(mat.last_unit_price_idr.notna(), "last PO item amount read as unit price, IDR lines only (estimate)", None)
+k = int(mat.last_unit_price_idr.isna().sum()); dq("po_line", "amount", "PO-Item Amount treated as unit price", "warn", "within a material the amount does not change with the quantity (slope 0.001, correlation 0.02, 350 materials)", "unit price = amount; if the owner of the data says it is a line total, divide by PR quantity (one line in build_db.py)")
+dq("material", "*", "no usable purchase price", "warn", f"{k} of {len(mat)} materials have no IDR PO line with a positive amount", "stock value left empty for these, never guessed")
 # families: standard parts by specification, OEM parts by item type and equipment class (pooling for statistics only)
 std = mat.nps.notna() & mat.dwg_no.isna()
 mat["spec_family"] = None

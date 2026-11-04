@@ -19,5 +19,5 @@ export default guard((req, res) => {
   const family = part.family_id ? all("select p.material_no, m.descr, p.demand_class, p.months_active, p.total_qty, p.stock from part_profile p join material m using(material_no) where p.family_id = ? and p.material_no != ? order by p.total_qty desc limit 10", part.family_id, id) : [];
   const famInfo = part.family_id ? one("select family_id, label, standard_ref, members, basis from spec_family where family_id = ?", part.family_id) : null;
   json(res, 200, { part, series, data_cutoff: meta.data_cutoff, served_by_bom: bom, served_by_other_links: equipment, procurement: po, notifications_12m_on_served_equipment: notif, planned_maintenance_next_12m: pm, family: famInfo, family_members: family,
-    notes: ["Stock is held at material level in the baseline data: the same stock figure appears under every location the part is installed on.", "Unit price is an estimate: last PO amount divided by PR quantity, IDR lines only."] });
+    notes: ["Stock is held at material level in the baseline data: the same stock figure appears under every location the part is installed on.", "Unit price is an estimate: the last PO item amount, read as a unit price (the amount does not scale with quantity), IDR lines only."] });
 });

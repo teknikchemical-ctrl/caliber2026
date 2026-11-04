@@ -1,0 +1,1507 @@
+{
+ "case": {
+  "id": "spi",
+  "title": "Spare Part Intelligence",
+  "product": "Spare Part Intelligence and Inventory Optimization",
+  "subtitle": "CALIBER 2026 final case | AI-powered forecasting and dynamic optimization",
+  "company": "Baseline data set (synthetic)",
+  "site": "Baseline site PX",
+  "code": "SPI",
+  "brief": "CALIBER 2026 final case brief",
+  "examples": [
+   "Which critical spare parts are at risk of stockout?",
+   "Which parts are overstocked and by how much?",
+   "What should we reorder first and how many?",
+   "Which parts are slow-moving or dead stock?",
+   "What are the Min and Max for a part?",
+   "What if we cut stock by 20%?"
+  ]
+ },
+ "sets": [
+  {
+   "tag": "KT-383A",
+   "name": "Turbine For Kc-383A",
+   "kind": "comp",
+   "type": "steam turbine driver",
+   "unit": "Baseline site PX",
+   "area": "Not in baseline data",
+   "fluid": "Not in baseline data",
+   "crit": "HIGH CRITICAL",
+   "pid": {
+    "ref": "SPI-KT-383A",
+    "title": "Turbine For Kc-383A (schematic from data)",
+    "sys": "Generated from the baseline data set",
+    "process": "Turbine For Kc-383A (KT-383A) is a steam turbine driver in the baseline data set, criticality S (highest criticality). It has 227 different spare parts in the bill of materials; the list on this page shows the 40 most consumed. Parts, stock, Min and Max, issues, work notifications and lead times are records of the baseline data set (synthetic). The drawing and the data sheet are schematic and generated from these records: they are not vendor drawings. Reference standard for this equipment class: API 612."
+   },
+   "bom": [
+    {
+     "name": "Studbolt,7/8Inx60Mm,B8M/8M",
+     "mat": "Material 4100024158 | B8M",
+     "qty": 12
+    },
+    {
+     "name": "Studbolt,5/8Inx85Mm,B7/2H",
+     "mat": "Material 4100024181 | B7",
+     "qty": 16
+    },
+    {
+     "name": "Studbolt,1/2Inx80Mm,B16/4",
+     "mat": "Material 4100024231 | B16",
+     "qty": 12
+    },
+    {
+     "name": "Studbolt,3/4Inx40Mm,B7/2H",
+     "mat": "Material 4100024258 | B7",
+     "qty": 24
+    },
+    {
+     "name": "Studbolt,1Inx40Mm,B8M/8M",
+     "mat": "Material 4100024353 | B8M",
+     "qty": 16
+    },
+    {
+     "name": "Gasket,Ring,1-1/2In,300#,Ptfe",
+     "mat": "Material 4100014000",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Nbr,41Mm Id,5.3Mm Cs",
+     "mat": "Material 4100019326",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Nbr,139Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019363",
+     "qty": 2
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,6316",
+     "mat": "Material 4100000129",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Ring,2In,300#,Ptfe",
+     "mat": "Material 4100014049",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Seal Gas,5Micron,P/N Fe-9",
+     "mat": "Material 4100086104",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sw,2In,300#,Gr/304",
+     "mat": "Material 4100014060 | 304",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,7/8Inx100Mm,B16/4",
+     "mat": "Material 4100024822 | B16",
+     "qty": 20
+    },
+    {
+     "name": "Gasket,Ring,4In,300#,Graphite",
+     "mat": "Material 4100014098",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,7/8Inx90Mm,B16/4",
+     "mat": "Material 4100024849 | B16",
+     "qty": 20
+    },
+    {
+     "name": "O-Ring,Viton,263Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019402",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sheet,1/4In,150#,Ptfe",
+     "mat": "Material 4100014123",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Seal Gas,10Micron,P/N Fe-",
+     "mat": "Material 4100086132",
+     "qty": 4
+    },
+    {
+     "name": "Studbolt,1Inx70Mm,B8M/8M",
+     "mat": "Material 4100024501 | B8M",
+     "qty": 16
+    },
+    {
+     "name": "O-Ring,Viton,7Mm Id,3.5Mm Cs",
+     "mat": "Material 4100019476",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,Angular,Nu306-2Z",
+     "mat": "Material 4100000155",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Nbr,290Mm Id,5.3Mm Cs",
+     "mat": "Material 4100019490",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sw,8In,600#,Graphite",
+     "mat": "Material 4100014225",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sheet,1-1/2In,600#,Graphite",
+     "mat": "Material 4100014165",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Air Intake,25Micron,P/N F",
+     "mat": "Material 4100086161",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Nbr,224Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019439",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Epdm,280Mm Id,3.5Mm Cs",
+     "mat": "Material 4100019521",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Nbr,137Mm Id,3.5Mm Cs",
+     "mat": "Material 4100019691",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,6305",
+     "mat": "Material 4100000203",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sw,3/4In,300#,Graphite",
+     "mat": "Material 4100014256",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Ring,4In,300#,Gr/304",
+     "mat": "Material 4100014324 | 304",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Seal Gas,3Micron,P/N Fe-8",
+     "mat": "Material 4100086235",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Air Intake,5Micron,P/N Fe",
+     "mat": "Material 4100086207",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Seal Gas,3Micron,P/N Fe-2",
+     "mat": "Material 4100086272",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Fuel Gas,5Micron,P/N Fe-8",
+     "mat": "Material 4100086264",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,7211",
+     "mat": "Material 4100000320",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Lube Oil,25Micron,P/N Fe-",
+     "mat": "Material 4100086306",
+     "qty": 2
+    },
+    {
+     "name": "Bearing,Ball,Angular,6306Bdb",
+     "mat": "Material 4100000460",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Epdm,286Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019638",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Epdm,224Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019977",
+     "qty": 1
+    }
+   ],
+   "datasheet": {
+    "no": "SPI-DS-KT-383A",
+    "title": "EQUIPMENT RECORD (generated from baseline data)",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "KT-383A"
+       ],
+       [
+        "Description",
+        "TURBINE FOR KC-383A"
+       ],
+       [
+        "Class",
+        "steam turbine driver"
+       ],
+       [
+        "Criticality",
+        "S"
+       ],
+       [
+        "Reference standard",
+        "API 612"
+       ],
+       [
+        "Spare parts in BoM",
+        "227"
+       ],
+       [
+        "Source",
+        "FuncLoc list and BoM, baseline data set (synthetic)"
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "tag": "KT-202",
+   "name": "Turbine For Kc-202",
+   "kind": "comp",
+   "type": "steam turbine driver",
+   "unit": "Baseline site PX",
+   "area": "Not in baseline data",
+   "fluid": "Not in baseline data",
+   "crit": "HIGH CRITICAL",
+   "pid": {
+    "ref": "SPI-KT-202",
+    "title": "Turbine For Kc-202 (schematic from data)",
+    "sys": "Generated from the baseline data set",
+    "process": "Turbine For Kc-202 (KT-202) is a steam turbine driver in the baseline data set, criticality S (highest criticality). It has 216 different spare parts in the bill of materials; the list on this page shows the 40 most consumed. Parts, stock, Min and Max, issues, work notifications and lead times are records of the baseline data set (synthetic). The drawing and the data sheet are schematic and generated from these records: they are not vendor drawings. Reference standard for this equipment class: API 612."
+   },
+   "bom": [
+    {
+     "name": "Studbolt,7/8Inx60Mm,B8M/8M",
+     "mat": "Material 4100024158 | B8M",
+     "qty": 4
+    },
+    {
+     "name": "Studbolt,5/8Inx85Mm,B7/2H",
+     "mat": "Material 4100024181 | B7",
+     "qty": 16
+    },
+    {
+     "name": "Studbolt,3/4Inx75Mm,B8M/8M",
+     "mat": "Material 4100024218 | B8M",
+     "qty": 20
+    },
+    {
+     "name": "Studbolt,1/2Inx80Mm,B16/4",
+     "mat": "Material 4100024231 | B16",
+     "qty": 24
+    },
+    {
+     "name": "Studbolt,1Inx40Mm,B8M/8M",
+     "mat": "Material 4100024353 | B8M",
+     "qty": 16
+    },
+    {
+     "name": "Gasket,Ring,1-1/2In,300#,Ptfe",
+     "mat": "Material 4100014000",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,5/8Inx30Mm,B16/4",
+     "mat": "Material 4100024362 | B16",
+     "qty": 8
+    },
+    {
+     "name": "O-Ring,Nbr,41Mm Id,5.3Mm Cs",
+     "mat": "Material 4100019326",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Ring,8In,600#,Graphite",
+     "mat": "Material 4100014019",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Nbr,139Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019363",
+     "qty": 2
+    },
+    {
+     "name": "O-Ring,Viton,24Mm Id,5.3Mm Cs",
+     "mat": "Material 4100019372",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,6316",
+     "mat": "Material 4100000129",
+     "qty": 4
+    },
+    {
+     "name": "Gasket,Ring,2In,300#,Ptfe",
+     "mat": "Material 4100014049",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Seal Gas,5Micron,P/N Fe-9",
+     "mat": "Material 4100086104",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,7/8Inx40Mm,B8M/8M",
+     "mat": "Material 4100024792 | B8M",
+     "qty": 4
+    },
+    {
+     "name": "Studbolt,1/2Inx85Mm,B16/4",
+     "mat": "Material 4100024473 | B16",
+     "qty": 12
+    },
+    {
+     "name": "Studbolt,5/8Inx95Mm,B8M/8M",
+     "mat": "Material 4100024564 | B8M",
+     "qty": 8
+    },
+    {
+     "name": "O-Ring,Viton,263Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019402",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sheet,12In,300#,Gr/304",
+     "mat": "Material 4100014119 | 304",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,Angular,Nu306-2Z",
+     "mat": "Material 4100000155",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sw,8In,600#,Graphite",
+     "mat": "Material 4100014225",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sheet,1-1/2In,600#,Graphite",
+     "mat": "Material 4100014165",
+     "qty": 3
+    },
+    {
+     "name": "O-Ring,Nbr,224Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019439",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Seal Gas,25Micron,P/N Fe-",
+     "mat": "Material 4100086180",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,3/4Inx55Mm,B8M/8M",
+     "mat": "Material 4100024754 | B8M",
+     "qty": 20
+    },
+    {
+     "name": "Gasket,Ring,10In,150#,Graphite",
+     "mat": "Material 4100014625",
+     "qty": 2
+    },
+    {
+     "name": "O-Ring,Nbr,137Mm Id,3.5Mm Cs",
+     "mat": "Material 4100019691",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sheet,1In,300#,Graphite",
+     "mat": "Material 4100014879",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Lube Oil,5Micron,P/N Fe-1",
+     "mat": "Material 4100086233",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Viton,231Mm Id,2.5Mm Cs",
+     "mat": "Material 4100019564",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Air Intake,5Micron,P/N Fe",
+     "mat": "Material 4100086207",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sheet,6In,150#,Ptfe",
+     "mat": "Material 4100015432",
+     "qty": 1
+    },
+    {
+     "name": "Filter Element,Fuel Gas,5Micron,P/N Fe-8",
+     "mat": "Material 4100086264",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sheet,12In,150#,Ptfe",
+     "mat": "Material 4100014505",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,6312",
+     "mat": "Material 4100000410",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Viton,184Mm Id,5.3Mm Cs",
+     "mat": "Material 4100019660",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Roller,Cyl,1Row,6305-2Z",
+     "mat": "Material 4100000783",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,Angular,6304 C3",
+     "mat": "Material 4100000324",
+     "qty": 1
+    },
+    {
+     "name": "Transmitter,Temp,Model Gr348,Nbr",
+     "mat": "Material 4100058864",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,6311 C3",
+     "mat": "Material 4100000708",
+     "qty": 1
+    }
+   ],
+   "datasheet": {
+    "no": "SPI-DS-KT-202",
+    "title": "EQUIPMENT RECORD (generated from baseline data)",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "KT-202"
+       ],
+       [
+        "Description",
+        "TURBINE FOR KC-202"
+       ],
+       [
+        "Class",
+        "steam turbine driver"
+       ],
+       [
+        "Criticality",
+        "S"
+       ],
+       [
+        "Reference standard",
+        "API 612"
+       ],
+       [
+        "Spare parts in BoM",
+        "216"
+       ],
+       [
+        "Source",
+        "FuncLoc list and BoM, baseline data set (synthetic)"
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "tag": "BF-108",
+   "name": "Cracking Furnace Bf-108",
+   "kind": "fired",
+   "type": "cracking furnace item",
+   "unit": "Baseline site PX",
+   "area": "Not in baseline data",
+   "fluid": "Not in baseline data",
+   "crit": "HIGH CRITICAL",
+   "pid": {
+    "ref": "SPI-BF-108",
+    "title": "Cracking Furnace Bf-108 (schematic from data)",
+    "sys": "Generated from the baseline data set",
+    "process": "Cracking Furnace Bf-108 (BF-108) is a cracking furnace item in the baseline data set, criticality S (highest criticality). It has 103 different spare parts in the bill of materials; the list on this page shows the 40 most consumed. Parts, stock, Min and Max, issues, work notifications and lead times are records of the baseline data set (synthetic). The drawing and the data sheet are schematic and generated from these records: they are not vendor drawings. Reference standard for this equipment class: API 560."
+   },
+   "bom": [
+    {
+     "name": "Castable,Refractory,Dense,1500Deg C",
+     "mat": "Material 4100073350",
+     "qty": 1200
+    },
+    {
+     "name": "Firebrick,Insul,26,76T,114W,230L",
+     "mat": "Material 4100071521",
+     "qty": 1500
+    },
+    {
+     "name": "Firebrick,Insul,28,65T,114W,230L",
+     "mat": "Material 4100071552",
+     "qty": 400
+    },
+    {
+     "name": "Castable,Refractory,Dense,1600Deg C",
+     "mat": "Material 4100073384",
+     "qty": 200
+    },
+    {
+     "name": "Screw,Tapping,M6X20Mm,Cs Zn",
+     "mat": "Material 4100098110",
+     "qty": 400
+    },
+    {
+     "name": "Screw,Tapping,M4X25Mm,Cs Zn",
+     "mat": "Material 4100098180",
+     "qty": 50
+    },
+    {
+     "name": "Firebrick,Insul,23,65T,114W,230L",
+     "mat": "Material 4100071591",
+     "qty": 50
+    },
+    {
+     "name": "Firebrick,Insul,28,76T,114W,230L",
+     "mat": "Material 4100071608",
+     "qty": 120
+    },
+    {
+     "name": "Firebrick,Insul,26,65T,114W,230L",
+     "mat": "Material 4100071619",
+     "qty": 400
+    },
+    {
+     "name": "Castable,Refractory,Insul,1300Deg C",
+     "mat": "Material 4100073422",
+     "qty": 200
+    },
+    {
+     "name": "Castable,Refractory,Dense,1300Deg C",
+     "mat": "Material 4100073509",
+     "qty": 1200
+    },
+    {
+     "name": "Firebrick,Insul,28,76T,114W,230L",
+     "mat": "Material 4100071738",
+     "qty": 400
+    },
+    {
+     "name": "Studbolt,7/8Inx60Mm,B8M/8M",
+     "mat": "Material 4100024158 | B8M",
+     "qty": 20
+    },
+    {
+     "name": "Firebrick,Insul,23,65T,114W,230L",
+     "mat": "Material 4100071686",
+     "qty": 1500
+    },
+    {
+     "name": "Studbolt,5/8Inx85Mm,B7/2H",
+     "mat": "Material 4100024181 | B7",
+     "qty": 12
+    },
+    {
+     "name": "Anchor,Refractory,Type Gv126,A182F11",
+     "mat": "Material 4100080445 | A182F11",
+     "qty": 1500
+    },
+    {
+     "name": "Screw,Tapping,M3X16Mm,Cs Zn",
+     "mat": "Material 4100098240",
+     "qty": 50
+    },
+    {
+     "name": "Studbolt,3/4Inx75Mm,B8M/8M",
+     "mat": "Material 4100024218 | B8M",
+     "qty": 12
+    },
+    {
+     "name": "Castable,Refractory,Lw,1500Deg C",
+     "mat": "Material 4100073473",
+     "qty": 50
+    },
+    {
+     "name": "Firebrick,Insul,26,65T,114W,230L",
+     "mat": "Material 4100071925",
+     "qty": 1500
+    },
+    {
+     "name": "Pipe,1In,Sch80,P11,Smls,6M Lg",
+     "mat": "Material 4100027715 | P11",
+     "qty": 1
+    },
+    {
+     "name": "Castable,Refractory,Lw,1300Deg C",
+     "mat": "Material 4100073634",
+     "qty": 200
+    },
+    {
+     "name": "Gasket,Ring,8In,600#,Graphite",
+     "mat": "Material 4100014019",
+     "qty": 1
+    },
+    {
+     "name": "Valve,Gate,1-1/2In,300#,Cf8,Rf",
+     "mat": "Material 4100034556 | CF8",
+     "qty": 1
+    },
+    {
+     "name": "Elbow,90Deg,12In,Sch40,Ss316,Bw",
+     "mat": "Material 4100029697 | SS316",
+     "qty": 1
+    },
+    {
+     "name": "Ceramic Fiber,Blanket,25T,96Kg/M3,1260C",
+     "mat": "Material 4100075317",
+     "qty": 4
+    },
+    {
+     "name": "Elbow,45Deg,1/2In,Sch40,Ss316,Bw",
+     "mat": "Material 4100029734 | SS316",
+     "qty": 1
+    },
+    {
+     "name": "Anchor,Refractory,Size Mc296,Ss304",
+     "mat": "Material 4100079016 | SS304",
+     "qty": 50
+    },
+    {
+     "name": "Screw,Tapping,M4X10Mm,Cs Zn",
+     "mat": "Material 4100099271",
+     "qty": 50
+    },
+    {
+     "name": "Gasket,Sheet,12In,300#,Gr/304",
+     "mat": "Material 4100014119 | 304",
+     "qty": 1
+    },
+    {
+     "name": "Elbow,45Deg,1/4In,Sch40,A234Wpb,Sw",
+     "mat": "Material 4100029750 | A234WPB",
+     "qty": 1
+    },
+    {
+     "name": "Valve,Gate,6In,300#,A216Wcb,Rf",
+     "mat": "Material 4100034575 | A216WCB",
+     "qty": 3
+    },
+    {
+     "name": "Ceramic Fiber,Blanket,50T,96Kg/M3,1260C",
+     "mat": "Material 4100075356",
+     "qty": 4
+    },
+    {
+     "name": "Ceramic Fiber,Blanket,25T,96Kg/M3,1430C",
+     "mat": "Material 4100075392",
+     "qty": 5
+    },
+    {
+     "name": "Gasket,Sw,8In,600#,Graphite",
+     "mat": "Material 4100014225",
+     "qty": 1
+    },
+    {
+     "name": "Anchor,Refractory,Size Ob614,Incoloy",
+     "mat": "Material 4100079034",
+     "qty": 5037
+    },
+    {
+     "name": "Elbow,90Deg,3/4In,Sch40,A234Wpb,Bw",
+     "mat": "Material 4100029756 | A234WPB",
+     "qty": 1
+    },
+    {
+     "name": "Pipe,8In,Std,P11,Smls,6M Lg",
+     "mat": "Material 4100027986 | P11",
+     "qty": 3
+    },
+    {
+     "name": "Firebrick,Insul,28,65T,114W,230L",
+     "mat": "Material 4100071868",
+     "qty": 50
+    },
+    {
+     "name": "Anchor,Refractory,Model Ss521,A105",
+     "mat": "Material 4100079731 | A105",
+     "qty": 5037
+    }
+   ],
+   "datasheet": {
+    "no": "SPI-DS-BF-108",
+    "title": "EQUIPMENT RECORD (generated from baseline data)",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "BF-108"
+       ],
+       [
+        "Description",
+        "CRACKING FURNACE BF-108"
+       ],
+       [
+        "Class",
+        "cracking furnace item"
+       ],
+       [
+        "Criticality",
+        "S"
+       ],
+       [
+        "Reference standard",
+        "API 560"
+       ],
+       [
+        "Spare parts in BoM",
+        "103"
+       ],
+       [
+        "Source",
+        "FuncLoc list and BoM, baseline data set (synthetic)"
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "tag": "BF-110",
+   "name": "Cracking Furnace Bf-110",
+   "kind": "fired",
+   "type": "cracking furnace item",
+   "unit": "Baseline site PX",
+   "area": "Not in baseline data",
+   "fluid": "Not in baseline data",
+   "crit": "HIGH CRITICAL",
+   "pid": {
+    "ref": "SPI-BF-110",
+    "title": "Cracking Furnace Bf-110 (schematic from data)",
+    "sys": "Generated from the baseline data set",
+    "process": "Cracking Furnace Bf-110 (BF-110) is a cracking furnace item in the baseline data set, criticality S (highest criticality). It has 96 different spare parts in the bill of materials; the list on this page shows the 40 most consumed. Parts, stock, Min and Max, issues, work notifications and lead times are records of the baseline data set (synthetic). The drawing and the data sheet are schematic and generated from these records: they are not vendor drawings. Reference standard for this equipment class: API 560."
+   },
+   "bom": [
+    {
+     "name": "Castable,Refractory,Dense,1500Deg C",
+     "mat": "Material 4100073350",
+     "qty": 50
+    },
+    {
+     "name": "Firebrick,Insul,26,76T,114W,230L",
+     "mat": "Material 4100071521",
+     "qty": 400
+    },
+    {
+     "name": "Firebrick,Insul,28,65T,114W,230L",
+     "mat": "Material 4100071552",
+     "qty": 50
+    },
+    {
+     "name": "Castable,Refractory,Insul,1600Deg C",
+     "mat": "Material 4100073394",
+     "qty": 50
+    },
+    {
+     "name": "Castable,Refractory,Dense,1600Deg C",
+     "mat": "Material 4100073384",
+     "qty": 200
+    },
+    {
+     "name": "Screw,Tapping,M6X20Mm,Cs Zn",
+     "mat": "Material 4100098110",
+     "qty": 400
+    },
+    {
+     "name": "Firebrick,Insul,23,76T,114W,230L",
+     "mat": "Material 4100071553",
+     "qty": 50
+    },
+    {
+     "name": "Firebrick,Insul,23,65T,114W,230L",
+     "mat": "Material 4100071591",
+     "qty": 5037
+    },
+    {
+     "name": "Screw,Tapping,M5X25Mm,Ss304",
+     "mat": "Material 4100098171 | SS304",
+     "qty": 5037
+    },
+    {
+     "name": "Screw,Tapping,M3X16Mm,Ss304",
+     "mat": "Material 4100098169 | SS304",
+     "qty": 5037
+    },
+    {
+     "name": "Castable,Refractory,Insul,1300Deg C",
+     "mat": "Material 4100073422",
+     "qty": 25
+    },
+    {
+     "name": "Firebrick,Insul,28,76T,114W,230L",
+     "mat": "Material 4100071673",
+     "qty": 5037
+    },
+    {
+     "name": "Studbolt,7/8Inx60Mm,B8M/8M",
+     "mat": "Material 4100024158 | B8M",
+     "qty": 4
+    },
+    {
+     "name": "Firebrick,Insul,23,65T,114W,230L",
+     "mat": "Material 4100071686",
+     "qty": 1500
+    },
+    {
+     "name": "Studbolt,5/8Inx85Mm,B7/2H",
+     "mat": "Material 4100024181 | B7",
+     "qty": 8
+    },
+    {
+     "name": "Screw,Tapping,M6X16Mm,Ss304",
+     "mat": "Material 4100098225 | SS304",
+     "qty": 50
+    },
+    {
+     "name": "Gasket,Ring,1-1/2In,300#,Ptfe",
+     "mat": "Material 4100014000",
+     "qty": 2
+    },
+    {
+     "name": "Castable,Refractory,Insul,1600Deg C",
+     "mat": "Material 4100073733",
+     "qty": 25
+    },
+    {
+     "name": "Elbow,90Deg,1-1/2In,Sch80,Ss316,Sw",
+     "mat": "Material 4100029645 | SS316",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,5/8Inx30Mm,B16/4",
+     "mat": "Material 4100024362 | B16",
+     "qty": 20
+    },
+    {
+     "name": "Firebrick,Insul,28,65T,114W,230L",
+     "mat": "Material 4100072053",
+     "qty": 5037
+    },
+    {
+     "name": "Gasket,Ring,8In,600#,Graphite",
+     "mat": "Material 4100014019",
+     "qty": 1
+    },
+    {
+     "name": "Pipe,1/2In,Std,P11,Smls,6M Lg",
+     "mat": "Material 4100027753 | P11",
+     "qty": 1
+    },
+    {
+     "name": "Elbow,90Deg,12In,Sch40,Ss316,Bw",
+     "mat": "Material 4100029697 | SS316",
+     "qty": 1
+    },
+    {
+     "name": "Ceramic Fiber,Blanket,25T,96Kg/M3,1260C",
+     "mat": "Material 4100075317",
+     "qty": 2
+    },
+    {
+     "name": "Anchor,Refractory,Size Ty222,A182F11",
+     "mat": "Material 4100079028 | A182F11",
+     "qty": 1500
+    },
+    {
+     "name": "Studbolt,7/8Inx100Mm,B16/4",
+     "mat": "Material 4100024822 | B16",
+     "qty": 8
+    },
+    {
+     "name": "Screw,Tapping,M5X25Mm,Cs Zn",
+     "mat": "Material 4100098244",
+     "qty": 1500
+    },
+    {
+     "name": "Firebrick,Insul,23,76T,114W,230L",
+     "mat": "Material 4100072939",
+     "qty": 1500
+    },
+    {
+     "name": "Elbow,45Deg,1/4In,Sch40,A234Wpb,Sw",
+     "mat": "Material 4100029750 | A234WPB",
+     "qty": 1
+    },
+    {
+     "name": "Ceramic Fiber,Blanket,50T,96Kg/M3,1260C",
+     "mat": "Material 4100075356",
+     "qty": 1
+    },
+    {
+     "name": "Ceramic Fiber,Blanket,25T,96Kg/M3,1430C",
+     "mat": "Material 4100075392",
+     "qty": 2
+    },
+    {
+     "name": "Screw,Tapping,M4X25Mm,Ss304",
+     "mat": "Material 4100098499 | SS304",
+     "qty": 120
+    },
+    {
+     "name": "Ceramic Fiber,Blanket,50T,128Kg/M3,1260C",
+     "mat": "Material 4100075418",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Ring,1In,300#,Ptfe",
+     "mat": "Material 4100014252",
+     "qty": 1
+    },
+    {
+     "name": "Gasket,Sw,3/4In,300#,Graphite",
+     "mat": "Material 4100014256",
+     "qty": 1
+    },
+    {
+     "name": "Ceramic Fiber,Blanket,25T,128Kg/M3,1430C",
+     "mat": "Material 4100075429",
+     "qty": 3
+    },
+    {
+     "name": "Castable,Refractory,Lw,1300Deg C",
+     "mat": "Material 4100074336",
+     "qty": 200
+    },
+    {
+     "name": "Valve,Gate,1In,150#,A216Wcb,Sw",
+     "mat": "Material 4100034740 | A216WCB",
+     "qty": 1
+    },
+    {
+     "name": "Pipe,3/4In,Std,P11,Smls,6M Lg",
+     "mat": "Material 4100028631 | P11",
+     "qty": 3
+    }
+   ],
+   "datasheet": {
+    "no": "SPI-DS-BF-110",
+    "title": "EQUIPMENT RECORD (generated from baseline data)",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "BF-110"
+       ],
+       [
+        "Description",
+        "CRACKING FURNACE BF-110"
+       ],
+       [
+        "Class",
+        "cracking furnace item"
+       ],
+       [
+        "Criticality",
+        "S"
+       ],
+       [
+        "Reference standard",
+        "API 560"
+       ],
+       [
+        "Spare parts in BoM",
+        "96"
+       ],
+       [
+        "Source",
+        "FuncLoc list and BoM, baseline data set (synthetic)"
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "tag": "PP-148A",
+   "name": "Reflux Pump",
+   "kind": "pump",
+   "type": "centrifugal pump",
+   "unit": "Baseline site PX",
+   "area": "Not in baseline data",
+   "fluid": "Not in baseline data",
+   "crit": "HIGH CRITICAL",
+   "pid": {
+    "ref": "SPI-PP-148A",
+    "title": "Reflux Pump (schematic from data)",
+    "sys": "Generated from the baseline data set",
+    "process": "Reflux Pump (PP-148A) is a centrifugal pump in the baseline data set, criticality S (highest criticality). It has 13 different spare parts in the bill of materials; the list on this page shows the 13 most consumed. Parts, stock, Min and Max, issues, work notifications and lead times are records of the baseline data set (synthetic). The drawing and the data sheet are schematic and generated from these records: they are not vendor drawings. Reference standard for this equipment class: API 610 / API 682."
+   },
+   "bom": [
+    {
+     "name": "Studbolt,7/8Inx60Mm,B8M/8M",
+     "mat": "Material 4100024158 | B8M",
+     "qty": 4
+    },
+    {
+     "name": "Gasket,Ring,1-1/2In,300#,Ptfe",
+     "mat": "Material 4100014000",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,6316",
+     "mat": "Material 4100000129",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,3/4Inx80Mm,B7/2H",
+     "mat": "Material 4100024659 | B7",
+     "qty": 8
+    },
+    {
+     "name": "O-Ring,Viton,252Mm Id,5.3Mm Cs",
+     "mat": "Material 4100019559",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Nbr,137Mm Id,3.5Mm Cs",
+     "mat": "Material 4100019691",
+     "qty": 1
+    },
+    {
+     "name": "Seal,Mechanical,Type Wb489,Nbr",
+     "mat": "Material 4100005164",
+     "qty": 4
+    },
+    {
+     "name": "O-Ring,Epdm,110Mm Id,5.3Mm Cs",
+     "mat": "Material 4100019872",
+     "qty": 1
+    },
+    {
+     "name": "O-Ring,Viton,83Mm Id,3.5Mm Cs",
+     "mat": "Material 4100019838",
+     "qty": 1
+    },
+    {
+     "name": "Seal,Mechanical,Model Hv667,Monel",
+     "mat": "Material 4100005349",
+     "qty": 1
+    },
+    {
+     "name": "Impeller,Dwg.837-5723,For Pp-148A",
+     "mat": "Material 4300021368",
+     "qty": 1
+    },
+    {
+     "name": "Impeller,Dwg.309-1170,For Pp-148A",
+     "mat": "Material 4300021407",
+     "qty": 4
+    },
+    {
+     "name": "Seal,Mechanical,Type Im456,Nbr",
+     "mat": "Material 4100006374",
+     "qty": 1
+    }
+   ],
+   "datasheet": {
+    "no": "SPI-DS-PP-148A",
+    "title": "EQUIPMENT RECORD (generated from baseline data)",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "PP-148A"
+       ],
+       [
+        "Description",
+        "REFLUX PUMP"
+       ],
+       [
+        "Class",
+        "centrifugal pump"
+       ],
+       [
+        "Criticality",
+        "S"
+       ],
+       [
+        "Reference standard",
+        "API 610 / API 682"
+       ],
+       [
+        "Spare parts in BoM",
+        "13"
+       ],
+       [
+        "Source",
+        "FuncLoc list and BoM, baseline data set (synthetic)"
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "tag": "PP-411A",
+   "name": "Condensate Pump",
+   "kind": "pump",
+   "type": "centrifugal pump",
+   "unit": "Baseline site PX",
+   "area": "Not in baseline data",
+   "fluid": "Not in baseline data",
+   "crit": "HIGH CRITICAL",
+   "pid": {
+    "ref": "SPI-PP-411A",
+    "title": "Condensate Pump (schematic from data)",
+    "sys": "Generated from the baseline data set",
+    "process": "Condensate Pump (PP-411A) is a centrifugal pump in the baseline data set, criticality S (highest criticality). It has 12 different spare parts in the bill of materials; the list on this page shows the 12 most consumed. Parts, stock, Min and Max, issues, work notifications and lead times are records of the baseline data set (synthetic). The drawing and the data sheet are schematic and generated from these records: they are not vendor drawings. Reference standard for this equipment class: API 610 / API 682."
+   },
+   "bom": [
+    {
+     "name": "Studbolt,5/8Inx45Mm,B16/4",
+     "mat": "Material 4100024318 | B16",
+     "qty": 16
+    },
+    {
+     "name": "Gasket,Ring,1-1/2In,300#,Ptfe",
+     "mat": "Material 4100014000",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,6316",
+     "mat": "Material 4100000129",
+     "qty": 1
+    },
+    {
+     "name": "Bearing,Ball,1Row,Deep Groove,6305",
+     "mat": "Material 4100000203",
+     "qty": 1
+    },
+    {
+     "name": "Coupling,Size Fe254,Ss316",
+     "mat": "Material 4100010618 | SS316",
+     "qty": 1
+    },
+    {
+     "name": "Seal,Mechanical,Type Av862,Nbr",
+     "mat": "Material 4100005227",
+     "qty": 1
+    },
+    {
+     "name": "Coupling,Dwg.244-6854,For Pp-411A",
+     "mat": "Material 4300057439",
+     "qty": 1
+    },
+    {
+     "name": "Ring,Wear,Dwg.403-8588,For Pp-411A",
+     "mat": "Material 4300057460",
+     "qty": 1
+    },
+    {
+     "name": "Ring,Wear,Model Qx377,A105",
+     "mat": "Material 4100013139 | A105",
+     "qty": 1
+    },
+    {
+     "name": "Ring,Wear,Model Cn469,A105",
+     "mat": "Material 4100012530 | A105",
+     "qty": 1
+    },
+    {
+     "name": "Coupling,Type Ez965,Incoloy",
+     "mat": "Material 4100010600",
+     "qty": 3
+    },
+    {
+     "name": "Gasket,Ring,1/4In,150#,Ptfe",
+     "mat": "Material 4100016305",
+     "qty": 1
+    }
+   ],
+   "datasheet": {
+    "no": "SPI-DS-PP-411A",
+    "title": "EQUIPMENT RECORD (generated from baseline data)",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "PP-411A"
+       ],
+       [
+        "Description",
+        "CONDENSATE PUMP"
+       ],
+       [
+        "Class",
+        "centrifugal pump"
+       ],
+       [
+        "Criticality",
+        "S"
+       ],
+       [
+        "Reference standard",
+        "API 610 / API 682"
+       ],
+       [
+        "Spare parts in BoM",
+        "12"
+       ],
+       [
+        "Source",
+        "FuncLoc list and BoM, baseline data set (synthetic)"
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "tag": "HE-605",
+   "name": "Wash Water Exchanger",
+   "kind": "hx",
+   "type": "shell and tube heat exchanger",
+   "unit": "Baseline site PX",
+   "area": "Not in baseline data",
+   "fluid": "Not in baseline data",
+   "crit": "CRITICAL",
+   "pid": {
+    "ref": "SPI-HE-605",
+    "title": "Wash Water Exchanger (schematic from data)",
+    "sys": "Generated from the baseline data set",
+    "process": "Wash Water Exchanger (HE-605) is a shell and tube heat exchanger in the baseline data set, criticality A (high criticality). It has 10 different spare parts in the bill of materials; the list on this page shows the 10 most consumed. Parts, stock, Min and Max, issues, work notifications and lead times are records of the baseline data set (synthetic). The drawing and the data sheet are schematic and generated from these records: they are not vendor drawings. Reference standard for this equipment class: TEMA / API 660."
+   },
+   "bom": [
+    {
+     "name": "Pipe,1In,Sch80,P11,Smls,6M Lg",
+     "mat": "Material 4100027715 | P11",
+     "qty": 6
+    },
+    {
+     "name": "Studbolt,1/2Inx105Mm,B16/4",
+     "mat": "Material 4100024393 | B16",
+     "qty": 12
+    },
+    {
+     "name": "Gasket,Ring,2In,300#,Ptfe",
+     "mat": "Material 4100014049",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,1/2Inx30Mm,B16/4",
+     "mat": "Material 4100025621 | B16",
+     "qty": 16
+    },
+    {
+     "name": "Pipe,2In,Std,Cs,Smls,6M Lg",
+     "mat": "Material 4100027779",
+     "qty": 3
+    },
+    {
+     "name": "Pipe,1-1/2In,Sch80,P11,Smls,6M Lg",
+     "mat": "Material 4100027918 | P11",
+     "qty": 6
+    },
+    {
+     "name": "Gasket,Ring,10In,150#,Graphite",
+     "mat": "Material 4100014625",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,5/8Inx85Mm,B8M/8M",
+     "mat": "Material 4100025027 | B8M",
+     "qty": 12
+    },
+    {
+     "name": "Studbolt,5/8Inx90Mm,B7/2H",
+     "mat": "Material 4100025542 | B7",
+     "qty": 20
+    },
+    {
+     "name": "Pipe,1In,Sch40,Ss316,Smls,6M Lg",
+     "mat": "Material 4100028442 | SS316",
+     "qty": 3
+    }
+   ],
+   "datasheet": {
+    "no": "SPI-DS-HE-605",
+    "title": "EQUIPMENT RECORD (generated from baseline data)",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "HE-605"
+       ],
+       [
+        "Description",
+        "WASH WATER EXCHANGER"
+       ],
+       [
+        "Class",
+        "shell and tube heat exchanger"
+       ],
+       [
+        "Criticality",
+        "A"
+       ],
+       [
+        "Reference standard",
+        "TEMA / API 660"
+       ],
+       [
+        "Spare parts in BoM",
+        "10"
+       ],
+       [
+        "Source",
+        "FuncLoc list and BoM, baseline data set (synthetic)"
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "tag": "FCV-1905D",
+   "name": "He-163D Outlet Flow",
+   "kind": "valve",
+   "type": "flow control valve",
+   "unit": "Baseline site PX",
+   "area": "Not in baseline data",
+   "fluid": "Not in baseline data",
+   "crit": "HIGH CRITICAL",
+   "pid": {
+    "ref": "SPI-FCV-1905D",
+    "title": "He-163D Outlet Flow (schematic from data)",
+    "sys": "Generated from the baseline data set",
+    "process": "He-163D Outlet Flow (FCV-1905D) is a flow control valve in the baseline data set, criticality S (highest criticality). It has 10 different spare parts in the bill of materials; the list on this page shows the 10 most consumed. Parts, stock, Min and Max, issues, work notifications and lead times are records of the baseline data set (synthetic). The drawing and the data sheet are schematic and generated from these records: they are not vendor drawings. Reference standard for this equipment class: API 6D / ISA-75."
+   },
+   "bom": [
+    {
+     "name": "Gasket,Ring,12In,600#,Ptfe",
+     "mat": "Material 4100014829",
+     "qty": 1
+    },
+    {
+     "name": "Seat Ring,Valve,Size Mu249,Graphite",
+     "mat": "Material 4100050203",
+     "qty": 1
+    },
+    {
+     "name": "Diaphragm,Actuator,Model Ob629,Ss316",
+     "mat": "Material 4100048174 | SS316",
+     "qty": 1
+    },
+    {
+     "name": "Packing Set,Valve,Type Ee99,Ss316",
+     "mat": "Material 4100045989 | SS316",
+     "qty": 1
+    },
+    {
+     "name": "Trim Set,Control Valve,Dwg.250-7414,For ",
+     "mat": "Material 4300075103",
+     "qty": 1
+    },
+    {
+     "name": "Studbolt,5/8Inx55Mm,B7/2H",
+     "mat": "Material 4100025316 | B7",
+     "qty": 4
+    },
+    {
+     "name": "Trim Set,Control Valve,Dwg.515-9968,For ",
+     "mat": "Material 4300075066",
+     "qty": 1
+    },
+    {
+     "name": "Seat Ring,Valve,Dwg.529-3088,For Fcv-190",
+     "mat": "Material 4300075079",
+     "qty": 4
+    },
+    {
+     "name": "Positioner,Valve,Dwg.470-4988,For Fcv-19",
+     "mat": "Material 4300075051",
+     "qty": 1
+    },
+    {
+     "name": "Seat Ring,Valve,Dwg.376-4869,For Fcv-190",
+     "mat": "Material 4300075027",
+     "qty": 1
+    }
+   ],
+   "datasheet": {
+    "no": "SPI-DS-FCV-1905D",
+    "title": "EQUIPMENT RECORD (generated from baseline data)",
+    "sections": [
+     [
+      "Identification",
+      [
+       [
+        "Item / Tag No.",
+        "FCV-1905D"
+       ],
+       [
+        "Description",
+        "HE-163D OUTLET FLOW"
+       ],
+       [
+        "Class",
+        "flow control valve"
+       ],
+       [
+        "Criticality",
+        "S"
+       ],
+       [
+        "Reference standard",
+        "API 6D / ISA-75"
+       ],
+       [
+        "Spare parts in BoM",
+        "10"
+       ],
+       [
+        "Source",
+        "FuncLoc list and BoM, baseline data set (synthetic)"
+       ]
+      ]
+     ]
+    ]
+   }
+  }
+ ],
+ "documents": [],
+ "history": {
+  "source": "mh.json"
+ }
+}
