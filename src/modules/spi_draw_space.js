@@ -125,7 +125,7 @@ function spiSpSetOfLoc(x){const tag=(x.tag||"").toUpperCase(),own=K.sets.find(s=
  const cls=(typeof spiSubCls==="function"&&spiSubCls((x.eq_class||"").toUpperCase(),x.descr))||(typeof spiClsOf==="function"&&spiClsOf((x.eq_class||"").toUpperCase()));if(!cls)return 0;
  const s=K.sets.find(q=>spiSpCls(q.n)===cls);if(s)return s.n;const t=(P3.tpl||[]).find(q=>q.cls===cls);return t?t.n:0}
 function spiSpPaint(){const R=document.getElementById("sp_res");if(!R||!SPSP.res)return;const {L,loc,parts}=SPSP.res;let h="";
- if(L.sets.length)h+=`<div class="sp-g">Units in the library</div>`+L.sets.map(n=>`<button class="sp-r" onclick="spiSpGo('${n}')"><b>${esc(spiSpU(n).tag)}</b><span>${esc(spiSpU(n).name)}${spiSpU(n).tpl?"":" | "+esc(spiSpLab(n))}</span></button>`).join("");
+ if(L.sets.length)h+=`<div class="sp-g">Units in the library</div>`+L.sets.map(n=>`<button class="sp-r" onclick="${spiSpU(n).tpl?`spiSpGo('${n}')`:`spiSpGo('${n}');setTimeout(()=>exOpenSet(${n}),600)`}"><b>${esc(spiSpU(n).tag)}</b><span>${esc(spiSpU(n).name)}${spiSpU(n).tpl?"":" | "+esc(spiSpLab(n))}</span></button>`).join("");
  if(L.inside.length)h+=`<div class="sp-g">Parts inside the sets</div>`+L.inside.slice(0,3).map(g=>g.hits.slice(0,3).map(b=>`<button class="sp-r" onclick="spiSpPart('${g.n}',${spiSpMat(b)||0},'${esc(b.name).replace(/'/g,"")}')"><b>${esc(S(g.n).tag)}</b><span>${esc(typeof spiDesc==="function"?spiDesc(b.name):b.name)}</span></button>`).join("")).join("");
  if(loc&&loc.length)h+=`<div class="sp-g">Locations in the plant</div>`+loc.map(x=>{const n=spiSpSetOfLoc(x);return `<button class="sp-r" data-f="${esc(x.funcloc).replace(/"/g,"&quot;")}" onclick="spiSpLoc(this.dataset.f)"><b>${esc(x.tag||x.funcloc)}</b><span>${esc(typeof spiName==="function"?spiName(x.descr||""):x.descr||"")}${n?" | shown on "+esc(spiSpU(n).tag)+(spiSpU(n).tpl?" template":""):" | no 3D template"}</span></button>`}).join("");
  if(parts&&parts.length)h+=`<div class="sp-g">Parts in the catalogue${SPSP.res.pt?" ("+spiNum(SPSP.res.pt)+" match)":""}</div>`+parts.map(p=>`<button class="sp-r" onclick="spiSpCat(${p.material_no})"><b>${esc(p.material_no)}</b><span>${esc(typeof spiDesc==="function"?spiDesc(p.descr):p.descr)}</span></button>`).join("");
@@ -137,7 +137,7 @@ function spiSpPart(n,mat,descr){n=spiSpK(n);spiSpGo(n);setTimeout(()=>{if(typeof
 async function spiSpLoc(funcloc){const R=document.getElementById("sp_res"),x=((SPSP.res&&SPSP.res.loc)||[]).find(q=>q.funcloc===funcloc);if(R)R.hidden=true;if(!x)return;
  const n=spiSpSetOfLoc(x);if(!n){exOpenFunc(funcloc);return}
  const own=!spiSpU(n).tpl&&S(n).tag.toUpperCase()===(x.tag||"").toUpperCase();
- SPSP.focus=own?null:{n:spiSpRep(n),funcloc:x.funcloc,tag:x.tag,descr:x.descr,note:"No set of its own. Shown on "+spiSpU(n).tag+", the template for this equipment class."};spiSpFly(n)}
+ SPSP.focus=null;spiSpFly(n);if(typeof exOpenFunc==="function")setTimeout(()=>exOpenFunc(funcloc),600)}
 async function spiSpCat(mat){const R=document.getElementById("sp_res");if(R)R.hidden=true;
  const row=((SPSP.res&&SPSP.res.parts)||[]).find(p=>p.material_no===mat),descr=row?row.descr:"";
  /* the set whose bill of materials holds the part, else the unit of the class of the first location that uses it */

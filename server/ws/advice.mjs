@@ -23,11 +23,12 @@ export function advise(p, o, A) {
   /* search: order size (months of demand) and service level at or above the target; today's Min and Max is a candidate too, so the recommendation never costs more than today */
   let best = null; if (mu > 0) { const covers = o.cover > 0 ? [o.cover] : [1, 2, 3, 4, 6, 9, 12, 18, 24], svcs = [svc, 0.99, 0.995, 0.999].filter((x, k, a) => x >= svc && a.indexOf(x) === k);
     covers.forEach((c) => svcs.forEach((sv) => { const r0 = Math.ceil(muL + zOf(sv) * sdL), S0 = r0 + Math.ceil(c * mu); if (o.cap && p.max_qty > 0 && S0 > p.max_qty) return; const e = evalPart(p, { mode: "fixed", rop: r0, max: S0 }, A); if (!best || e.total < best.e.total) best = { rop: r0, S: S0, cover: c, service: sv, e, source: "calculated" }; }));
-    if (!(o.cover > 0) && cur.max > 0 && (!best || cur.total <= best.e.total)) best = { rop: p.min_qty || 0, S: Math.max(p.max_qty || 0, p.min_qty || 0), cover: Math.max(1, Math.round(((p.max_qty || 0) - (p.min_qty || 0)) / mu)), service: null, e: cur, source: "current" }; }
+    if (!(o.cover > 0) && (!best || cur.total <= best.e.total)) best = { rop: p.min_qty || 0, S: Math.max(p.max_qty || 0, p.min_qty || 0), cover: Math.max(1, Math.round(((p.max_qty || 0) - (p.min_qty || 0)) / mu)), service: null, e: cur, source: "current" }; }
   if (!best && mu > 0) best = { rop: p.min_qty || 0, S: Math.max(p.max_qty || 0, p.min_qty || 0), cover: 1, service: null, e: cur, source: "current" };
   const rop = best ? best.rop : 0, S = best ? best.S : 0, cover = best ? best.cover : 0;
   let decision = "none", qty = 0, orderBy = null, months_to_rop = null;
   if (mu <= 0) decision = (p.stock || 0) > 0 ? "hold_no_use" : "none";
+  else if (S <= 0) { decision = "to_order"; }
   else if (pos <= rop) { decision = "order_now"; qty = S - pos; orderBy = CUTOFF; months_to_rop = 0; }
   else { months_to_rop = (pos - rop) / mu; if (months_to_rop <= H) { decision = "order_by"; qty = S - rop; orderBy = addDays(addDays(CUTOFF, months_to_rop * MD), -leadD); if (orderBy < CUTOFF) { orderBy = CUTOFF; decision = "order_now"; } } else decision = "no_order"; }
   const use = mu * H, excessUnits = Math.max(0, (p.stock || 0) - Math.max(S, Math.ceil(use + rop))), rec = best ? best.e : evalPart(p, { mode: "fixed", rop: 0, max: 0 }, A);
@@ -54,13 +55,13 @@ export default guard(async (req, res) => {
     from part_profile p join material t using(material_no) where p.material_no in (${ch.map(() => "?").join(",")})`).all(CUTOFF, ...ch)); }
   const o = { cap: String(i.cap) === "1", release_idle: String(i.release_idle) === "1", apply: list(i.apply).map((x) => x.toUpperCase()), horizon: H, cover, lead: i.lead || "median", service: { S: 0.98, A: 0.95, B: 0.9, C: 0.85, ...P(i.service) } };
   if (i.mu != null && i.mu !== "" && rows.length === 1) { rows[0].mu_override = Number(i.mu); rows[0].sd_override = Number(i.sd) || 0; }
-  let out = rows.map((p) => advise(p, o, A)), rank = { order_now: 0, order_by: 1, no_order: 2, hold_no_use: 3, none: 4 };
+  let out = rows.map((p) => advise(p, o, A)), rank = { order_now: 0, order_by: 1, to_order: 2, no_order: 3, hold_no_use: 4, none: 5 };
   const SORT = { saving: (a, b) => b.saving_per_year - a.saving_per_year, value: (a, b) => (b.order_value || 0) - (a.order_value || 0), risk: (a, b) => b.risk.stockout_in_lead_time - a.risk.stockout_in_lead_time || b.risk.downtime_cost_per_stockout - a.risk.downtime_cost_per_stockout, date: (a, b) => String(a.order_by || "9").localeCompare(String(b.order_by || "9")), excess: (a, b) => b.risk.excess_value - a.risk.excess_value,
     imp_emergency: (a, b) => (b.impact.current.emergency_cost - b.impact.recommended.emergency_cost) - (a.impact.current.emergency_cost - a.impact.recommended.emergency_cost),
     imp_purchase: (a, b) => (b.impact.current.purchase_carry - b.impact.recommended.purchase_carry) - (a.impact.current.purchase_carry - a.impact.recommended.purchase_carry),
     imp_capital: (a, b) => (b.impact.current.working_capital - b.impact.recommended.working_capital) - (a.impact.current.working_capital - a.impact.recommended.working_capital),
     imp_downtime: (a, b) => (b.impact.current.downtime_cost - b.impact.recommended.downtime_cost) - (a.impact.current.downtime_cost - a.impact.recommended.downtime_cost) };
-  const counts = { order_now: 0, order_by: 0, no_order: 0, hold_no_use: 0, none: 0, high: 0, medium: 0, excess: 0, low: 0 }; out.forEach((x) => { counts[x.decision]++; counts[x.level]++; });
+  const counts = { order_now: 0, order_by: 0, to_order: 0, no_order: 0, hold_no_use: 0, none: 0, high: 0, medium: 0, excess: 0, low: 0 }; out.forEach((x) => { counts[x.decision]++; counts[x.level]++; });
   if (all) { const dec = list(i.decision), lv = list(i.level); if (dec.length) out = out.filter((x) => dec.includes(x.decision)); if (lv.length) out = out.filter((x) => lv.includes(x.level)); out.sort(SORT[i.sort] || SORT.saving); }
   else out.sort((a, b) => rank[a.decision] - rank[b.decision] || (b.saving_per_year - a.saving_per_year));
   const t = { parts: out.length, order_now: out.filter((x) => x.decision === "order_now").length, order_by: out.filter((x) => x.decision === "order_by").length, no_order: out.filter((x) => x.decision === "no_order").length, no_use: out.filter((x) => x.decision === "hold_no_use").length,
