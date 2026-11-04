@@ -9,6 +9,9 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 
 **Updated:** 2026-11-04   **Branch:** claude/funny-edison-pis09w   **Last commit:** see git log
 
+## Round 9 (2026-11-04)
+- Secondary tabs on the one engine and without blunt tables: planner cost chart, simulator recommended policy (cheapest of engine, formula, cost-curve minimum; never dearer than today), purchase plan on engine orders, Summary tiles on the engine, Stock opens the first part, class names instead of codes, takeaways; consistency test for orders now.
+
 ## Round 8 (2026-11-04)
 - Answer band on the four landing tabs (`spi_zone_aiview.js`): sentence, four figures against today, first actions, model check; data from A's /api/data/project and /api/data/golden, B's /api/ws/aimaint. No 'AI' wording in titles (owner). Costs recommended view on A's engine. Raw rows behind a toggle. Suppliers: critical parts grouped by slow supplier.
 

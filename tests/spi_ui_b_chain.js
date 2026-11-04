@@ -126,7 +126,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   /* inventory planner: one part and one equipment set */
   await p.evaluate(() => { IP.mode = "part"; IP.mat = 4100000129; go("spi_iplan") }); await p.waitForFunction(() => document.querySelector(".ip-steps"), null, { timeout: 30000 }).catch(() => {});
   ok("planner: a part shows stock, projected use, recommendation and cost reduction", (await p.$$(".ip-step")).length === 4 && await p.evaluate(() => !!SPIWS.views.iplan.outputs.part && SPIWS.views.iplan.outputs.projection.months.length === 12));
-  ok("planner: the cost table and the risk analysis are shown", !!(await p.$(".ws-cmp .tot")) && (await p.$$(".ip-risk")).length >= 8);
+  ok("planner: the cost chart with the policy change and the risk analysis are shown", (await p.$$(".ip-chg")).length === 4 && (await p.$$(".ip-risk")).length >= 8);
   await p.evaluate(() => { IP.mode = "set"; IP.set = "PP-148A"; ipInputs(); ipRun() }); await p.waitForFunction(() => document.querySelector(".ip-row"), null, { timeout: 30000 }).catch(() => {});
   ok("planner: an equipment set lists every part with its decision", await p.evaluate(() => document.querySelectorAll(".ip-row").length === SPIWS.views.iplan.outputs.totals.parts && SPIWS.views.iplan.outputs.totals.parts > 0));
   await p.evaluate(() => document.querySelector(".ip-row").click()); await p.waitForFunction(() => document.querySelector(".ip-steps"), null, { timeout: 30000 }).catch(() => {});
@@ -211,6 +211,14 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   }
   await p.evaluate(() => ciView("rec")); await p.waitForTimeout(6000);
   ok("costs: the answer band and the impact tool show the same yearly saving", await p.evaluate(() => { const a = [...document.querySelectorAll(".aiv-t b")].map(e => e.textContent), k = [...document.querySelectorAll(".kb-kpi .kb-kv")].map(e => e.textContent); return a[1] && k.includes(a[1]) }));
+  /* round 9: one figure for "order now" on the Summary, the Inventory landing band and Status */
+  await p.evaluate(() => go("spi_summ")); await p.waitForFunction(() => { const e = document.querySelector("#sm_s_reorder .sm-v"); return e && /\d/.test(e.textContent) }, null, { timeout: 40000 }).catch(() => {}); await p.waitForTimeout(2500);
+  const smNow = await p.evaluate(() => document.querySelector("#sm_s_reorder .sm-v").textContent.trim());
+  await p.evaluate(() => go("spi_golden")); await p.waitForFunction(() => document.querySelectorAll(".aiv .aiv-t").length === 4, null, { timeout: 40000 }).catch(() => {});
+  const bandNow = await p.evaluate(() => (document.querySelector(".aiv .aiv-t b") || {}).textContent || "");
+  await p.evaluate(() => go("spi_status")); await p.waitForFunction(() => document.querySelectorAll(".st-c").length >= 5, null, { timeout: 40000 }).catch(() => {});
+  const stNow = await p.evaluate(() => { const c = [...document.querySelectorAll(".st-c")].find(e => /Order now/.test(e.textContent)); return c ? c.querySelector("b").textContent.trim() : "" });
+  ok("one figure for parts to order now: Summary, landing band and Status agree", smNow && bandNow.startsWith(smNow) && stNow === smNow, `${smNow} | ${bandNow} | ${stNow}`);
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
