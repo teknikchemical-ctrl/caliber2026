@@ -21,6 +21,7 @@ const syClean=r=>{const o={...r};["n","t0","t1","t2","mon","_p"].forEach(k=>dele
 const syWoSig=rows=>rows.length+":"+rows.map(r=>r.wo).join(",").length;
 SYNC.init=syInit;
 async function syInit(){
+  if(typeof window!=="undefined"&&window.SPI_MODE){SYNC.state="off";SYNC.on=false;AI.conn={state:"local",label:"AI planning not yet tested"};return}
   if(SYNC.on||location.protocol==="file:"||!/^https?:$/.test(location.protocol)){syLabel();return}
   SYNC.on=true;
   try{const h=await syApi("health",{timeout:6000});if(!h||!h.ok)throw new Error("no server");SYNC.state="online";SYNC.ai=h.ai;SYNC.access=h.access||{};SYNC.canSetKey=!!h.canSetKey;syAiSetup();await syPull(true);setTimeout(()=>{try{syEmbed()}catch(e){}},4000);SYNC.timer=setInterval(()=>{if(!document.hidden)syTick()},SYNC.poll);document.addEventListener("visibilitychange",()=>{if(!document.hidden)syTick()})}

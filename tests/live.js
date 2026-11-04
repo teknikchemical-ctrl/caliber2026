@@ -196,7 +196,7 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  await A.evaluate(()=>syFlush());await B.evaluate(()=>syNow());await B.waitForTimeout(800);
  ok(await B.evaluate(()=>MH.some(r=>r.wo==="WO-IMP-1")),"imported work order shared to B");
  /* feedback */
- await A.evaluate(()=>FB.add({verdict:"Wrong",q:"test question",note:""}));await A.waitForTimeout(1500);await B.evaluate(()=>syNow());await B.waitForTimeout(800);
+ await A.evaluate(()=>FB.add({verdict:"Wrong",q:"test question",note:""}));await A.waitForFunction(()=>!SYNC.flushing,null,{timeout:20000});await A.evaluate(()=>syFlush());await B.evaluate(()=>syNow());await B.waitForFunction(()=>STORE.mem.fb.some(f=>f.q==="test question"),null,{timeout:20000});
  ok(await B.evaluate(()=>STORE.mem.fb.some(f=>f.q==="test question")),"feedback shared to B");
  /* AI ingestion in the wizard: read, review, save, share */
  await A.evaluate(()=>{ROLE.name="Engineer";ROLE.user="Ingest Tester"});

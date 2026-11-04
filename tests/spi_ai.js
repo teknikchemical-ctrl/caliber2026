@@ -32,7 +32,7 @@ const assert=require('node:assert/strict'),http=require('node:http'),Database=re
    if(/busy/.test(req.url)){res.statusCode=503;return res.end(JSON.stringify({error:{message:'high demand'}}))}
    if(/denied/.test(req.url)){res.statusCode=403;return res.end(JSON.stringify({error:{message:'key restriction'}}))}
    const j=JSON.parse(raw);assert(j.generationConfig.responseSchema);assert.equal(j.generationConfig.responseSchema.type,'OBJECT');
-   res.end(JSON.stringify({candidates:[{content:{parts:[{text:/garbage/.test(req.url)?'not JSON':JSON.stringify(base)}]}}],usageMetadata:{promptTokenCount:10,candidatesTokenCount:20}}));
+   res.end(JSON.stringify({candidates:[{content:{parts:[{text:/garbage/.test(req.url)?'not JSON':JSON.stringify({...base,inputs:[]})}]}}],usageMetadata:{promptTokenCount:10,candidatesTokenCount:20}}));
   })});await new Promise(r=>server.listen(0,'127.0.0.1',r));
   try{
    const opts={key:'synthetic-test-key',base:'http://127.0.0.1:'+server.address().port,callMs:1000,totalMs:5000};

@@ -1,0 +1,23 @@
+const assert=require('node:assert/strict'),Database=require('better-sqlite3');
+(async()=>{
+ const {executePlan}=await import('../spi/ai/execute.js'),{evidence}=await import('../spi/ai/evidence.js'),{rulesPlan}=await import('../spi/ai/rules_planner.js');
+ const db=new Database('spi/fixtures/mini.sqlite',{readonly:true}),id=db.prepare("SELECT material_no FROM part_profile WHERE demand_class='smooth' LIMIT 1").get().material_no;
+ let calls=[];
+ // Synthetic engine fixture, never imported by production. Sentinel values prove unchanged transfer to the chart.
+ const engine={async runPlan(plan,context){calls.push({plan,context});const forecast=[];const t=new Date('2026-09-01T00:00:00Z');for(let i=0;i<plan.horizon_months;i++){t.setUTCMonth(t.getUTCMonth()+1);forecast.push({month:t.toISOString().slice(0,7),p10:1.125,p50:2.375+plan.inputs.reduce((n,x)=>n+(x.effect==='add_qty'?x.value:0),0),p90:9.875,drivers:[]})}return {plan_id:'SYNTHETIC-flow-test',material_no:plan.material_no,method:plan.method,forecast,inventory:{safety_stock:1,reorder_point:2,min_qty:2,max_qty:6,order_qty:4,service_level:plan.service_level},recommendation:{action:'MAINTAIN',urgency:3,stockout_risk:.1,overstock_risk:.2,rationale:'Synthetic engine fixture.'},backtest:{},provenance:{inputs:plan.inputs.map(x=>x.input_id),assumptions:['SYNTHETIC TEST ENGINE: no operational prediction.']}}}};
+ try{
+ const pending=await executePlan({db,material_no:id,engineLoader:async()=>{throw Object.assign(new Error('Not yet merged'),{code:'ENGINE_PENDING'})}});assert.equal(pending.status,'engine_pending');assert.equal(pending.result,null);assert(!pending.adopted);console.log('ok   missing engine is explicit and produces no fake prediction');
+ const first=await executePlan({db,material_no:id,engine});assert.equal(first.result.forecast[0].p50,2.375);assert.equal(first.plan.material_no,id);assert.equal(first.trace.at(-1).plan_id,first.result.plan_id);assert(first.trace.some(x=>x.step==='evidence'));console.log('ok   actual SQLite evidence passes through reasoning and validator to the injected deterministic engine');
+ const pack=evidence(db,id),plan=rulesPlan(pack),input={input_id:'synthetic-driver',driver:'one_off',effect:'add_qty',value:1,source:'ai',status:'proposed',confidence:.5,rationale:'Adjustment proposed for review.',evidence:['series:'+id]};
+ const ai={name:'gemini',complete:async()=>({json:{...plan,inputs:[input]},model:'synthetic-model',usage:{}})};
+ const gated={...engine,backtest:async()=>({plan_error:1,baseline_error:1,metric:'synthetic',n_origins:4})};
+ const proposed=await executePlan({db,material_no:id,engine:gated,adapter:ai});assert(proposed.adopted);assert.equal(proposed.result.forecast[0].p50,2.375);assert.equal(calls.at(-1).plan.inputs.length,0);assert.equal(proposed.ledger[0].status,'proposed');console.log('ok   unaccepted AI proposals stay visible but do not move the forecast');
+ const accepted=await executePlan({db,material_no:id,engine:gated,adapter:ai,inputs_accepted:[input]});assert.equal(accepted.result.forecast[0].p50,3.375);assert.equal(calls.at(-1).plan.inputs[0].status,'accepted');console.log('ok   an explicitly accepted and revalidated input reaches the engine and changes its result');
+ const losing=await executePlan({db,material_no:id,engine:{...engine,backtest:async p=>({plan_error:p.method===plan.method?1:2,baseline_error:1,n_origins:4})},adapter:{name:'gemini',complete:async()=>({json:{...plan,method:'sba',inputs:[]},model:'synthetic'})}});assert(!losing.adopted);assert.equal(losing.plan.method,plan.method);assert.equal(losing.result.method,plan.method);assert.equal(losing.proposed_plan.method,'sba');console.log('ok   losing AI plan is rejected and the chart result follows the rules baseline');
+ await assert.rejects(()=>executePlan({db,material_no:id,engine,inputs_accepted:[{...input,value:1e10}]}),/Accepted inputs rejected/);
+ await assert.rejects(()=>executePlan({db,material_no:id,engine:{runPlan:async p=>({...first.result,material_no:id+1})}}),/different|another material/);
+ console.log('ok   untrusted input and wrong-material engine result are rejected');
+ const fallback=await executePlan({db,material_no:id,engine,adapter:{name:'gemini',complete:async()=>{throw new Error('Synthetic provider unavailable')}}});assert.equal(fallback.provider,'rules');assert.equal(fallback.status,'ready');assert(fallback.result.forecast.length===fallback.plan.horizon_months);assert(fallback.trace.some(x=>x.step==='rules_fallback'));console.log('ok   provider failure still returns a labelled rules forecast from the engine');
+ console.log('All SPI database-to-engine flow checks passed (engine is explicitly synthetic)');
+ }finally{db.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});
