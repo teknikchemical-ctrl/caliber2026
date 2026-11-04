@@ -13,3 +13,4 @@ AKP-netlify-drop.zip
 cases/*/build/
 # per-page text and images made by tools/pdf_pages.sh (each agent makes its own)
 cases/_source/
+submission/
