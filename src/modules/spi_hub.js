@@ -5,11 +5,12 @@ const SPI_HUBS=[
  {id:"spi_h_ov",label:"Overview",tabs:[["spi_space","Equipment library 3D"],["spi_dash","Summary"],["spi_ready","Campaign readiness"],["spi_val","Method and validation"],["spi_arch","Data and architecture"]]},
  {id:"spi_h_inv",label:"Inventory",tabs:[["spi_find","Find"],["spi_health","Stock health"],["spi_loc","Locations and equipment"],["spi_parts","Parts"],["spi_reg","Registers"],["spi_ingest","Documents and log"]]},
  {id:"spi_h_mnt",label:"Maintenance",tabs:[["spi_maint","Maintenance board"],["spi_eq","Equipment 3D and drawings"],["spi_prot","Protective devices"]]},
- {id:"spi_h_fc",label:"Forecasting and Simulation",tabs:[["spi_fo","Forecasting and optimisation"],["spi_forecast","Part forecast"],["spi_reco","Recommendations"],["spi_opt","Parameters"],["spi_outlook","Demand outlook"],["spi_sim","Scenario simulator"],["spi_ask","Ask the AI"]]},
+ {id:"spi_h_fc",label:"Forecasting and Simulation",tabs:[["spi_fo","Forecasting and optimisation"],["spi_forecast","Part forecast"],["spi_sim","Scenario simulator"],["spi_ask","Ask the AI"]]},
  {id:"spi_h_cost",label:"Costs",tabs:[["spi_savings","Cost reduction"],["spi_impact","Business impact"]]}];
 const SPIHUB={tab:{}};
 function spiHubTab(hub,id){SPIHUB.tab[hub]=id;st.page=hub;render()}
-function spiHubFor(p){return SPI_HUBS.find(h=>h.tabs.some(t=>t[0]===p))}
+const SPI_MOVED={spi_reco:"spi_h_fc",spi_opt:"spi_h_fc",spi_outlook:"spi_h_fc"};/* removed views: links to them open the Forecasting and Simulation hub */
+function spiHubFor(p){return SPI_HUBS.find(h=>h.tabs.some(t=>t[0]===p))||SPI_HUBS.find(h=>h.id===SPI_MOVED[p])}
 SPI_HUBS.forEach(h=>spiRegister(h.id,h.label,async host=>{
  const avail=h.tabs.filter(t=>SPI.pages[t[0]]),cur=avail.find(t=>t[0]===SPIHUB.tab[h.id])||avail[0];
  document.querySelectorAll("aside .nav").forEach(n=>n.classList.toggle("active",n.dataset.page===h.id));
