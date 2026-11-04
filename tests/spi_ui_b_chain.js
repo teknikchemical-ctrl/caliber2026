@@ -68,14 +68,14 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("find: an equipment result opens in 3D", !!(await p.$(".spi-eq3")));
   /* I. spatial library: opens in 3D, search flies to the matching set */
   await p.evaluate(() => go("spi_space")); await p.waitForTimeout(3000);
-  ok("library: the 3D space with every set is shown", !!(await p.$("#p3 canvas")) && (await p.$$(".sp-ni")).length === (await p.evaluate(() => p3Units().length)));
+  ok("library: the 3D space with every set is shown", !!(await p.$("#p3 canvas")) && (await p.$$(".sp-ni")).length === (await p.evaluate(() => p3Units().length)) && (await p.evaluate(() => new Set(p3Units().map(u => u.tpl ? u.cls : spiSpCls(u.n))).size === p3Units().length)));
   await p.fill("#sp_q", "PP-411"); await p.waitForTimeout(2500);
-  ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#p3card button")));
+  ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === P3.rep[K.sets.find(s => s.tag === "PP-411A").n] && SPSP.act[P3.sel] === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#p3card button")));
   await p.fill("#sp_q", "bearing"); await p.waitForTimeout(2500);
   ok("library: a part search lists the sets that hold it", !!(await p.$("#sp_res .sp-r")) && await p.evaluate(() => !!P3.sel));
   const tags = await p.evaluate(() => K.sets.map(s => s.tag)); let found = 0;
-  for (const t of tags) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(700); if (await p.evaluate(t => P3.sel === K.sets.find(s => s.tag === t).n, t)) found++; }
-  ok("library: every equipment set is found by its tag (" + found + " of " + tags.length + ")", found === tags.length);
+  for (const t of tags) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(700); if (await p.evaluate(t => { const n = K.sets.find(s => s.tag === t).n; return P3.sel === P3.rep[n] && SPSP.act[P3.sel] === n }, t)) found++; }
+  ok("library: every equipment set is found by its tag and opens in its block, no double blocks (" + found + " of " + tags.length + ")", found === tags.length);
   const tpl = await p.evaluate(() => P3.tpl.map(u => u.tag)); let tf = 0;
   for (const t of tpl) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(500); if (await p.evaluate(t => !!P3.sel && p3Units().find(u => u.n === P3.sel).tag === t, t)) tf++; }
   ok("library: every class template is in the space and found by search (" + tf + " of " + tpl.length + ")", tpl.length >= 15 && tf === tpl.length);
