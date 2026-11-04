@@ -16,8 +16,8 @@ Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer no
 | A8 | A | todo | Ship: zip script, final deploy, screenshot steps, final audits | M5 | tools/spi_zip.sh |
 | B1 | A | todo | App shell `spi_core.js`, Overview, Data and architecture pages, nav group (took over from B) | M1 | src/modules/spi_core.js, spi_dash.js, spi_arch.js |
 | B2 | codex-ai | todo | Forecast page (chart with bands, ledger with source badges, how the AI reasoned) (took over from B) | M2 | src/modules/spi_forecast.js |
-| B3 | B | todo | Recommendations and Inventory health pages (the brief's named outputs), live by M3. Back to B: B has about 99% usage left | M3 | src/modules/spi_reco.js, spi_health.js |
-| B4 | B / codex-ai | todo | Optimisation and Scenario simulator pages (B, M4); Ask AI page (codex-ai) | M3 to M4 | spi_opt.js, spi_scn.js (B); spi_ask.js (codex-ai) |
+| B3 | B | done | Recommendations and Inventory health pages (the brief's named outputs), live by M3. Back to B: B has about 99% usage left | M3 | src/modules/spi_reco.js, spi_health.js |
+| B4 | B / codex-ai | doing | Optimisation and Scenario simulator pages (B, M4); Ask AI page (codex-ai) | M3 to M4 | spi_opt.js, spi_scn.js (B); spi_ask.js (codex-ai) |
 | B5 | B | done | Drawings and 3D for all 8 equipment sets to engineering standards (API, ASME, TEMA, ISA), with stock overlay; see docs/spi/DRAWINGS_BRIEF.md | M3 | cases/spi/geo, g3*.js, auto3d.js, spi_overlay.js | first complete version pushed; polish items in handoff b |
 | C1 | codex-ai | todo | Providers (gemini, mock), model chain, tests with fake Gemini | M1 | spi/ai/providers |
 | C2 | codex-ai | todo | Evidence pack and rules planner and validator | M1 | spi/ai |
@@ -25,7 +25,7 @@ Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer no
 | C4 | codex-ai | todo | Tools and Flow B `POST /api/ai/ask` (proposals into the ledger) | M3 | spi/ai, server/ai |
 | C5 | codex-ai | todo | Batch precompute to results.sqlite; golden question evaluation; key connection guide for Vercel | M3 to M5 | spi/ai, docs/AI_ASSISTANT.md |
 | F1 | codex | done | Engine core: classify, methods, bootstrap quantiles, unit tests | M1 | spi/engine |
-| F2 | codex | doing | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
+| F2 | codex | done | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
 | F3 | codex | done | `server/engine/*` endpoints | M2 | server/engine |
 | F4 | codex | doing | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
 | F5 | codex | todo | Business case workbook, impact.json, BUSINESS_CASE.md | M4 | finance/spi |
@@ -38,6 +38,9 @@ Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer no
 | W1 | codex / B | todo | Three-way policy comparison (current, workbook baseline, dynamic) replayed over 17 months | M4 | spi/engine, page |
 | W2 | A | todo | Show-your-work panel with editable assumption cells on the Forecast page | M4 | spi_forecast.js |
 | W4 | A | todo | Validation page: the workbook's 12 test-plan rows with live status | M4 | server/data, new page |
+| F4 | codex | done | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
+| F5 | codex | doing | Business case workbook, impact.json, BUSINESS_CASE.md | M4 | finance/spi |
+| F6 | codex | blocked | 7-slide deck in competition format; team.json for the human | M4 to M5 | deck/spi |
 | H1 | human | todo | Import the repo in Vercel and send the URL; set AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel env vars; fill `deck/spi/team.json`; confirm deadline time zone; tell Claude A the clock | M0 to M5 | |
 
 ## Open contract questions
@@ -81,3 +84,5 @@ B | Day-2 runbook, how I will make the 3D for the real case (nothing new to buil
   6. Scenario 3D and replay (`sim3d.js`) reuse the plant 3D, so they inherit step 4.
   7. Look at every screenshot, fix, re-run steps 3 and `node tools/profile_load.js` (needs `mkdir -p /tmp/claude-0/t` once). Commit and push my branch after each working step, then write the handoff line.
 B | Known limits to tell the integrator tomorrow: more than 8 sets crowd the 3D plant and plot; a set with no parts list or nozzle table gets the generic parts from `autoGaFill` (labelled schematic); no wording or data from the first plant is in my files except the hard-coded site items in point 4 and 5.
+
+Codex Finance | 2026-11-04 | Human deferred deck; prototype first. Engine/server APIs and Business Impact ready on codex/finance. Source savings overlap correction proposed in finance/spi/savings_source_correction.patch; source owners must reconcile it.

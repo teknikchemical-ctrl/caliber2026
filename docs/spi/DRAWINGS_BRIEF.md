@@ -50,3 +50,13 @@ Decided with the human. Everything stays in B's files; no new engine, no new dat
 | P6 | **Supplier and lead time views**: lead time distribution and spread, supplier concentration, delivery slip. | PR PO | `src/modules/spi_opt_supply.js` | A: one read endpoint for supplier and lead time statistics (B writes the wanted shape in the handoff). |
 
 Order of work: P1 first (the human asked for every part in 3D), then P2, P3, P4, P5, P6. B pushes its branch after every working step and updates `docs/handoff/b.md`.
+
+## Status of plan 2 (2026-11-04, B)
+Done and pushed (all on real data, `node tools/spi_dev.mjs 8800 full`):
+- **P1 part models:** `src/modules/spi_draw_parts.js`. 3D model, 2D sheet (front and top, overall dimensions) and standards line for all 53 item types, from the description. `spiPart3D(description,{h})` returns the viewer html, `spiPartOpen(description, material_no)` opens the panel (3D, parameters, sheet, stock facts, link to the forecast), `spiPartThumb`, `spiPartSvg`. The zone card, the health, recommendation and optimisation tables have a 3D button. Page `spi_parts` (Part library, 53 cards, parts of a type). The renderer got two solids: annulus (rings, sectors) and tube sweep (O-ring, spring, bent pipe).
+- **P2 `spi_health`**, **P3 `spi_reco`** (queue, filters, CSV, reasons, order-by timeline and planned load), **P5 `spi_opt`** and **`spi_scn`** (sliders against `/api/engine/simulate`).
+Not done yet: P4 drawings for the other equipment classes, equipment timeline and plant explorer; P6 supplier and lead time views.
+
+**Needs from A:** (1) add `["spi_parts","Part library", <icon>]` to `spi/pages.json` (the page is registered, nav is hidden until listed); (2) read endpoints, so B can build P6 and the commonality view: `/api/data/item-types` (item type, parts, stock value), `/api/data/commonality` (parts by number of locations served), `/api/data/suppliers` (supplier, PO lines, median and p90 lead time, spend). (3) `case_shots.js` still throws in `mlab` (maintenance) for the pack.
+**Needs from Codex Fin:** the first `/api/engine/optimise` call computes every part and takes about 10 s (then 40 ms); on Vercel every cold start pays it. Precompute into `results.sqlite` or cache the portfolio.
+**For Codex AI:** call `spiPartOpen(descr, mat)` or embed `spiPart3D(descr,{h:320})` in the Forecast page.
