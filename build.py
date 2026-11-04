@@ -131,13 +131,14 @@ P('<div class="nav" data-page="gov">Governance</div>','<div class="nav" data-pag
 P('p==="gov"?govPage():','p==="gov"?govPage():p==="fin"?finPage():')
 if SPI:  # spare part navigation group, routing and start page
     PG=json.load(open(os.path.join(ROOT,'spi','pages.json')))
-    P('<div class="nav active" data-page="dashboard">▦ Dashboard</div>',''.join('<div class="nav" data-page="%s">%s</div>\n  '%(pid,lab) for pid,lab,_ in PG)+'<div class="nav active" data-page="dashboard">▦ Dashboard</div>')
+    P('<div class="nav active" data-page="dashboard">▦ Dashboard</div>',''.join('<div class="nav" data-page="%s">%s</div>\n  '%(pid,lab) for pid,lab,_ in PG)+'<div class="nav active" data-page="dashboard">Plant overview</div>')
     P('const NAVG=[["Operate",','const SPIPAGES='+json.dumps(PG)+';\nconst NAVG=[["Spare parts",SPIPAGES.map(r=>[r[0],r[2]])],["Operate",')
     P('app.innerHTML=p==="dashboard"?','app.innerHTML=p.startsWith("spi_")?spiRoute(p):p==="dashboard"?')
     P('let st={page:"dashboard",','let st={page:"spi_dash",')
 
 # ---------- 4. theme + cleanup ----------
 h=remap(h)
+if SPI: h=h.replace('Asset Knowledge Platform','Spare Part Intelligence').replace('AI Manufacturing Knowledge Hub','Spare Part Intelligence')
 h=h.replace(ROOT_OLD,ROOT_NEW)
 h=h.replace('<meta name="viewport" content="width=device-width, initial-scale=1.0" />','<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n<meta name="theme-color" content="#155ea3" />\n<link rel="manifest" href="manifest.webmanifest" />\n<link rel="icon" href="icon-192.png" />',1)
 h=strip_emoji(h); h=dashes(h)
