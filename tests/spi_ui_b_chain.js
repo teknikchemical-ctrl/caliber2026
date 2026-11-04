@@ -155,6 +155,10 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => [...document.querySelectorAll("#sp_res .sp-r")].find(x => /BF-105/.test(x.textContent)).click()); await p.waitForFunction(() => EXP.eq && document.querySelector("#ex_eco .ip-risk"), null, { timeout: 30000 }).catch(() => {});
   ok("explorer: a location found by search opens in 3D with its economics", await p.evaluate(() => EXP.eq && !!document.querySelector("#ex_eco .ip-risk")));
   ok("overview has only the explorer and the summary", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_dash"));
+  /* explorer: the 2D drawing and the 3D model follow the same zone */
+  await p.evaluate(() => { go("spi_space") }); await p.waitForTimeout(2500); await p.evaluate(() => exOpenFunc("PX_PP-148A")); await p.waitForFunction(() => EXP.eq && document.getElementById("ex_svg"), null, { timeout: 30000 }).catch(() => {});
+  await p.evaluate(() => { exView("both"); const z = spiPrep(EXP.key).zones.find(q => q.lines.length); document.querySelector('#ex_svg [data-k="' + z.key + '"]').dispatchEvent(new MouseEvent("click", { bubbles: true })) }); await p.waitForTimeout(1200);
+  ok("explorer: a zone selected on the 2D drawing selects it in 3D and lists its parts", await p.evaluate(() => EXP.zone != null && document.querySelectorAll("#ex_svg .sel").length > 0 && document.querySelectorAll("#ex_side .ex-pr").length > 0));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();

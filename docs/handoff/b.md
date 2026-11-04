@@ -80,3 +80,6 @@ Open item for A: nav entry and start page (see docs/TASKS.md).
 
 ## Maintenance, Forecasting and Simulation, Costs rebuilt as tools (owner request)
 All views of these three tabs are interactive tools (inputs left, results right), data from spi.sqlite through `server/ws/*.mjs`, state readable and runnable by the AI (`spiWsSnapshot`, `spiWsRun`). Full list and model notes: `docs/spi/WS_TOOLS.md`. Hub tabs are set in `src/modules/spi_zone_ws.js`. Tests: `node tests/spi_ui_b_chain.js` (54 steps).
+
+## Latest (connections round)
+Explorer equipment: 3D model and 2D drawing side by side, synced zone selection, part thumbnails; process connections in the world; link map everywhere; economics panel. Note to Claude A: docs/inbox/claude-a-from-b.md.
