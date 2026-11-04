@@ -31,3 +31,9 @@ Every view is a tool: inputs on the left, results on the right, recalculated on 
 - Replenishment simulator: reference run with the default inputs and the change of each result against it; monthly demand chart (17 months issued, simulated months with band); total cost and stockout chance against the reorder point (sweep), with the three policies marked.
 - Cost-risk scenarios: sensitivity of the total cost to each assumption (25% lower and higher).
 - Test `tests/spi_ui_b_handlers.js`: compiles every inline event handler on every page (the chip handlers were broken before this fix).
+
+## Inventory planner (`spi_iplan`, first view of Inventory)
+- Choose a part number, an equipment set (8 chips) or any location with parts. Inputs: look-ahead 6 to 24 months, order size (cheapest, or fixed months of use), use compared with the history, lead time (median, slow p90, own days), service targets and cost assumptions.
+- Part: four numbered answers (stock now, projected use with range, recommendation with quantity, months covered and order-by date, cost reduction per year and over the horizon); projected stock with and without the recommendation (Monte Carlo, open orders on their delivery month); every cost line today against the recommendation; nine risk measures; use history and projection; purchase history.
+- Set or location: every part of its bill of materials with decision, stock, use, order, cost reduction and risk level; select a part to open it with the set in the trail.
+- Endpoint `/api/ws/advice` (mat, mats, set or loc). The recommendation is the cheapest of order sizes 1 to 24 months and service levels at or above the target, with today's Min and Max as a candidate, so it never costs more than today.
