@@ -154,7 +154,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => go("spi_space")); await p.waitForTimeout(2500); await p.fill("#kbs_ex_q input", "BF-105"); await p.waitForTimeout(2500);
   await p.evaluate(() => [...document.querySelectorAll("#kbs_ex_q .kb-o")].find(x => /BF-105/.test(x.textContent)).dispatchEvent(new MouseEvent("mousedown", { bubbles: true }))); await p.waitForFunction(() => EXP.eq && document.querySelector("#ex_eco .ip-risk"), null, { timeout: 30000 }).catch(() => {});
   ok("explorer: a location found by search opens in 3D with its economics", await p.evaluate(() => EXP.eq && !!document.querySelector("#ex_eco .ip-risk")));
-  ok("overview has the explorer, the status and the summary", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_status,spi_summ"));
+  ok("overview has the explorer, the status, the summary and the link map; inventory has five tabs", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_status,spi_summ,spi_link" && SPI_HUBS.find(h => h.id === "spi_h_inv").tabs.length === 5));
   /* explorer: the 2D drawing and the 3D model follow the same zone */
   await p.evaluate(() => { go("spi_space") }); await p.waitForTimeout(2500); await p.evaluate(() => exOpenFunc("PX_PP-148A")); await p.waitForFunction(() => EXP.eq && document.getElementById("ex_svg"), null, { timeout: 30000 }).catch(() => {});
   await p.evaluate(() => { exView("both"); const z = spiPrep(EXP.key).zones.find(q => q.lines.length); document.querySelector('#ex_svg [data-k="' + z.key + '"]').dispatchEvent(new MouseEvent("click", { bubbles: true })) }); await p.waitForTimeout(1200);
@@ -194,6 +194,15 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("Optimized Scenario replaces Golden path", await p.evaluate(() => /Optimized Scenario/.test(document.body.innerText) && !/Golden path|Purchase pathway/.test(document.querySelector("#app").innerText)));
   await p.evaluate(() => go("spi_space")); await p.waitForFunction(() => window.SPSP && SPSP.conn, null, { timeout: 30000 }).catch(() => {});
   ok("explorer: every block has a connection", await p.evaluate(() => p3Units().every(u => SPSP.flows.pairs.some(f => !f.self && (f.a === u.n || f.b === u.n)))));
+  /* round 7: every date field of every sheet on a timeline, the figures register */
+  for (const [pg, sh, n] of [["spi_src_mnt", "notif", 6], ["spi_src_mnt", "plan", 2], ["spi_src_cost", "prpo", 4], ["spi_src_inv", "movement", 2]]) {
+    await p.evaluate(([g, s]) => { SRC.sel[g] = s; go(g) }, [pg, sh]); await p.waitForFunction(s => window.SRC && SRC.d[s] && document.querySelector("#src_dt0 .kb-svg"), sh, { timeout: 30000 }).catch(() => {}); await p.waitForTimeout(600);
+    ok(`source data ${sh}: every date field has its own timeline (${n})`, await p.evaluate(() => document.querySelectorAll("[id^=src_dt] .kb-svg, #src_dd .kb-svg").length) === n);
+  }
+  ok("source data: raw rows load with paging", await p.evaluate(() => document.querySelectorAll("#src_rt tbody tr").length === 50));
+  await p.evaluate(() => kbDefs()); await p.waitForFunction(() => document.querySelector("#kb_defs .kb-dt"), null, { timeout: 20000 }).catch(() => {});
+  ok("figures register: the drawer lists definitions with values", await p.evaluate(() => document.querySelectorAll("#kb_defs .kb-dt tr").length > 25));
+  await p.evaluate(() => { document.getElementById("kb_defs").hidden = true });
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
