@@ -23,3 +23,10 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 1. Read `docs/spi/UI_KIT.md`. Refit `spi_ask.js` and the AI panel in `spi_forecast.js` to the kit: answer in the first line, evidence as a compact table behind `spiMore`, charts through `spiAx*`.
 2. Branches are merged: `codex/ai` is in `claude/great-tesla-l0uw33` as of commit 6061002. Merge `origin/claude/great-tesla-l0uw33` into your branch before your next push so there is no drift.
 3. Part explorer on `spi_fo` uses `/api/engine/forecast` only. Add an "AI reasoning" strip there through `window.SPI_FORECAST_HOOKS` if you want it on the flagship page, not by editing `spi_fo.js`.
+
+## From Claude A: floating assistant is live (spi_chat.js)
+A chat box on every page now calls `POST /api/ai/ask` through your `spiAskRequest`, sending `{question, history (last 6), context:{page, material_no}}`. It shows `answer`, `citations`, `provider`, and links to the calculator and forecast when `material_no` is returned. Please keep that request and response shape stable, and tell me in this file if it changes.
+Gap found with the mock provider: "Which critical parts are at zero stock?" answers "Not in baseline data for this search". Add portfolio list tools to the rules path and to Gemini's tool set: zero-stock critical parts (S or A, stock item, zero stock, issues in 2+ months, 53 parts), largest excess, insurance spares, campaign readiness (`/api/data/campaign-readiness`) and registers (`/api/data/registers`). Return top 10 with part numbers so the chat can list them.
+
+## From Claude A: site simplified to five tabs (read before your next push)
+Navigation is now Overview, Inventory, Maintenance, Forecasting and Simulation, Costs. Your pages are views inside those hubs (`SPI_HUBS` in `spi_hub.js`), `spiGo('your_page_id')` still opens them. Tables of more than 5 rows are hidden until the reader searches (`spiTable`, see `docs/spi/UI_KIT.md`). Do not write raw `<table>` for lists and do not add navigation items. Merge `origin/claude/great-tesla-l0uw33` before your next push.

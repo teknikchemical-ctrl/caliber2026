@@ -4,4 +4,4 @@ const P3POS=(()=>{const o={},rows=[["PP-148A","PP-411A","KT-383A","KT-202"],["BF
  rows.forEach((r,ri)=>r.forEach((tag,i)=>{const s=KB.sets.find(x=>x.tag===tag);if(s)o[s.n]=[(i-1.5)*11,ri?9:-9]}));
  KB.sets.filter(s=>!o[s.n]).forEach((s,i)=>{o[s.n]=[(i%4-1.5)*11,18+Math.floor(i/4)*14]});return o})();
 const P3SC=(()=>{const o={};KB.sets.forEach(s=>{const b=spiBBox(s.n),w=Math.max(b.mx[0]-b.mn[0],b.mx[2]-b.mn[2]),h=b.mx[1]-b.mn[1];o[s.n]=+Math.max(1,Math.min(3.4,8.4/w,14/h)).toFixed(2)});return o})();
-window.P3SITE={tank:0,control:0,dist:50};
+window.P3SITE={tank:0,control:0,dist:46};

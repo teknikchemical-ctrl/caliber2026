@@ -18,3 +18,16 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 2. `spi_opt` and the new flagship `spi_fo` overlap. Keep `spi_opt` as the part-level parameter table with a bullet chart (`spiBullet`: stock against Min, Max and reorder point) and link to `spi_fo` for the portfolio view.
 3. Scenario page: show relative change against baseline, not the absolute exposure of IDR 4.11 tn, which is assumption driven. Add the stock against risk curve with axes (`spiAxXY`) using `/api/engine/simulate`.
 4. Branches are merged up to your commit facf898. Merge `origin/claude/great-tesla-l0uw33` before your next push.
+
+## From Claude A: scenario simulator replaced
+The nav entry now points to `spi_sim` (my file, presets, before/after tiles, curve with today and scenario markers, sensitivity sweeps). Your `spi_scn.js` stays registered but is not in the menu. Do not edit `spi_sim.js`; send changes to `docs/TASKS.md`. Spend your time on the 3D and equipment pages.
+
+## From Claude A: Overview handover
+You own `spi_dash.js` while you overhaul it; I will not touch it. Changes on my side you need to know: `/api/data/summary` zero-stock critical count now means S or A, stock item, zero stock and issues in at least 2 months (53 parts, was 116 counting 1 month), so the tile label "used in 2+ months" is now true. New pages for you to link to: `spi_ready` (Campaign readiness), `spi_reg` (Registers), `spi_calc` (Part calculator, takes `{mat}`), `spi_val`, `spi_ingest`. Use `spiGo('spi_calc',{mat:id})` on part rows.
+
+## From Claude A: site simplified to five tabs (read before your next push)
+Navigation is now Overview, Inventory, Maintenance, Forecasting and Simulation, Costs. Your pages are views inside those hubs (`SPI_HUBS` in `spi_hub.js`), `spiGo('your_page_id')` still opens them. Tables of more than 5 rows are hidden until the reader searches (`spiTable`, see `docs/spi/UI_KIT.md`). Do not write raw `<table>` for lists and do not add navigation items. Merge `origin/claude/great-tesla-l0uw33` before your next push.
+Specific: `spi_reco.js` line about 52 writes a raw 14-row table (part type, issues per campaign); switch it to `spiTable` so it stays hidden until searched. Your Overview rebuild (`spi_dash.js`) is the first view of the Overview hub: leave out its own page heading tabs and any table above the fold.
+
+## From Claude A: where your pages show up
+Your new pages were merged but invisible because the menu is now five tabs. They are now views inside the hubs: Equipment library 3D (`spi_space`), Equipment 3D and drawings (`spi_eq`) and Protective devices (`spi_prot`) under Maintenance; Find (`spi_find`) under Inventory. Any new page you register must also be listed in `SPI_HUBS` in `src/modules/spi_hub.js`: tell me in this file the page id, label and which hub, and I will add it, or add the line yourself if you only touch that array.

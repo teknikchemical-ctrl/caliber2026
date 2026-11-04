@@ -21,6 +21,10 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 ## In progress (not finished: which files, what state)
 - Nothing half done. Next candidates: B3 Recommendations and Inventory health pages (`spi_reco.js`, `spi_health.js`).
 
+## Chemical engineering features (real data only): process connections, installed spare letters, turnaround readiness by part type, protective devices page; no system map because the data has no membership.
+
+## Search: `spi_find` page, part panel with where used and purchasing, Show in 3D, tests/spi_ui_b_chain.js (all pass).
+
 ## Plan 3: `spi_eq` page and 15 equipment templates are in (see the brief status). Remaining: sub-item assemblies, block flow explorer, timeline, corrections.
 
 ## Plan 3 in progress (see docs/spi/DRAWINGS_BRIEF.md): every location clickable in 3D, templates by tier, page `spi_eq`.
@@ -45,3 +49,19 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 ## Waiting on the other Claude / the human
 - Claude A: the maintenance page throws `Cannot read properties of undefined (reading 'slice')` in `mlab` (mh*.js) for the SPI pack (seen in `case_shots.js`). The KT parts lists contain air intake and fuel gas filters (gas-turbine items) although the class is a steam turbine driver.
 - Codex AI: the zone card links to `spiGo('spi_forecast',{mat:<material_no>})`, as the Overview does.
+
+## Part inspector pop-up (latest)
+One pop-up replaces the side panel and the second modal. Clicking a zone in 3D, on the 2D sheet or in the zone table (Equipment 3D page and equipment set page) opens `#spi_pm`: left a searchable list of the zone's parts with status dot and stock; right the selected part's 3D model, parameters and standards, KPIs (Stock, Min, Max, Issued 17 months, Lead time), issued-per-month chart, stock record, where used (Show in 3D), purchasing, specification family, forecast button and a collapsible drawing sheet. Parts opened from tables or search use the same pop-up through `spiPartOpen(descr,mat)`. Closes with Close, backdrop, Esc or any re-render.
+Code: `spiInspect`, `spiInspectShow`, `spiInspectList`, `spiInspectZone` (spi_draw_parts.js); `spiEqPick` (spi_draw_equip.js); gSel and gP wrappers (spi_overlay.js). Test: `node tests/spi_ui_b_chain.js`.
+Note: `tests/stress3d.js` reports `bad 1` on some runs because a random wheel zoom can drop pick coverage under 600; script errors are the real check and are 0.
+
+## Spatial library (spi_space)
+Page `spi_space` (`src/modules/spi_draw_space.js`). The site starts in it (module switches `st.page` from `spi_dash` when there is no hash). Full-height plant 3D with all 8 equipment sets, left rail, card with real stock status counts, buttons to the set drawing and spare parts.
+Search (top left): local match on tag, name, class and bill of materials lines flies to the set at once; server results add locations (`/api/data/locations`) and catalogue parts (`/api/data/parts`). A location or part with no set of its own is shown on the set of the same equipment class and the card says so, with an "Open in 3D" button for the location. A part result flies to the set that holds it and opens the part inspector.
+Open item for A: nav entry and start page (see docs/TASKS.md).
+
+## World overhaul, set tab, clean-up (latest)
+- Plant 3D (`spi_space`) is now a game-like world: dark floor, no roads, rack, tank or flare (`P3SITE.world` in plant3d.js, `spiWorldScene` in spi_draw_space.js). 27 units in six districts with colour coded pads: 8 equipment sets plus 19 class templates. Left list of all units with location counts per class; click in 3D, in the list, or search. A unit card lists every functional location of its class from the baseline data (filter, show more) and each opens in Equipment 3D.
+- Equipment set tab (Overview): `spi_zone_set.js` replaces `spiEquipPanel`: every functional location tied to the set (set, sub-items, instruments and lines naming it) and every material of its bill of materials, no 60 row cut, filters, each row opens the part pop-up; also the parts linked by drawing text or order.
+- Clean-up requested by the owner: `spi_zone_clean.js` hides pages with no data in this case (Plant overview, Plot Plan, Maintenance generic, Performance, Scenarios, Interlock Library, AI Assistant, Knowledge Studio, Failure Memory, Integrations, Governance, Costing, My work, OPL Library, Data Quality), sends their links to the library, drops the P&ID tab, and hides the cards "Location in the unit", "Place in the plant", "Key items on the P&ID", "How it works", the "Ask the assistant" button and the bogus "Functional location SPI-Not in baseline data-01" fact.
+- Test: `node tests/spi_ui_b_chain.js` (all 27 units found and in view, location list, set tab materials and locations).

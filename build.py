@@ -131,16 +131,21 @@ P('<div class="nav" data-page="gov">Governance</div>','<div class="nav" data-pag
 P('p==="gov"?govPage():','p==="gov"?govPage():p==="fin"?finPage():')
 if SPI:  # spare part navigation group, routing and start page
     PG=json.load(open(os.path.join(ROOT,'spi','pages.json')))
-    P('<div class="nav active" data-page="dashboard">▦ Dashboard</div>',''.join('<div class="nav" data-page="%s">%s</div>\n  '%(pid,lab) for pid,lab,_ in PG)+'<div class="nav active" data-page="dashboard">Plant overview</div>')
-    P('const NAVG=[["Operate",','const SPIPAGES='+json.dumps(PG)+';\nconst NAVG=[["Spare parts",SPIPAGES.map(r=>[r[0],r[2]])],["Operate",')
+    P('<div class="nav active" data-page="dashboard">▦ Dashboard</div>',''.join('<div class="nav%s" data-page="%s">%s</div>\n  '%(' active' if i==0 else '',pid,lab) for i,(pid,lab,_) in enumerate(PG))+'<div class="nav" data-page="dashboard">Plant overview</div>')
+    P('const NAVG=[["Operate",','const SPIPAGES='+json.dumps(PG)+';\nconst NAVG=[["Spare parts",SPIPAGES.map(r=>[r[0],r[2]])]];const NAVG_OLD=[["Operate",')
     P('app.innerHTML=p==="dashboard"?','app.innerHTML=p.startsWith("spi_")?spiRoute(p):p==="dashboard"?')
-    P('let st={page:"dashboard",','let st={page:"spi_dash",')
+    P('let st={page:"dashboard",','let st={page:"spi_h_ov",')
     h=h.replace('All eight P&IDs are laid out as on the plot plan and linked by their process lines.','All equipment sets are shown in a schematic layout generated from the data.')
     h=h.replace('slot("Plot Plan",DOC[s.pp.document_id]),','').replace(',slot("Interlock Logic (SEQ)",DOC["IL-"+n])','')
     P('Each set = P&ID + GA drawing + datasheet + plot plan + interlock logic + OPLs + maintenance history, for one main equipment item','Each set = schematic P&ID, equipment drawing and 3D model, datasheet, spare parts list and maintenance notifications, for one main equipment item')
     P('<span class="tag">🧩 ${cnt(K.opl,o=>o.set===s.n)} lessons</span>','')
     h=h.replace('Ask about procedures, interlocks, equipment details, locations or maintenance history.','Ask about spare parts, stock, equipment details or maintenance history.').replace('plot plans, interlock documents, OPLs, instrument data and ','spare part records, datasheets and ')
-    P('window.NW=n=>','window.SPI_MODE=true;window.NW=n=>')
+    _sha=(os.environ.get('VERCEL_GIT_COMMIT_SHA') or '').strip()
+    if not _sha:
+        try: _sha=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True,cwd=ROOT).stdout.strip()
+        except Exception: _sha=''
+    import datetime
+    P('window.NW=n=>','window.SPI_MODE=true;window.SPI_STAMP={sha:"%s",time:"%s"};window.NW=n=>'%(_sha[:7] or 'local',datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')))
     P('All ${NW(K.sets.length)} units as laid out on the plot plan, joined by their process, gas, water, nitrogen and steam lines. Drag to look around. Select a unit to fly to it and see its figures, then open its equipment set from the card.','All ${NW(K.sets.length)} equipment sets in a schematic site layout generated from the data. Drag to look around. Select a unit to fly to it, then open its equipment set from the card.')
 
 # ---------- 4. theme + cleanup ----------

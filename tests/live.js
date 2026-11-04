@@ -237,16 +237,16 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  const tq=await A.evaluate(async()=>{const r=await aiAsk("What is the MTBF of each equipment?",{noLog:true});return{via:r.via,t:r.text}});ok(tq.via==="remote"&&/\d/.test(tq.t),"computed result is explained by the AI (draft passed)");
  /* access codes in the browser */
  const sc=proc(8911,{AI_PROVIDER:"mock",EDIT_CODE:"ed9"});await up(8911);
- const bc=await b.newContext({viewport:{width:1280,height:800}}),D=await bc.newPage();D.on("pageerror",e=>errs.push(e.message));await D.goto("http://localhost:8911/",{waitUntil:"commit"});await D.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await D.waitForTimeout(1800);
- await D.evaluate(()=>{ACC.edit="";UKB.add({type:"lesson",title:"Needs code",text:"x",set:1})});await D.waitForTimeout(2200);
+ const bc=await b.newContext({viewport:{width:1280,height:800}}),D=await bc.newPage();D.on("pageerror",e=>errs.push(e.message));await D.goto("http://localhost:8911/",{waitUntil:"commit"});await D.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await D.waitForFunction(()=>SYNC.state==="online"&&SYNC.last>0&&!SYNC.applying&&!SYNC.flushing,null,{timeout:15000});
+ await D.evaluate(async()=>{ACC.edit="";UKB.add({type:"lesson",title:"Needs code",text:"x",set:1});await syFlush()});await D.waitForFunction(()=>SYNC.codeNeeded==="edit",null,{timeout:10000});
  ok(await D.evaluate(()=>SYNC.codeNeeded==="edit"),"a save without the edit code is reported to the user");
- await D.evaluate(()=>{ACC.edit="ed9";accSave();SYNC.codeNeeded=null;syPush()});await D.waitForTimeout(2200);
+ await D.evaluate(async()=>{ACC.edit="ed9";accSave();SYNC.codeNeeded=null;syPush();await syFlush()});
  const ks=await fetch("http://localhost:8911/api/kb/state").then(r=>r.json());ok(ks.uk.some(x=>x.title==="Needs code"),"after entering the edit code the item reaches the shared database");
  await D.evaluate(()=>setOpen());await D.waitForTimeout(300);ok(await D.evaluate(()=>document.querySelector("#setbody").innerText.includes("Access codes")),"Settings shows the access code fields when the site requires codes");
  await bc.close();sc.kill();
  /* entering the AI key from Settings */
  const sk=proc(8915,{AI_PROVIDER:"",AI_API_KEY:"",GEMINI_API_KEY:"",AI_BASE_URL:"http://localhost:8977/v1beta",ADMIN_CODE:"adm",AI_RATE_PER_MIN:"60"});await up(8915);
- const kc=await b.newContext({viewport:{width:1280,height:900}}),K=await kc.newPage();K.on("pageerror",e=>errs.push(e.message));await K.goto("http://localhost:8915/",{waitUntil:"commit"});await K.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await K.waitForTimeout(1800);
+ const kc=await b.newContext({viewport:{width:1280,height:900}}),K=await kc.newPage();K.on("pageerror",e=>errs.push(e.message));await K.goto("http://localhost:8915/",{waitUntil:"commit"});await K.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await K.waitForFunction(()=>SYNC.state==="online"&&SYNC.ai&&typeof SYNC.canSetKey==="boolean",null,{timeout:15000});
  ok(await K.evaluate(()=>SYNC.state==="online"&&!SYNC.ai.configured&&AI.conn.state==="local"),"site without a key starts in search-only mode");
  await K.evaluate(()=>{ACC.admin="adm";accSave();setOpen()});await K.waitForTimeout(300);
  ok(await K.evaluate(()=>document.querySelector("#setbody").innerText.includes("Connect the AI")),"Settings offers to connect the AI");

@@ -1,3 +1,4 @@
+import {unsafeProtectiveText} from './safety.js';
 import fs from 'node:fs';
 import {fact} from './evidence.js';
 const load=name=>JSON.parse(fs.readFileSync(new URL('../contracts/'+name,import.meta.url),'utf8'));
@@ -17,6 +18,7 @@ const numbers=text=>(String(text).match(/-?\d+(?:,\d{3})*(?:\.\d+)?/g)||[]).map(
 export function unsupportedNumbers(text,pack){const allowed=new Set();const walk=v=>{if(typeof v==='number')allowed.add(Number(v));else if(typeof v==='string')numbers(v).forEach(n=>allowed.add(Number(n)));else if(v&&typeof v==='object')Object.values(v).forEach(walk)};pack.facts.forEach(f=>walk(f.value));return numbers(text).filter(n=>!allowed.has(Number(n)))}
 export function validatePlan(plan,pack,{ai=false}={}){
  const errors=schemaErrors(plan,planSchema);if(errors.length)return {ok:false,errors};
+ if(unsafeProtectiveText(plan.rationale)||(plan.inputs||[]).some(i=>unsafeProtectiveText(i.rationale)))errors.push('Protective-function bypass instructions are not permitted');
  const p=fact(pack,'profile:'),lead=fact(pack,'lead:'),policy=fact(pack,'policy:'),ids=new Map(pack.facts.map(f=>[f.id,f]));
  const checkEvidence=(list,label)=>{if(!list.length)errors.push(label+': evidence is required');for(const id of list)if(!ids.has(id))errors.push(label+': unknown evidence '+id)};
  checkEvidence(plan.evidence,'plan');
