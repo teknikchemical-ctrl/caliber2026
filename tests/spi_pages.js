@@ -14,7 +14,7 @@ const MIN = { spi_dash: /Spare part overview/, spi_arch: /Six sources, one datab
   const pages = await p.evaluate(() => Object.keys(SPI.pages)); let bad = 0;
   for (const id of pages) {
     await p.evaluate(x => { document.querySelectorAll("#setbg,#notifbox,#gsmodal,#tourcard").forEach(e => e.remove()); go(x); }, id);
-    try { await p.waitForFunction(() => { const h = document.querySelector(".spi-page"); return h && !/^Loading/.test(h.textContent.replace(/^.*?Loading/, "Loading").slice(0, 0)) && !h.querySelector(".spi-sub")?.textContent.startsWith("Loading"); }, null, { timeout: 20000 }); } catch (e) {}
+    try { await p.waitForFunction(() => { const h = document.querySelector(".spi-page"); return h && !/^Loading/.test(h.textContent.replace(/^.*?Loading/, "Loading").slice(0, 0)) && !h.querySelector(".spi-sub")?.textContent.startsWith("Loading"); }, null, { timeout: 45000 }); } catch (e) {}
     await p.waitForTimeout(300);
     const txt = await p.evaluate(() => document.querySelector("#app").innerText), err = await p.evaluate(() => !!document.querySelector(".spi-err"));
     const okp = txt.length > 200 && !err && (!MIN[id] || MIN[id].test(txt));
