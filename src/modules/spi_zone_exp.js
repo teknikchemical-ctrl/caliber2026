@@ -34,7 +34,10 @@ function exTo(w){
  else if(w==="zone"){EXP.part=null}
  exSide();exTrail()}
 function exStage(w){const W=document.getElementById("ex_world"),E=document.getElementById("ex_equip");if(!W||!E)return;const eq=w==="equip";W.hidden=eq;E.hidden=!eq;(eq?E:W).classList.remove("ex-in");void (eq?E:W).offsetWidth;(eq?E:W).classList.add("ex-in")}
-function exRedraw(){if(typeof G3!=="undefined")Object.values(G3.inst).forEach(I=>{I.dirty=true})}
+function exRedraw(){if(typeof G3!=="undefined")Object.values(G3.inst).forEach(I=>{I.dirty=true});exSheetSync()}
+/* 2D drawing follows the zone selected in 3D or in the list, and the other way round */
+function exSheetSync(){const S=document.getElementById("ex_svg");if(!S)return;S.querySelectorAll("[data-k]").forEach(e=>e.classList.toggle("sel",EXP.zone!=null&&e.dataset.k===String(EXP.zone)))}
+function exView(v){EXP.view=v;const V=document.querySelector(".ex-views");if(V)V.className="ex-views v-"+v;document.querySelectorAll(".ex-vt .ws-chip").forEach(b=>b.classList.toggle("on",b.getAttribute("onclick").indexOf("'"+v+"'")>0));exRedraw()}
 /* ---------- open an equipment in place ---------- */
 async function exOpenFunc(funcloc,mat){if(!document.getElementById("ex_root")){spiGo("spi_space",{funcloc});return}
  const S0=document.getElementById("ex_side");if(S0&&!EXP.eq)S0.innerHTML='<p class="muted spi-sub" style="padding:14px">Opening the equipment</p>';
@@ -44,7 +47,8 @@ async function exOpenFunc(funcloc,mat){if(!document.getElementById("ex_root")){s
   Object.assign(EXP,{eq:true,key,zone:null,part:null,items:[],loc:{funcloc:e.funcloc,tag:e.tag||e.funcloc,descr:e.descr||"",crit:e.criticality,cname:e.eq_class_name||"",parts:a.parts||[],notif:a.notifications||[],pm:a.planned_maintenance||[]}});
   const bn=spiSpSetOfLoc(e);if(bn){const r=spiSpRep(bn);P3.sel=r;P3.focus=r;if(P3.alts&&P3.alts[r])SPSP.act[r]=P3.alts[r].indexOf(bn)>=0?bn:SPSP.act[r]}
   const id="g3_"+(++G3.seq);G3.cfg[id]={n:key,title:e.tag,sel:()=>EXP.zone,click:k=>exZonePick(k),tint:spiStockTint(key)};
-  document.getElementById("ex_equip").innerHTML=`<div class="g3box ex-g3" id="${id}"></div>`;exStage("equip");spiStockPaint(key);
+  const sheet=(()=>{try{return spiGaSvg(key).replace(/gSel\('/g,"exZonePick('").replace(/<svg id="gsvg"/,'<svg id="ex_svg"')}catch(x){return ""}})();EXP.view=EXP.view||"3d";
+  document.getElementById("ex_equip").innerHTML=`<div class="ex-vt">${wsChips("View",[["3d","3D model"],["2d","2D drawing"],["both","3D and 2D"]],EXP.view,"exView(",true)}<span class="muted">Select a zone on either view; both follow the selection</span></div><div class="ex-views v-${EXP.view}"><div class="g3box ex-g3" id="${id}"></div><div class="ex-sheet gasheet">${sheet||'<p class="muted">No drawing for this location.</p>'}</div></div>`;exStage("equip");spiStockPaint(key);exSheetSync();
   exSide();exTrail();if(mat)exFocusPart(mat)}
  catch(err){if(S0)S0.innerHTML=`<div class="ex-pad"><p class="muted">The equipment could not be loaded: ${esc(err.message)}</p></div>`}}
 function exOpenSet(n){const s=S(n);exOpenFunc("PX_"+s.tag)}
@@ -70,7 +74,7 @@ function exZones0(){const P=spiPrep(EXP.key),D=SPIST.d[EXP.key];
  if(!zs.length){EXP.items=(EXP.loc.parts||[]).map(p=>({descr:p.descr,mat:p.material_no,stat:spiStat(p),stock:p.stock,min:p.min_qty,max:p.max_qty}));return `<div class="ex-pad"><div class="ex-zh"><b>Parts</b><span class="muted">${EXP.items.length}</span></div><div class="ex-pl" id="ex_pl">${exPartRows("")}</div></div>`}
  return `<div class="ex-pad"><div class="ex-zh"><b>Zones of this equipment</b><span class="muted">Select a zone here or on the 3D model</span></div><div class="ex-zl">${zs.map(z=>{const q=D&&D.zones&&D.zones[z.id],w=q?q.worst:"none";return `<button class="ex-z" onclick="exZonePick('${z.key}')"><span class="spi-st ${w}"><i></i></span><span class="nm">${esc(z.label)}</span><span class="muted">${z.lines.length}</span></button>`}).join("")}</div></div>`}
 function exPartRows(q){q=(q||"").toLowerCase();const rows=EXP.items.map((it,i)=>({it,i})).filter(x=>!q||x.it.descr.toLowerCase().indexOf(q)>=0||String(x.it.mat||"").indexOf(q)>=0);
- return rows.map(({it,i})=>`<button class="ex-pr" onclick="exPartPick(${i})"><span class="spi-st ${it.stat||"none"}"><i></i></span><span class="nm">${esc(spiDesc(it.descr))}</span><span class="muted num">${it.stock!=null?spiNum(it.stock):""}</span></button>`).join("")||'<div class="muted spi-sub">No part matches.</div>'}
+ return rows.map(({it,i})=>`<button class="ex-pr" onclick="exPartPick(${i})"><span class="spi-st ${it.stat||"none"}"><i></i></span><span class="ex-th">${(()=>{try{return spiPartThumb(it.descr,90,46)}catch(e){return ""}})()}</span><span class="nm">${esc(spiDesc(it.descr))}</span><span class="muted num">${it.stock!=null?spiNum(it.stock):""}</span></button>`).join("")||'<div class="muted spi-sub">No part matches.</div>'}
 function exFilter(v){const L=document.getElementById("ex_pl");if(L)L.innerHTML=exPartRows(v)}
 /* nothing selected: every block, grouped by district */
 function exBlocks(){return `<div class="ex-pad"><div class="ex-zh"><b>Blocks</b><span class="muted">${p3Units().length} in ${SPCAT.length} districts</span></div>${SPCAT.map(k=>{const us=p3Units().filter(u=>(P3.cat[u.n]||SPCAT[5])===k);return us.length?`<div class="sp-ng" style="padding-left:0"><span class="sp-nd" style="background:${k.c}"></span>${esc(k.n)}</div>`+us.map(u=>{const c=spiSpCount(u),sub=u.tpl?"Template":spiSpSub(u.n);return `<button class="sp-ni" data-n="${u.n}" style="--pc:${k.c}" onclick="spiSpGo('${u.n}')"><b>${esc(spiSpBlock(u.n))}</b><span>${esc(sub)}${c!=null?(sub?" | ":"")+spiNum(c)+" locations":""}</span></button>`}).join(""):""}).join("")}</div>`}
