@@ -167,6 +167,6 @@
     "Fill rate is units filled / units demanded. Service level is 1 minus stockout part-months / all part-months, including zero-demand months. Mixed material units make aggregate fill rate a descriptive indicator; inspect per-part results.",
     "Stock held is mean month-end on-hand valued at snapshot positive IDR unit prices, not a recoverable cash amount. Unpriced parts remain in service metrics. No emergency price premium, downtime or PO-spend saving is claimed. Criticality S > A > B > C is assumed."
   ],
-  "generated_at": "2026-11-04T05:10:49.080Z",
+  "generated_at": "2026-11-04T07:06:10.735Z",
   "engine_version": "spi-engine-1.1"
 }

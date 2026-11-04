@@ -11,6 +11,92 @@
     "consumed_parts": 1930,
     "single_event_parts": 1220
   },
+  "rop_spread_by_class": {
+    "smooth": {
+      "parts": 27,
+      "flagged_parts": 26,
+      "same_lead_ratio": {
+        "p50": 5.481481481481482,
+        "p90": 10.080825057295648,
+        "max": 17.389078498293514
+      },
+      "default60_ratio": {
+        "p50": 4.181818181818182,
+        "p90": 5.835087719298248,
+        "max": 7.260869565217392
+      }
+    },
+    "erratic": {
+      "parts": 116,
+      "flagged_parts": 115,
+      "same_lead_ratio": {
+        "p50": 8.549647887323944,
+        "p90": 15.514254011608056,
+        "max": 148.3153153153153
+      },
+      "default60_ratio": {
+        "p50": 5.026785714285714,
+        "p90": 8.756119379571473,
+        "max": 18.68671963677639
+      }
+    },
+    "lumpy": {
+      "parts": 231,
+      "flagged_parts": 177,
+      "same_lead_ratio": {
+        "p50": 5.3125,
+        "p90": 15.965909090909092,
+        "max": 39.89473684210526
+      },
+      "default60_ratio": {
+        "p50": 4,
+        "p90": 7.677114427860697,
+        "max": 26.09090909090909
+      }
+    },
+    "intermittent": {
+      "parts": 336,
+      "flagged_parts": 92,
+      "same_lead_ratio": {
+        "p50": 2,
+        "p90": 5.25,
+        "max": 20
+      },
+      "default60_ratio": {
+        "p50": 2,
+        "p90": 4.619047619047619,
+        "max": 17.75
+      }
+    },
+    "single_event": {
+      "parts": 1220,
+      "flagged_parts": 138,
+      "same_lead_ratio": {
+        "p50": 0.6666666666666666,
+        "p90": 4,
+        "max": 34.91489361702128
+      },
+      "default60_ratio": {
+        "p50": 0.6666666666666666,
+        "p90": 4,
+        "max": 26
+      }
+    },
+    "no_demand": {
+      "parts": 5551,
+      "flagged_parts": 0,
+      "same_lead_ratio": {
+        "p50": 0.5,
+        "p90": 0.5,
+        "max": 0.5
+      },
+      "default60_ratio": {
+        "p50": 0.5,
+        "p90": 0.5,
+        "max": 0.5
+      }
+    }
+  },
   "financial_basis": {
     "low_risk_candidates_idr": 14733770130,
     "low_risk_parts": 72,
