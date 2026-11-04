@@ -34,7 +34,11 @@ export function validatePlan(plan,pack,{ai=false}={}){
   if(unsupportedNumbers(input.rationale,pack).length)errors.push('Input rationale contains unsupported numbers');
   const v=input.value;
   if(input.effect==='multiply'){if(v<.25||v>3)errors.push('Multiplier outside guardrail');if(v>2&&new Set(input.evidence.map(id=>ids.get(id)?.origin).filter(x=>x&&!['policy','material'].includes(x))).size<2)errors.push('Large multiplier requires independent evidence origins');}
-  if(input.effect==='add_qty'&&(v<0||v>10*Math.max(0,...fact(pack,'series:').map(r=>r.qty))))errors.push('Added quantity exceeds history-based bound');
+  if(input.effect==='add_qty'){
+   const maximum=Math.max(0,...fact(pack,'series:').map(r=>r.qty)),limit=maximum>0?10*maximum:Math.min(10,p.installed_total||0);
+   if(v<0||v>limit)errors.push('Added quantity exceeds evidence bound');
+   if(maximum===0&&v>0&&(!plan.flags?.includes('sparse_history')||new Set(input.evidence.map(id=>ids.get(id)?.origin).filter(x=>x&&!['policy','material'].includes(x))).size<2))errors.push('Zero-history addition needs independent evidence and sparse_history flag');
+  }
   if(input.effect==='set_lead_days'&&(v<1||v>400||(lead.p10!=null&&v<lead.p10)))errors.push('Lead-time driver outside guardrail');
   if(input.effect==='set_service_level'&&!service(v))errors.push('Service-level driver outside policy');
   if(input.effect==='set_zero_after'&&(input.driver!=='obsolescence'||p.months_since_last==null||p.months_since_last<12||['S','A'].includes(p.crit_max)))errors.push('Obsolescence is unsupported or part is protected');

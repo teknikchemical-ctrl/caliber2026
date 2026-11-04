@@ -10,6 +10,7 @@
 - No engine in production means result:null/status:engine_pending, never a fake forecast. Reasoning provider in the chart test was explicitly synthetic; ordinary mock/rules API mode was also tested with the real engine. Live Gemini and Vercel are not verified. Engine tests are tests/spi_ai_engine_integration.js; SPI_TEST_ENGINE may point to a published candidate for independent integration testing. The final browser test used the real merged engine.
 ## Next / waiting on
 - Claude A: merge this branch and deploy Vercel; human: set AI_PROVIDER/AI_API_KEY/AI_MODEL securely and verify /api/ai/health plus a real part forecast. No key in chat, no main push, no PR.
-- Remaining wider-role work: Ask AI/tool loop, resumable AI batch/results.sqlite and golden question evaluation. Latest inbox resolves target persistence and zero-history add_qty bounds; validation update follows this pushed chart piece. Current inbox read and acknowledged here because inbox is outside the human's edit list.
+- Remaining wider-role work: Ask AI/tool loop, resumable AI batch/results.sqlite and golden question evaluation. Latest inbox resolves target persistence and zero-history add_qty bounds; zero-history add_qty validation is now updated and tested (261 core checks). Current inbox read and acknowledged here because inbox is outside the human's edit list.
 
 - Remaining account usage is not exposed by this client. Chart wiring is committed and pushed immediately; next pieces are Ask AI, batch and golden questions.
+- Ready to merge: zero-history additions require installed-capacity bounds, two independent origins and sparse_history. Scope target schema is consumed unchanged.
