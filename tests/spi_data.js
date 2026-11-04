@@ -55,6 +55,8 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); 
     r = await post({ kind: "nonsense", rows: [] }); ok(r.s === 400, "ingest check: unknown kind is a 400"); }
   r = await run("server/data/campaign-readiness.mjs", { crit: "S,A" }); ok(r.s === 200 && r.j.months >= 1 && r.j.parts_checked > 100 && r.j.rows.every(x => x.gap_qty > 0 && ["S", "A"].includes(x.crit)), "campaign readiness: gap list for critical parts in the high-load window");
   r = await run("server/data/maint-board.mjs", { class: "PP" }); ok(r.s === 200 && r.j.kpis.total > 100 && r.j.timeline.length === r.j.kpis.total && r.j.month_priority.months.length >= 10, "maintenance board filters by equipment class");
+  r = await run("server/data/marks.mjs"); { const j = r.j, ok1 = j.E.every((e) => e[0] >= 0 && e[1] >= 0 && e[1] < j.K.length && (e[3] === -1 || e[3] < j.F.length) && (!e[2] || j.M[e[2]]) && e[6] < j.T.length);
+    ok(r.s === 200 && j.counts.issue > 100 && j.counts.notification > 100 && j.counts.po_raised > 100 && ok1 && j.E.every((e, i) => !i || j.E[i - 1][0] <= e[0]), `event marks: ${j.E.length.toLocaleString("en-US")} dated records with part, location, quantity and value, in date order`); }
   r = await run("server/data/loc-board.mjs"); ok(r.s === 200 && r.j.tiles.locations > (mode === "full" ? 10000 : 1000) && r.j.heat.length > 10 && r.j.risk.every(x => ["S", "A"].includes(x.crit)), "location board: tiles, risk matrix and S and A risk list");
   console.log(`\nAll ${n} data checks passed (${mode})`);
 })().catch(e => { console.error("FAIL", e.message); process.exit(1); });

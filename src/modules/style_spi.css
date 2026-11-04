@@ -109,3 +109,18 @@ html.spi input[type=range]{accent-color:#2a78d6}.spi-eq>div{border-left-color:#2
 .spi-pbasis{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:8px 0 10px;padding:7px 10px;border:1px solid #d8e0ea;border-radius:10px;background:#f7f9fc;font-size:12px;color:#3b4656}.spi-pbasis b{color:#1d4f91;margin-right:4px}.spi-pbasis button{margin-left:auto;font-size:12px;padding:2px 10px}
 .spm-flow{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch;margin:6px 0 12px}.spm-flow div{flex:1 1 130px;border:1px solid #c9d7ec;border-radius:10px;padding:8px 10px;background:#fff;font-size:12px;line-height:1.4}.spm-flow div b{display:block;font-size:13px;color:#1c2533}.spm-flow div.ai{background:#eef4fd;border-color:#1d4f91}.spm-flow i{align-self:center;color:#6b6a62;font-style:normal}
 .spm-pick{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 10px}.spm-pick select{padding:5px 8px;border:1px solid #c9d2de;border-radius:8px;font:inherit}
+/* event symbols under every month chart and on every timeline (spi_evl.js, Claude A) */
+.spi-evb{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:6px 0 2px;font-size:12px;color:#52514e}
+.spi-evs{display:flex;align-items:center;gap:6px}.spi-evs span{font-weight:600}.spi-evs select{font-size:12px;padding:3px 6px;border:1px solid #d6d5cd;border-radius:6px;background:#fff;max-width:240px}
+.spi-evq{font-size:12px;padding:3px 8px;border:1px solid #d6d5cd;border-radius:6px;width:130px}
+.spi-evk{display:flex;flex-wrap:wrap;gap:4px}.spi-evkb{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border:1px solid #e1e0d9;border-radius:12px;background:#fff;cursor:pointer;color:#35445c}
+.spi-evkb b{font-weight:600;color:#6b6a65}.spi-evkb.off{opacity:.4;text-decoration:line-through}.spi-evn{color:#6b6a65;font-size:11px;margin-left:auto}
+.spi-evc{position:relative;cursor:crosshair}.spi-evc canvas{display:block;width:100%}
+.spi-evtip{position:absolute;z-index:30;pointer-events:none;background:#fff;border:1px solid #d6d5cd;border-radius:6px;padding:6px 8px;font-size:12px;box-shadow:0 4px 14px rgba(0,0,0,.12);max-width:340px}
+.spi-evpop{position:absolute;z-index:31;right:0;top:0;width:min(420px,100%);max-height:340px;overflow:auto;background:#fff;border:1px solid #c9c8bf;border-radius:8px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.16);cursor:default}
+.spi-evph{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.spi-evi{padding:6px 0;border-top:1px solid #efeee8;font-size:12px}.spi-evi:first-child{border-top:0}.spi-evh{display:flex;align-items:center;gap:6px;color:#52514e}.spi-evh span{color:#6b6a65}
+.spi-evt{font-weight:600;color:#1f2a3a;margin-top:2px}.spi-evd{color:#52514e;margin-top:2px;line-height:1.4}.spi-eva{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.spi-evcr{color:#fff;font-size:10px;font-weight:700;border-radius:3px;padding:0 4px;margin-left:auto}
+/* visual clean-up: no explanatory captions, method notes, page purposes or usage hints on the pages; the figures, symbols and the AI boxes carry the reading */
+.spi-card>p.spi-sub,.spi-card>.spi-note,.spi-page>.spi-note,.spi-note,.ws-hd>p,.kb-hint,.spm-flow{display:none}

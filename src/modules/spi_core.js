@@ -28,9 +28,9 @@ const spiBadge=(t,tone)=>`<span class="spi-badge spi-${tone||"n"}">${esc(t)}</sp
 const spiCritBadge=c=>c?spiBadge(c,{S:"bad",A:"warn",B:"n",C:"n"}[c]):spiBadge("unknown","n");
 const spiEmpty=(msg)=>`<div class="spi-empty">${esc(msg||"Nothing to show for this selection.")}</div>`;
 const spiKpi=(big,label,tone,sub)=>`<div class="spi-kpi spi-k-${tone||"n"}"><div class="spi-kv">${esc(big)}</div><div class="spi-kl">${esc(label)}</div>${sub?`<div class="spi-ks">${esc(sub)}</div>`:""}</div>`;
-const spiCard=(title,body,sub)=>`<section class="spi-card"><h3>${esc(title)}</h3>${sub?`<p class="spi-sub">${esc(sub)}</p>`:""}${body}</section>`;
+const spiCard=(title,body,sub)=>`<section class="spi-card"><h3>${esc(title)}</h3>${body}</section>`;/* chart cards carry a title and the chart; no caption paragraph (owner: the site is not a text dump) */
 function spiTable(rows,cols,o={}){if(!rows||!rows.length)return spiEmpty(o.empty);
-  const raw=spiTableRaw(rows,cols,o);if(o.always||rows.length<=5)return raw;return `<div class="spi-ts"><input class="spi-tsi" type="search" placeholder="Search ${rows.length} rows to show them" aria-label="Search the table" oninput="spiTs(this)"><p class="spi-sub spi-tsh">The table stays hidden until you search.</p><div class="spi-tsb" hidden>${raw}</div></div>`}
+  const raw=spiTableRaw(rows,cols,o);if(o.always||rows.length<=5)return raw;return `<div class="spi-ts"><input class="spi-tsi" type="search" placeholder="Search ${rows.length} rows to show them" aria-label="Search the table" oninput="spiTs(this)"><div class="spi-tsb" hidden>${raw}</div></div>`}
 function spiTableRaw(rows,cols,o={}){
   return `<div class="spi-tw"><table class="spi-t"><thead><tr>${cols.map(c=>`<th${c.num?' class="r"':""}>${esc(c.h)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr${o.row?` ${o.row(r)}`:""}>${cols.map(c=>`<td${c.num?' class="r"':""}>${c.f?c.f(r):esc(r[c.k]??"")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}
 /* horizontal bars, direct labels, one axis. items:[{label,value,tone,text}] */

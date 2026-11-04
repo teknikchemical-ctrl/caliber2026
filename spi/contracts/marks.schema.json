@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GET /api/data/marks: every dated record of the case for the symbols on every timeline and month chart (owner: Claude A)",
+  "type": "object",
+  "required": ["v", "from", "cutoff", "K", "S", "U", "T", "F", "M", "E", "counts"],
+  "properties": {
+    "v": { "const": 1 },
+    "from": { "type": "string", "description": "first day; E[0] counts days from here" },
+    "to": { "type": "string" },
+    "cutoff": { "type": "string", "description": "last day of the baseline data" },
+    "K": { "type": "array", "items": { "enum": ["issue", "notification", "po_raised", "receipt", "po_due", "plan", "recommended_order", "campaign"] }, "description": "kinds; names match Claude B's KB_EV" },
+    "S": { "type": "array", "items": { "type": "array", "prefixItems": [{ "type": "string", "description": "set tag" }, { "type": "string", "description": "set name" }] } },
+    "U": { "type": "array", "items": { "type": "string" }, "description": "suppliers, referenced as s<index> in T texts" },
+    "T": { "type": "array", "items": { "type": "string" }, "description": "texts, | separated fields per kind (notification: priority|description|status and completion date; po_raised: supplier|lead; plan: task|cycle; recommended_order: arrives date)" },
+    "F": { "type": "array", "items": { "type": "array", "description": "[location tag, description, criticality, equipment class, equipment set bit mask]" } },
+    "M": { "type": "object", "additionalProperties": { "type": "array", "description": "[description, unit, criticality, unit price IDR, set mask, classes comma separated, [F index of installed locations]]" } },
+    "E": { "type": "array", "items": { "type": "array", "description": "[day from `from`, K index, part number or 0, F index or -1, quantity, value IDR (qty x last PO price, Estimate for recommended orders), T index, reference: work order or notification, notification no, PR/PO, maintenance item]" } },
+    "counts": { "type": "object", "additionalProperties": { "type": "integer" } }
+  }
+}
