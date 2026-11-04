@@ -1,1 +1,10 @@
 /* Styles for the 3D views (owned by the 3D UI stream). Loaded after style4.css. */
+/* SPI drawings: sheet, stock overlay, legend, zone tables (owner: Claude B) */
+.spi-ga .gs{stroke:#1c2733;stroke-width:.8;stroke-linejoin:round}.spi-ga .spi-in{stroke-dasharray:4 3;fill:none!important}.spi-ga .spi-sh.gp{cursor:pointer}.spi-ga .spi-sh.gp:hover{stroke:#0969da;stroke-width:1.6}.spi-ga .spi-sh.sel{stroke:#0b5fd7!important;stroke-width:2.2!important}
+.spi-ga .spi-sh[data-stock]{fill:var(--sc)!important;fill-opacity:.85}.spi-ga .spi-in[data-stock]{fill:var(--sc)!important;fill-opacity:.35}.spi-ga .spi-bal[data-stock] .bl{fill:var(--sc)}.spi-ga .spi-dot{fill:#1c2733}.spi-ga .spi-vt{font:700 11px Arial,sans-serif;fill:#1f3864}
+.spi-stock{margin-top:10px}.spi-lg{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;font-size:12.5px}.spi-rule{font-size:11.5px;margin:6px 0 8px;line-height:1.45}
+.spi-st{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line,#d5dae2);border-radius:999px;padding:2px 9px;font-size:12px;white-space:nowrap}.spi-st i{width:10px;height:10px;border-radius:3px;background:#dfe4ec;border:1px solid rgba(0,0,0,.25)}
+.spi-st.red i{background:#d03b3b}.spi-st.amber i{background:#e0a100}.spi-st.green i{background:#3fa55a}.spi-st.grey i{background:#8b95a5}
+.spi-zt,.spi-zc{overflow-x:auto}.spi-t2{width:100%;border-collapse:collapse;font-size:12px}.spi-t2 th,.spi-t2 td{padding:5px 7px;border-bottom:1px solid var(--line,#e1e4ea);text-align:left;vertical-align:top}.spi-t2 .num{text-align:right;font-variant-numeric:tabular-nums}.spi-t2 tr.click{cursor:pointer}.spi-t2 tr.click:hover,.spi-t2 tr.click:focus-visible{background:rgba(9,105,218,.08);outline:none}
+.spi-g3c{max-width:560px}.spi-g3c .spi-zc{max-height:260px;overflow:auto}
+.spi-pr{padding:6px 0;border-bottom:1px solid var(--line,#e1e4ea);font-size:12px}.spi-pr .top{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}.spi-pr .nm{flex:1 1 140px;min-width:0;overflow-wrap:anywhere}.spi-pr .nums{margin-top:3px;font-size:11.5px}.spi-pr .ghost{padding:1px 8px;font-size:11.5px;margin-left:6px}
