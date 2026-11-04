@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spi/forecast_input",
+  "title": "ForecastInput: one driver in the ledger that moves a forecast. Row of table forecast_input. Whoever creates it states the source.",
+  "type": "object",
+  "required": ["driver", "effect", "value", "source", "confidence", "rationale", "evidence"],
+  "additionalProperties": false,
+  "properties": {
+    "input_id": { "type": "string" },
+    "scope": { "enum": ["part", "family", "funcloc", "plant"], "default": "part" },
+    "target": { "type": "string", "description": "material_no, family_id, funcloc or 'plant' depending on scope" },
+    "driver": { "enum": ["pm_due", "turnaround", "failure_rate", "lead_time", "demand_uplift", "demand_cut", "one_off", "obsolescence", "price", "criticality_override"] },
+    "effect": { "enum": ["add_qty", "multiply", "set_lead_days", "set_service_level", "set_zero_after"] },
+    "value": { "type": "number" },
+    "unit": { "type": "string" },
+    "period_start": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}(-\\d{2})?$" },
+    "period_end": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}(-\\d{2})?$" },
+    "source": { "enum": ["data", "rule", "ai", "user"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "rationale": { "type": "string", "maxLength": 500 },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "status": { "enum": ["proposed", "accepted", "rejected"], "default": "proposed" }
+  },
+  "x-bounds": {
+    "multiply": "value between 0.25 and 3.0. Above 2.0 needs two independent evidence ids.",
+    "add_qty": "value between 0 and 10 times the part's largest monthly issue in history.",
+    "set_lead_days": "between 1 and 400 and not below the 10th percentile of the part's PO lead times.",
+    "set_zero_after": "only with driver 'obsolescence' and months_since_last of at least 12."
+  }
+}

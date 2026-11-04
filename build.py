@@ -56,13 +56,17 @@ mods=[w('auto.js'),w('auto3d.js'),'const EQC='+open(os.path.join(ROOT,'src','dat
 for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pid2.js','pidv.js','pdm.js','pdm2.js','ks.js','wiz.js','scn.js','scnui.js','fm.js','rc.js','cov.js','int.js','il.js','fx.js','help.js','auth.js','notify.js','ingest.js','gov.js','eq2.js','perf.js','ready.js','hse.js','hse3d.js','ai2.js','eqclass.js','fin.js','g3neck.js','g3d.js','g3r.js','plant3d.js','sim3d.js','plan.js','i18n.js','sync.js','dash.js','polish.js']:
     try: mods.append(w(f))
     except FileNotFoundError: pass
+SPI=(CASE=='spi')
+if SPI:  # spare part pages: shell first, then every spi_*.js (each owned by one agent), nav from spi/pages.json
+    import glob
+    for f in ['spi_core.js']+sorted(os.path.basename(g) for g in glob.glob(os.path.join(ROOT,'src','modules','spi_*.js')) if not g.endswith('spi_core.js')): mods.append(w(f))
 h=h[:a]+''.join(mods)+h[b:]
 for t,r in [('["ga","Equipment drawing"],','["ga","Equipment drawing"],["perf","Key indicators"],["plot","Plot plan"],'),('if(tab==="ga")b=gaView(n);','if(tab==="ga")b=gaView(n);if(tab==="plot")b=ppView(n);if(tab==="perf")b=perfSetView(n);if(tab==="ready")b=rdyView(n);'),('if(tab==="maint")b=maint(n);','if(tab==="maint")b=mhView(n);')]:
     P(t,r)
 P('"go(\'documents\',{doc:\'"+s.pp.document_id+"\'})"','"st.tab=\'plot\';render()"')
 P('<div class="nav" data-page="equipment">🏭 Equipment Sets</div>','<div class="nav" data-page="equipment">Equipment Sets</div>\n  <div class="nav" data-page="plot">Plot Plan</div>\n  <div class="nav" data-page="mnt">Maintenance</div>\n  <div class="nav" data-page="perf">Performance</div>\n  <div class="nav" data-page="scn">Scenarios</div>\n  <div class="nav" data-page="il">Interlock Library</div>')
 P('p==="pid"?pidPage():','p==="pid"?pidPage():p==="plot"?plotPage():p==="mnt"?mhPage():p==="perf"?perfPage():p==="gov"?govPage():')
-i=h.index('.pbar{padding'); h=h[:i]+w('style2.css')+w('style3.css')+(w('style4.css') if True else '')+w('style3d.css')+w('style_fin.css')+h[i:]
+i=h.index('.pbar{padding'); h=h[:i]+w('style2.css')+w('style3.css')+(w('style4.css') if True else '')+w('style3d.css')+w('style_fin.css')+(w('style_spi.css') if SPI else '')+h[i:]
 
 # ---------- contextual exports ----------
 P('<button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button>','<div class="row" style="gap:8px"><button onclick="go(\'ai\',{scope:${n}})">🤖 Ask AI about ${s.tag}</button><button class="ghost" onclick="rcOpen(\'dossier\',{set:${n}})">Export dossier</button></div>')
@@ -125,8 +129,21 @@ for old,new in [
 # ---------- costing page (module fin.js, owned by Codex) ----------
 P('<div class="nav" data-page="gov">Governance</div>','<div class="nav" data-page="gov">Governance</div>\n  <div class="nav" data-page="fin">Costing</div>')
 P('p==="gov"?govPage():','p==="gov"?govPage():p==="fin"?finPage():')
+if SPI:  # spare part navigation group, routing and start page
+    PG=json.load(open(os.path.join(ROOT,'spi','pages.json')))
+    P('<div class="nav active" data-page="dashboard">▦ Dashboard</div>',''.join('<div class="nav" data-page="%s">%s</div>\n  '%(pid,lab) for pid,lab,_ in PG)+'<div class="nav active" data-page="dashboard">Plant overview</div>')
+    P('const NAVG=[["Operate",','const SPIPAGES='+json.dumps(PG)+';\nconst NAVG=[["Spare parts",SPIPAGES.map(r=>[r[0],r[2]])],["Operate",')
+    P('app.innerHTML=p==="dashboard"?','app.innerHTML=p.startsWith("spi_")?spiRoute(p):p==="dashboard"?')
+    P('let st={page:"dashboard",','let st={page:"spi_dash",')
+    P('Each set = P&ID + GA drawing + datasheet + plot plan + interlock logic + OPLs + maintenance history, for one main equipment item','Each set = schematic P&ID, equipment drawing and 3D model, datasheet, spare parts list and maintenance notifications, for one main equipment item')
+    P('<span class="tag">🧩 ${cnt(K.opl,o=>o.set===s.n)} lessons</span>','')
+    h=h.replace('Ask about procedures, interlocks, equipment details, locations or maintenance history.','Ask about spare parts, stock, equipment details or maintenance history.').replace('plot plans, interlock documents, OPLs, instrument data and ','spare part records, datasheets and ')
+    P('window.NW=n=>','window.SPI_MODE=true;window.NW=n=>')
+    P('All ${NW(K.sets.length)} units as laid out on the plot plan, joined by their process, gas, water, nitrogen and steam lines. Drag to look around. Select a unit to fly to it and see its figures, then open its equipment set from the card.','All ${NW(K.sets.length)} equipment sets in a schematic site layout generated from the data. Drag to look around. Select a unit to fly to it, then open its equipment set from the card.')
+
 # ---------- 4. theme + cleanup ----------
 h=remap(h)
+if SPI: h=h.replace('Asset Knowledge Platform','Spare Part Intelligence').replace('AI Manufacturing Knowledge Hub','Spare Part Intelligence')
 h=h.replace(ROOT_OLD,ROOT_NEW)
 h=h.replace('<meta name="viewport" content="width=device-width, initial-scale=1.0" />','<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n<meta name="theme-color" content="#155ea3" />\n<link rel="manifest" href="manifest.webmanifest" />\n<link rel="icon" href="icon-192.png" />',1)
 h=strip_emoji(h); h=dashes(h)

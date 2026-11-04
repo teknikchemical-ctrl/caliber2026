@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spi/forecast_result",
+  "title": "ForecastResult: what the engine returns for one executed plan (engine.runPlan). Owner: Codex Fin. Consumed by the API, the AI agent (to explain) and the UI.",
+  "type": "object",
+  "required": ["plan_id", "material_no", "method", "forecast", "inventory", "recommendation", "backtest", "provenance"],
+  "properties": {
+    "plan_id": { "type": "string" },
+    "material_no": { "type": "integer" },
+    "method": { "type": "string" },
+    "demand_class": { "enum": ["smooth", "erratic", "intermittent", "lumpy", "no_demand", "single_event"] },
+    "forecast": { "type": "array", "items": { "type": "object", "required": ["month", "p10", "p50", "p90"], "properties": { "month": { "type": "string" }, "p10": { "type": "number" }, "p50": { "type": "number" }, "p90": { "type": "number" }, "drivers": { "type": "array", "items": { "type": "string" }, "description": "input_ids that changed this month" } } } },
+    "history": { "type": "array", "items": { "type": "object", "properties": { "month": { "type": "string" }, "qty": { "type": "number" } } } },
+    "inventory": { "type": "object", "required": ["safety_stock", "reorder_point", "min_qty", "max_qty", "order_qty", "service_level"], "properties": { "safety_stock": { "type": "number" }, "reorder_point": { "type": "number" }, "min_qty": { "type": "number" }, "max_qty": { "type": "number" }, "order_qty": { "type": "number" }, "service_level": { "type": "number" }, "lt_demand_mean": { "type": "number" }, "lt_demand_sd": { "type": "number" }, "current": { "type": "object" } } },
+    "recommendation": { "type": "object", "required": ["action", "urgency", "stockout_risk", "overstock_risk", "rationale"], "properties": { "action": { "enum": ["REORDER", "REDUCE", "MAINTAIN", "MONITOR", "REVIEW_OBSOLETE", "KEEP_INSURANCE"] }, "urgency": { "enum": [1, 2, 3] }, "stockout_risk": { "type": "number" }, "overstock_risk": { "type": "number" }, "order_qty": { "type": "number" }, "order_by": { "type": ["string", "null"] }, "exposure_idr": { "type": ["number", "null"] }, "holding_cost_idr_yr": { "type": ["number", "null"] }, "release_idr": { "type": ["number", "null"] }, "rationale": { "type": "string" } } },
+    "backtest": { "type": "object", "description": "Rolling-origin check of this plan against the rules baseline on the last 4 months of history", "properties": { "baseline_method": { "type": "string" }, "plan_error": { "type": "number" }, "baseline_error": { "type": "number" }, "metric": { "type": "string" }, "plan_wins": { "type": "boolean" }, "n_origins": { "type": "integer" } } },
+    "provenance": { "type": "object", "required": ["inputs", "assumptions"], "properties": { "inputs": { "type": "array", "items": { "type": "string" } }, "assumptions": { "type": "array", "items": { "type": "string" }, "description": "Every default used, e.g. 'carrying cost 22% of unit value per year (assumption)'" }, "engine_version": { "type": "string" } } }
+  }
+}

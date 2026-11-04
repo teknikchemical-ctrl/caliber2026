@@ -1,0 +1,1 @@
+The human's integrated spreadsheet (CALIBER_Connected_Database_Foundation.xlsx): the same six sources normalised into tables with a SQLite schema, source map and a quality register. Claude A reads it as a cross-check. The database used by the app is built from the six raw files in `spi/data/raw/` by `spi/etl/build_db.py` (reproducible, one command: `spi/etl/run_all.sh`).

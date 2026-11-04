@@ -1,0 +1,1 @@
+Owner: Claude A. raw/ holds the six baseline Excel files and the data relationship diagram exactly as received. integrated/ is for the integrated spreadsheet the human is preparing. Never edit raw files.

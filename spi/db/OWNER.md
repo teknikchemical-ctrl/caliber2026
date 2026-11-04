@@ -1,0 +1,1 @@
+Owner: Claude A. schema.sql and schema_results.sql are the contracts (results.sqlite is written by the batch scripts of Codex AI and Codex Fin). spi.sqlite is the one generated file that IS committed (the submission needs it): only Claude A commits it, only at milestones.

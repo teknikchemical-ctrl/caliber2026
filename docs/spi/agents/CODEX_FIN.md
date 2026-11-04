@@ -1,0 +1,26 @@
+# Role: Codex Fin, the forecasting and optimisation engine, the business case, the deck
+
+Branch `codex/finance`. This replaces your earlier costing-page-only brief for this case. Reuse what you built (`finance/build_case.py`, `fin.json` schema, reconciliation tests) as far as it fits. The engine is the product's calculator and the AI's executor: its correctness is the first priority, the deck the last.
+
+## Your files
+`spi/engine/**`, `api/engine/**`, `tests/spi_engine*.js`, `finance/spi/**`, `deck/spi/**`, `docs/spi/FORECASTING.md`, `docs/spi/BUSINESS_CASE.md`, `src/modules/fin.js`, `src/modules/style_fin.css`, `finance/**`, `deck/**`, `docs/handoff/codex.md`.
+Not yours: `spi/ai` (Codex AI), `spi/db` and `api/data` (Claude A), `src/modules/spi_*.js` (Claude B). Ask through your handoff "Waiting on" and `docs/inbox`.
+
+## Tasks in order
+1. **F1 Core (M1).** `spi/engine/classify.js`, `methods.js` (ses, croston, sba, tsb, family_pooled_sba, driver_based, zero_demand_insurance), reproducible bootstrap quantiles (seeded). Unit tests in `tests/spi_engine*.js` against hand calculations and published worked examples for Croston and SBA. Pure functions, ES modules, no I/O; the DB is passed in. Work against `spi/fixtures/mini.sqlite` and `spi/db/schema.sql`.
+2. **F2 Plan runner (M1).** `runPlan(plan, ctx) -> ForecastResult` exactly as `spi/contracts/forecast_result.schema.json`, with a `Policy` object (service level by criticality, holding rate, ordering cost, downtime cost per day by criticality, slow-moving thresholds), every default listed in `provenance.assumptions`.
+3. **F3 Optimiser and recommender (M2).** Safety stock, ROP, dynamic Min and Max, EOQ, stockout risk and exposure, overstock and release, actions with urgency and a one-sentence reason, insurance-spare rule, as in `FORECASTING.md` sections 4 and 5.
+4. **F4 Backtest and baseline replay (M3).** `backtest(plan)` rolling origin on the last 4 months, and the replay of 17 months comparing current static Min and Max against dynamic parameters (service level achieved, stock held, stockouts). Report the numbers in `docs/spi/BUSINESS_CASE.md`; if we do not beat the baseline in a class, say so.
+5. **F5 Simulation and portfolio (M3).** `simulate.js` (also served to the browser as a static file), `health.js` (excess, slow, non-moving, obsolete lists), `optimise.js` portfolio and the cost-risk curve. Batch script `spi/engine/batch.js` writes the rules-based results for all parts to `spi/db/results.sqlite` (coordinate the table use with Codex AI who writes the AI rows).
+6. **F6 `api/engine/*` (M2 to M3):** `forecast`, `optimise`, `simulate`, `health` per `ARCHITECTURE.md`. Validate inputs, parameterised access, `limit`s, readable errors.
+7. **F7 Business case (M4).** In `finance/spi/` and `docs/spi/BUSINESS_CASE.md`: Excel model with live formulas (blue inputs, black formulas, every assumption labelled Case data, Market source, Estimate or Assumption), IDR: working capital released from excess stock, carrying cost saved (holding rate assumption), emergency purchase premium avoided (assumption), downtime hours avoided (assumption by criticality), one-off and running cost of the solution (Estimate), NPV, IRR, payback, benefit-cost ratio, pessimistic, base and optimistic scenarios, sensitivity. Numbers from the engine on the real data wherever possible. A Business impact page content for the app is exported as JSON for Claude B (`finance/spi/impact.json`), plus `fin.js` shows it.
+8. **F8 Deck (M4 to M5).** `deck/spi/` the 7 slides exactly in the competition format of `BRIEF.md` (cover; background and problem; solution with the answers to both key questions; business impact with success metrics and expected benefits; roadmap and risk management; team profile table and the AI models and tools used; appendix with methods, standards and data architecture). English, bold the key figures, consistent with the app. Screenshots come from `docs/spi/shots/` (Claude B). Team names, majors, semesters and contributions come from the human: leave a clearly marked input file `deck/spi/team.json`, never invent names.
+
+## Pages you now also own (reassigned from Claude B, who is out of usage)
+`src/modules/spi_opt.js` (Optimisation), `spi_health.js` (Inventory health), `spi_reco.js` (Recommendations), `spi_scn.js` (Scenario simulator), `spi_impact.js` (Business impact, from `finance/spi/impact.json`), exactly as specified in items 3 to 6 of `docs/spi/agents/B.md`, using the shell of Claude A (`spi_core.js`: `spiApi`, `spiCss`, chart helpers, page registration). Also the screenshots for the deck into `docs/spi/shots/` (use `tools/case_shots.js`). Order: Recommendations and Health first (they show the named outputs), then Scenario, Optimisation, Impact. Tests `tests/spi_ui_fin*.js`, 0 script errors in `case_shots`.
+
+## Tests
+`node tests/spi_engine.js` (all methods, parameters, recommendations against hand calculations), reconciliation: the workbook NPV equals the engine NPV to the shown precision; `bash tools/baseline_check.sh codex` before every push.
+
+## Done when
+Engine passes tests and is called by the API and by the AI planner, backtest and replay numbers are published, business case and deck match the app numbers, `deck/spi/team.json` is filled by the human, the deck builds with one command.

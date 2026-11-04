@@ -10,9 +10,9 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 role="${1:?role: a, b, codex or any}"
 git fetch -q origin 2>/dev/null || echo "(could not fetch: results may be out of date)"
-B3D='^(src/modules/(g3d|g3r|g3neck|plant3d|hse3d|sim3d|auto3d)\.js|src/modules/style3d\.css|cases/[^/]+/geo/(g3m|p3|h3)\.js|tools/g3bridge\.js|tests/stress3d\.js)$'
-CODEX='^((deck|finance|manual)/.*|src/modules/(fin\.js|style_fin\.css)|cases/[^/]+/(fin|eval_extra_fin)\.json|docs/handoff/codex\.md|tests/fin_[a-z0-9_]+\.js|tools/record_demo\.js)$'
-AIF='^(netlify/functions/[a-z_0-9]+\.mjs|src/modules/(ai|ai2|sync|intent|facts)\.js|tests/live\.js|docs/(AI_ASSISTANT|AI_PROVIDER_CONTRACT|BACKEND_API)\.md|docs/handoff/codex-ai\.md)$'
+B3D='^(src/modules/(g3d|g3r|g3neck|plant3d|hse3d|sim3d|auto3d)\.js|src/modules/style3d\.css|cases/[^/]+/geo/(g3m|p3|h3)\.js|tools/g3[a-z]*\.js|tests/stress3d\.js|cases/spi/geo/.*)$'
+CODEX='^((deck|finance|manual)/.*|src/modules/(fin\.js|style_fin\.css)|cases/[^/]+/(fin|eval_extra_fin)\.json|docs/handoff/codex\.md|tests/fin_[a-z0-9_]+\.js|tools/record_demo\.js|spi/engine/.*|api/engine/.*|src/modules/spi_(opt|health|reco|scn|impact)\.js|docs/spi/shots/.*|tests/spi_ui_fin[a-z0-9_]*\.js|tests/spi_engine[a-z0-9_]*\.js|docs/spi/(FORECASTING|BUSINESS_CASE)\.md)$'
+AIF='^(netlify/functions/[a-z_0-9]+\.mjs|src/modules/(ai|ai2|sync|intent|facts)\.js|tests/live\.js|docs/(AI_ASSISTANT|AI_PROVIDER_CONTRACT|BACKEND_API)\.md|docs/handoff/codex-ai\.md|spi/ai/.*|api/ai/.*|src/modules/spi_(forecast|ask)\.js|tests/spi_ui_ai[a-z0-9_]*\.js|tests/spi_ai[a-z0-9_]*\.js|docs/spi/AI_REASONING\.md)$'
 base=$(git merge-base HEAD origin/main)
 behind=$(git rev-list --count HEAD..origin/main); ahead=$(git rev-list --count origin/main..HEAD)
 echo "branch:        $(git rev-parse --abbrev-ref HEAD) at $(git rev-parse --short HEAD)"
@@ -24,6 +24,7 @@ echo "you are $ahead commit(s) ahead of main and $behind behind it"
 files=$( (git diff --name-only "$base" HEAD; git diff --name-only HEAD; git ls-files --others --exclude-standard) | sort -u)
 bad=""
 while IFS= read -r f; do [ -z "$f" ] && continue
+  case "$f" in docs/inbox/*|docs/TASKS.md|docs/handoff/*) continue;; esac
   isb=0; isx=0; isa=0; echo "$f" | grep -Eq "$AIF" && isa=1; echo "$f" | grep -Eq "$B3D" && isb=1; echo "$f" | grep -Eq "$CODEX" && isx=1
   case "$role" in
     any) ;;

@@ -32,3 +32,6 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 - Settings "Test the AI connection" now shows the real server error, and the first failing diagnostic check.
 - Diagnostics make a real one-word call and name the model that answered.
 - Tests: `tests/live.js` covers retired models and the diagnostics call. Not yet run with a real Gemini key.
+
+## SPI planning done (Claude A)
+Contracts, schema, role files, task board, inboxes, ownership checks are in the repo (`docs/spi/`). Next: A1 (Vercel hello, needs the human to import the repo in Vercel), A2 (ETL and mini.sqlite within the first hour). The initial seeding commit touched files in other agents' folders (OWNER.md files, AI_REASONING.md, FORECASTING.md): that is expected once, ownership applies from now.

@@ -1,0 +1,1 @@
+Owner: Codex Fin. Pure JavaScript ES modules, no I/O except through the db helper passed in: classify, forecast methods, inventory optimiser, recommender, simulator, backtest. See docs/spi/agents/CODEX_FIN.md and docs/spi/FORECASTING.md.
