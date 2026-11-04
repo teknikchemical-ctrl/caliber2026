@@ -6,13 +6,13 @@ Each case point (11 stock, 9 demand) has a figure on the Summary tile (`spi_summ
 
 | Id | Case point | Summary tile | Tool and chart that answers it |
 |---|---|---|---|
-| s_stockout | Critical parts at risk of a stockout | Critical parts at risk | Status (critical parts at zero stock, by criticality); Inventory planner (stockout chance per part); Golden path (Monte Carlo chance of a stockout per month) |
+| s_stockout | Critical parts at risk of a stockout | Critical parts at risk | Status (critical parts at zero stock, by criticality); Inventory planner (stockout chance per part); Optimized Scenario (Monte Carlo chance of a stockout per month) |
 | s_overstock | Stock above the projected need | Value above need | Status (overstock group); Savings planner (`spi_csave`) |
-| s_reorder | Parts to order now | Parts to order now | Purchase pathway (timeline markers and the work-order list); Status (order now) |
+| s_reorder | Parts to order now | Parts to order now | Optimized Scenario (timeline markers and the work-order list); Status (order now) |
 | s_minmax | New Min and Max | Parts with a new Min and Max | Inventory planner (bar of stock against today's and the recommended Min and Max; part card) |
 | s_slow | Dead and slow stock | Dead stock value | Stock view (`spi_inv`); Status (dead stock) |
 | s_carry | Holding cost | Holding cost per year | Carrying cost calculator (`spi_ccalc`); Impact reduction waterfall |
-| s_procure | Purchase value | Purchase value in 17 months | Suppliers (spend, lead-time range per supplier); Purchase pathway (purchase value by month and criticality) |
+| s_procure | Purchase value | Purchase value in 17 months | Suppliers (spend, lead-time range per supplier); Optimized Scenario (purchase value by month and criticality) |
 | s_crit | Criticality S exposure | Parts serving S equipment | Link map (`spi_link`); criticality filter and colour on every page |
 | s_downtime | Downtime from stockouts | Downtime per year | Impact reduction (`spi_cimp`, four impacts and the waterfall) |
 | s_tradeoff | Service level against cost | Lowest-cost service level | Cost-risk scenarios (`spi_scr`, cost against service curve) |
@@ -26,7 +26,7 @@ Each case point (11 stock, 9 demand) has a figure on the Summary tile (`spi_summ
 | d_failure | Failures as a demand driver | Share of issues on failures | Reliability (`spi_mrel`) |
 | d_planned | Planned maintenance | Planned occurrences in 17 months | Maintenance plan (`spi_mplan`); Maintenance timeline (planned tasks layer) |
 | d_preventive | Preventive plan ahead | Occurrences in the next 12 months | Maintenance plan; work pack for the months in view on the maintenance timeline |
-| d_shutdown | Campaigns and shutdowns | Campaign uplift | Maintenance timeline (`spi_mtime`, campaign shading); Golden path (repeat campaign input) |
+| d_shutdown | Campaigns and shutdowns | Campaign uplift | Maintenance timeline (`spi_mtime`, campaign shading); Optimized Scenario (repeat campaign input) |
 | d_population | Installed base | Installed quantity in the BoMs | Link map; part card (where it is used) |
 | d_season | Seasonality | Highest month index | Maintenance timeline (monthly index) |
 | d_abnormal | Abnormal months | Parts with abnormal months | Inventory planner (demand drivers, abnormal months marked) |
