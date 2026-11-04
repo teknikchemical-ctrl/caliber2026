@@ -1,4 +1,4 @@
-import {viewRoute} from './views_route.js';
+import {viewRoute,pageViewRoute} from './views_route.js';
 import {scopeRoute} from './scope.js';
 import {inventoryRoute} from './inventory.js';
 import {financeRoute,composeFinance} from './finance_route.js';
@@ -31,7 +31,7 @@ export async function ask({db,question,history=[],context={},inputs_accepted=[],
  if(safety(question)){const answer='I cannot provide instructions to bypass or disable a protective function. Follow the approved safety procedure and consult the responsible engineer.';emit({delta:answer});return {answer,citations:[],inputs:[],provider:'safety_guard',trace:[{step:'safety_guard'}],refused:true}}
  const tools=createTools(db,{signal,inputs_accepted,adapter:mock()});
  const run=async(name,args)=>{if(++calls>5)throw new Error('Read-only tool limit reached');const value=await tools.run(name,args);results.push(value);if(value.result)forecast=value;step({step:'tool',name,args,evidence_id:value.id});return value};
- const resolved=resolveContext(question,history,context);step({step:'context',...resolved});let selected=firstTool(question,resolved);{let sc=null;try{sc=scopeRoute(db,question,resolved)}catch{}if(sc&&(sc[0]==='activity_on_date'||['search_parts','get_location','search_locations','get_equipment_context'].includes(selected[0])))selected=sc}
+ const resolved=resolveContext(question,history,context);step({step:'context',...resolved});let selected=pageViewRoute(question,context?.page)||firstTool(question,resolved);{let sc=null;try{sc=scopeRoute(db,question,resolved)}catch{}if(sc&&selected[0]!=='get_view'&&(sc[0]==='activity_on_date'||['search_parts','get_location','search_locations','get_equipment_context'].includes(selected[0])))selected=sc}
  if(/\bmin\b.*\bmax\b|\bmax\b.*\bmin\b/i.test(question)&&!resolved.material_no){const answer='Please provide the material number to read its current Min and Max. An equipment set can contain several materials with different thresholds.';emit({delta:answer});return {answer,citations:[],inputs:[],provider:'clarification',model:null,trace,charts:[]};}
  try{await run(...selected);if(selected[0]==='inventory_metric'&&selected[1].material_no&&/stock|min|max|inventory/i.test(question))await run('get_part_profile',{material_no:selected[1].material_no})}catch(e){step({step:'tool_error',name:selected[0],reason:e.message})}
  let final={answer:groundedText(results,trace),citations:results.map(r=>r.id),inputs:[],provider:adapter.name,model:adapter.name==='mock'?'rules':null,material_no:resolved.material_no,context:resolved,trace,tool_results:results,result:forecast?.result||null};

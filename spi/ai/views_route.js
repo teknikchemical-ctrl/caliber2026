@@ -25,3 +25,8 @@ export async function runView(db, name, args = {}) {
   const limits = (p.notes || []).slice(0, 3).join(" ");
   return { id, answer: (p.insight || p.title) + (limits ? " Limits: " + limits : ""), data: p, facts: (p.figures || []).map(f => ({ id: id + ":" + f.id, origin: "view:" + name, value: { ...f, basis: f.basis } })), evidence_ids: p.source_ids || [], assumptions: p.assumptions || [] };
 }
+
+// Page tab id -> view payload, so "Explain this view" on any tab is answered from the figures that tab draws.
+const PAGE_VIEW = { spi_f_pred: "demand_predictability", spi_f_port: "portfolio_forecast", spi_f_dec: "decision_board", spi_f_par: "parameters_shift", spi_f_opt: "cost_risk", spi_m_pop: "maintenance_population", spi_m_drv: "maintenance_driven_demand", spi_m_ta: "turnaround_readiness", spi_m_open: "open_work_exposure", spi_c_bal: "cost_balance", spi_c_sav: "savings_waterfall", spi_c_cash: "cash_plan", spi_c_score: "business_scorecard", spi_reg: "registers" };
+export function pageViewRoute(q, page) { const name = PAGE_VIEW[page]; return name && /^explain this (view|page)/i.test(q) && VIEW_NAMES.includes(name) ? ["get_view", { name }] : null; }
+export const PAGE_VIEW_TABS = Object.keys(PAGE_VIEW);
