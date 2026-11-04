@@ -1,3 +1,14 @@
+# Integrator and Codex AI notification: economics checkpoint complete
+Updated 2026-11-04. All Finance work through c3a3c73 is pushed to codex/finance and ready to merge. Required checks and responsive browser tests pass. Finance has not deployed or changed main.
+
+## In progress now: AI-readable economics models
+Finance is extending deterministic economics tools for the assistant: compact cited facts, budget and service tradeoffs, cleanup NPV, funding thresholds and break-even conditions. Work stays in spi/engine, server/engine, finance/spi and Finance tests/docs. No edits to spi/ai, server/ai or AI-owned UI files.
+
+## Waiting on: integrator and AI owner
+- Integrator: merge c3a3c73 and its ancestors. New /api/engine/economics, /compare and /cashplan contracts are documented in their handler headers. Impact UI and quantitative scenarios are complete for this checkpoint.
+- Codex AI: a compact Finance tool contract will follow in finance/spi. Please reserve read-only economics tools in your registry; Finance will provide executable functions, schemas and citation-ready results. Until wired, do not claim the assistant already calls these models. Existing economics endpoint can be used now.
+- Finance will update this handoff after each working push. Deck remains deferred. Remaining usage is not exposed.
+
 # Codex Finance: SPI prototype
 Updated 2026-11-04 WIB. Branch codex/finance. Published prototype checkpoint 647b09d (includes e23000d, 87d11ee, 554fe59 and router merge 247c62f). Account usage is not exposed by this client.
 ## Ready to merge
@@ -41,3 +52,22 @@ Updated 2026-11-04 WIB. Branch codex/finance. Published prototype checkpoint 647
 - Includes common-path current/workbook/dynamic policies: monthly consumption, purchase cash including simulated future repeat orders, cash holding, separate economic indicator, stock ledger, shortfalls and priced-value fill. All use the same receipt lead proxy; workbook ROP formula retains 60-day defaults. Lead stress changes delivery timing only, not a recalculated safety-stock policy.
 - New batch-generated finance/spi/economics_source.json and spi/engine/economics_data.json preserve per-part forecast mean paths. Missing prices remain explicit (1,015 of 1,930 forecast-active parts priced). Zero unverified operational benefits. No stock disposal. Current actual recommendations remain the separate cashplan endpoint.
 - Validation: monthly cash/stock ledger arithmetic, receipt timing, stress bounds, missing prices, full criticality reconciliation and API methods. Required baseline/core/API/full-data checks run before push. Waiting on: optional adoption of this endpoint by the other page owners. Impact trajectory UI is the next Finance piece. Remaining usage not exposed; deck deferred.
+
+## Ready to merge: site economics and reduction trajectory UI
+- Backend published as c4a5623. Business Impact now plots priced issue history / 12-month demand forecast, three-policy cumulative operating funding and closing stock, plus separate pessimistic/base/optimistic cleanup project cash trajectories.
+- Live demand/price/receipt-lead stress controls are explicitly Assumptions. Dynamic priced-value fill and current fill appear beside purchase funding, so under-service is not labelled a saving. A collapsed policy table and criticality budgets show where funding is used. Monthly site-economics CSV includes stock/cash reconciliation columns for all three policies.
+- Base forecast: IDR 231.09 bn priced demand. Dynamic purchase proposals IDR 425.01 bn over cut-off plus 12 months; cash holding IDR 30.93 bn is separate. This is a forward repeat-order simulation, distinct from the IDR 253.78 bn current recommended-order backlog. No claim that these are realised or approved budgets.
+- Validation: live demand control scales forecast and resets, financial edits still recalculate NPV, mobile/tablet/desktop fit, no browser errors, screenshot visually reviewed. Required baseline/core/API/full-data checks before push. Waiting on: other owners can adopt /api/engine/economics anywhere on the site; their pages remain untouched. Deck deferred, remaining usage not exposed.
+
+## Ready to merge: citation-ready quantitative Finance tools
+- New GET catalogue / POST evaluator at /api/engine/finance-tools. Pure factory createFinanceTools(ctx), strict function declarations and getFinanceContext() lazy server loader are ready. Contract and exact AI-owner integration instructions: finance/spi/AI_FINANCE_TOOLS.md. No AI-owned files changed.
+- Tools: get_financial_summary, forecast_inventory_budget, assess_cleanup_case, assess_availability_funding. Results include deterministic answer, compact highlights, config-specific root/fact citations, raw values, safe displays, units, source/basis and null reasons. Compatible with the current AI unsupported-number checker.
+- New quantitative results: cleanup requires 14.96% realisation for project NPV break-even versus 69.23% for recurring operating break-even. Full standalone availability case requires IDR 81.09 bn verified annual operational benefit; no claim that this benefit exists. Avoided-hour thresholds require an explicit hypothetical margin and reject double counting with generic annual benefits.
+- Validation: threshold roots reproduce zero NPV/cash balance independently, availability break-even exactly closes NPV, argument/unknown-tool errors, bounded evidence, immutable sources, stable IDs and endpoint methods. Mandatory baseline/core/API/full-data checks before push.
+- Waiting on integrator: merge Finance checkpoints. Waiting on Codex AI: register and route these four read-only tools, preserve citations/displays and test assistant questions. They are prepared, not yet wired by Finance. Finance continues economics only. Deck deferred; usage not exposed.
+
+## Ready to merge: validation and candidate economics for AI
+- Initial four Finance tools published as 34f15a6. Catalogue now has six: get_policy_validation and rank_cleanup_candidates added. Integration contract updated in finance/spi/AI_FINANCE_TOOLS.md. getFinanceContext() also supplies the generated validation summary.
+- Full batch now precomputes the chronological policy replay once, not during assistant calls. finance/spi/validation.json and spi/engine/validation_data.json retain both in-sample and holdout metrics and caveats. Existing /compare remains available for drill-down.
+- Candidate tool ranks only B/C marginal release/holding PV, with five-row pagination and explicit fixed-cost exclusions. Missing review cost yields null marginal NPV, not an invented zero. Supplied review cost can be tested against the exact break-even threshold. S/A source-injection guard prevents critical disposal recommendations.
+- Validation: all six results fit the model evidence budget and pass current AI numeric checks; candidate marginal arithmetic, pagination, criticality exclusion and exact source holdout facts checked, plus mandatory baseline/core/API/full-data checks. Waiting on integrator: merge Finance. Waiting on Codex AI: register six read-only tools and run assistant routing/citation evaluations. Finance does not claim AI wiring is live. Deck deferred; usage not exposed.
