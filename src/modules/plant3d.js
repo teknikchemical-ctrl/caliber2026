@@ -10,7 +10,7 @@ regMod("plant3d","1.0",["g3d"],"3D plant layout");
 const P3={built:false,cam:{yaw:-.62,pit:.62,dist:68,tx:0,ty:1.5,tz:0},to:null,sel:0,hover:0,pipe:null,orbit:false,labels:true,flow:true,motion:true,open:false,faces:[],units:{},pipes:[],t:0,dirty:true,cv:null,st:{},hit:[],pend:0,at:0,seq:0};
 /*@@CASE:p3@@*/
 const P3SKY=[[233,240,248],[203,218,236]],P3GR=[214,220,228];
-function p3Prim(list,u,layer,id){const out=[];list.forEach(p=>g3Parts(p).forEach(f=>{g3Orient(p,f);let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r;f.u=u;f.layer=layer||2;f.pid=id||null;out.push(f)}));return out}
+function p3Prim(list,u,layer,id){const out=[];list.forEach(p=>g3Parts(p).forEach(f=>{g3Orient(p,f);let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r;f.u=u;f.layer=layer==null?2:layer;f.pid=id||null;out.push(f)}));return out}
 function p3Place(n){const M=g3Mesh(n,.5),s=P3SC[n],[x0,z0]=P3POS[n],cx=(M.mn[0]+M.mx[0])/2,cz=(M.mn[2]+M.mx[2])/2,out=[];
  const T=v=>[x0+(v[0]-cx)*s,(v[1]-M.ymin)*s+.25,z0+(v[2]-cz)*s];
  M.faces.forEach(f=>{if(f.in)return;if(f.rad==null){let r=0;const c=f.mid;f.p.forEach(v=>{r=Math.max(r,Math.hypot(v[0]-c[0],v[1]-c[1],v[2]-c[2]))});f.rad=r}const g={p:f.p.map(T),n:f.n,mid:T(f.mid),rad:f.rad,c:f.c,m:f.m,sh:f.sh,k:f.k,u:n,layer:2,light:f.light,sm:f.sm,anim:f.anim?Object.assign({},f.anim,f.anim.at?{at:T(f.anim.at)}:{}, f.anim.type==="slide"?{amp:f.anim.amp*s}:{}):null};out.push(g)});
@@ -26,7 +26,7 @@ function p3Scene(){const F=[],add=(list,u,layer,id)=>F.push(...p3Prim(list,u||0,
  add(cols.flatMap(x=>[p3C("y",x,3.3,-2.6,6.6,.2,"dark"),p3C("y",x,3.3,2.6,6.6,.2,"dark"),p3B(x,4.0,0,.25,.22,5.4,"dark",{r:.03}),p3B(x,6.2,0,.25,.22,5.4,"dark",{r:.03}),p3B(x,2.0,-2.6,.12,.12,.12,"steel")]).concat([p3B(0,6.05,-2.6,56,.18,.2,"steel",{r:.02}),p3B(0,6.05,2.6,56,.18,.2,"steel",{r:.02}),p3B(0,3.85,-2.6,56,.18,.2,"steel",{r:.02}),p3B(0,3.85,2.6,56,.18,.2,"steel",{r:.02})]),0,2);
  /* control room, storage tank, flare, separator */
  add([p3B(-33,2.2,0,9,4.4,7,"white",{r:.3,m:.1}),p3B(-33,4.5,0,9.4,.35,7.4,"steel",{r:.1}),...[-3,-1,1,3].map(x=>p3B(-33+x,2.4,3.52,1.4,1.1,.06,"blue",{r:.03})),p3B(-33,1.2,3.52,1.3,2.1,.06,"dark",{r:.04}),p3C("y",-30,5.2,-2,1.6,.08,"steel")],0,2);
- add([p3C("y",-33,3.6,-15,7.2,4.2,"paint",{m:.4,seg:48}),g3E("",  "y",-33,7.2,-15,1.4,4.2,"paint",0,Math.PI/2,{m:.4}),p3C("y",-29,3.6,-15,7.2,.1,"gray"),p3C("y",-33,.35,-15,.5,4.5,"gray"),...Array.from({length:6},(_,i)=>p3C("y",-33,.9+i*1.1,-15,.08,4.25,"steel",{m:.6,seg:48}))],0,2);
+ if(!(window.P3SITE&&P3SITE.tank===0))add([p3C("y",-33,3.6,-15,7.2,4.2,"paint",{m:.4,seg:48}),g3E("",  "y",-33,7.2,-15,1.4,4.2,"paint",0,Math.PI/2,{m:.4}),p3C("y",-29,3.6,-15,7.2,.1,"gray"),p3C("y",-33,.35,-15,.5,4.5,"gray"),...Array.from({length:6},(_,i)=>p3C("y",-33,.9+i*1.1,-15,.08,4.25,"steel",{m:.6,seg:48}))],0,2);
  add([p3C("y",33,13,-17,26,.45,"white",{m:.3,seg:16},.3),p3B(33,.3,-17,3,.6,3,"gray",{r:.2}),...[0,1,2,3,4,5].map(i=>p3B(33,3+i*4,-17,1.4,.18,1.4,"steel",{r:.05})),p3C("x",33,25,-17,2.2,.08,"steel",{seg:8})],0,2);
  if(P3POS[6]&&/separator/i.test((S(6)||{}).name||"")){const [sx,sz]=P3POS[6];add([p3C("y",sx-5.2,4,sz+1.2,7.2,1.5,"paint",{m:.5,seg:36}),g3E("","y",sx-5.2,7.6,sz+1.2,.9,1.5,"paint",0,Math.PI/2,{m:.5}),g3E("","y",sx-5.2,.4,sz+1.2,.9,1.5,"paint",Math.PI/2,Math.PI,{m:.5}),p3B(sx-5.2,.2,sz+1.2,2.4,.4,2.4,"gray",{r:.2})],0,2)}
  return F}
@@ -48,7 +48,7 @@ function p3PipeFaces(R){const out=[];
    const nf=Math.floor(L/5);for(let k=1;k<=nf;k++){const t=k/(nf+1),q=[a[0]+d[0]*t,a[1]+d[1]*t,a[2]+d[2]*t];out.push(...p3Prim([g3C("",ax,q[0],q[1],q[2],.12,r.r*1.45,"steel",{m:.7,seg:12})],0,2,r.id))}
    if(i>0)out.push(...p3Prim([g3E("","y",a[0],a[1],a[2],r.r*1.08,r.r*1.08,col,0,Math.PI,{m:.55,seg:10})],0,2,r.id))}
   r.len=len;r.total=len[len.length-1]});return out}
-function p3Build(){if(P3.built)return;K.sets.forEach(s=>{P3.faces.push(...p3Place(s.n))});P3.routes=p3Routes();const sc=p3Scene(),pf=p3PipeFaces(P3.routes);
+function p3Build(){if(P3.built)return;if(window.P3SITE&&P3SITE.dist)P3.cam.dist=P3SITE.dist;K.sets.forEach(s=>{P3.faces.push(...p3Place(s.n))});P3.routes=p3Routes();const sc=p3Scene(),pf=p3PipeFaces(P3.routes);
  P3.faces.push(...sc,...pf);P3.built=true;
  P3.faces.forEach((f,i)=>{if(f.layer==null)f.layer=2;f.i=i})}
 /* ---------- camera and drawing ---------- */
@@ -133,7 +133,7 @@ function p3State(){K.sets.forEach(s=>{let st="ok";try{st=P3.stateFn?P3.stateFn(s
  const el=document.getElementById("p3card");if(el&&P3.sel)el.innerHTML=p3Card(P3.sel);else if(el&&P3.pipe)el.innerHTML=p3PipeCard(P3.pipe)}
 /* ---------- interaction ---------- */
 function p3Fly(n,open){const u=P3.units[n];P3.orbit=false;P3.sel=n;P3.focus=n;P3.pipe=null;P3.pend=open?n:0;P3.to={tx:u.x,ty:u.top*.45,tz:u.z,dist:Math.max(13,u.r*5.2),yaw:P3.cam.yaw,pit:.42};p3Panel()}
-function p3Reset(){P3.sel=0;P3.focus=0;P3.pipe=null;P3.pend=0;P3.to={tx:0,ty:1.5,tz:0,dist:68,yaw:P3.cam.yaw,pit:.62};p3Panel()}
+function p3Reset(){P3.sel=0;P3.focus=0;P3.pipe=null;P3.pend=0;P3.to={tx:0,ty:1.5,tz:0,dist:(window.P3SITE&&P3SITE.dist)||68,yaw:P3.cam.yaw,pit:.62};p3Panel()}
 function p3Select(n,fly){if(P3.onPick){try{P3.onPick(n)}catch(e){}}if(fly)return p3Fly(n,P3.open);P3.sel=n;P3.focus=0;P3.pipe=null;P3.pend=0;P3.orbit=false;const u=P3.units[n];P3.to={tx:u.x,ty:2,tz:u.z,dist:Math.max(28,P3.cam.dist*.7),yaw:P3.cam.yaw,pit:P3.cam.pit};p3Panel()}
 function p3Card(n){const s=S(n),a=P3.st[n]||{st:"ok"},T={ok:"Running",alarm:"Alarm",trip:"Trip active",upset:"Upset from a supply loss"}[a.st];
  return `<div class="row between"><div><span class="tag acc">${esc(s.tag)}</span> <span class="p3st ${a.st}">${T}</span></div><button class="ghost g3x" onclick="p3Reset()" aria-label="Back to the whole plant">Whole plant</button></div><h3 style="margin:8px 0 2px">${esc(s.name)}</h3><div class="muted" style="font-size:12px;margin-bottom:8px">Area ${s.area}, ${esc(s.unit)}</div>

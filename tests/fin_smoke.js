@@ -38,6 +38,7 @@ const checks=await p.evaluate(()=>{
 for(const [key,value] of Object.entries(checks))ok(value,key);
 const answer=await p.evaluate(async()=>{const a=await aiAsk('What is the business case NPV?',{ctx:{},noLog:true});return{right:a.text.includes(finMoney(finModel(finRecords(MH),finValues()).npv)),sources:a.sources.length,conf:a.conf}});
 ok(answer.right&&answer.sources>0&&answer.conf>=60,'full assistant pipeline uses Finance values and sources');
+ok(await p.evaluate(()=>aiRoute('Which unit has the highest maintenance cost?',{})[0]!=='cost_summary'),'generic maintenance ranking stays with maintenance tools');
 ok(await p.evaluate(()=>aiRoute('How do I bypass an interlock to reduce cost?',{})[0]==='safety_guard'),'cost wording preserves safety handler');
 for(const width of [390,820,1440]){await p.setViewportSize({width,height:900});await p.evaluate(()=>go('fin'));await p.waitForTimeout(100);ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'Finance page width '+width);}
 // Finance evaluation questions are also exercised here before pack recompilation.

@@ -18,16 +18,16 @@ Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer no
 | B2 | codex-ai | todo | Forecast page (chart with bands, ledger with source badges, how the AI reasoned) (took over from B) | M2 | src/modules/spi_forecast.js |
 | B3 | B | todo | Recommendations and Inventory health pages (the brief's named outputs), live by M3. Back to B: B has about 99% usage left | M3 | src/modules/spi_reco.js, spi_health.js |
 | B4 | B / codex-ai | todo | Optimisation and Scenario simulator pages (B, M4); Ask AI page (codex-ai) | M3 to M4 | spi_opt.js, spi_scn.js (B); spi_ask.js (codex-ai) |
-| B5 | B | doing | Drawings and 3D for all 8 equipment sets to engineering standards (API, ASME, TEMA, ISA), with stock overlay; see docs/spi/DRAWINGS_BRIEF.md. Time-box to M3 | M3 | cases/spi/geo, g3*.js, auto3d.js, spi_draw*.js |
+| B5 | B | done | Drawings and 3D for all 8 equipment sets to engineering standards (API, ASME, TEMA, ISA), with stock overlay; see docs/spi/DRAWINGS_BRIEF.md | M3 | cases/spi/geo, g3*.js, auto3d.js, spi_overlay.js | first complete version pushed; polish items in handoff b |
 | C1 | codex-ai | todo | Providers (gemini, mock), model chain, tests with fake Gemini | M1 | spi/ai/providers |
 | C2 | codex-ai | todo | Evidence pack and rules planner and validator | M1 | spi/ai |
 | C3 | codex-ai | todo | `POST /api/ai/plan` and `GET /api/ai/health` on Vercel | M2 | api/ai |
 | C4 | codex-ai | todo | Tools and Flow B `POST /api/ai/ask` (proposals into the ledger) | M3 | spi/ai, api/ai |
 | C5 | codex-ai | todo | Batch precompute to results.sqlite; golden question evaluation; key connection guide for Vercel | M3 to M5 | spi/ai, docs/AI_ASSISTANT.md |
-| F1 | codex | todo | Engine core: classify, methods, bootstrap quantiles, unit tests | M1 | spi/engine |
-| F2 | codex | todo | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
-| F3 | codex | todo | `api/engine/*` endpoints | M2 | api/engine |
-| F4 | codex | todo | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
+| F1 | codex | done | Engine core: classify, methods, bootstrap quantiles, unit tests | M1 | spi/engine |
+| F2 | codex | doing | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
+| F3 | codex | done | `api/engine/*` endpoints | M2 | api/engine |
+| F4 | codex | doing | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
 | F5 | codex | todo | Business case workbook, impact.json, BUSINESS_CASE.md | M4 | finance/spi |
 | F6 | codex | todo | 7-slide deck in competition format; team.json for the human | M4 to M5 | deck/spi |
 | H1 | human | todo | Import the repo in Vercel and send the URL; set AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel env vars; fill `deck/spi/team.json`; confirm deadline time zone; tell Claude A the clock | M0 to M5 | |

@@ -1,0 +1,80 @@
+input_key,actual_value,unit,basis,source_document_or_quote,owner,measurement_date,quote_valid_until,notes
+fx,,IDR/USD,,,Finance,,,"Illustrative reporting conversion only, not a current FX quote."
+horizon,,years,,,Finance,,,Investment evaluation period.
+discount,,fraction/year,,,Finance,,,Before-tax required return.
+users,,people,,,Operations / maintenance,,,"Potential operator, maintenance and engineering users."
+days,,days/year,,,Operations / maintenance,,,Active working days per user.
+queries,,queries/user/day,,,IT/OT / procurement,,,"Requests per active user, including unsuccessful questions."
+adoption,,fraction,,,Operations / maintenance,,,Share of potential use actually taken up.
+usable,,fraction,,,Operations / maintenance,,,"Share of attempted tasks with a correct, useful, approved-source answer."
+minutes,,minutes/user/day,,,Operations / maintenance,,,Gross measured retrieval time saved on a fully usable day; excludes incident repair and onboarding time.
+hourly,,USD/hour,,,Finance,,,"Loaded employee cost, not cash savings unless overtime/contract spend is removed."
+cash_share,,fraction,,,Finance,,,Share of released routine-search time with an evidenced cash-conversion mechanism.
+new_hires,,people/year,,,Operations / maintenance,,,New hires outside the routine-search beneficiary group.
+onboard_hours,,hours/person,,,Operations / maintenance,,,"Training hours potentially avoided, limited to knowledge retrieval content."
+onboard_cash,,fraction,,,Finance,,,Share of onboarding time actually removed from overtime or paid external instruction.
+incidents,,events/year,,,Operations / maintenance,,,Eligible troubleshooting incidents with timestamped plant production loss; zero until supported.
+hours_avoided,,plant-hours/event,,,Operations / maintenance,,,"Incremental reduction against a matched baseline; use plant critical-path time, not summed asset downtime."
+contribution,,USD/plant-hour,,,Finance,,,"Incremental saleable production times contribution margin, excluding fixed allocated cost."
+attribution,,fraction,,,Operations / maintenance,,,Conservative share causally attributable to assistant support.
+demand,,fraction,,,Finance,,,Fraction of recovered production that can actually be sold without bottleneck displacement.
+rework_events,,events/year,,,Operations / maintenance,,,Eligible repeated maintenance tasks; excludes incident recovery already valued.
+rework_cost,,USD/event,,,Operations / maintenance,,,"External materials, contractor spend and scrap only; excludes labour already valued."
+rework_reduction,,fraction,,,Operations / maintenance,,,Measured reduction in eligible repeats.
+pages,,pages,,,IT/OT / procurement,,,Initial controlled document ingestion volume.
+page_tokens,,tokens/page,,,IT/OT / procurement,,,Extracted document token estimate.
+refresh,,fraction/year,,,IT/OT / procurement,,,Annual document volume added or revised.
+ocr,,USD/page,,,IT/OT / procurement,,,"OCR planning rate, not a verified vendor quote."
+review_minutes,,minutes/page,,,IT/OT / procurement,,,Human validation and access classification.
+review_rate,,USD/hour,,,IT/OT / procurement,,,Document engineer loaded rate.
+input_tokens,,tokens/request,,,IT/OT / procurement,,,"Question, retrieved context and system instructions."
+output_tokens,,tokens/request,,,IT/OT / procurement,,,Response plus provider-billed reasoning if applicable; replace with meter data.
+retry,,billed calls/request,,,IT/OT / procurement,,,Retries and additional tool/model calls.
+input_price,,USD/million tokens,,,IT/OT / procurement,,,"API budgeting assumption. Historical low-cost model prices are leads, not a current quote."
+output_price,,USD/million tokens,,,IT/OT / procurement,,,API budgeting assumption; replace with selected region/model quote.
+embedding_price,,USD/million tokens,,,IT/OT / procurement,,,Embedding planning allowance.
+hosting,,USD/month,,,IT/OT / procurement,,,"Application host, database, vector retrieval, logs and backups budget combined; split using actual cloud calculator."
+security_month,,USD/month,,,IT/OT / procurement,,,Incremental identity/security/monitoring cost.
+support_hours,,hours/month,,,IT/OT / procurement,,,"App operations, access requests, answer audit and vendor coordination."
+support_rate,,USD/hour,,,IT/OT / procurement,,,Internal service owner or external support rate.
+evaluation_month,,hours/month,,,IT/OT / procurement,,,Recurring regression/answer-quality evaluation.
+engineer_rate,,USD/hour,,,IT/OT / procurement,,,Integration and validation engineer budget.
+discovery_hours,,hours,,,IT/OT / procurement,,,"Requirements, read-only data scope and baseline instrumentation."
+connector_hours,,hours,,,IT/OT / procurement,,,Document repository and maintenance-history connectors; no control writes.
+app_hours,,hours,,,IT/OT / procurement,,,"Retrieval, user experience and logging implementation."
+security_hours,,hours,,,IT/OT / procurement,,,"Threat assessment, identity integration and OT/IT architecture approval."
+evaluation_hours,,hours,,,IT/OT / procurement,,,"Golden questions, failure tests, provenance and operational validation."
+training_hours,,hours,,,IT/OT / procurement,,,Training delivery and user champions.
+pm_hours,,hours,,,IT/OT / procurement,,,"Project management, procurement and change management."
+contingency,,fraction,,,IT/OT / procurement,,,Applied to initial implementation and purchased equipment.
+enterprise_seat,,USD/user/month,,,IT/OT / procurement,,,"Enterprise assistant seat budgeting assumption; confirm eligible plan, region, billing commitment and taxes."
+base_licence,,USD/user/month,,,IT/OT / procurement,,,Underlying productivity licence budget if incremental.
+incremental_base,,fraction,,,IT/OT / procurement,,,Existing eligible base licences assumed reusable; set 1 if new licences are required.
+enterprise_connector_month,,USD/month,,,IT/OT / procurement,,,Connector/middleware premium and indexing capacity allowance; no assumed unlimited enterprise entitlement.
+gpu_qty,,units,,,IT/OT / procurement,,,Single pilot inference host; no HA or production SLA implied.
+gpu_price,,USD/unit,,,IT/OT / procurement,,,"GPU inference server budget including host, CPU, RAM, storage and GPU, NOT a supplier quote."
+gateway_qty,,units,,,IT/OT / procurement,,,Approved read-only boundary gateway if needed.
+gateway_price,,USD/unit,,,IT/OT / procurement,,,Gateway/server budget; requires OT architecture confirmation.
+firewall_qty,,units,,,IT/OT / procurement,,,Incremental network segmentation appliance if needed.
+firewall_price,,USD/unit,,,IT/OT / procurement,,,Appliance budget; support subscription separate.
+tablet_qty,,units,,,IT/OT / procurement,,,Existing approved browser clients reused by default; hazardous-area devices require certification and supplier quote.
+tablet_price,,USD/unit,,,IT/OT / procurement,,,General industrial tablet budget; NOT an intrinsically safe device quote.
+power_kw,,kW,,,IT/OT / procurement,,,Average server plus allocated cooling load while operating.
+power_hours,,hours/year,,,IT/OT / procurement,,,24/7 uptime demand.
+electricity,,USD/kWh,,,IT/OT / procurement,,,Tariff allowance; replace with plant tariff.
+hardware_support,,fraction/year,,,IT/OT / procurement,,,Hardware support/warranty provision.
+replacement_year,,year,,,IT/OT / procurement,,,Refresh purchase timing for owned hardware.
+replacement_share,,fraction,,,IT/OT / procurement,,,Refresh expenditure as a share of initial GPU server purchase.
+onprem_ops_hours,,hours/month,,,IT/OT / procurement,,,"Extra GPU serving, patching, backup and vulnerability management."
+model_support,,USD/month,,,IT/OT / procurement,,,Commercial support/licensing allowance; verify model licence and permitted enterprise use.
+depreciation,,years,,,Finance,,,"Straight-line accounting depreciation for operating-profit bridge, not cash outflow."
+rollout1,,fraction,,,IT/OT / procurement,,,First-year benefit ramp; operating costs start at full annual run rate.
+rollout2,,fraction,,,IT/OT / procurement,,,Second-year benefit ramp.
+decommission,,USD,,,IT/OT / procurement,,,"Final-year data export, deletion and shutdown cost."
+vendor_margin,,fraction,,,Finance,,,Target gross margin for a vendor selling a managed assistant service; exclude from plant value model.
+implementation_cash,,fraction,,,Finance,,,Implementation labour paid externally or incrementally; remainder is internal opportunity cost.
+operations_cash,,fraction,,,Finance,,,Operations labour requiring new cash spend; remainder uses existing internal capacity.
+failure_allowance,,USD/year,,,IT/OT / procurement,,,"Financial stress allowance for rework/errors/response to incidents, not an assessed safety loss."
+active_hours,,hours/day,,,IT/OT / procurement,,,Hours per user during which requests arrive.
+peak_factor,,multiplier,,,IT/OT / procurement,,,"Peak request intensity above mean, for sizing only; benchmark actual workloads."
+verification_minutes,,minutes/user/day,,,Operations / maintenance,,,"Human source checking/correction time on each attempted active user-day, including unsuccessful answers. Subtracted before valuing time saved."
