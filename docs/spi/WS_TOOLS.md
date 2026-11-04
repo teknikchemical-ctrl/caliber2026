@@ -44,3 +44,11 @@ Every view is a tool: inputs on the left, results on the right, recalculated on 
 - Suppliers and lead time (`spi_sup`, `/api/ws/suppliers`): lead time against on-time share per supplier, lead-time histogram, supplier detail.
 - Stock view: categories "At risk of a stockout" and "Becoming slow-moving".
 - `/api/ws/questions?q=<id>`: one structured answer per point of the case (no page; for the AI). Each tool's SPIWS state carries `answers:[point ids]`.
+
+## Link map and explorer economics (fourth round)
+- `/api/ws/links?mat=` (part in the centre, equipment that install it, their sub-item locations) and `/api/ws/links?loc=` (equipment in the centre, its parts with sub-items, other equipment sharing those parts, line width = parts shared). Sub-items (PP-148A-M) belong to their main tag when that location exists.
+- Client: `spiLinkSvg(graph,o)` radial spider diagram (hover highlights the links of a node), `spiLinkInto(el,{mat|loc})` for panels. Shown in: Inventory > Link map (`spi_link`, walk by selecting nodes), the part panel (where used), the Inventory planner (where installed), the equipment explorer (equipment panel). State: `SPIWS.views.links`.
+- Equipment explorer: search results for a location or an equipment set open the equipment in place; every equipment panel shows its economics (`/api/ws/advice?loc=`: stock value, orders due, cost reduction, emergency orders, downtime hours, working capital, today to recommended). State: `SPIWS.views.explorer_economics`.
+- Recommendation rule tightened: today's Min and Max (or buying against demand for parts with none) is always a candidate, so a recommendation never costs more than today; decision `to_order` = cheapest to keep no stock.
+- Overview tab = Equipment explorer and Summary only. Campaign readiness, Brief coverage, Method and validation, Data and architecture are no longer in the menu (code kept, Claude A's pages).
+- 2D sheets: standards line added for every sub-item class (no more "undefined"), view titles placed at the top left of each view.

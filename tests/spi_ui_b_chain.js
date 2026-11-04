@@ -30,7 +30,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("the pop-up shows the selected part: 3D model, sheet and data", !!(await p.$("#spi_pm #spi_ipane .g3box")) && !!(await p.$("#spi_pm .spi-psvg")) && !!(await p.$("#spi_pm .spi-inkpis")));
   const n2 = await p.evaluate(() => document.querySelectorAll("#spi_inlist .spi-inr").length); if (n2 > 1) { await p.evaluate(() => document.querySelectorAll("#spi_inlist .spi-inr")[1].click()); await p.waitForTimeout(1800); ok("choosing another part in the list updates the pop-up", await p.evaluate(() => SPIINS.sel === 1)); }
   const fc = await p.$("#spi_pm button[onclick*=spiPartForecast]");
-  if (fc) { await fc.click(); await p.waitForTimeout(2500); ok("the part opens its forecast", await p.evaluate(() => st.page === "spi_forecast")); } else { await p.evaluate(() => document.getElementById("spi_pm").remove()); ok("the part panel offers the forecast", false, "no forecast button"); }
+  if (fc) { await fc.click(); await p.waitForTimeout(2500); ok("the part opens its stock projection in the planner", await p.evaluate(() => st.page === "spi_iplan" || st.page === "spi_h_inv")); } else { await p.evaluate(() => document.getElementById("spi_pm").remove()); ok("the part panel offers the forecast", false, "no forecast button"); }
   /* C and D. sheet and zone table */
   await p.evaluate(() => spiGo("spi_eq", { funcloc: "PX_PP-148A" })); await p.waitForTimeout(3500);
   await p.evaluate(zk => document.querySelector('#spi_eqsvg [data-k="' + zk + '"]').dispatchEvent(new MouseEvent("click", { bubbles: true })), zone); await p.waitForTimeout(500);
@@ -146,6 +146,15 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("planner: the maintenance plan driver raises the planned use", await p.evaluate(mu0 => SPIWS.views.iplan.outputs.demand.mean_month > mu0, mu0));
   await p.evaluate(() => { IP.drv.plan = false; IP.mode = "all"; ipInputs(); ipRun() }); await p.waitForFunction(() => document.querySelector(".ip-row"), null, { timeout: 30000 }).catch(() => {});
   ok("planner: all parts are ranked with the impact panel", (await p.$$(".ip-row")).length > 10 && !!(await p.$(".imp-c")));
+  /* link map, explorer search opens a location in place, economics panel */
+  await p.evaluate(() => spiGo("spi_link", { lk: "mat", lkv: "4100000129" })); await p.waitForFunction(() => document.querySelector("#wso_lk .lk-svg"), null, { timeout: 30000 }).catch(() => {});
+  ok("link map: a part is drawn with the equipment that use it", (await p.$$("#wso_lk .lk-n")).length > 10);
+  await p.evaluate(() => lkGo("loc", "PX_PP-148A")); await p.waitForTimeout(2500);
+  ok("link map: an equipment is drawn with its parts and the equipment that share them", await p.evaluate(() => SPIWS.views.links.outputs.mode === "location" && SPIWS.views.links.outputs.peers.length > 0));
+  await p.evaluate(() => go("spi_space")); await p.waitForTimeout(2500); await p.fill("#sp_q", "BF-105"); await p.waitForTimeout(2500);
+  await p.evaluate(() => [...document.querySelectorAll("#sp_res .sp-r")].find(x => /BF-105/.test(x.textContent)).click()); await p.waitForFunction(() => EXP.eq && document.querySelector("#ex_eco .ip-risk"), null, { timeout: 30000 }).catch(() => {});
+  ok("explorer: a location found by search opens in 3D with its economics", await p.evaluate(() => EXP.eq && !!document.querySelector("#ex_eco .ip-risk")));
+  ok("overview has only the explorer and the summary", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_dash"));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
