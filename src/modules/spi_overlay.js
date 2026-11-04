@@ -6,7 +6,7 @@
    Status rule (screening, shown in the legend): red = zero stock and (criticality S or A, or the part has had demand); amber = below Min;
    grey = above Max (excess); green = within Min and Max; light = no stock record in the baseline data.
    ===================================================================================================== */
-regMod("spi_stock","1.0",["spi_core"],"Stock status on equipment drawings and 3D models");
+regMod("spi_overlay","1.0",["spi_core"],"Stock status on equipment drawings and 3D models");
 const SPIST={d:{},load:{}};
 const SPI_SC={red:{n:"Stock out",rgb:[208,59,59,.72],c:"#d03b3b"},amber:{n:"Below Min",rgb:[236,170,30,.68],c:"#e0a100"},green:{n:"Within Min and Max",rgb:[63,165,90,.5],c:"#3fa55a"},grey:{n:"Above Max, excess",rgb:[139,149,165,.7],c:"#8b95a5"},none:{n:"No stock record",rgb:null,c:"#dfe4ec"}};
 const SPI_RANK={red:4,amber:3,grey:2,green:1,none:0};
@@ -14,7 +14,7 @@ function spiStat(p){if(!p||p.stock==null)return"none";const st=+p.stock,mn=+p.mi
  if(st<=0&&(p.crit_max==="S"||p.crit_max==="A"||dem))return"red";if(mn>0&&st<mn)return"amber";if(mx>0&&st>mx)return"grey";return"green"}
 const spiWorst=l=>l.reduce((a,b)=>SPI_RANK[b]>SPI_RANK[a]?b:a,"none");
 /* load once per set; the paint step runs when the data is there */
-function spiStockLoad(n){if(!(typeof spiCls==="function"&&spiCls(n)))return Promise.resolve(null);if(SPIST.load[n])return SPIST.load[n];
+function spiStockLoad(n){if(!(typeof spiCls==="function"&&spiCls(n)))return Promise.resolve(null);if(SPIST.load[n])return SPIST.load[n];if(location.protocol==="file:"){SPIST.d[n]={error:"open the deployed site or the local server to see it"};setTimeout(()=>spiStockPaint(n),0);return Promise.resolve(null)}
  return SPIST.load[n]=spiApi("/api/data/equipment/"+encodeURIComponent(S(n).tag)).then(r=>{const by={};(r.parts||[]).forEach(p=>by[p.material_no]=p);
   const lines={};(GA[n].bom||[]).forEach((b,i)=>{const m=/Material\s+(\d{5,})/.exec(b.mat||""),p=m?by[+m[1]]:null;lines[i+1]={mat:m?+m[1]:null,part:p||null,stat:spiStat(p)}});
   const P=spiPrep(n),zs={};P.zones.forEach(z=>{const st=z.lines.map(l=>lines[l].stat),c={red:0,amber:0,grey:0,green:0,none:0};st.forEach(x=>c[x]++);zs[z.id]={worst:spiWorst(st),counts:c}});

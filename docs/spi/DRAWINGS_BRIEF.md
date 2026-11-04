@@ -21,7 +21,7 @@ Everything is labelled "Schematic generated from the baseline data (SYNTHETIC ge
 - Data comes from `GET /api/data/equipment/<tag>` (fields `material_no, stock, min_qty, max_qty, total_qty, crit_max`). No new endpoint is needed. The material number is read from the BoM `mat` text ("Material 4100024158 | B8M").
 
 ## Files B touches (all inside B's ownership)
-`cases/spi/geo/g3m.js`, `cases/spi/geo/gad.js` (new, case geo files), `src/modules/spi_stock.js` (new), `src/modules/g3d.js`, `src/modules/style3d.css`, `docs/spi/shots/**`, `docs/handoff/b.md`. Nothing in `src/modules/ga.js`, `build.py` or the pack data is edited: B wraps functions at run time and replaces `GA[n].nz` (the generic "N1 Inlet, N2 Outlet") with class nozzle names in the geo file.
+`cases/spi/geo/g3m.js`, `cases/spi/geo/gad.js` (new, case geo files), `src/modules/spi_overlay.js` (new), `src/modules/g3d.js`, `src/modules/style3d.css`, `docs/spi/shots/**`, `docs/handoff/b.md`. Nothing in `src/modules/ga.js`, `build.py` or the pack data is edited: B wraps functions at run time and replaces `GA[n].nz` (the generic "N1 Inlet, N2 Outlet") with class nozzle names in the geo file.
 
 ## What B needs from the others
 - **Claude A:** nothing blocking. Please keep `/api/data/equipment/<tag>` returning `parts[]` with the fields above. FYI data observations: the KT parts lists contain air intake and fuel gas filters (a gas-turbine feature) although the class map says steam turbine; the maintenance page throws `Cannot read properties of undefined (reading 'slice')` in `mlab` (mh*.js) for the SPI pack when `case_shots.js` runs.

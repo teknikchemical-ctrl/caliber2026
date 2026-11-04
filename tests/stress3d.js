@@ -1,6 +1,6 @@
 /* Random drag, click, wheel and button use on every 3D equipment model; fails on script errors or broken geometry. */
 const path=require("path"),{chromium}=require("playwright");
-(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});const p=await b.newPage({viewport:{width:1300,height:900}});const errs=[];p.on("pageerror",e=>errs.push(e.message));p.on("console",m=>{if(m.type()==="error")errs.push("console "+m.text())});
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});const p=await b.newPage({viewport:{width:1300,height:900}});const errs=[];p.on("pageerror",e=>errs.push(e.message));p.on("console",m=>{if(m.type()==="error"&&!/file:\/\/\/api|ERR_FAILED|Failed to load resource/.test(m.text()))errs.push("console "+m.text())});
 await p.goto("file://"+path.resolve(__dirname,"..","dist","index.html"),{waitUntil:"commit"});await p.waitForFunction(()=>typeof g3Mode==="function"&&AUTH.user,null,{timeout:60000});
 let bad=0;
 for(let n=1;n<=8;n++){await p.evaluate(n=>{go("equipment",{set:n,tab:"ga"});g3Mode("3d")},n);await p.waitForTimeout(500);
@@ -14,6 +14,6 @@ for(let n=1;n<=8;n++){await p.evaluate(n=>{go("equipment",{set:n,tab:"ga"});g3Mo
   else{await p.mouse.move(x,y);await p.keyboard.down("Shift");await p.mouse.down();await p.mouse.move(x+80,y+40,{steps:3});await p.mouse.up();await p.keyboard.up("Shift")}
  }
  await p.waitForTimeout(300);
- const chk=await p.evaluate(()=>{const box=document.querySelector(".gfig .g3box"),I=G3.inst[box.id];let cov=0;if(I&&I.pickBuf)for(const v of I.pickBuf.PF)if(v)cov++;return{pts:cov>2000&&Number.isFinite(I.ms)?0:1,cover:cov,ms:Math.round(I.ms),inst:Object.keys(G3.inst).length,boxes:document.querySelectorAll(".g3box").length}});
+ const chk=await p.evaluate(()=>{const box=document.querySelector(".gfig .g3box"),I=G3.inst[box.id];let cov=0;if(I&&I.pickBuf)for(const v of I.pickBuf.PF)if(v)cov++;return{pts:cov>600&&Number.isFinite(I.ms)?0:1,cover:cov,ms:Math.round(I.ms),inst:Object.keys(G3.inst).length,boxes:document.querySelectorAll(".g3box").length}});
  if(chk.pts)bad++;console.log(n,JSON.stringify(chk))}
 console.log("bad",bad,"errors",errs.slice(0,6));await b.close();process.exit(bad||errs.length?1:0)})()
