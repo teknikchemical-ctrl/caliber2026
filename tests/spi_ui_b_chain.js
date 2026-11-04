@@ -132,6 +132,20 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => document.querySelector(".ip-row").click()); await p.waitForFunction(() => document.querySelector(".ip-steps"), null, { timeout: 30000 }).catch(() => {});
   ok("planner: a part of the set opens with the set in the trail", !!(await p.$(".ip-steps")) && !!(await p.$("#wso_ip .ex-trail")));
   ok("planner: the recommendation never costs more than today", await p.evaluate(() => SPIWS.views.iplan.outputs.part.saving_per_year >= -1));
+  /* impacts, suppliers, new stock categories, planner drivers and all-parts mode */
+  await p.evaluate(() => go("spi_cimp")); await p.waitForFunction(() => document.querySelector(".imp-c"), null, { timeout: 30000 }).catch(() => {});
+  ok("impact reduction shows the four impacts", (await p.$$(".imp-c")).length === 4);
+  const dt0 = await p.evaluate(() => SPIWS.views.cimp.outputs.impact.recommended.downtime_hours); await p.evaluate(() => spiWsRun("cimp", { apply: [] })); await p.waitForTimeout(3000);
+  ok("impact reduction responds to where the recommendation is applied", await p.evaluate(dt0 => SPIWS.views.cimp.outputs.impact.recommended.downtime_hours > dt0, dt0));
+  await p.evaluate(() => go("spi_sup")); await p.waitForFunction(() => document.querySelector(".su-h.ip-row"), null, { timeout: 30000 }).catch(() => {});
+  ok("suppliers list with lead time and on-time share", (await p.$$(".su-h.ip-row")).length > 5);
+  await p.evaluate(() => go("spi_inv")); await p.waitForSelector(".inv-c", { timeout: 30000 }).catch(() => {});
+  ok("stock view has the stockout-risk and becoming-slow categories", await p.evaluate(() => SPINV.cats.some(c => c.cat === "risk") && SPINV.cats.some(c => c.cat === "slowing")));
+  await p.evaluate(() => { IP.mode = "part"; IP.mat = 4100000129; IP.s = null; go("spi_iplan") }); await p.waitForFunction(() => document.querySelector(".imp-c"), null, { timeout: 30000 }).catch(() => {});
+  const mu0 = await p.evaluate(() => SPIWS.views.iplan.outputs.demand.mean_month); await p.evaluate(() => { IP.drv.plan = true; IP.drv.planShare = 0.2; ipRun() }); await p.waitForTimeout(3500);
+  ok("planner: the maintenance plan driver raises the planned use", await p.evaluate(mu0 => SPIWS.views.iplan.outputs.demand.mean_month > mu0, mu0));
+  await p.evaluate(() => { IP.drv.plan = false; IP.mode = "all"; ipInputs(); ipRun() }); await p.waitForFunction(() => document.querySelector(".ip-row"), null, { timeout: 30000 }).catch(() => {});
+  ok("planner: all parts are ranked with the impact panel", (await p.$$(".ip-row")).length > 10 && !!(await p.$(".imp-c")));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
