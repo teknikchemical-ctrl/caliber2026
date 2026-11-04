@@ -21,7 +21,7 @@ const wsPct=(n,d)=>n==null||!isFinite(n)?"n/a":(n*100).toFixed(d==null?1:d)+"%";
 function wsDeb(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms||300)}}
 function wsQS(o){return Object.entries(o).filter(([k,v])=>v!==""&&v!=null&&!(Array.isArray(v)&&!v.length)).map(([k,v])=>encodeURIComponent(k)+"="+encodeURIComponent(Array.isArray(v)?v.join(","):typeof v==="object"?JSON.stringify(v):v)).join("&")}
 /* chip group: multi or single choice */
-function wsChips(name,opts,sel,on,single){sel=Array.isArray(sel)?sel:[sel];return `<div class="ws-chips" role="group" aria-label="${wsE(name)}">${opts.map(o=>{const v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;return `<button type="button" class="ws-chip ${sel.includes(v)?"on":""}" onclick="${on}('${String(v).replace(/'/g,"")}')">${wsE(l)}</button>`}).join("")}</div>`}
+function wsChips(name,opts,sel,on,single){sel=Array.isArray(sel)?sel:[sel];return `<div class="ws-chips" role="group" aria-label="${wsE(name)}">${opts.map(o=>{const v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;return `<button type="button" class="ws-chip ${sel.includes(v)?"on":""}" onclick="${on}'${String(v).replace(/'/g,"")}')">${wsE(l)}</button>`}).join("")}</div>`}
 function wsTog(list,v){const i=list.indexOf(v);if(i>=0)list.splice(i,1);else list.push(v);return list}
 const wsField=(label,html,hint)=>`<div class="ws-f"><label>${wsE(label)}</label>${html}${hint?`<div class="ws-hint">${wsE(hint)}</div>`:""}</div>`;
 const wsSel=(opts,val,on,aria)=>`<select onchange="${on}" aria-label="${wsE(aria||"")}">${opts.map(o=>{const v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;return `<option value="${wsE(v)}" ${String(v)===String(val)?"selected":""}>${wsE(l)}</option>`}).join("")}</select>`;
