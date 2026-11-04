@@ -358,3 +358,6 @@ svg[data-kbh]{cursor:crosshair}
 .aiv .ws-card{margin-top:10px}.aiv-wait{display:flex;flex-direction:column;gap:4px;padding:14px;color:#5a6a80}.aiv-wait b{color:#1b2733}
 @media (max-width:1100px){.aiv-row{grid-template-columns:1fr}}
 .src-raw{margin-top:10px}.src-raw>summary{cursor:pointer;font-weight:600;font-size:13px;color:#33425a;padding:8px 0}
+.ip-chgs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}.ip-chg{display:inline-flex;align-items:baseline;gap:4px;background:#f5f8fc;border:1px solid #e3e9f2;border-radius:8px;padding:4px 8px;font-size:12px}.ip-chg small{color:#5a6a80;margin-right:2px}.ip-chg i{font-style:normal;color:#6b7a90}
+.spi-aibox.kb-short .ab-s,.spi-aibox.kb-short .ab-do{display:none}.kb-abt{margin:2px 0 4px}
+.ss-cmp{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px;align-items:start}@media (max-width:1000px){.ss-cmp{grid-template-columns:1fr}}

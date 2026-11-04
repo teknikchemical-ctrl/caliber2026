@@ -16,8 +16,8 @@ function kbhVal(v,u,yfmt){if(v==null||!isFinite(v))return"n/a";u=String(u||"").t
  if(!u&&yfmt){const f=String(yfmt(v));if(/[a-z%]/i.test(f))return f}return kbhNum(v)+(u?" "+u:"")}
 function kbhTag(html,kind,o){const id="h"+(++KBH.n);KBH.o[id]={kind,o:{...o,labels:(o.labels||[]).map(typeof spiML==="function"?spiML:x=>x)}};KBH.keys.push(id);if(KBH.keys.length>600)delete KBH.o[KBH.keys.shift()];
  let h=html.replace("<svg ",`<svg data-kbh="${id}" `);
- if(kind==="line"&&!o.nolast){const G=kbhGeo(kind,KBH.o[id].o),u=kbhUnit(o);if(G){let t="";const used=[];o.series.slice(0,4).forEach(se=>{let i=se.values.length-1;while(i>=0&&(se.values[i]==null||!isFinite(se.values[i])))i--;if(i<0)return;let y=G.Y(se.values[i])-7;used.forEach(z=>{if(Math.abs(z-y)<12)y=z-12});used.push(y);
-   t+=`<text x="${(G.X(i)-5).toFixed(1)}" y="${y.toFixed(1)}" text-anchor="end" class="kbh-last" style="fill:${spiCol(se.tone||"acc")}">${esc(kbhVal(se.values[i],u,o.yfmt))}</text>`});h=h.replace("</svg>",t+"</svg>")}}
+ if(kind==="line"&&!o.nolast){const G=kbhGeo(kind,KBH.o[id].o),u=kbhUnit(o);if(G){let t="";const used=[];o.series.slice(0,4).forEach(se=>{let i=se.values.length-1;while(i>=0&&(se.values[i]==null||!isFinite(se.values[i])))i--;if(i<0)return;const lab=kbhVal(se.values[i],u,o.yfmt);if(used.some(z=>z.l===lab&&Math.abs(z.x-G.X(i))<2))return;let y=G.Y(se.values[i])-7;used.forEach(z=>{if(Math.abs(z.y-y)<12)y=z.y-12});used.push({y,l:lab,x:G.X(i)});
+   t+=`<text x="${(G.X(i)-5).toFixed(1)}" y="${y.toFixed(1)}" text-anchor="end" class="kbh-last" style="fill:${spiCol(se.tone||"acc")}">${esc(lab)}</text>`});h=h.replace("</svg>",t+"</svg>")}}
  return h}
 function kbhGeo(kind,o){const W=o.w||720,H=o.h||300,m={l:o.ml||58,r:o.mr||14,t:12,b:o.xlabel?48:34};let lo,hi;
  if(kind==="line"){const all=o.series.flatMap(s=>s.values).concat((o.bands||[]).flatMap(b=>[...b.lo,...b.hi]),(o.hlines||[]).map(h=>h.v)).filter(v=>v!=null&&isFinite(v));lo=Math.min(0,...all);hi=Math.max(...all,1e-9)}

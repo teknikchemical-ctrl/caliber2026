@@ -126,7 +126,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   /* inventory planner: one part and one equipment set */
   await p.evaluate(() => { IP.mode = "part"; IP.mat = 4100000129; go("spi_iplan") }); await p.waitForFunction(() => document.querySelector(".ip-steps"), null, { timeout: 30000 }).catch(() => {});
   ok("planner: a part shows stock, projected use, recommendation and cost reduction", (await p.$$(".ip-step")).length === 4 && await p.evaluate(() => !!SPIWS.views.iplan.outputs.part && SPIWS.views.iplan.outputs.projection.months.length === 12));
-  ok("planner: the cost table and the risk analysis are shown", !!(await p.$(".ws-cmp .tot")) && (await p.$$(".ip-risk")).length >= 8);
+  ok("planner: the cost chart with the policy change and the risk analysis are shown", (await p.$$(".ip-chg")).length === 4 && (await p.$$(".ip-risk")).length >= 8);
   await p.evaluate(() => { IP.mode = "set"; IP.set = "PP-148A"; ipInputs(); ipRun() }); await p.waitForFunction(() => document.querySelector(".ip-row"), null, { timeout: 30000 }).catch(() => {});
   ok("planner: an equipment set lists every part with its decision", await p.evaluate(() => document.querySelectorAll(".ip-row").length === SPIWS.views.iplan.outputs.totals.parts && SPIWS.views.iplan.outputs.totals.parts > 0));
   await p.evaluate(() => document.querySelector(".ip-row").click()); await p.waitForFunction(() => document.querySelector(".ip-steps"), null, { timeout: 30000 }).catch(() => {});
