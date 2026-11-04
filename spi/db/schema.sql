@@ -72,6 +72,12 @@ CREATE TABLE part_profile(               -- one row per BoM material: everything
   months_cover REAL, turnover REAL, abc_class TEXT, xyz_class TEXT,
   family_id TEXT, dq_flags TEXT            -- JSON list
 );
+CREATE TABLE location_profile(          -- one row per functional location: criticality, stock keeping, maintenance and cost (ETL). Stock is held at material level: stock figures here are the parts installed at the location and are NOT additive across locations.
+  funcloc TEXT PRIMARY KEY, tag TEXT, descr TEXT, criticality TEXT, eq_class TEXT, eq_class_name TEXT, system_code TEXT,
+  n_parts INTEGER, n_parts_used INTEGER, stock_value_idr REAL, excess_value_idr REAL, n_zero_stock INTEGER, n_below_min INTEGER, n_critical_zero INTEGER,
+  notif_total INTEGER, notif_12m INTEGER, notif_high_12m INTEGER, notif_open INTEGER, pm_due_12m INTEGER, pm_next_due TEXT
+);
+CREATE INDEX ix_lp_crit ON location_profile(criticality); CREATE INDEX ix_lp_class ON location_profile(eq_class);
 CREATE TABLE equipment_set(              -- the equipment sets used for drawings, plot plan and 3D (see docs/spi/EQUIPMENT_SETS.md)
   set_no INTEGER PRIMARY KEY, tag TEXT, name TEXT, funcloc TEXT, eq_class TEXT, system_code TEXT, criticality TEXT, n_parts INTEGER, basis TEXT
 );

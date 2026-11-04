@@ -20,3 +20,6 @@ function spiEquipPanel(n){const s=S(n),id="speq"+n;
 
 /* Case data tidy-up: the generic engine adds interlock documents and "issued" statuses for every set. This case has no such records, so they are removed rather than shown. */
 if(window.SPI_MODE){KB.docs=KB.docs.filter(d=>d.type!=="Interlock Logic");KB.chunks=KB.chunks.filter(c=>!/^IL-/.test(c.doc));KB.docs.forEach(d=>{d.status="Generated from baseline data";d.rev="-";d.date="-";d.src="Generated from the baseline data set"})}
+/* Professional display form of a location description ("TURBINE FOR KC-383A" becomes "Turbine for KC-383A"): words with digits or tag patterns stay as they are. */
+const spiName=s=>{if(!s)return"";return String(s).trim().split(/\s+/).map((w,i)=>/\d/.test(w)||/^[A-Z]{1,4}-[A-Z0-9]/.test(w)||/^(TLE|KO|LP|MP|HP|DCS|API|ASME|FCC)$/.test(w)?w:(i===0?w.charAt(0)+w.slice(1).toLowerCase():w.toLowerCase())).join(" ")};
+const spiStatus=r=>r.mrp_type==="Non Stock"&&r.stock>0?spiBadge("Non Stock, holds stock","warn"):r.stock===0&&r.max_qty>0?spiBadge("Zero stock","bad"):(r.min_qty>0&&r.stock<r.min_qty)?spiBadge("Below Min","warn"):(r.max_qty>0&&r.stock>r.max_qty)?spiBadge("Above Max","n"):r.stock===0?spiBadge("No stock","n"):spiBadge("In range","ok");
