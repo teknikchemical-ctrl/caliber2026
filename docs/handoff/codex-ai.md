@@ -19,3 +19,12 @@
 - Preserved Claude A's Forecast base page and integrated AI planning through SPI_FORECAST_HOOKS. The selected AI/rules plan has its own labelled chart, validated Accept/Reject ledger, evidence and adoption trace. Base inventory, backtest and assumptions panels remain intact.
 - Browser verification passed against the real merged engine: exact SQL history and engine quantiles, malformed-response handling, accepted-input rerun and chart redraw.
 - Chart integration was already pushed in 9850fc1; this merge resolves the later base-page addition. Ask AI and batch are the next working pieces. Remaining account usage is unavailable in this client.
+
+## Ready to merge: Ask AI and golden evaluation
+- Added server/ai/ask.mjs, bounded read-only tool loop, typed data/engine tools, fixed parameterised SQL metric catalogue and NDJSON transport. No raw SQL accepted. Citation, number, schema and proposal bounds are checked; model failures fall back with readable trace. Prompt budgeting preserves valid JSON.
+- Ask page and legacy assistant in SPI mode use the new service. Safety refusal is preserved. Proposed inputs are never silently executed; browser Accept calls the validated plan endpoint and redraws from the real engine result.
+- Golden evaluation after main's sample-CV2 update: mock 43/43 and local fake Gemini REST 43/43. Real Gemini is not tested. Production does not load the golden answers. Added workbook cautions for procurement proxy, assumed criticality order and on-hand inventory.
+- Tests passed: Ask guardrails, NDJSON API, real-engine browser SQL answer/citations/acceptance/chart, all eight registered SPI pages. Prior chart test passed with the shared Forecast extension hook. Exact Vercel key setup is in docs/AI_ASSISTANT.md.
+## Waiting on
+- Claude A: merge and deploy; run npm run test:quick. Human: set the key securely in Vercel, redeploy and verify /api/ai/health. No real key is available here, and the environment proxy does not permit this Vercel host.
+- Next: deterministic resumable batch and results persistence. Remaining account usage is unavailable in this client.

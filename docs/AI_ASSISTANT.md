@@ -102,3 +102,9 @@ Verification: `AI_PROVIDER=mock node tests/spi_ai.js` checks the reasoning core;
 Open Vercel, select the SPI project, then Settings > Environment Variables. Add `AI_PROVIDER` with value `gemini`, `AI_API_KEY` with Sensitive enabled, and `AI_MODEL` with value `gemini-flash-latest`. Select the Production and Preview environments used by the deployment URL. Save, then open Deployments, select the deployment menu and choose Redeploy. Open `/api/ai/health` on the resulting URL and inspect `ok`, provider, model, key presence, last error and deployed commit. Never paste the key into chat. If this model fails, share the error and attempt results so an available model can be chosen.
 
 All SPI AI handlers live under `server/ai/` and are dispatched through the single `api/router.mjs` function. Public URLs remain `/api/ai/health`, `/api/ai/plan` and `/api/ai/ask`. Do not create additional functions under `api/`.
+
+### Ask the AI in SPI
+
+Open Ask the AI and ask an inventory question or include a material number. Sources and tool steps show which baseline records were read. Mock mode uses rules and SQL without contacting a model. Gemini may read additional bounded tools and propose forecast adjustments. Proposals appear with Accept and Reject. Accept validates the adjustment again, reruns the engine and updates the selected forecast chart. A provider failure uses the available database answer and explains the reason in the tool steps. A connection failure is shown in plain words.
+
+Baseline cautions: procurement lead time is a proxy from PR date to PO delivery date. Criticality order S, A, B, C is assumed. Inventory position is on-hand only. Monetary values are Estimates. Synthetic baseline records do not establish future events.
