@@ -56,3 +56,10 @@ Demand class by ADI and CV2 -> method: smooth `ses`, erratic `ses` with wider in
 
 ## Tests (`tests/spi_ai*.js`, run with `AI_PROVIDER=mock` and a fake Gemini server like `tests/live.js`)
 Plans validate; out-of-bounds plans are rejected; a plan with an unknown evidence id is rejected; a model that returns garbage falls back to rules; Flow B proposals land in the ledger with source `ai`; accepted inputs change the forecast; the golden questions in `spi/eval` give the same numbers as SQL; the safety refusal still works; start-up budget unchanged.
+
+## M1 implementation notes (Codex AI)
+- Modules in `spi/ai` use ES modules via their own package.json; the root package remains unchanged. Entry points are `evidence(db, material_no)`, `rulesPlan(pack)`, `validatePlan(plan, pack, {ai})`, and async `planPart(pack, {adapter, signal})`. Provider interface remains as above.
+- Evidence is bounded to 6,000 JSON characters (an approximate token budget), with whole optional facts removed and `truncated=true` when needed. Profiles, the zero-filled series, policy and lead-time basis are retained. Prompts delimit and escape untrusted evidence. The baseline is labelled synthetic.
+- Historical lead-time evidence excludes negative values, values above the contract bound, and delivery dates after the data cutoff. Delivery dates are not represented as confirmed goods receipt. Family or plant fallback is labelled Assumption. The database is not changed.
+- Weak `G|` families and OEM-specific `T|` families are not automatic pooling or substitution evidence. Critical no-demand parts remain protected even when the available lead time is short. Large multipliers require different evidence origins; multiple IDs from one origin and derived profile statistics do not satisfy independence.
+- No engine or backtest is implemented in this layer. Pending integration must not claim that a stub forecast or backtest is a measured result. Model, parser or validation trouble returns the validated rules plan and a visible reason in trace.
