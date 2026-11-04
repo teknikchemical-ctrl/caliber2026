@@ -19,7 +19,7 @@ export function reviewPart(p) {
   if ((p.planned_12m || 0) > 0 && mu * 12 < 0.5 && h === 0) flags.push({ code: 'planned_work_no_forecast', severity: 'info', text: `${p.planned_12m} planned tasks on its locations in the next 12 months, no expected use` });
   if (p.lead_basis === 'learned') flags.push({ code: 'lead_learned', severity: 'info', text: 'never bought, lead time is learned from similar purchases' });
   else if (p.lead_basis === 'default') flags.push({ code: 'lead_default', severity: 'info', text: 'no lead time history or model, contract default used' });
-  if (!(p.price > 0)) flags.push({ code: 'unpriced', severity: 'info', text: 'no price, money figures leave it out' });
+  if (!(p.price > 0)) flags.push({ code: 'unpriced', severity: 'info', text: 'no PO price; money figures leave it out unless prices=estimated adds the learned estimate' });
   if (p.campaign && (p.campaign_uplift || 0) >= 2) flags.push({ code: 'campaign_uplift', severity: 'info', text: `use in campaign months is about ${r1(p.campaign_uplift)} times a normal month` });
   return { material_no: p.material_no, basis, factor: Math.round(factor * 1000) / 1000, insurance, flags, reason };
 }
