@@ -2,9 +2,9 @@
    A hub shows a strip of its views and draws the chosen one; spiGo('<any page id>') still works: it opens the hub that holds the page and selects the view. */
 regMod("spi_hub","1.0",["spi_core","spi_viz"],"Hubs");
 const SPI_HUBS=[
- {id:"spi_h_ov",label:"Overview",tabs:[["spi_dash","Summary"],["spi_ready","Campaign readiness"],["spi_val","Method and validation"],["spi_arch","Data and architecture"]]},
+ {id:"spi_h_ov",label:"Overview",tabs:[["spi_space","Equipment library 3D"],["spi_dash","Summary"],["spi_ready","Campaign readiness"],["spi_val","Method and validation"],["spi_arch","Data and architecture"]]},
  {id:"spi_h_inv",label:"Inventory",tabs:[["spi_find","Find"],["spi_health","Stock health"],["spi_loc","Locations and equipment"],["spi_parts","Parts"],["spi_reg","Registers"],["spi_ingest","Documents and log"]]},
- {id:"spi_h_mnt",label:"Maintenance",tabs:[["spi_maint","Maintenance board"],["spi_space","Equipment library 3D"],["spi_eq","Equipment 3D and drawings"],["spi_prot","Protective devices"]]},
+ {id:"spi_h_mnt",label:"Maintenance",tabs:[["spi_maint","Maintenance board"],["spi_eq","Equipment 3D and drawings"],["spi_prot","Protective devices"]]},
  {id:"spi_h_fc",label:"Forecasting and Simulation",tabs:[["spi_fo","Forecasting and optimisation"],["spi_forecast","Part forecast"],["spi_reco","Recommendations"],["spi_opt","Parameters"],["spi_outlook","Demand outlook"],["spi_sim","Scenario simulator"],["spi_ask","Ask the AI"]]},
  {id:"spi_h_cost",label:"Costs",tabs:[["spi_savings","Cost reduction"],["spi_impact","Business impact"]]}];
 const SPIHUB={tab:{}};
