@@ -1,7 +1,7 @@
 // Local server for the SPI app: serves the built page and routes /api/* to the Vercel function files. (owner: Claude A)
 // Usage: python3 build.py spi && node tools/spi_dev.mjs [port] [fixture|full]     env SPI_DB / SPI_RES override the database files.
 import http from "node:http"; import fs from "node:fs"; import path from "node:path"; import { pathToFileURL } from "node:url";
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const ROOT = (await import("node:url")).fileURLToPath(new URL("../", import.meta.url));
 const port = Number(process.argv[2]) || 8765, mode = process.argv[3] || "full";
 if (!process.env.SPI_DB) process.env.SPI_DB = path.join(ROOT, mode === "fixture" ? "spi/fixtures/mini.sqlite" : "spi/db/spi.sqlite");
 const router = (await import(pathToFileURL(path.join(ROOT, "api/router.mjs")).href)).default;
