@@ -59,7 +59,7 @@ for f in ['ch.js','mh1.js','mh2.js','mh3.js','mh4.js','rp.js','pid2.js','pidv.js
 SPI=(CASE=='spi')
 if SPI:  # spare part pages: shell first, then every spi_*.js (each owned by one agent), nav from spi/pages.json
     import glob
-    for f in ['spi_core.js']+sorted(os.path.basename(g) for g in glob.glob(os.path.join(ROOT,'src','modules','spi_*.js')) if not g.endswith('spi_core.js')): mods.append(w(f))
+    for f in ['spi_core.js','spi_viz.js']+sorted(os.path.basename(g) for g in glob.glob(os.path.join(ROOT,'src','modules','spi_*.js')) if not g.endswith(('spi_core.js','spi_viz.js'))): mods.append(w(f))
 h=h[:a]+''.join(mods)+h[b:]
 for t,r in [('["ga","Equipment drawing"],','["ga","Equipment drawing"],["perf","Key indicators"],["plot","Plot plan"],'),('if(tab==="ga")b=gaView(n);','if(tab==="ga")b=gaView(n);if(tab==="plot")b=ppView(n);if(tab==="perf")b=perfSetView(n);if(tab==="ready")b=rdyView(n);'),('if(tab==="maint")b=maint(n);','if(tab==="maint")b=mhView(n);')]:
     P(t,r)
