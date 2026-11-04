@@ -182,6 +182,18 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("summary: a tile with a figure for each of the 20 case points", await p.evaluate(() => [...document.querySelectorAll(".sm-t .sm-v")].filter(e => e.textContent !== "...").length === 20));
   await p.evaluate(() => go("spi_cimp")); await p.waitForSelector(".kb-wf", { timeout: 20000 }).catch(() => {});
   ok("costs: the waterfall and the impact bars are drawn", !!(await p.$(".kb-wf")) && (await p.$$(".kb-hbr")).length > 3);
+  /* round 6: hover readout, linked panels, range buttons, rename, explorer connections */
+  const hov = async (sel, fx = 0.6) => { const e = (await p.$$(sel))[0]; if (!e) return ""; await e.scrollIntoViewIfNeeded(); await p.waitForTimeout(300); const r = await e.boundingBox(); await p.mouse.move(r.x + r.width * (fx - 0.05), r.y + r.height * 0.45); await p.mouse.move(r.x + r.width * fx, r.y + r.height * 0.45); await p.waitForTimeout(250); return p.evaluate(() => { const t = document.getElementById("kbh_tip"); return t && !t.hidden ? t.innerText : "" }) };
+  const tw = await hov(".kb-wf"); ok("hover: the waterfall shows a value with its unit", /IDR [\d.,]+ bn/.test(tw), tw.slice(0, 80));
+  const tb = await hov("svg.spi-svg[data-kbh]"); ok("hover: a bar chart shows its category and value", tb.split("\n").length >= 2 && /\d/.test(tb), tb.slice(0, 80));
+  await p.evaluate(() => go("spi_golden")); await p.waitForFunction(() => window.KBT && KBT.gd_tl && KBT.gd_tl2, null, { timeout: 30000 }).catch(() => {});
+  const tt = await hov("#gd_tl2 .kb-svg", 0.85); ok("hover: the linked timeline readout lists the other panels too", /Stock value/.test(tt) && /Value per month/.test(tt), tt.slice(0, 120));
+  await p.evaluate(() => kbRange("gd_tl", 6)); await p.waitForTimeout(300);
+  ok("timeline: 6M shows about six months and the linked panel follows", await p.evaluate(() => { const w = (KBT.gd_tl.v1 - KBT.gd_tl.v0) / 864e5; return w > 150 && w < 215 && KBT.gd_tl2.v0 === KBT.gd_tl.v0 }));
+  ok("timeline: the side panel lists the events in the window", await p.evaluate(() => /event\(s\) in the window/.test(document.getElementById("gd_ev").innerText)));
+  ok("Optimized Scenario replaces Golden path", await p.evaluate(() => /Optimized Scenario/.test(document.body.innerText) && !/Golden path|Purchase pathway/.test(document.querySelector("#app").innerText)));
+  await p.evaluate(() => go("spi_space")); await p.waitForFunction(() => window.SPSP && SPSP.conn, null, { timeout: 30000 }).catch(() => {});
+  ok("explorer: every block has a connection", await p.evaluate(() => p3Units().every(u => SPSP.flows.pairs.some(f => !f.self && (f.a === u.n || f.b === u.n)))));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();

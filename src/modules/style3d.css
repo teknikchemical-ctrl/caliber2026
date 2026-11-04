@@ -326,7 +326,8 @@ svg[data-kbh]{cursor:crosshair}
 .kb-term{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px;align-items:start}.kb-main{min-width:0;display:flex;flex-direction:column;gap:0}
 .kb-main .ws-card{margin-bottom:8px}.kb-side{display:flex;flex-direction:column;gap:8px;min-width:0}.kb-side .ws-ai{max-height:300px;overflow:auto}
 .kb-side .ws-ai{margin:0}.kb-evc h4{margin:0 0 6px;font-size:13px}.kb-evl-h{font-size:12px;color:#5a6a80;margin-bottom:6px}
-#gd_ev{max-height:560px;overflow:auto}.kb-evi{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #eef2f7;padding:6px 2px;font:inherit;font-size:12px;color:#1b2733;cursor:pointer}.kb-evi:hover{background:#f5f8fc}
+#gd_ev,.kb-evs{max-height:560px;overflow:auto}.kb-evi{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #eef2f7;padding:6px 2px;font:inherit;font-size:12px;color:#1b2733;cursor:pointer}.kb-evi:hover{background:#f5f8fc}
 .kb-evi i{flex:none;width:8px;height:8px;border-radius:2px;margin-top:4px}.kb-evi small{display:block;color:#6b7a90;font-size:11px}.kb-evm{font-size:11px}
 .kb-rg{display:inline-flex;gap:2px;margin-right:6px}
 @media (max-width:1100px){.kb-term{grid-template-columns:1fr}.kb-side{position:static}}
+.kb-side{background:none!important;border:0!important;padding:0!important;box-shadow:none!important}

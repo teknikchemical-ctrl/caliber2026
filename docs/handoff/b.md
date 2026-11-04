@@ -9,6 +9,10 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 
 **Updated:** 2026-11-04   **Branch:** claude/funny-edison-pis09w   **Last commit:** see git log
 
+## Round 6 (2026-11-04, plan docs/spi/PLAN_B_ROUND6.md, owner approved, light theme)
+- Hover readout on every chart (`spi_zone_hover.js`), timeline range buttons, linked panels, events-in-window list; Optimized Scenario (renamed golden path) and Maintenance timeline in the terminal layout; figures strip on Costs; explorer blocks all connected (`server/ws/connect.mjs`), side panel no longer clips.
+- Open: terminal layout for Overview Status and Forecasting issues panel, single model once A extends /api/data/golden.
+
 ## Round 5 (2026-11-04, plan docs/spi/PLAN_B_ROUND5.md)
 - Shared kit `src/modules/spi_zone_zkit.js`: search dropdown, draggable and zoomable timeline, top ribbon, recommended or my-inputs toggle, AI box hosts (`kbAi` calls A's spiAiBox), waterfall, bars, text cleaner, tour hidden.
 - New pages: Status (`spi_status`, A's /api/data/status), Summary tiles (`spi_summ`), Purchase pathway (`spi_golden`) and Golden path (`spi_fgold`) on B's /api/ws/golden plus A's Monte Carlo; part card (`spi_zone_pcard.js`); maintenance timeline with work pack; impact waterfall; supplier lead-time ranges.
