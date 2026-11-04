@@ -13,6 +13,8 @@
 - Assistant layer (all in `spi/ai/`): `scope.js` (FTS5, classes, dates, part codes, document numbers, suppliers), `pages.js` (every tab summarised from its own endpoint; the 21 case points from Claude B's `/api/ws/questions` as paragraphs; part plan from `/api/ws/advice`), `screen.js` (the tool on screen via `context.view`, answer buttons), `dbread.js` (data dictionary, safe record queries and counts over any table). Tests: `tests/spi_ai_scope_eval.js`, visible text audit `tests/spi_text_audit.js`.
 - Database polish after the ETL: `spi/etl/polish_db.py` (whitespace, indexes, `data_dictionary`, three new quality findings).
 
+- Learned demand model: `spi/ml/train.py` (numpy, python3.13, about 1 minute) writes ml_model, ml_eval, ml_forecast, ml_flag into spi.sqlite; read by `spi/ai/ml.js` (tools ml_summary, ml_part, ml_flags), `GET /api/data/ml`, and the Model validation tab (added to Forecasting and Simulation by `spi_hub.js`). Retrain after any data change; it runs in `spi/etl/run_all.sh`.
+
 ## Open
 - Gemini not connected (owner sets AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel, then selftest).
 - Dynamic Min outliers (424 parts above 3 times lead-time demand) are flagged on Parameters, not capped.
