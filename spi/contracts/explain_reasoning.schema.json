@@ -1,0 +1,153 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "POST /api/ai/explain: structured AI reasoning for one feature result (owner: Claude A)",
+ "description": "Sections are full paragraphs (about 150 to 260 words in all). Request {feature, title, inputs, outputs, figures:[{label,value,unit,basis}], compare:{label,current,recommended,unit}, actions:[string|{text,material_no,qty,unit,date,value_idr}], page}. Feature ids: iplan, golden, fgold, mtime, mnotif, mplan, mrel, ssim, scr, cimp, ccalc, csave, cbuy, sup, links, status, summary, partcard, timeline, page:<tab>. Every number in a Gemini reply must be in the request or the rules draft, otherwise the rules reply is returned. Never throws to the page: offline, the box says so. text = the blocks joined, for logs and the assistant.",
+ "type": "object",
+ "required": [
+  "text",
+  "provider",
+  "reasoning"
+ ],
+ "properties": {
+  "text": {
+   "type": "string"
+  },
+  "provider": {
+   "enum": [
+    "gemini",
+    "rules"
+   ]
+  },
+  "model": {
+   "type": "string"
+  },
+  "fallback": {
+   "type": "string"
+  },
+  "reasoning": {
+   "type": "object",
+   "required": [
+    "verdict",
+    "why",
+    "do_next",
+    "risk",
+    "method",
+    "inputs",
+    "evidence"
+   ],
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "description": "one line, the decision in plain words"
+    },
+    "why": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 5,
+     "description": "two to four full sentences, each with one number and its basis, rendered as one paragraph"
+    },
+    "do_next": {
+     "type": "array",
+     "maxItems": 3,
+     "items": {
+      "type": "object",
+      "required": [
+       "text"
+      ],
+      "properties": {
+       "text": {
+        "type": "string"
+       },
+       "material_no": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "qty": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "unit": {
+        "type": "string"
+       },
+       "date": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "value_idr": {
+        "type": [
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "risk": {
+     "type": "string",
+     "description": "main uncertainty (backtest error, band width, lead-time spread, unpriced parts) and what would change the verdict"
+    },
+    "inputs": {
+     "type": [
+      "object",
+      "null"
+     ],
+     "description": "only when the user moved an input off its default",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "changed": {
+       "type": "object"
+      },
+      "deltas": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "label": {
+          "type": "string"
+         },
+         "recommended": {
+          "type": "number"
+         },
+         "yours": {
+          "type": "number"
+         },
+         "delta": {
+          "type": "number"
+         },
+         "unit": {
+          "type": "string"
+         },
+         "text": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    },
+    "do_intro": {
+     "type": "string",
+     "description": "one sentence before the action list"
+    },
+    "method": {
+     "type": "string",
+     "description": "how this was worked out, one paragraph, no numbers"
+    },
+    "evidence": {
+     "type": "object",
+     "description": "facts from the learned models (demand, equipment risk, lead time) and derived figures the text may quote; every number is checked against the request and this object"
+    }
+   }
+  }
+ }
+}

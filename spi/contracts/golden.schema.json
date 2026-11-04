@@ -1,0 +1,851 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "GET /api/data/golden: the Optimized Scenario, the single decision engine (owner: Claude A)",
+ "description": "Query: scope mat | tag | set | cls, optional crit=S,A; inputs (Assumptions) service_S..service_C, demand (0.2 to 3), lead (0.3 to 3), carrying, budget (IDR per month), campaign=1, runs, seed. Cached per input set. Plant run about 1.2 s cold, 0 ms cached. totals = steady state per year with the policy in place (same cost function as /api/ws/advice); simulated_12m = first 12 months from today's stock (Monte Carlo). saving_per_year = totals.saving. golden = Optimized Scenario, current = today's Min and Max.",
+ "type": "object",
+ "required": [
+  "months",
+  "cutoff",
+  "scope",
+  "parts",
+  "runs",
+  "seed",
+  "inputs",
+  "orders",
+  "by_month",
+  "decisions",
+  "golden",
+  "current",
+  "totals",
+  "simulated_12m",
+  "history",
+  "backtest",
+  "calibration",
+  "basis",
+  "saving_per_year"
+ ],
+ "properties": {
+  "months": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "cutoff": {
+   "type": "string"
+  },
+  "scope": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "enum": [
+      "plant",
+      "part",
+      "set",
+      "tag",
+      "class"
+     ]
+    },
+    "label": {
+     "type": "string"
+    }
+   }
+  },
+  "parts": {
+   "type": "number"
+  },
+  "runs": {
+   "type": "number"
+  },
+  "seed": {
+   "type": "number"
+  },
+  "inputs": {
+   "type": "object"
+  },
+  "orders": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "month",
+     "order_date",
+     "material_no",
+     "qty",
+     "unit",
+     "value_idr",
+     "lead_days",
+     "reason",
+     "funded_month"
+    ],
+    "properties": {
+     "month": {
+      "type": "string"
+     },
+     "order_date": {
+      "type": "string"
+     },
+     "material_no": {
+      "type": "number"
+     },
+     "descr": {
+      "type": "string"
+     },
+     "crit": {
+      "type": "string"
+     },
+     "qty": {
+      "type": "number"
+     },
+     "unit": {
+      "type": "string"
+     },
+     "months_covered": {
+      "type": [
+       "number",
+       "null"
+      ]
+     },
+     "value": {
+      "type": "number"
+     },
+     "value_idr": {
+      "type": [
+       "number",
+       "null"
+      ]
+     },
+     "lead_days": {
+      "type": "number"
+     },
+     "stock": {
+      "type": "number"
+     },
+     "reason": {
+      "type": "string"
+     },
+     "saving_idr_yr": {
+      "type": "number"
+     },
+     "funded_month": {
+      "type": "string"
+     },
+     "deferred_from": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "arrives": {
+      "type": "string"
+     }
+    }
+   },
+   "description": "up to 400 rows, sorted by month then value"
+  },
+  "orders_total": {
+   "type": "number"
+  },
+  "orders_value": {
+   "type": "number"
+  },
+  "unfunded": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "properties": {
+    "orders": {
+     "type": "number"
+    },
+    "value": {
+     "type": "number"
+    },
+    "deferred": {
+     "type": "number"
+    }
+   }
+  },
+  "by_month": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "parts": {
+      "type": "number"
+     },
+     "qty": {
+      "type": "number"
+     },
+     "value": {
+      "type": "number"
+     },
+     "S": {
+      "type": "number"
+     },
+     "A": {
+      "type": "number"
+     },
+     "B": {
+      "type": "number"
+     },
+     "C": {
+      "type": "number"
+     },
+     "value_S": {
+      "type": "number"
+     },
+     "value_A": {
+      "type": "number"
+     },
+     "value_B": {
+      "type": "number"
+     },
+     "value_C": {
+      "type": "number"
+     }
+    }
+   }
+  },
+  "decisions": {
+   "type": "object",
+   "properties": {
+    "order_now": {
+     "type": "number"
+    },
+    "order_by": {
+     "type": "number"
+    },
+    "no_order": {
+     "type": "number"
+    },
+    "buy_when_needed": {
+     "type": "number"
+    },
+    "no_use": {
+     "type": "number"
+    }
+   }
+  },
+  "golden": {
+   "type": "object",
+   "required": [
+    "fan",
+    "stockout_chance",
+    "cost"
+   ],
+   "properties": {
+    "fan": {
+     "type": "object",
+     "properties": {
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": "number"
+       }
+      },
+      "p50": {
+       "type": "array",
+       "items": {
+        "type": "number"
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": "number"
+       }
+      }
+     },
+     "description": "stock value IDR per month, Monte Carlo percentiles"
+    },
+    "qty_fan": {
+     "type": "object",
+     "description": "one part only: on-hand quantity per month, p10 p50 p90"
+    },
+    "stockout_chance": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "stockout_measure": {
+     "type": "string"
+    },
+    "cost": {
+     "type": "object",
+     "properties": {
+      "holding": {
+       "type": "number"
+      },
+      "ordering": {
+       "type": "number"
+      },
+      "shortage": {
+       "type": "number"
+      },
+      "downtime": {
+       "type": "number"
+      },
+      "purchase": {
+       "type": "number"
+      },
+      "total": {
+       "type": "number"
+      },
+      "hold": {
+       "type": "number"
+      },
+      "order": {
+       "type": "number"
+      },
+      "short": {
+       "type": "number"
+      },
+      "buy": {
+       "type": "number"
+      }
+     }
+    },
+    "cost_month": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "purchase_month": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "stockouts_per_year": {
+     "type": "number"
+    },
+    "emergency_orders": {
+     "type": "number"
+    },
+    "downtime_hours": {
+     "type": "number"
+    },
+    "working_capital": {
+     "type": "number"
+    },
+    "service_reached": {
+     "type": "object",
+     "description": "share of months with demand fully met, by criticality S A B C"
+    }
+   }
+  },
+  "current": {
+   "type": "object",
+   "required": [
+    "fan",
+    "stockout_chance",
+    "cost"
+   ],
+   "properties": {
+    "fan": {
+     "type": "object",
+     "properties": {
+      "p10": {
+       "type": "array",
+       "items": {
+        "type": "number"
+       }
+      },
+      "p50": {
+       "type": "array",
+       "items": {
+        "type": "number"
+       }
+      },
+      "p90": {
+       "type": "array",
+       "items": {
+        "type": "number"
+       }
+      }
+     },
+     "description": "stock value IDR per month, Monte Carlo percentiles"
+    },
+    "qty_fan": {
+     "type": "object",
+     "description": "one part only: on-hand quantity per month, p10 p50 p90"
+    },
+    "stockout_chance": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "stockout_measure": {
+     "type": "string"
+    },
+    "cost": {
+     "type": "object",
+     "properties": {
+      "holding": {
+       "type": "number"
+      },
+      "ordering": {
+       "type": "number"
+      },
+      "shortage": {
+       "type": "number"
+      },
+      "downtime": {
+       "type": "number"
+      },
+      "purchase": {
+       "type": "number"
+      },
+      "total": {
+       "type": "number"
+      },
+      "hold": {
+       "type": "number"
+      },
+      "order": {
+       "type": "number"
+      },
+      "short": {
+       "type": "number"
+      },
+      "buy": {
+       "type": "number"
+      }
+     }
+    },
+    "cost_month": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "purchase_month": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "stockouts_per_year": {
+     "type": "number"
+    },
+    "emergency_orders": {
+     "type": "number"
+    },
+    "downtime_hours": {
+     "type": "number"
+    },
+    "working_capital": {
+     "type": "number"
+    },
+    "service_reached": {
+     "type": "object",
+     "description": "share of months with demand fully met, by criticality S A B C"
+    }
+   }
+  },
+  "totals": {
+   "type": "object",
+   "properties": {
+    "current": {
+     "type": "object",
+     "properties": {
+      "holding": {
+       "type": "number"
+      },
+      "ordering": {
+       "type": "number"
+      },
+      "shortage": {
+       "type": "number"
+      },
+      "downtime": {
+       "type": "number"
+      },
+      "total": {
+       "type": "number"
+      },
+      "stockouts_per_year": {
+       "type": "number"
+      },
+      "emergency_orders": {
+       "type": "number"
+      },
+      "downtime_hours": {
+       "type": "number"
+      },
+      "working_capital": {
+       "type": "number"
+      },
+      "parts_changed": {
+       "type": "number"
+      }
+     }
+    },
+    "golden": {
+     "type": "object",
+     "properties": {
+      "holding": {
+       "type": "number"
+      },
+      "ordering": {
+       "type": "number"
+      },
+      "shortage": {
+       "type": "number"
+      },
+      "downtime": {
+       "type": "number"
+      },
+      "total": {
+       "type": "number"
+      },
+      "stockouts_per_year": {
+       "type": "number"
+      },
+      "emergency_orders": {
+       "type": "number"
+      },
+      "downtime_hours": {
+       "type": "number"
+      },
+      "working_capital": {
+       "type": "number"
+      },
+      "parts_changed": {
+       "type": "number"
+      }
+     }
+    },
+    "saving": {
+     "type": "number"
+    },
+    "basis": {
+     "type": "string"
+    }
+   }
+  },
+  "simulated_12m": {
+   "type": "object",
+   "properties": {
+    "current": {
+     "type": "object",
+     "properties": {
+      "holding": {
+       "type": "number"
+      },
+      "ordering": {
+       "type": "number"
+      },
+      "shortage": {
+       "type": "number"
+      },
+      "downtime": {
+       "type": "number"
+      },
+      "purchase": {
+       "type": "number"
+      },
+      "total": {
+       "type": "number"
+      },
+      "hold": {
+       "type": "number"
+      },
+      "order": {
+       "type": "number"
+      },
+      "short": {
+       "type": "number"
+      },
+      "buy": {
+       "type": "number"
+      }
+     }
+    },
+    "golden": {
+     "type": "object",
+     "properties": {
+      "holding": {
+       "type": "number"
+      },
+      "ordering": {
+       "type": "number"
+      },
+      "shortage": {
+       "type": "number"
+      },
+      "downtime": {
+       "type": "number"
+      },
+      "purchase": {
+       "type": "number"
+      },
+      "total": {
+       "type": "number"
+      },
+      "hold": {
+       "type": "number"
+      },
+      "order": {
+       "type": "number"
+      },
+      "short": {
+       "type": "number"
+      },
+      "buy": {
+       "type": "number"
+      }
+     }
+    },
+    "saving": {
+     "type": "number"
+    },
+    "basis": {
+     "type": "string"
+    }
+   }
+  },
+  "history": {
+   "type": "object",
+   "properties": {
+    "months": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "issue_value": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "issue_qty": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "po_value": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "receipt_value": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "campaign_months": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "basis": {
+     "type": "string"
+    }
+   }
+  },
+  "backtest": {
+   "type": "object",
+   "properties": {
+    "months": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "actual": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "forecast": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "forecast_calibrated": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     }
+    },
+    "mape": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "mape_calibrated": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "bias": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "bias_calibrated": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "calibration_factor": {
+     "type": "number"
+    },
+    "basis": {
+     "type": "string"
+    }
+   }
+  },
+  "calibration": {
+   "type": "object",
+   "properties": {
+    "band": {
+     "type": "string"
+    },
+    "inside_all_part_months": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "inside_months_with_issue": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "part_months": {
+     "type": "number"
+    },
+    "part_months_with_issue": {
+     "type": "number"
+    }
+   }
+  },
+  "part": {
+   "anyOf": [
+    {
+     "type": "object",
+     "properties": {
+      "material_no": {
+       "type": "number"
+      },
+      "decision": {
+       "enum": [
+        "order_now",
+        "order_by",
+        "no_order",
+        "buy_when_needed",
+        "no_use"
+       ]
+      },
+      "order_by": {
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "rop": {
+       "type": "number"
+      },
+      "order_up_to": {
+       "type": "number"
+      },
+      "min_now": {
+       "type": "number"
+      },
+      "max_now": {
+       "type": "number"
+      },
+      "policy_source": {
+       "enum": [
+        "calculated",
+        "current",
+        "none"
+       ]
+      },
+      "stockout_chance_in_lead_time": {
+       "type": "number"
+      },
+      "months_of_cover": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "mean_month": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "sd_month": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "forecast_12m": {
+       "type": "number"
+      },
+      "lead_days": {
+       "type": "number"
+      },
+      "lead_p90_days": {
+       "type": "number"
+      },
+      "saving_idr_yr": {
+       "type": "number"
+      },
+      "cost_current_yr": {
+       "type": "number"
+      },
+      "cost_optimized_yr": {
+       "type": "number"
+      },
+      "orders": {
+       "type": "array",
+       "items": {
+        "type": "object"
+       }
+      }
+     }
+    },
+    {
+     "type": "null"
+    }
+   ]
+  },
+  "top_parts": {
+   "type": "array",
+   "items": {
+    "type": "object"
+   }
+  },
+  "basis": {
+   "type": "string"
+  },
+  "saving_per_year": {
+   "type": "number"
+  },
+  "saving_first_12m": {
+   "type": "number"
+  }
+ }
+}

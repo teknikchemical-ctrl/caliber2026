@@ -64,7 +64,7 @@ const cases=[
  ['Where can I see supplier performance?','search_all',/Suppliers and lead time tab/],
  ['vibration','describe_scope',/vibration/i],
  ['What does the price basis column mean?','describe_scope',/How the price was derived/],
- ['What is the best course of action?','golden_path',/recommends \*\*[0-9,]+ orders\*\*[\s\S]*cuts the yearly cost/],
+ ['What is the best course of action?','golden_path',/Optimized Scenario places \*\*[0-9,]+ orders\*\*[\s\S]*a cut of \*\*IDR [0-9.]+ bn a year/],
  ['What needs to be done right now?','plant_status',/parts to order now\*\*/],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];

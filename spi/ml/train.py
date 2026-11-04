@@ -161,6 +161,17 @@ for name, m in segs.items():
     if m.sum() < 5: continue
     evals.append((name, int(m.sum()), mae(pred, m), mae(naive, m), mae(sbaf, m), tot(pred, m), tot(naive, m), tot(sbaf, m)))
 
+# backtest rows per part and held-out month: model forecast (not calibrated) and its 80% band (10% to 90% of the hurdle mixture)
+from statistics import NormalDist
+_nd = NormalDist(); sig = math.sqrt(sig2); bt_rows = []
+mul = np.column_stack([ridge_pred(ws, feats(t0, h)) for h in range(1, HOLD + 1)])
+def _q(p, m, u):
+    if u <= 1 - p: return 0.0
+    v = min(0.999, max(0.001, (u - (1 - p)) / p)); return float(math.exp(m + sig * _nd.inv_cdf(v)))
+for i in range(P):
+    for h in range(HOLD):
+        if pred[i, h] >= 0.005 or act[i, h] > 0:
+            bt_rows.append((parts[i][0], MONTHS[t0 + h], float(act[i, h]), round(float(pred[i, h]), 3), round(_q(prob[i, h], mul[i, h], 0.1), 2), round(_q(prob[i, h], mul[i, h], 0.9), 2)))
 # calibration: the hurdle model under-predicts totals on held-out months; scale the projection by actual / predicted on them (clipped)
 calib = float(np.clip(act[issued].sum() / max(pred[issued].sum(), 1e-9), 0.7, 1.5))
 # --- final model on all months, projection for the next 12 months
@@ -189,6 +200,8 @@ for h, (pr, ex, lo, hi) in enumerate(proj):
     for i, r in enumerate(parts):
         if ex[i] >= 0.005 or pr[i] >= 0.01: rows.append((r[0], FUT[h], round(float(pr[i]), 4), round(float(ex[i]), 3), round(float(lo[i]), 2), round(float(hi[i]), 2)))
 con.executemany("insert into ml_forecast values (?,?,?,?,?,?)", rows)
+con.executescript("drop table if exists ml_backtest; create table ml_backtest (material_no integer, month text, actual real, forecast real, band_low real, band_high real, primary key (material_no, month))")
+con.executemany("insert into ml_backtest values (?,?,?,?,?,?)", bt_rows)
 
 # --- flaws: where the learned demand and today's settings disagree
 y12 = np.sum([p[1] for p in proj], 0); flags = []
@@ -206,6 +219,7 @@ dd = [("ml_model", "", "Learned demand model: method, training size, validation 
       ("ml_eval", "", "Learned model against the naive mean and Croston SBA on the 5 held-out months, by segment", None),
       ("ml_eval", "model_error", "Mean absolute error per month, scaled by the part's average use (lower is better)", None),
       ("ml_eval", "model_total_error", "Error of the total quantity of the segment over the held-out months, as a share", None),
+      ("ml_backtest", "", "Held-out months: actual issue quantity against the model forecast made before them, with the 80% band", None),
       ("ml_forecast", "", "Learned 12-month projection per part and month (Estimate)", None),
       ("ml_forecast", "p_issue", "Chance the part is issued in the month", None), ("ml_forecast", "expected_qty", "Expected quantity in the month", None),
       ("ml_forecast", "qty_if_issued_low", "Quantity if issued, low case (10%)", None), ("ml_forecast", "qty_if_issued_high", "Quantity if issued, high case (90%)", None),
@@ -213,7 +227,7 @@ dd = [("ml_model", "", "Learned demand model: method, training size, validation 
 try:
     con.execute("delete from data_dictionary where table_name like 'ml_%'")
     con.executemany("insert or replace into data_dictionary values (?,?,?,?)", dd)
-    for t in ("ml_model", "ml_eval", "ml_forecast", "ml_flag"):
+    for t in ("ml_model", "ml_eval", "ml_forecast", "ml_flag", "ml_backtest"):
         con.execute("update data_dictionary set rows=(select count(*) from " + t + ") where table_name=? and column_name=''", (t,))
 except sqlite3.OperationalError: pass
 # per-part summary used by every planner endpoint (Claude B's ws tools read it through portfolioParts)
