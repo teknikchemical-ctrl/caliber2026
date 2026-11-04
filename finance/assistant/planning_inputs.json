@@ -1,0 +1,670 @@
+{
+  "schema_version": 1,
+  "status": "ILLUSTRATIVE PLANNING MODEL. No real plant data or current vendor quotes supplied. Direct literature and current-price verification pending network access.",
+  "currency": "USD",
+  "inputs": {
+    "fx": {
+      "value": 16000,
+      "unit": "IDR/USD",
+      "basis": "Assumption",
+      "description": "Illustrative reporting conversion only, not a current FX quote.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "horizon": {
+      "value": 5,
+      "unit": "years",
+      "basis": "Assumption",
+      "description": "Investment evaluation period.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "discount": {
+      "value": 0.12,
+      "unit": "fraction/year",
+      "basis": "Assumption",
+      "description": "Before-tax required return.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "users": {
+      "value": 50,
+      "unit": "people",
+      "basis": "Assumption",
+      "description": "Potential operator, maintenance and engineering users.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "days": {
+      "value": 220,
+      "unit": "days/year",
+      "basis": "Assumption",
+      "description": "Active working days per user.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "queries": {
+      "value": 10,
+      "unit": "queries/user/day",
+      "basis": "Assumption",
+      "description": "Requests per active user, including unsuccessful questions.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "adoption": {
+      "value": 0.6,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Share of potential use actually taken up.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "usable": {
+      "value": 0.85,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Share of attempted tasks with a correct, useful, approved-source answer.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "minutes": {
+      "value": 10,
+      "unit": "minutes/user/day",
+      "basis": "Assumption",
+      "description": "Gross measured retrieval time saved on a fully usable day; excludes incident repair and onboarding time.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "hourly": {
+      "value": 40,
+      "unit": "USD/hour",
+      "basis": "Assumption",
+      "description": "Loaded employee cost, not cash savings unless overtime/contract spend is removed.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "cash_share": {
+      "value": 0.3,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Share of released routine-search time with an evidenced cash-conversion mechanism.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "new_hires": {
+      "value": 10,
+      "unit": "people/year",
+      "basis": "Assumption",
+      "description": "New hires outside the routine-search beneficiary group.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "onboard_hours": {
+      "value": 8,
+      "unit": "hours/person",
+      "basis": "Assumption",
+      "description": "Training hours potentially avoided, limited to knowledge retrieval content.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "onboard_cash": {
+      "value": 0.25,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Share of onboarding time actually removed from overtime or paid external instruction.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "incidents": {
+      "value": 0,
+      "unit": "events/year",
+      "basis": "Assumption",
+      "description": "Eligible troubleshooting incidents with timestamped plant production loss; zero until supported.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "hours_avoided": {
+      "value": 0,
+      "unit": "plant-hours/event",
+      "basis": "Assumption",
+      "description": "Incremental reduction against a matched baseline; use plant critical-path time, not summed asset downtime.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "contribution": {
+      "value": 0,
+      "unit": "USD/plant-hour",
+      "basis": "Assumption",
+      "description": "Incremental saleable production times contribution margin, excluding fixed allocated cost.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "attribution": {
+      "value": 0.25,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Conservative share causally attributable to assistant support.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "demand": {
+      "value": 0.8,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Fraction of recovered production that can actually be sold without bottleneck displacement.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "rework_events": {
+      "value": 0,
+      "unit": "events/year",
+      "basis": "Assumption",
+      "description": "Eligible repeated maintenance tasks; excludes incident recovery already valued.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "rework_cost": {
+      "value": 0,
+      "unit": "USD/event",
+      "basis": "Assumption",
+      "description": "External materials, contractor spend and scrap only; excludes labour already valued.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "rework_reduction": {
+      "value": 0.1,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Measured reduction in eligible repeats.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "pages": {
+      "value": 2000,
+      "unit": "pages",
+      "basis": "Assumption",
+      "description": "Initial controlled document ingestion volume.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "page_tokens": {
+      "value": 600,
+      "unit": "tokens/page",
+      "basis": "Assumption",
+      "description": "Extracted document token estimate.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "refresh": {
+      "value": 0.2,
+      "unit": "fraction/year",
+      "basis": "Assumption",
+      "description": "Annual document volume added or revised.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "ocr": {
+      "value": 0.002,
+      "unit": "USD/page",
+      "basis": "Assumption",
+      "description": "OCR planning rate, not a verified vendor quote.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "review_minutes": {
+      "value": 2,
+      "unit": "minutes/page",
+      "basis": "Assumption",
+      "description": "Human validation and access classification.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "review_rate": {
+      "value": 40,
+      "unit": "USD/hour",
+      "basis": "Assumption",
+      "description": "Document engineer loaded rate.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "input_tokens": {
+      "value": 8000,
+      "unit": "tokens/request",
+      "basis": "Assumption",
+      "description": "Question, retrieved context and system instructions.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "output_tokens": {
+      "value": 1000,
+      "unit": "tokens/request",
+      "basis": "Assumption",
+      "description": "Response plus provider-billed reasoning if applicable; replace with meter data.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "retry": {
+      "value": 1.1,
+      "unit": "billed calls/request",
+      "basis": "Assumption",
+      "description": "Retries and additional tool/model calls.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "input_price": {
+      "value": 0.4,
+      "unit": "USD/million tokens",
+      "basis": "Assumption",
+      "description": "API budgeting assumption. Historical low-cost model prices are leads, not a current quote.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "output_price": {
+      "value": 1.6,
+      "unit": "USD/million tokens",
+      "basis": "Assumption",
+      "description": "API budgeting assumption; replace with selected region/model quote.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "embedding_price": {
+      "value": 0.02,
+      "unit": "USD/million tokens",
+      "basis": "Assumption",
+      "description": "Embedding planning allowance.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "hosting": {
+      "value": 100,
+      "unit": "USD/month",
+      "basis": "Assumption",
+      "description": "Application host, database, vector retrieval, logs and backups budget combined; split using actual cloud calculator.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "security_month": {
+      "value": 100,
+      "unit": "USD/month",
+      "basis": "Assumption",
+      "description": "Incremental identity/security/monitoring cost.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "support_hours": {
+      "value": 8,
+      "unit": "hours/month",
+      "basis": "Assumption",
+      "description": "App operations, access requests, answer audit and vendor coordination.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "support_rate": {
+      "value": 60,
+      "unit": "USD/hour",
+      "basis": "Assumption",
+      "description": "Internal service owner or external support rate.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "evaluation_month": {
+      "value": 4,
+      "unit": "hours/month",
+      "basis": "Assumption",
+      "description": "Recurring regression/answer-quality evaluation.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "engineer_rate": {
+      "value": 75,
+      "unit": "USD/hour",
+      "basis": "Assumption",
+      "description": "Integration and validation engineer budget.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "discovery_hours": {
+      "value": 32,
+      "unit": "hours",
+      "basis": "Assumption",
+      "description": "Requirements, read-only data scope and baseline instrumentation.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "connector_hours": {
+      "value": 80,
+      "unit": "hours",
+      "basis": "Assumption",
+      "description": "Document repository and maintenance-history connectors; no control writes.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "app_hours": {
+      "value": 80,
+      "unit": "hours",
+      "basis": "Assumption",
+      "description": "Retrieval, user experience and logging implementation.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "security_hours": {
+      "value": 40,
+      "unit": "hours",
+      "basis": "Assumption",
+      "description": "Threat assessment, identity integration and OT/IT architecture approval.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "evaluation_hours": {
+      "value": 60,
+      "unit": "hours",
+      "basis": "Assumption",
+      "description": "Golden questions, failure tests, provenance and operational validation.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "training_hours": {
+      "value": 24,
+      "unit": "hours",
+      "basis": "Assumption",
+      "description": "Training delivery and user champions.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "pm_hours": {
+      "value": 40,
+      "unit": "hours",
+      "basis": "Assumption",
+      "description": "Project management, procurement and change management.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "contingency": {
+      "value": 0.2,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Applied to initial implementation and purchased equipment.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "enterprise_seat": {
+      "value": 30,
+      "unit": "USD/user/month",
+      "basis": "Assumption",
+      "description": "Enterprise assistant seat budgeting assumption; confirm eligible plan, region, billing commitment and taxes.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "base_licence": {
+      "value": 36,
+      "unit": "USD/user/month",
+      "basis": "Assumption",
+      "description": "Underlying productivity licence budget if incremental.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "incremental_base": {
+      "value": 0,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Existing eligible base licences assumed reusable; set 1 if new licences are required.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "enterprise_connector_month": {
+      "value": 200,
+      "unit": "USD/month",
+      "basis": "Assumption",
+      "description": "Connector/middleware premium and indexing capacity allowance; no assumed unlimited enterprise entitlement.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "gpu_qty": {
+      "value": 1,
+      "unit": "units",
+      "basis": "Assumption",
+      "description": "Single pilot inference host; no HA or production SLA implied.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "gpu_price": {
+      "value": 10000,
+      "unit": "USD/unit",
+      "basis": "Assumption",
+      "description": "GPU inference server budget including host, CPU, RAM, storage and GPU, NOT a supplier quote.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "gateway_qty": {
+      "value": 1,
+      "unit": "units",
+      "basis": "Assumption",
+      "description": "Approved read-only boundary gateway if needed.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "gateway_price": {
+      "value": 1500,
+      "unit": "USD/unit",
+      "basis": "Assumption",
+      "description": "Gateway/server budget; requires OT architecture confirmation.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "firewall_qty": {
+      "value": 1,
+      "unit": "units",
+      "basis": "Assumption",
+      "description": "Incremental network segmentation appliance if needed.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "firewall_price": {
+      "value": 2000,
+      "unit": "USD/unit",
+      "basis": "Assumption",
+      "description": "Appliance budget; support subscription separate.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "tablet_qty": {
+      "value": 0,
+      "unit": "units",
+      "basis": "Assumption",
+      "description": "Existing approved browser clients reused by default; hazardous-area devices require certification and supplier quote.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "tablet_price": {
+      "value": 1500,
+      "unit": "USD/unit",
+      "basis": "Assumption",
+      "description": "General industrial tablet budget; NOT an intrinsically safe device quote.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "power_kw": {
+      "value": 0.8,
+      "unit": "kW",
+      "basis": "Assumption",
+      "description": "Average server plus allocated cooling load while operating.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "power_hours": {
+      "value": 8760,
+      "unit": "hours/year",
+      "basis": "Assumption",
+      "description": "24/7 uptime demand.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "electricity": {
+      "value": 0.12,
+      "unit": "USD/kWh",
+      "basis": "Assumption",
+      "description": "Tariff allowance; replace with plant tariff.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "hardware_support": {
+      "value": 0.12,
+      "unit": "fraction/year",
+      "basis": "Assumption",
+      "description": "Hardware support/warranty provision.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "replacement_year": {
+      "value": 4,
+      "unit": "year",
+      "basis": "Assumption",
+      "description": "Refresh purchase timing for owned hardware.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "replacement_share": {
+      "value": 0.75,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Refresh expenditure as a share of initial GPU server purchase.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "onprem_ops_hours": {
+      "value": 16,
+      "unit": "hours/month",
+      "basis": "Assumption",
+      "description": "Extra GPU serving, patching, backup and vulnerability management.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "model_support": {
+      "value": 250,
+      "unit": "USD/month",
+      "basis": "Assumption",
+      "description": "Commercial support/licensing allowance; verify model licence and permitted enterprise use.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "depreciation": {
+      "value": 3,
+      "unit": "years",
+      "basis": "Assumption",
+      "description": "Straight-line accounting depreciation for operating-profit bridge, not cash outflow.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "rollout1": {
+      "value": 0.5,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "First-year benefit ramp; operating costs start at full annual run rate.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "rollout2": {
+      "value": 0.85,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Second-year benefit ramp.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "decommission": {
+      "value": 1000,
+      "unit": "USD",
+      "basis": "Assumption",
+      "description": "Final-year data export, deletion and shutdown cost.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "vendor_margin": {
+      "value": 0.35,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Target gross margin for a vendor selling a managed assistant service; exclude from plant value model.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    },
+    "implementation_cash": {
+      "value": 0.7,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Implementation labour paid externally or incrementally; remainder is internal opportunity cost.",
+      "source": "Illustrative planning assumption. Replace with measured or approved case value.",
+      "verified_current_price": false
+    },
+    "operations_cash": {
+      "value": 0.5,
+      "unit": "fraction",
+      "basis": "Assumption",
+      "description": "Operations labour requiring new cash spend; remainder uses existing internal capacity.",
+      "source": "Illustrative planning assumption. Replace with measured or approved case value.",
+      "verified_current_price": false
+    },
+    "failure_allowance": {
+      "value": 2000,
+      "unit": "USD/year",
+      "basis": "Assumption",
+      "description": "Financial stress allowance for rework/errors/response to incidents, not an assessed safety loss.",
+      "source": "Illustrative planning assumption. Replace with measured or approved case value.",
+      "verified_current_price": false
+    },
+    "active_hours": {
+      "value": 8,
+      "unit": "hours/day",
+      "basis": "Assumption",
+      "description": "Hours per user during which requests arrive.",
+      "source": "Illustrative planning assumption. Replace with measured or approved case value.",
+      "verified_current_price": false
+    },
+    "peak_factor": {
+      "value": 5,
+      "unit": "multiplier",
+      "basis": "Assumption",
+      "description": "Peak request intensity above mean, for sizing only; benchmark actual workloads.",
+      "source": "Illustrative planning assumption. Replace with measured or approved case value.",
+      "verified_current_price": false
+    },
+    "verification_minutes": {
+      "value": 2,
+      "unit": "minutes/user/day",
+      "basis": "Assumption",
+      "description": "Human source checking/correction time on each attempted active user-day, including unsuccessful answers. Subtracted before valuing time saved.",
+      "source": "Planning allowance; replace with case measurement or written supplier quote.",
+      "verified_current_price": false
+    }
+  },
+  "options": [
+    "cloud_api",
+    "enterprise_seat",
+    "onprem_gpu"
+  ],
+  "scenarios": [
+    {
+      "name": "Downside",
+      "adoption": 0.3,
+      "usable": 0.7,
+      "time_factor": 0.5,
+      "cost_factor": 1.25,
+      "basis": "Assumption"
+    },
+    {
+      "name": "Base",
+      "adoption": 0.6,
+      "usable": 0.85,
+      "time_factor": 1,
+      "cost_factor": 1,
+      "basis": "Assumption"
+    },
+    {
+      "name": "Upside",
+      "adoption": 0.85,
+      "usable": 0.95,
+      "time_factor": 1.5,
+      "cost_factor": 0.9,
+      "basis": "Assumption"
+    }
+  ]
+}

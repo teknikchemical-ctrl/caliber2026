@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),path=require('node:path');
+process.env.SPI_DB=path.resolve(process.argv[2]==='full'?'spi/db/spi.sqlite':'spi/fixtures/mini.sqlite');process.env.SPI_RES='/nonexistent';
+(async()=>{const D=require('better-sqlite3'),db=new D(process.env.SPI_DB,{readonly:true}),id=db.prepare('select material_no from part_profile where months_active>=3 limit 1').get().material_no;let n=0;
+const call=async(name,method,body,query={})=>{const {default:fn}=await import('../api/engine/'+name+'.mjs');let response;await fn({method,body,query,url:'/x'}, {setHeader(){},end(text){response={status:this.statusCode||200,data:JSON.parse(text)}},statusCode:200});return response};
+let r=await call('forecast','POST',{material_no:id});assert.equal(r.status,200);assert.equal(r.data.forecast.length,12);assert.equal(r.data.material_no,id);n++;
+r=await call('forecast','POST',{material_no:id,horizon:99});assert.equal(r.status,400);n++;
+r=await call('forecast','POST',{});assert.equal(r.status,400);n++;
+r=await call('forecast','POST',{material_no:1});assert.equal(r.status,404);n++;
+r=await call('forecast','GET',{});assert.equal(r.status,405);n++;
+r=await call('optimise','POST',{filters:{material_no:id},limit:1});assert.equal(r.status,200);assert.equal(r.data.total,1);assert.equal(r.data.rows.length,1);n++;
+r=await call('health','GET',null,{q:String(id)});assert.equal(r.status,200);assert.ok(r.data.groups.insurance);n++;
+r=await call('simulate','POST',{material_no:id,include_rows:true});assert.equal(r.status,200);assert.equal(r.data.rows.length,1);assert.ok(r.data.curve.length>=5);n++;
+r=await call('simulate','POST',{stock_multiplier:100,material_no:id});assert.equal(r.status,400);n++;
+console.log(n,'engine API checks passed');db.close()})().catch(e=>{console.error(e);process.exitCode=1});

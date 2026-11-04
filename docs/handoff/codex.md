@@ -1,14 +1,14 @@
-# Codex Finance handoff
-**Updated:** 2026-11-03 WIB | **Branch:** codex/finance | **Baseline:** 7995889 | Commit: see git log -1.
-## Ready to merge
-- Sample-case Finance workflow: record cost/downtime breakdowns and charts, labelled inputs, cost build-up, NPV/IRR/payback/BCR, 3 scenarios, cash flow, sensitivity, explicit unvalued risk, CSV/print and cost_summary in fin.js only.
-- cases/mock-cdu/fin.json has SYNTHETIC demonstration assumptions; _template has null required values. All real-case inputs remain to be sourced. Benefits cover the whole supplied history, not a guessed partial rollout.
-- 16 Finance evaluation questions; smoke test checks answers directly. Integrator: recompile mock-cdu to include eval_extra_fin.json in Governance; generated case files are untouched.
-- finance/build_case.py generates a live-formula workbook, Word report and financial slides from any case's saved FIN inputs and MH. Reproduction: finance/CASE_FINANCE.md. Legacy first-case deliverables unchanged.
+# Codex Finance: SPI engine
+Updated 2026-11-04 WIB. Branch codex/finance. Baseline ebe4d8f. Remaining usage is not exposed by this client; working in tested milestones.
+## Ready to merge: F1/F2/F3 engine milestone
+- spi/engine/index.js exports runPlan(plan, {db}) or runPlan(plan, {part,series:number[],months,cutoff,...}), defaultPlan(ctx), contextFor(db,id), policy; pure calculator and injected SQLite context. Stable ForecastResult matches the shared schema. ES modules are enabled inside spi/engine/package.json.
+- Methods: SES, Croston, SBA, TSB, family-pooled SBA, driver-based and zero-demand insurance. Seeded bootstrap, explicit defaults, cut-off anchoring, evidence-bound drivers, rolling-origin comparison and 10% fallback. PM quantities are Estimated usage on dated maintenance signals, not observed parts requirements.
+- forecast and health APIs answer on real SQLite. Exact request/response shapes are at the top of every api/engine/*.mjs file. UI owner B: health groups are excess, slow, non_moving, obsolete, insurance; recommendation fields are flattened in each row, dynamic parameters in row.inventory. All part descriptions need spiDesc.
+- optimise returns paginated rows plus full-selection totals and a cost-risk curve. simulate returns scenario, baseline, curve; include_rows:true returns weighted empirical distributions. GET /api/engine/simulate?module=1 serves the identical pure simulator for browser import. Quantities/values are Estimates; shared-equipment exposure is not additive plant downtime.
+- OEM family T| with Max 0 is protected as KEEP_INSURANCE. Missing open orders are explicit, not silently treated as confirmed zero. Only completed PO lead times known by cut-off are used.
 ## Validation
-- Pure model/edge checks and independent Python NPV passed; 16 LibreOffice-recalculated metrics (returns, scenarios, sensitivity) match the page. Sample NPV 151,823,149 IDR; demonstration only.
-- HTTP Finance smoke tests passed with 16 answer evaluations, totals, user edits/reset, invalid inputs and responsive checks; rendered page, report and slides inspected. Default build/static checks passed.
-- Required quick suite: build/static pass; shared regression cannot navigate file:// (ERR_BLOCKED_BY_ADMINISTRATOR with system Chromium). Shared layout/case/3D suites remain unverified; no shared tests edited.
+- Engine hand-calculation, seeded and fixture invariants passed across 237 parts; 9 API checks passed on full DB. 17 data checks and all currently registered full-DB pages passed. Earlier plant and Finance work retained in merge, not reset.
 ## Next / waiting on
-- Human/integrator: load and announce real case id on main; Finance then merges main, replaces sourced inputs and reconciles deliverables. No invented probability from risk categories. Use explicit annual probability and consequence for risk valuation.
-- Merge main hourly during active real-case work; push only codex/finance, no PR. For preview, human configures the Netlify branch. Generated sample artifacts are under /tmp/finance-mock-cdu and reproducible from the committed builder.
+- Continuing full-data batch/backtest/replay, Business Impact, business case workbook and seven-slide deck. Other four inventory pages are back with Claude B per scope update; I will not edit them.
+- Codex AI: call runPlan from spi/engine/index.js using {db}; defaultPlan(contextFor(db,id)) is available. Proposed inputs are scenario-labelled; rejected inputs are excluded. Review method fallback on results.backtest. Coordinate results.sqlite shared writes at milestone (engine writes only forecast/inventory_param/recommendation).
+- No research/access configuration is republished. Prior assistant procurement pack remains a separate planning artifact and is not the SPI business case.

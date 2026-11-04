@@ -24,10 +24,10 @@ Update only your own rows (status `todo`, `doing`, `blocked`, `done`). Longer no
 | C3 | codex-ai | todo | `POST /api/ai/plan` and `GET /api/ai/health` on Vercel | M2 | api/ai |
 | C4 | codex-ai | todo | Tools and Flow B `POST /api/ai/ask` (proposals into the ledger) | M3 | spi/ai, api/ai |
 | C5 | codex-ai | todo | Batch precompute to results.sqlite; golden question evaluation; key connection guide for Vercel | M3 to M5 | spi/ai, docs/AI_ASSISTANT.md |
-| F1 | codex | todo | Engine core: classify, methods, bootstrap quantiles, unit tests | M1 | spi/engine |
-| F2 | codex | todo | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
-| F3 | codex | todo | `api/engine/*` endpoints | M2 | api/engine |
-| F4 | codex | todo | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
+| F1 | codex | done | Engine core: classify, methods, bootstrap quantiles, unit tests | M1 | spi/engine |
+| F2 | codex | doing | `runPlan`, Policy object, optimiser, recommender | M1 to M2 | spi/engine |
+| F3 | codex | done | `api/engine/*` endpoints | M2 | api/engine |
+| F4 | codex | doing | Backtest, baseline replay, simulate, health lists, rules batch | M3 | spi/engine |
 | F5 | codex | todo | Business case workbook, impact.json, BUSINESS_CASE.md | M4 | finance/spi |
 | F6 | codex | todo | 7-slide deck in competition format; team.json for the human | M4 to M5 | deck/spi |
 | H1 | human | todo | Import the repo in Vercel and send the URL; set AI_PROVIDER, AI_API_KEY, AI_MODEL in Vercel env vars; fill `deck/spi/team.json`; confirm deadline time zone; tell Claude A the clock | M0 to M5 | |
