@@ -39,3 +39,4 @@
 - Hover: `data-kb` on every point and bar of spiAxLine and spiAxBars, small readout when B's kit is absent.
 - "Golden path" renamed "Optimized Scenario" in all my text. Test: `node tests/spi_ai_reasoning.js`.
 - Data note: po_line repeats some lines; history and events count each once, open quantities still sum the repeats (noted to B).
+- 2026-11-04 later: `spi/ml/train_more.py` adds equipment risk (ml_equip_risk) and lead time (ml_leadtime) models; golden uses the learned lead time for parts without PO history (saving 143.1 bn, 145.2 with lead_model=default); AI box sections are full paragraphs with a method section and checked model evidence; assistant tools equipment_risk and lead_model. Test: tests/spi_ai_reasoning.js (46 checks).

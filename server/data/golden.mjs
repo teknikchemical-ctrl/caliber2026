@@ -1,7 +1,7 @@
 // GET /api/data/golden : the Optimized Scenario, the single decision engine of the site (owner: Claude A). Every page reads its orders, decisions and totals from here.
 // Scope: ?mat= | ?tag= (funcloc and below) | ?set= (equipment set tag, its bill of materials) | ?cls= (equipment class) | ?crit=S,A | default all parts.
 // Inputs (Assumptions): service_S..C, demand (factor), lead (factor), carrying, budget (IDR per month), campaign=1, runs, seed.
-// Policy per part: learned demand (ml_part, ml_forecast), lead time from PO history, service target by criticality. Candidate policies: reorder point =
+// Policy per part: learned demand (ml_part, ml_forecast), lead time from PO history (learned from supplier, group and item type where a part has none), service target by criticality. Candidate policies: reorder point =
 // lead-time demand + z x spread, order-up-to = reorder point + 1 to 24 months of demand, at the target service or higher; today's Min and Max is a candidate
 // too, so the recommendation never costs more than today (same rule and same yearly cost function as /api/ws/advice, evalPart in server/ws/costrisk.mjs).
 // Two views of cost: steady state per year (the policy in place, the cost function above) and the first 12 months simulated from today's stock and open orders
@@ -28,7 +28,9 @@ function statics(db) {
   const bt = new Map(); try { for (const r of db.prepare("select material_no, month, actual, forecast, band_low, band_high from ml_backtest").all()) { (bt.get(r.material_no) || bt.set(r.material_no, []).get(r.material_no)).push(r); } } catch { }
   const sq = new Map(db.prepare("select material_no, sum(qty*qty) s from demand_month group by 1").all().map((r) => [r.material_no, r.s]));
   let calib = 1; try { calib = JSON.parse(db.prepare("select value from ml_model where key='calibration_factor'").get().value) || 1; } catch { }
-  const s = { price, months, iss, po, rc, camp, bt, sq, calib }; stat.set(db, s); return s;
+  // learned equipment risk (spi/ml/train_more.py): the highest chance of a notification in 3 months among the part's locations
+  const risk = new Map(); try { for (const r of db.prepare("select e.material_no, max(r.p_notif_3m) p, (select tag from ml_equip_risk x where x.funcloc = e.funcloc) t from part_equipment e join ml_equip_risk r using(funcloc) group by 1").all()) risk.set(r.material_no, r.p); } catch { }
+  const s = { price, months, iss, po, rc, camp, bt, sq, calib, risk }; stat.set(db, s); return s;
 }
 export function golden(db, q = {}) {
   const key = JSON.stringify(Object.keys(q).filter((k) => k !== "all" && q[k] !== "" && q[k] != null).sort().map((k) => [k, String(q[k])])); if (cache.has(key)) return cache.get(key);
@@ -42,8 +44,10 @@ export function golden(db, q = {}) {
   else if (q.tag) { const t = String(q.tag).toUpperCase().replace(/^PX_/, ""); where = "m.material_no in (select material_no from part_equipment where funcloc=? or funcloc like ?)"; args = ["PX_" + t, "PX_" + t + "-%"]; scope = { kind: "tag", label: t }; }
   else if (q.cls) { where = "m.material_no in (select e.material_no from part_equipment e join funcloc f using(funcloc) where f.eq_class=?)"; args = [String(q.cls).toUpperCase()]; scope = { kind: "class", label: String(q.cls).toUpperCase() }; }
   if (q.crit) { const cs = String(q.crit).toUpperCase().split(/[ ,]+/).filter((c) => "SABC".includes(c) && c); if (cs.length) { where += ` and coalesce(p.crit_max,'C') in (${cs.map(() => "?").join(",")})`; args.push(...cs); scope.label += " (criticality " + cs.join(", ") + ")"; } }
+  // lead time: the part's PO history; without history the learned lead time (ml_leadtime, spi/ml/train_more.py) unless lead_model=default (the 60-day default of the contract)
+  const LT = String(q.lead_model || "learned") !== "default" && !!db.prepare("select 1 from sqlite_master where name='ml_leadtime'").get();
   const parts = db.prepare(`select m.material_no, m.descr, m.unit, m.mrp_type, coalesce(p.stock,m.stock,0) stock, coalesce(p.min_qty,m.min_qty,0) min_qty, coalesce(p.max_qty,m.max_qty,0) max_qty, coalesce(p.unit_price_idr,m.last_unit_price_idr,0) price, coalesce(p.crit_max,'C') crit,
-    p.lt_median, p.lt_p90, p.total_qty, p.n_issues, x.mu ml_mu, x.sd ml_sd, x.p_any ml_p from material m left join part_profile p using(material_no) left join ml_part x using(material_no) where ${where}`).all(...args);
+    p.lt_median, p.lt_p90, p.total_qty, p.n_issues, x.mu ml_mu, x.sd ml_sd, x.p_any ml_p, ${LT ? "lt.lead_pred_days lt_ml, lt.lead_pred_p90_days lt_ml90" : "null lt_ml, null lt_ml90"} from material m left join part_profile p using(material_no) left join ml_part x using(material_no) ${LT ? "left join ml_leadtime lt using(material_no)" : ""} where ${where}`).all(...args);
   const ids = new Set(parts.map((p) => p.material_no)), fc = {};
   const fq = ids.size <= 900 ? db.prepare(`select material_no, month, p_issue, expected_qty, qty_if_issued_low, qty_if_issued_high from ml_forecast where material_no in (${[...ids].map(() => "?").join(",") || "0"})`).all(...ids) : db.prepare("select material_no, month, p_issue, expected_qty, qty_if_issued_low, qty_if_issued_high from ml_forecast").all();
   for (const r of fq) { if (!ids.has(r.material_no)) continue; (fc[r.material_no] = fc[r.material_no] || {})[r.month] = r; }
@@ -63,7 +67,8 @@ export function golden(db, q = {}) {
     const f = fc[p0.material_no] || {}, mu = F.map((m, i) => (f[m]?.expected_qty || 0) * dem * campF[i]), pi = F.map((m) => Math.min(1, (f[m]?.p_issue || 0) * (dem > 1 ? Math.min(1.5, dem) : 1)));
     const lo = F.map((m) => f[m]?.qty_if_issued_low || 0), hi = F.map((m) => f[m]?.qty_if_issued_high || 0);
     const muM = mu.reduce((s, x) => s + x, 0) / M, sdM = Math.sqrt(F.reduce((s, m, i) => { const sz = (lo[i] + hi[i]) / 2 * dem, sd = (hi[i] - lo[i]) / 2.56 * dem; return s + (pi[i] * (1 - pi[i]) * sz * sz + pi[i] * sd * sd); }, 0) / M);
-    const lt = (p0.lt_median || ECON.lead_default) * lf, lt90 = (p0.lt_p90 || p0.lt_median || ECON.lead_default) * lf, L = Math.max(0.3, lt / MD), Lm = Math.max(1, Math.round(L)), crit = p0.crit, price = p0.price || 0;
+    const leadBasis = p0.lt_median ? "PO history" : p0.lt_ml ? "learned" : "default", lt = (p0.lt_median || p0.lt_ml || ECON.lead_default) * lf, lt90 = (p0.lt_p90 || (p0.lt_median ? p0.lt_median : p0.lt_ml90 || p0.lt_ml) || ECON.lead_default) * lf;
+    const L = Math.max(0.3, lt / MD), Lm = Math.max(1, Math.round(L)), crit = p0.crit, price = p0.price || 0;
     // the yearly cost function shared with /api/ws/advice; learned demand from ml_part
     const pe = { ...p0, lt_median: lt, lt_p90: lt90, sq: S0.sq.get(p0.material_no) || 0 }, cur = evalPart(pe, { mode: "current" }, A);
     const muY = cur.demand / 12, sdY = p0.ml_sd != null && p0.ml_mu != null && Math.abs(muY - p0.ml_mu * dem * campAvg) < 1e-9 ? p0.ml_sd * dem * campAvg : sdM, muL = muY * L, sdL = sdY * Math.sqrt(L);
@@ -97,7 +102,7 @@ export function golden(db, q = {}) {
           if (qfan) { if (R === nR) qfan[k][i][r] = st; else qfan[k][i].fill(st); } } } }
     perPart.push({ material_no: p0.material_no, descr: p0.descr, unit: p0.unit, crit, mrp_type: p0.mrp_type, stock: p0.stock, on_order: onOrder, min_qty: p0.min_qty, max_qty: p0.max_qty, min_now: p0.min_qty, max_now: p0.max_qty, rop, order_up_to: upTo, policy_source: best ? best.source : "none", cover_months: best ? best.cover : null, service_used: best ? best.service : null,
       decision, order_by, months_to_rop: r0(months_to_rop, 1), stockout_chance_in_lead_time: muY > 0 ? r0(sdL > 0 ? 1 - Phi((pos0 - muL) / sdL) : pos0 < muL ? 1 : 0, 3) : 0, months_of_cover: muY > 0 ? r0(pos0 / muY, 1) : null,
-      mean_month: r0(muY, 3), sd_month: r0(sdY, 3), lead_days: Math.round(lt), lead_p90_days: Math.round(lt90), forecast_12m: r0(muM * 12, 1), price, priced: price > 0, saving_idr_yr: Math.round(savingYr), cost_current_yr: Math.round(cur.total), cost_optimized_yr: Math.round(rec.total), orders: pOrders });
+      mean_month: r0(muY, 3), sd_month: r0(sdY, 3), lead_days: Math.round(lt), lead_p90_days: Math.round(lt90), lead_basis: leadBasis, equip_risk_3m: S0.risk.has(p0.material_no) ? r0(S0.risk.get(p0.material_no), 3) : null, forecast_12m: r0(muM * 12, 1), price, priced: price > 0, saving_idr_yr: Math.round(savingYr), cost_current_yr: Math.round(cur.total), cost_optimized_yr: Math.round(rec.total), orders: pOrders });
   }
   // budget: fund orders month by month, criticality first, then risk; an order that does not fit waits for the next month with room
   queue.sort((a, b) => a.i - b.i || "SABC".indexOf(a.p.crit) - "SABC".indexOf(b.p.crit) || b.risk - a.risk);
@@ -125,7 +130,7 @@ export function golden(db, q = {}) {
   const backtest = { months: bms, actual: act, forecast: fcs, forecast_calibrated: fcc, mape: mape(fcs), mape_calibrated: mape(fcc), bias: sa > 0 ? r0((fcs.reduce((s, x) => s + x, 0) - sa) / sa, 3) : null, bias_calibrated: sa > 0 ? r0((fcc.reduce((s, x) => s + x, 0) - sa) / sa, 3) : null, calibration_factor: S0.calib, basis: "Data: issue quantity in the held-out months. Estimate: forecast made before them by the same model (ml_backtest); calibrated = forecast x calibration factor, as used for the projection." };
   const calibration = { band: "80% (10% to 90%)", inside_all_part_months: nAll ? r0(inAll / nAll, 3) : null, inside_months_with_issue: nIss ? r0(inIss / nIss, 3) : null, part_months: nAll, part_months_with_issue: nIss };
   const gS = simOut("g"), cS = simOut("c"), gT = stOut("g"), cT = stOut("c"), meas = single ? "chance of a stockout in the month" : "expected number of parts short in the month";
-  const out = { months: F, cutoff: H, scope, parts: perPart.length, runs: nR, seed: seed0, inputs: { service: svc, demand: dem, lead: lf, carrying: car, budget, campaign: camp },
+  const out = { months: F, cutoff: H, scope, parts: perPart.length, runs: nR, seed: seed0, inputs: { service: svc, demand: dem, lead: lf, carrying: car, budget, campaign: camp, lead_model: LT ? "learned" : "default" },
     orders: orders.sort((a, b) => a.month.localeCompare(b.month) || b.value - a.value).slice(0, 400), orders_total: orders.length, orders_value: Math.round(orders.reduce((s, o) => s + o.value, 0)), unfunded: budget ? { orders: unfunded, value: Math.round(unfundedValue), deferred } : null,
     by_month: byMonth.map((b) => ({ ...b, value: Math.round(b.value), value_S: Math.round(b.value_S), value_A: Math.round(b.value_A), value_B: Math.round(b.value_B), value_C: Math.round(b.value_C) })), decisions,
     golden: { ...gS, stockout_measure: meas }, current: { ...cS, stockout_measure: meas },

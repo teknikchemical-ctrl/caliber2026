@@ -21,7 +21,7 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); 
   const st = golden(db, { set: "KT-383A" }); ok(st.scope.kind === "set" && st.parts > 0, "golden: set scope " + st.scope.label);
   const b = golden(db, { budget: "3000000000" }); ok(b.unfunded && b.by_month.every((m) => m.value <= 3e9 + 1) && b.orders.some((o) => o.deferred_from), "golden: a budget caps each month and defers orders");
   try { const ws = (await imp("server/ws/golden.mjs")).default; const res = await new Promise((resolve) => { const r = { setHeader() {}, statusCode: 200, end(t) { resolve(JSON.parse(t)); } }; ws({ method: "GET", url: "/x", query: {}, body: {}, headers: {} }, r); });
-    const sv = (res.figures || []).find((f) => f.id === "saving"); if (sv) ok(Math.abs(sv.value - g.saving_per_year) / g.saving_per_year < 0.01, "golden: one model, saving matches Claude B's /api/ws/golden within 1% (" + Math.round(sv.value / 1e9 * 10) / 10 + " against " + Math.round(g.saving_per_year / 1e9 * 10) / 10 + " IDR bn)"); } catch (e) { console.log("skip ws/golden comparison:", e.message); }
+    const gd = golden(db, { lead_model: "default" }), sv = (res.figures || []).find((f) => f.id === "saving"); if (sv) ok(Math.abs(sv.value - gd.saving_per_year) / gd.saving_per_year < 0.01, "golden: one model, saving matches Claude B's /api/ws/golden within 1% (" + Math.round(sv.value / 1e9 * 10) / 10 + " against " + Math.round(gd.saving_per_year / 1e9 * 10) / 10 + " IDR bn, both with the 60-day default lead time)"); } catch (e) { console.log("skip ws/golden comparison:", e.message); }
   // 2. structured reasoning, rules
   const P = [
     { feature: "golden", title: "Optimized Scenario", inputs: { service: { S: 0.99, A: 0.975, B: 0.95, C: 0.9 } }, outputs: { orders: g.orders.slice(0, 4), backtest: g.backtest, golden: { fan: g.golden.fan } }, figures: [{ label: "Recommended orders", value: g.orders_total, unit: "orders", basis: "Estimate" }, { label: "Value of the recommended orders", value: g.orders_value, unit: "IDR", basis: "Estimate" }, { label: "Stockouts per year", value: g.totals.golden.stockouts_per_year, unit: "events", basis: "Estimate" }], compare: { label: "Total cost per year", current: g.totals.current.total, recommended: g.totals.golden.total, unit: "IDR per year" } },
@@ -29,10 +29,10 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); 
     { feature: "mnotif", title: "Notification explorer", inputs: { tag: "PP-1323B" }, figures: [{ label: "Notifications", value: 42, unit: "", basis: "Data" }, { label: "Share with a part issued", value: 0.31, unit: "share", basis: "Data" }], actions: ["Check the bearing stock"] },
     { feature: "golden", title: "Optimized Scenario", inputs: { demand_factor: 0.85, budget_idr: 5e9 }, figures: [{ label: "Recommended orders", value: 1100, unit: "orders", basis: "Estimate" }], compare: { label: "Total cost per year", current: 2.4e11, recommended: 9e10, unit: "IDR per year" } }];
   for (const p of P) { const r = await explain(p, { db }), R = r.reasoning, t = reasonText({ ...R, inputs: null });
-    ok(R && R.verdict && Array.isArray(R.why) && Array.isArray(R.do_next) && "risk" in R, p.feature + ": five blocks present");
-    ok(t.split(/\s+/).length <= 95, p.feature + ": under about 90 words without the inputs block (" + t.split(/\s+/).length + ")");
+    ok(R && R.verdict && Array.isArray(R.why) && Array.isArray(R.do_next) && "risk" in R && "method" in R && R.evidence, p.feature + ": sections present (verdict, why, do next, risk, method, evidence)");
+    ok(t.split(/\s+/).length <= 300 && (p.feature === "mnotif" || t.split(/\s+/).length >= 60), p.feature + ": full paragraphs, 60 to 300 words without the inputs block (" + t.split(/\s+/).length + ")");
     ok(!/golden path/i.test(r.text), p.feature + ": never says golden path");
-    const bad = unsupportedNumbers(r.text, { facts: [{ value: p }, { value: displays(p) }, { value: displays(R.inputs || {}) }] }); ok(bad.length === 0, p.feature + ": every number in the reply is in the payload " + bad.join(" "));
+    const bad = unsupportedNumbers(r.text, { facts: [{ value: p }, { value: displays(p) }, { value: displays(R.inputs || {}) }, { value: displays(R.evidence || {}) }] }); ok(bad.length === 0, p.feature + ": every number in the reply is in the payload " + bad.join(" "));
     ok(R.do_next.every((a) => !a.material_no || /^\d{10}$/.test(a.material_no)), p.feature + ": do-next links name a part number"); }
   const ch = (await explain(P[3], { db })).reasoning.inputs; ok(ch && ch.deltas.length === 3 && /85%/.test(ch.text), "inputs block shows only when inputs change, with three deltas");
   ok((await explain(P[0], { db })).reasoning.inputs === null, "inputs block absent at default inputs");
@@ -47,5 +47,12 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; console.log("ok  ", m); 
     ok(schemaErrors(e, es).length === 0, "events " + JSON.stringify(q) + ": matches spi/contracts/events.schema.json " + JSON.stringify(schemaErrors(e, es).slice(0, 2)));
     ok(e.events.every((x) => ["crit", "value_idr", "qty", "unit", "material_no", "funcloc"].every((k) => k in x)), "events " + JSON.stringify(q) + ": every event carries the common fields"); }
   ok(events(db, { tag: "PP-1323B" }).events.some((x) => x.kind === "receipt") && events(db, {}).events.some((x) => x.kind === "campaign"), "events: receipt and campaign kinds present");
+  // 5. the other learned models reach the engine and the assistant
+  const { ask } = await imp("spi/ai/ask.js"), A = async (q) => (await ask({ db, question: q })).answer || "";
+  ok(/chance of a notification in the next 3 months/.test(await A("What is the failure risk of KT-383A?")), "assistant: equipment risk for a tag from the learned model");
+  ok(/notifications in the next 12 months/.test(await A("Which pumps are most likely to fail?")), "assistant: riskiest pumps from the learned model");
+  ok(/never been bought|own PO history/.test(await A("What lead time does the model predict for 4100014142?")), "assistant: learned lead time for a part");
+  ok(/equipment risk from the notifications/.test(await A("How accurate is the machine learning model?")), "assistant: model summary names all three models");
+  ok(golden(db, { mat: "4100014142" }).part.lead_basis === "learned" && golden(db, {}).inputs.lead_model === "learned", "golden: parts without PO history use the learned lead time");
   console.log(n + " checks passed");
 })().catch((e) => { console.error(e); process.exit(1); });
