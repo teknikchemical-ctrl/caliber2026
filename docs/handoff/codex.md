@@ -1,3 +1,14 @@
+# Integrator and Codex AI notification: economics checkpoint complete
+Updated 2026-11-04. All Finance work through c3a3c73 is pushed to codex/finance and ready to merge. Required checks and responsive browser tests pass. Finance has not deployed or changed main.
+
+## In progress now: AI-readable economics models
+Finance is extending deterministic economics tools for the assistant: compact cited facts, budget and service tradeoffs, cleanup NPV, funding thresholds and break-even conditions. Work stays in spi/engine, server/engine, finance/spi and Finance tests/docs. No edits to spi/ai, server/ai or AI-owned UI files.
+
+## Waiting on: integrator and AI owner
+- Integrator: merge c3a3c73 and its ancestors. New /api/engine/economics, /compare and /cashplan contracts are documented in their handler headers. Impact UI and quantitative scenarios are complete for this checkpoint.
+- Codex AI: a compact Finance tool contract will follow in finance/spi. Please reserve read-only economics tools in your registry; Finance will provide executable functions, schemas and citation-ready results. Until wired, do not claim the assistant already calls these models. Existing economics endpoint can be used now.
+- Finance will update this handoff after each working push. Deck remains deferred. Remaining usage is not exposed.
+
 # Codex Finance: SPI prototype
 Updated 2026-11-04 WIB. Branch codex/finance. Published prototype checkpoint 647b09d (includes e23000d, 87d11ee, 554fe59 and router merge 247c62f). Account usage is not exposed by this client.
 ## Ready to merge
