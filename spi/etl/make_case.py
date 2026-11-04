@@ -8,8 +8,13 @@ DB = os.path.join(ROOT, "spi/db/spi.sqlite"); OUT = os.path.join(ROOT, "cases/sp
 EQ = json.load(open(os.path.join(ROOT, "spi/etl/eqclass_map.json")))
 c = sqlite3.connect(DB); c.row_factory = sqlite3.Row
 PLAN = [("KT", 2), ("BF", 2), ("PP", 2), ("HE", 1), ("FCV", 1)]   # equipment class and how many; variety for the demo
+# PINNED: set numbers 1..8 are frozen because hand made geometry (cases/spi/geo) and the drawings are keyed by set number. Change only with Claude B.
+PINNED = ["KT-383A", "KT-202", "BF-108", "BF-110", "PP-148A", "PP-411A", "HE-605", "FCV-1905D"]
 rows = []
-for cls, k in PLAN:
+for tag in PINNED:
+    r0 = c.execute("""select f.funcloc, f.tag, f.descr, f.criticality, f.eq_class, count(distinct b.material_no) parts, coalesce(sum(p.total_qty),0) used, sum(p.stock>0) instock from funcloc f join bom b using(funcloc) join part_profile p using(material_no) where f.tag=? group by f.funcloc""", (tag,)).fetchone()
+    if r0: rows.append(r0)
+for cls, k in ([] if len(rows) == len(PINNED) else PLAN):
     q = c.execute("""select f.funcloc, f.tag, f.descr, f.criticality, f.eq_class, count(distinct b.material_no) parts,
         coalesce(sum(p.total_qty),0) used, sum(p.stock>0) instock from funcloc f join bom b using(funcloc) join part_profile p using(material_no)
         where f.eq_class=? and f.criticality in ('S','A') group by f.funcloc having parts>=8 order by (case f.criticality when 'S' then 1 else 2 end), parts desc, used desc limit ?""", (cls, k)).fetchall()
