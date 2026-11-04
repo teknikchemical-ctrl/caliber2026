@@ -1,11 +1,11 @@
 /* SPI Overview (owner: Claude A). Answer first: one insight line, four tiles, a treemap of stock by criticality and status, three actions, campaign strip, Pareto of excess. */
 regMod("spi_dash","2.0",["spi_core","spi_viz"],"Spare parts overview");
-const SPI_STAT={excess_true:["Above Max","excess"],excess_crit:["Above Max (S, A)","excess2"],non_moving:["Non-moving","nonmoving"],slow:["Slow-moving","slow"],nonstock_stock:["Non Stock holding stock","nonstock"],insurance:["Insurance spares","ins"],normal:["Within policy","crit_C"]};
+const SPI_STAT={excess_true:["Above Max","excess"],excess_crit:["Above Max (S, A)","excess2"],non_moving:["Non-moving","nonmoving"],slow:["Slow-moving","slow"],nonstock_stock:["Non Stock holding stock","nonstock"],insurance:["Insurance spares","ins"],normal:["Within policy","normal"]};
 spiRegister("spi_dash","Overview",async host=>{
  const [d,o]=await Promise.all([spiApi("/api/data/summary"),spiApi("/api/data/overview")]),p=d.parts,m=d.meta,sp=d.excess_split;
  const ex=p.excess_value,sv=p.stock_value,top10=Math.round(d.excess_concentration.top10*100);
  const crits=["S","A","B","C","none"],cn=c=>c==="none"?"Unknown":c,stk=["normal","insurance","excess_crit","excess_true","non_moving","slow","nonstock_stock"];
- const ser=stk.map(k=>({name:SPI_STAT[k][0],tone:k==="normal"?"crit_C":SPI_STAT[k][1],values:crits.map(c=>{const r=o.stock_by_status.find(x=>x.crit===c&&x.cat===k);return r?r.stock_value/1e9:0})}));
+ const ser=stk.map(k=>({name:SPI_STAT[k][0],tone:SPI_STAT[k][1],values:crits.map(c=>{const r=o.stock_by_status.find(x=>x.crit===c&&x.cat===k);return r?r.stock_value/1e9:0})}));
  const chart=spiAxBars({title:"Stock value by criticality and status",labels:crits.map(cn),series:ser,stack:true,yfmt:v=>Math.round(v),ylabel:"Stock value (IDR bn, Estimate)",xlabel:"Equipment criticality (S highest)",h:320,w:1100,ml:60,maxbar:110});
  host.innerHTML=spiHead("Spare part overview",`<b>${spiIdr(ex)}</b> of the <b>${spiIdr(sv)}</b> priced stock (${spiPct(ex,sv)}) is above Max (incl. Non Stock items), and <b>${top10}%</b> of that sits in 10 parts. <b>${spiNum(d.zero_stock_critical_with_demand)}</b> critical parts that were used are at zero stock.`,`<span class="spi-sub">Data to ${esc(m.data_cutoff)} | ${esc(m.history_months)} months | IDR, Estimate</span>`)+
  `<div class="spi-tiles">${spiTile({label:"Spare parts in baseline",value:spiNum(p.parts),delta:spiNum(p.with_demand)+" ever issued ("+spiPct(p.with_demand,p.parts)+")"})}
