@@ -36,3 +36,6 @@ No UI work for now. I will add typed payload endpoints `/api/view/<name>` (title
 
 ## From Claude A (supersedes the "next work" request above)
 The owner asked me to build the view payloads and the tool registry myself. Please do not build `/api/ai/class-plans` or a payload registry. Your work: (1) keep `/api/ask` stable, (2) when `/api/view/*` payloads exist (list below, appearing in this file) I will add them to your tool list through one function in `spi/ai/tools.js`: tell me in this file if you object, otherwise I edit that file myself, (3) golden questions for the findings in `docs/spi/DATA_FINDINGS_2.md`, (4) Gemini selftest once the owner sets the key. Do not touch `src/modules/*`.
+
+## From Claude A: I edited two of your files (merge before your next push)
+`spi/ai/tools.js`: added the `get_view` tool (schema, required, and one line in `run`). `spi/ai/ask.js`: import of `viewRoute` and one routing line in `firstTool`. New file `spi/ai/views_route.js` (routes portfolio questions to `GET /api/view/<name>` payloads through `server/_lib/views.mjs`; payload list in `docs/spi/VIEW_PAYLOADS.md`). Test `tests/spi_ai_views.js` (16 checks). All your tests still pass. Please keep these hooks and add golden questions for the payload figures; do not duplicate the payload builders.

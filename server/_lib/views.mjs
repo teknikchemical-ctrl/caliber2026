@@ -333,3 +333,14 @@ VIEWS.business_scorecard = (db, q = {}) => {
     metrics, sensitivity: tor, base: baseR,
     notes: ["Baselines are measured on the baseline data to " + cutoff(db) + "; targets are Assumptions that follow from the funded reorders, the realised release and the engine's screening policy. No result here is an achieved saving.", "Benefits are avoided stockout loss (modelled with downtime-per-day assumptions), released working capital and lower holding cost. The data has no emergency purchase premium or downtime cost.", "Sensitivity changes one assumption at a time and reports net cash after 24 months and the holding cost saved per year."], assumptions: ["Holding rate 22%.", "Realisation 30% on B and C, 10% on S and A excess.", "Downtime per day: S 100 mn, A 30 mn, B 5 mn, C 1 mn IDR."], source_ids: ["db:part_profile", "res:recommendation", "report:engine_report", "derived:savings_categories"] };
 };
+
+/* ---------- registers (zero-stock critical parts, pilot, insurance, obsolescence) ---------- */
+import registersHandler from "../data/registers.mjs";
+VIEWS.registers = db => {
+  let d; registersHandler({ url: "/x", method: "GET" }, { statusCode: 200, setHeader() {}, end(b) { d = JSON.parse(b); } });
+  const top = (l, n = 10) => l.rows.slice(0, n).map(r => ({ material_no: r.material_no, descr: r.descr, crit: r.crit, stock: r.stock, months_active: r.months_active, lead_days: r.lead, value_idr: r.value, why: r.why }));
+  return { view: "registers", title: "Registers", data_cutoff: cutoff(db),
+    insight: `${d.reorder.n} S and A stock items are at zero stock with issues in 2 or more months (reorder now), ${d.insurance.n.toLocaleString("en-US")} insurance spares worth IDR ${bn(d.insurance.v)} bn stay on purpose, ${d.obsolete.n} stock items on B, C or unclassified equipment are candidates for an obsolescence review (IDR ${bn(d.obsolete.v)} bn), and a pilot of ${d.pilot.n} parts (25 release candidates, 25 critical zero-stock parts) is proposed.`,
+    figures: [fig("critical_zero_stock", "S and A parts at zero stock with demand", d.reorder.n, "parts", "Data"), fig("insurance_spares", "Insurance spares kept", d.insurance.n, "parts", "Estimate"), fig("insurance_value", "Insurance spares stock value", bn(d.insurance.v), "IDR bn", "Estimate"), fig("obsolete_candidates", "Obsolescence review candidates", d.obsolete.n, "parts", "Estimate"), fig("obsolete_value", "Obsolescence review stock value", bn(d.obsolete.v), "IDR bn", "Estimate"), fig("pilot_parts", "Pilot parts", d.pilot.n, "parts", "Estimate")],
+    reorder_now: top(d.reorder), insurance: top(d.insurance), obsolete: top(d.obsolete), pilot: top(d.pilot, 50), notes: d.notes.concat(["Open purchase orders are not in the data: check them before ordering.", "Insurance spares are never recommended for disposal."]), assumptions: ["Insurance rule: no demand, S or A, lead time above 90 days or unknown."], source_ids: ["db:part_profile", "db:material"] };
+};
