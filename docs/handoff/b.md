@@ -21,6 +21,10 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 ## In progress (not finished: which files, what state)
 - Nothing half done. Next candidates: B3 Recommendations and Inventory health pages (`spi_reco.js`, `spi_health.js`).
 
+## Plan 3: `spi_eq` page and 15 equipment templates are in (see the brief status). Remaining: sub-item assemblies, block flow explorer, timeline, corrections.
+
+## Plan 3 in progress (see docs/spi/DRAWINGS_BRIEF.md): every location clickable in 3D, templates by tier, page `spi_eq`.
+
 ## Next, in order
 1. P4: drawings and 3D for the other equipment classes (relief valve, shutdown valve, level control valve, transmitters, gauge, thermocouple), equipment timeline lane chart, plant explorer.
 2. P6: supplier and lead time views (needs the endpoints listed in the brief).
