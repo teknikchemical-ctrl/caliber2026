@@ -3,7 +3,7 @@
 Branch `codex/ai`. This replaces your earlier assistant-only brief for this case (keep what you built: provider chain, discovery, diagnostics, `docs/AI_ASSISTANT.md`; port it to Vercel). Read `docs/spi/AI_REASONING.md` first: it is the design you implement. You may edit that file when the design changes; tell Claude A in your handoff.
 
 ## Your files
-`spi/ai/**`, `api/ai/**`, `tests/spi_ai*.js`, `docs/spi/AI_REASONING.md`, `docs/AI_ASSISTANT.md`, `src/modules/ai.js ai2.js sync.js intent.js facts.js`, `netlify/functions/*` (old site, only if needed), `tests/live.js`, `docs/handoff/codex-ai.md`.
+`spi/ai/**`, `server/ai/**`, `tests/spi_ai*.js`, `docs/spi/AI_REASONING.md`, `docs/AI_ASSISTANT.md`, `src/modules/ai.js ai2.js sync.js intent.js facts.js`, `netlify/functions/*` (old site, only if needed), `tests/live.js`, `docs/handoff/codex-ai.md`.
 Not yours: `spi/engine` (Codex Fin) and `spi/db` (Claude A). Call the engine through its documented functions; until it exists, stub `runPlan` to return the contract shape from `spi/contracts/forecast_result.schema.json`.
 
 ## Tasks in order

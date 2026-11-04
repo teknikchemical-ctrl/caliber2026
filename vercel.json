@@ -2,9 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "python3 build.py spi",
   "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/router?path=$1" }
+  ],
   "functions": {
-    "api/**/*.mjs": {
-      "includeFiles": "spi/**/*.{sqlite,sql,json}",
+    "api/router.mjs": {
+      "includeFiles": "{server,spi}/**",
       "maxDuration": 60
     }
   }

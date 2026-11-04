@@ -16,7 +16,7 @@ spi/data/raw/*.xlsx
       v
 spi/db/spi.sqlite   clean tables, part_profile, demand_month, equipment_set, dq_issue     (schema.sql)
       |                                  ^ attached as 'res': spi/db/results.sqlite (ai_run, forecast_input, forecast_plan, forecast, inventory_param, recommendation)
-      | api/data/* (read)                |
+      | server/data/* (read)                |
       v                                  |
 spi/ai  Evidence Pack -> Reasoning Agent (Gemini or rules) -> ForecastPlan JSON -> Validator
       |                                                                   |
@@ -25,20 +25,20 @@ spi/ai  Evidence Pack -> Reasoning Agent (Gemini or rules) -> ForecastPlan JSON 
 spi/engine  classify | methods | runPlan -> ForecastResult | optimise | recommend | simulate | backtest
       |
       v
-api/engine/* , api/ai/*  (Vercel functions)  ->  src/modules/spi_*.js (pages, charts)  +  case pack pages (equipment, drawings)
+server/engine/* , server/ai/*  (Vercel functions)  ->  src/modules/spi_*.js (pages, charts)  +  case pack pages (equipment, drawings)
 ```
 
 ## Repo layout and owners (one owner per folder; `tools/baseline_check.sh <role>` enforces it)
 | Path | Owner | Content |
 |---|---|---|
-| `spi/data`, `spi/etl`, `spi/db`, `spi/fixtures`, `spi/contracts`, `spi/eval`, `api/_lib`, `api/data`, `vercel.json`, `package.json`, `build.py`, `cases/spi/*` (except `geo/`), `docs/spi/*.md` (except those listed below) | **Claude A** | data, contracts, integration, deploy |
+| `spi/data`, `spi/etl`, `spi/db`, `spi/fixtures`, `spi/contracts`, `spi/eval`, `server/_lib`, `server/data`, `vercel.json`, `package.json`, `build.py`, `cases/spi/*` (except `geo/`), `docs/spi/*.md` (except those listed below) | **Claude A** | data, contracts, integration, deploy |
 | `src/modules/spi_*.js`, `src/modules/style_spi.css`, `cases/spi/geo/**`, the older 3D files | **Claude B** | all spare-part pages, charts, drawings, UI polish |
-| `spi/ai`, `api/ai`, `src/modules/ai.js ai2.js sync.js intent.js facts.js`, `tests/spi_ai*.js`, `docs/spi/AI_REASONING.md`, old `netlify/functions` | **Codex AI** | reasoning agent, providers, tools, assistant |
-| `spi/engine`, `api/engine`, `tests/spi_engine*.js`, `finance/spi`, `deck/spi`, `docs/spi/FORECASTING.md`, `docs/spi/BUSINESS_CASE.md`, `src/modules/fin.js` | **Codex Fin** | forecasting and optimisation engine, business case, deck |
+| `spi/ai`, `server/ai`, `src/modules/ai.js ai2.js sync.js intent.js facts.js`, `tests/spi_ai*.js`, `docs/spi/AI_REASONING.md`, old `netlify/functions` | **Codex AI** | reasoning agent, providers, tools, assistant |
+| `spi/engine`, `server/engine`, `tests/spi_engine*.js`, `finance/spi`, `deck/spi`, `docs/spi/FORECASTING.md`, `docs/spi/BUSINESS_CASE.md`, `src/modules/fin.js` | **Codex Fin** | forecasting and optimisation engine, business case, deck |
 
 ## Vercel and SQLite specifics (verify in the spikes, `TIMELINE.md`)
 - `vercel.json`: build command `python3 build.py spi` (produces `dist/index.html`), output directory `dist`, functions in `api/**` on Node 22, `includeFiles: "spi/db/*.sqlite"` for each function that opens it, `maxDuration` 60.
-- DB access: `better-sqlite3` opened with `{ readonly: true, fileMustExist: true }` from `api/_lib/db.js` (one shared helper). Fallback if the native module fails on Vercel: `sql.js` (WASM) loading the same file.
+- DB access: `better-sqlite3` opened with `{ readonly: true, fileMustExist: true }` from `server/_lib/db.js` (one shared helper). Fallback if the native module fails on Vercel: `sql.js` (WASM) loading the same file.
 - Fallback if Vercel cannot run `python3 build.py`: commit the built `public/index.html` for the final deploy only (Claude A decides).
 - Secrets: `AI_API_KEY` (Gemini) as a Vercel environment variable, never in the repo, never in chat. `AI_PROVIDER=mock` is the safe default.
 - Function budget: one model call 8 s, whole request 25 s, then fall back to the rules planner and say so.
@@ -50,4 +50,4 @@ api/engine/* , api/ai/*  (Vercel functions)  ->  src/modules/spi_*.js (pages, ch
 All responses are JSON, errors are `{error:"plain words"}` with a proper status. No endpoint accepts raw SQL.
 
 ## Vercel function format (decided, tested)
-Every function is an ES module `api/<area>/<name>.mjs` with `export default function handler(req, res)` (Node runtime, Node 22). Shared code: `api/_lib/db.mjs` (`openDb()` read-only, attaches `res`), `api/_lib/http.mjs` (`json`, `fail`). The engine and the AI modules in `spi/` are plain ES modules (`.mjs` or `.js` with explicit imports) imported by the functions. `vercel.json` sets `outputDirectory: dist`, `buildCommand: python3 build.py` and `includeFiles` for `spi/**/*.{sqlite,sql,json}` on every function. Streaming: write NDJSON lines with `res.write()` and `res.end()`.
+Every function is an ES module `server/<area>/<name>.mjs` with `export default function handler(req, res)` (Node runtime, Node 22). Shared code: `server/_lib/db.mjs` (`openDb()` read-only, attaches `res`), `server/_lib/http.mjs` (`json`, `fail`). The engine and the AI modules in `spi/` are plain ES modules (`.mjs` or `.js` with explicit imports) imported by the functions. `vercel.json` sets `outputDirectory: dist`, `buildCommand: python3 build.py` and `includeFiles` for `spi/**/*.{sqlite,sql,json}` on every function. Streaming: write NDJSON lines with `res.write()` and `res.end()`.

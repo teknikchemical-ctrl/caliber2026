@@ -16,7 +16,12 @@
     "playwright": "^1.45.0"
   },
   "dependencies": {
-    "@netlify/blobs": "^8.1.0",
+    "@netlify/blobs": "^8.1.0"
+  },
+  "optionalDependencies": {
     "better-sqlite3": "^13.0.3"
+  },
+  "engines": {
+    "node": ">=22.13"
   }
 }
