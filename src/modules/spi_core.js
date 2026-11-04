@@ -53,3 +53,6 @@ function spiRoute(p){const hb=typeof spiHubFor==="function"&&spiHubFor(p);if(hb)
   return `<div id="${id}" class="spi-page"><h1>${esc(pg.label)}</h1><p class="spi-sub">Loading</p></div>`}
 if(typeof document!=="undefined"){document.documentElement.dataset.spi="1";const prune=()=>{const reg=SPI.pages;document.querySelectorAll("aside .nav").forEach(n=>{if(!/^spi_h_/.test(n.dataset.page)||!reg[n.dataset.page])n.style.display="none"});document.querySelectorAll("aside .navsec").forEach(n=>n.style.display="none")};setTimeout(prune,300);setTimeout(prune,1500)}
 if(typeof document!=="undefined"&&window.SPI_MODE)document.documentElement.classList.add("spi");
+
+/* build stamp in the sidebar so a deployment can be told apart at a glance */
+if(typeof document!=="undefined"&&window.SPI_MODE)setTimeout(()=>{try{const a=document.querySelector("aside .brand");if(a&&window.SPI_STAMP&&!document.getElementById("spibuild")){const s=document.createElement("small");s.id="spibuild";s.style.cssText="display:block;margin-top:6px;opacity:.7";s.textContent="Build "+SPI_STAMP.sha+" | "+SPI_STAMP.time;a.appendChild(s)}}catch(e){}},600);
