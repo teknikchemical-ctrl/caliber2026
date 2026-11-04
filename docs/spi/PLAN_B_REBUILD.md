@@ -1,6 +1,6 @@
 # Plan for owner approval: rebuild Inventory, Maintenance, Forecasting and Simulation, Costs (Claude B)
 
-Status: PLAN ONLY, nothing built. Owner approves first.
+Status: approved by the owner with changes (Forecasting and Simulation = replenishment and cost-effect simulator plus cost-risk scenarios). Built: see docs/spi/WS_TOOLS.md.
 Rule for every view: no static infographic. Each view = an input panel (what the user wants to see or try) + outputs that recalculate from the inputs. Every figure says its basis: Data (from spi.sqlite), Estimate (calculated), Assumption (a default the user can change).
 
 ## 1. What the six files give (re-checked today in spi/db/spi.sqlite)

@@ -107,6 +107,22 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.keyboard.press("Escape"); await p.waitForTimeout(300);
   await p.evaluate(() => document.querySelector("#spset_locs2 .spi-lc").click()); await p.waitForTimeout(3500);
   ok("set tab: a functional location opens in the explorer", !!(await p.$(".ex-g3")));
+  /* rebuilt tabs: every tool calculates from inputs and registers its state for the AI */
+  for (const v of ["spi_mnotif", "spi_mplan", "spi_mkit", "spi_mrel", "spi_ssim", "spi_scr", "spi_ccalc", "spi_csave", "spi_cbuy"]) {
+    await p.evaluate(v => go(v), v); await p.waitForFunction(() => document.querySelector(".ws-out .ws-tile"), null, { timeout: 30000 }).catch(() => {});
+    ok("tool " + v + " shows results from its inputs", !!(await p.$(".ws-out .ws-tile")) && !!(await p.$(".ws-in")));
+  }
+  ok("AI can read the state of the tools", await p.evaluate(() => { const s = spiWsSnapshot(); return !!s.views.mnotif && !!s.views.ssim && !!s.views.scr && !!s.views.cbuy && !!s.assumptions.downtime_idr_h }));
+  await p.evaluate(() => go("spi_mnotif")); await p.waitForTimeout(2500);
+  const n0 = await p.evaluate(() => SPIWS.views.mnotif.outputs.total); await p.evaluate(() => mnTog("priority", "Emergency")); await p.waitForTimeout(2500);
+  ok("notification filter changes the result", await p.evaluate(n0 => SPIWS.views.mnotif.outputs.total < n0 && SPIWS.views.mnotif.outputs.total > 0, n0));
+  await p.evaluate(() => mnOpen(WSN.d.outputs.rows[0].notif_no)); await p.waitForTimeout(2500);
+  ok("a notification record opens with its timeline", !!(await p.$("#mn_det .ws-tl2")));
+  await p.evaluate(() => go("spi_scr")); await p.waitForTimeout(3000);
+  const t0 = await p.evaluate(() => SPIWS.views.scr.outputs.scenario.total); await p.evaluate(() => spiWsRun("scr", { mode: "scale", scale: { S: 0.5, A: 0.5, B: 0.5, C: 0.5 } })); await p.waitForTimeout(2500);
+  ok("AI can run a cost-risk scenario and the result changes", await p.evaluate(t0 => SPIWS.views.scr.inputs.mode === "scale" && SPIWS.views.scr.outputs.scenario.total !== t0, t0));
+  await p.evaluate(() => go("spi_ssim")); await p.waitForTimeout(4000);
+  ok("replenishment simulator compares three policies", await p.evaluate(() => { const P = SPIWS.views.ssim.outputs.policies; return P.current && P.calc && P.custom && P.calc.fill_rate >= 0 }));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
