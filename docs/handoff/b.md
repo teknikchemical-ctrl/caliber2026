@@ -9,6 +9,9 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 
 **Updated:** 2026-11-04   **Branch:** claude/funny-edison-pis09w   **Last commit:** see git log
 
+## Round 8 (2026-11-04)
+- Answer band on the four landing tabs (`spi_zone_aiview.js`): sentence, four figures against today, first actions, model check; data from A's /api/data/project and /api/data/golden, B's /api/ws/aimaint. No 'AI' wording in titles (owner). Costs recommended view on A's engine. Raw rows behind a toggle. Suppliers: critical parts grouped by slow supplier.
+
 ## Round 7 (2026-11-04, plan docs/spi/PLAN_B_ROUND7.md, owner approved)
 - History and source data tab first in four hubs (`spi_zone_src.js`, `/api/ws/source`): every date field on linked timelines, case views, breakdowns, completeness, quality flags, raw rows. Figures register `/api/ws/metrics` with drawer and glossary. PR PO counted once (view `pol`), unit price reading everywhere, cycles normalised. Optimized Scenario on A's engine with AI projection accuracy and impacts. Sign-in skipped. Findings: docs/spi/DATA_FINDINGS.md.
 - Open: A's golden orders limit 400; equipment sets for new classes (A's sets-review).
