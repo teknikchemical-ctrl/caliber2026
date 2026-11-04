@@ -6,7 +6,7 @@ import { openDb } from "../_lib/db.mjs";
 import { json, guard } from "../_lib/http.mjs";
 import { golden } from "./golden.mjs";
 export function events(db, q = {}) {
-  const lim = Math.min(5000, Number(q.limit) || 2000), from = q.from || "2025-05", to = q.to || "2027-09";
+  const lim = Math.min(5000, Number(q.limit) > 0 ? Math.floor(Number(q.limit)) : 2000), from = q.from || "2025-05", to = q.to || "2027-09";
   let locs = null, mats = null;
   if (q.set && !q.tag) { const t = String(q.set).toUpperCase().replace(/^PX_/, ""), st = db.prepare("select funcloc from equipment_set where tag=? or funcloc=?").get(t, "PX_" + t); q = { ...q, tag: (st ? st.funcloc : "PX_" + t).replace(/^PX_/, "") }; }
   if (q.mat) { mats = [Number(q.mat)]; locs = db.prepare("select funcloc from part_equipment where material_no=?").all(Number(q.mat)).map((r) => r.funcloc); }

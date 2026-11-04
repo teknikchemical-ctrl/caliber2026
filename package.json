@@ -10,7 +10,9 @@
     "test:layout:quick": "node tests/layout.js --quick --strict",
     "test:case": "python3 tools/pack_validate.py $CASE && BUILD_OUT=/tmp/akp-case-build python3 build.py $CASE && node tests/smoke_case.js /tmp/akp-case-build/index.html",
     "pack": "python3 tools/pack_build.py",
-    "shots": "node tools/case_shots.js"
+    "shots": "node tools/case_shots.js",
+    "test:ai": "node tests/spi_ai_reliability.js && node tests/spi_projection.js && node tests/spi_ai_reasoning.js && node tests/spi_ai_scope_eval.js && node tests/spi_ai_views.js && node tests/spi_ai_coverage.js",
+    "test:ai:browser": "node tests/spi_ai_offline.js && node tests/spi_ai_boxes.js"
   },
   "devDependencies": {
     "playwright": "^1.45.0"
