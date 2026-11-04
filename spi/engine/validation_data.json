@@ -1,0 +1,172 @@
+{
+  "status": "Estimate: policy experiment, not observed savings",
+  "data_cutoff": "2026-09-30",
+  "total": 7481,
+  "workbook_defaults": {
+    "lead_days": 60,
+    "safety_stock": 2,
+    "review_months": 1,
+    "monthly_mean": 0,
+    "lead_demand": 0,
+    "min_qty": 2,
+    "max_qty": 2
+  },
+  "in_sample": {
+    "label": "In-sample Estimate: parameters fitted on all 17 months",
+    "train_months": [
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09"
+    ],
+    "test_months": [
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09"
+    ],
+    "policies": {
+      "current": {
+        "avg_stock_value_idr": 614316204389.4705,
+        "unpriced_parts": 6252,
+        "orders": 4026,
+        "ordered_qty": 668349,
+        "stockout_part_months": 1962,
+        "shortage_qty": 1113941,
+        "total_demand": 1797135,
+        "filled_qty": 683194,
+        "fill_rate": 0.3801573059341674,
+        "service_level": 0.984572682167373,
+        "part_months": 127177
+      },
+      "workbook": {
+        "avg_stock_value_idr": 743288077770.8235,
+        "unpriced_parts": 6252,
+        "orders": 9951,
+        "ordered_qty": 1538067,
+        "stockout_part_months": 681,
+        "shortage_qty": 459092,
+        "total_demand": 1797135,
+        "filled_qty": 1338043,
+        "fill_rate": 0.7445422853597532,
+        "service_level": 0.9946452581834766,
+        "part_months": 127177
+      },
+      "dynamic": {
+        "avg_stock_value_idr": 756720181972.9403,
+        "unpriced_parts": 6252,
+        "orders": 8803,
+        "ordered_qty": 2484040,
+        "stockout_part_months": 208,
+        "shortage_qty": 78227,
+        "total_demand": 1797135,
+        "filled_qty": 1718908,
+        "fill_rate": 0.9564712723306819,
+        "service_level": 0.9983644841441456,
+        "part_months": 127177
+      }
+    }
+  },
+  "holdout": {
+    "label": "Out-of-sample demand holdout: first 13 months fit, last 4 months test",
+    "train_months": [
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05"
+    ],
+    "test_months": [
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09"
+    ],
+    "policies": {
+      "current": {
+        "avg_stock_value_idr": 616729532035.5,
+        "unpriced_parts": 6252,
+        "orders": 2186,
+        "ordered_qty": 141719,
+        "stockout_part_months": 374,
+        "shortage_qty": 154613,
+        "total_demand": 273715,
+        "filled_qty": 119102,
+        "fill_rate": 0.43513143232924756,
+        "service_level": 0.9875016708996124,
+        "part_months": 29924
+      },
+      "workbook": {
+        "avg_stock_value_idr": 682302259521.75,
+        "unpriced_parts": 6252,
+        "orders": 7677,
+        "ordered_qty": 541245,
+        "stockout_part_months": 250,
+        "shortage_qty": 91478,
+        "total_demand": 273715,
+        "filled_qty": 182237,
+        "fill_rate": 0.6657910600442065,
+        "service_level": 0.9916455019382435,
+        "part_months": 29924
+      },
+      "dynamic": {
+        "avg_stock_value_idr": 699833682481.75,
+        "unpriced_parts": 6252,
+        "orders": 7090,
+        "ordered_qty": 1477631,
+        "stockout_part_months": 243,
+        "shortage_qty": 85065,
+        "total_demand": 273715,
+        "filled_qty": 188650,
+        "fill_rate": 0.6892205396123705,
+        "service_level": 0.9918794278839728,
+        "part_months": 29924
+      }
+    }
+  },
+  "assumptions": [
+    "Identical September 2026 stock snapshot starts each policy and each experiment. Historical starting balances, open orders and receipts are Not in baseline data. Holdout is out-of-sample for demand fitting only; it is not a historical inventory reconstruction or proof of realised savings.",
+    "Current Min and Max are fixed snapshot master data, not proven historical settings. No stock is disposed in any replay; S and A parts are never auto-released and insurance stays.",
+    "All policies use common lead 60 days by default (Assumption), monthly receipts then demand then reorder at month end, lost sales, and lead rounded up to monthly periods. Position is on-hand only; synthetic pipeline is tracked but excluded from ordering, so duplicate orders in transit are possible.",
+    "Workbook: ROUNDUP(mean demand * lead days / 30.4375 + safety stock 2); Max = MAX(ROP, ROUNDUP(ROP + review months 1 * mean demand)); order when on-hand <= ROP. Editable values are Assumptions.",
+    "Dynamic holdout excludes future demand, future family demand, PO samples, campaign uplifts and maintenance signals with no as-of availability. No parameters tuned on test months.",
+    "Fill rate is units filled / units demanded. Service level is 1 minus stockout part-months / all part-months, including zero-demand months. Mixed material units make aggregate fill rate a descriptive indicator; inspect per-part results.",
+    "Stock held is mean month-end on-hand valued at snapshot positive IDR unit prices, not a recoverable cash amount. Unpriced parts remain in service metrics. No emergency price premium, downtime or PO-spend saving is claimed. Criticality S > A > B > C is assumed."
+  ],
+  "generated_at": "2026-11-04T04:55:54.532Z",
+  "engine_version": "spi-engine-1.1"
+}

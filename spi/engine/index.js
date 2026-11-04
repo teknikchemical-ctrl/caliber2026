@@ -6,4 +6,4 @@ export {backtest,replay,replayCompare} from './backtest.js';
 export {workbookPolicy,policyReplay,comparePart,comparePolicies} from './compare.js';
 export {purchasePlanRows,cashPlan} from './cashplan.js';
 export {economicSource,economics} from './economics.js';
-export {financeToolDefinitions,runFinanceTool,createFinanceTools,cleanupThresholds,availabilityFunding} from './financeTools.js';
+export {financeToolDefinitions,runFinanceTool,createFinanceTools,cleanupThresholds,availabilityFunding,cleanupCandidates} from './financeTools.js';
