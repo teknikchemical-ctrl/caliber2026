@@ -29,7 +29,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.waitForTimeout(1800);
   ok("the pop-up shows the selected part: 3D model, sheet and data", !!(await p.$("#spi_pm #spi_ipane .g3box")) && !!(await p.$("#spi_pm .spi-psvg")) && !!(await p.$("#spi_pm .spi-inkpis")));
   const n2 = await p.evaluate(() => document.querySelectorAll("#spi_inlist .spi-inr").length); if (n2 > 1) { await p.evaluate(() => document.querySelectorAll("#spi_inlist .spi-inr")[1].click()); await p.waitForTimeout(1800); ok("choosing another part in the list updates the pop-up", await p.evaluate(() => SPIINS.sel === 1)); }
-  const fc = await p.$("#spi_pm button[onclick*=spi_forecast]");
+  const fc = await p.$("#spi_pm button[onclick*=spiPartForecast]");
   if (fc) { await fc.click(); await p.waitForTimeout(2500); ok("the part opens its forecast", await p.evaluate(() => st.page === "spi_forecast")); } else { await p.evaluate(() => document.getElementById("spi_pm").remove()); ok("the part panel offers the forecast", false, "no forecast button"); }
   /* C and D. sheet and zone table */
   await p.evaluate(() => spiGo("spi_eq", { funcloc: "PX_PP-148A" })); await p.waitForTimeout(3500);
@@ -61,16 +61,16 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => document.querySelector(".spi-fc .spi-fa button").click()); await p.waitForTimeout(3000);
   ok("find: the part opens with its 3D model and where it is used", !!(await p.$("#spi_pm .g3box")) && !!(await p.$("#spi_pm .spi-wu")));
   await p.evaluate(() => document.querySelector("#spi_pm .spi-wu").click()); await p.waitForTimeout(5500);
-  ok("find: Show in 3D lands on the equipment with the part marked", await p.evaluate(() => !!SPIEQ.sel && !!document.querySelector(".spi-hit")), "sel=" + (await p.evaluate(() => SPIEQ.sel)));
+  ok("find: where used opens the equipment in the explorer with the part selected, trail shown", await p.evaluate(() => EXP.eq && !!EXP.part && !!document.querySelector("#ex_part .g3box,#ex_part svg") && document.querySelectorAll("#ex_trail .ex-cr").length >= 4), "eq=" + (await p.evaluate(() => EXP.eq)));
   await p.evaluate(() => go("spi_find")); await p.waitForTimeout(1500); await p.evaluate(() => { spiFndMode("eq"); }); await p.waitForTimeout(2500);
   await p.evaluate(() => { document.getElementById("spi_fq").value = "PRV"; spiFndRun(true); }); await p.waitForTimeout(2500);
-  await p.evaluate(() => [...document.querySelectorAll(".spi-fc .spi-fa button")].find(b => /Open in 3D/.test(b.textContent)).click()); await p.waitForTimeout(3500);
-  ok("find: an equipment result opens in 3D", !!(await p.$(".spi-eq3")));
+  await p.evaluate(() => [...document.querySelectorAll(".spi-fc .spi-fa button")].find(b => /Open in the explorer|Open in 3D/.test(b.textContent)).click()); await p.waitForTimeout(4500);
+  ok("find: an equipment result opens in the explorer", !!(await p.$(".ex-g3")));
   /* I. spatial library: opens in 3D, search flies to the matching set */
   await p.evaluate(() => go("spi_space")); await p.waitForTimeout(3000);
   ok("library: the 3D space with every set is shown", !!(await p.$("#p3 canvas")) && (await p.$$(".sp-ni")).length === (await p.evaluate(() => p3Units().length)) && (await p.evaluate(() => new Set(p3Units().map(u => u.tpl ? u.cls : spiSpCls(u.n))).size === p3Units().length)));
   await p.fill("#sp_q", "PP-411"); await p.waitForTimeout(2500);
-  ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === P3.rep[K.sets.find(s => s.tag === "PP-411A").n] && SPSP.act[P3.sel] === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#p3card button")));
+  ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === P3.rep[K.sets.find(s => s.tag === "PP-411A").n] && SPSP.act[P3.sel] === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#ex_side button")));
   await p.fill("#sp_q", "bearing"); await p.waitForTimeout(2500);
   ok("library: a part search lists the sets that hold it", !!(await p.$("#sp_res .sp-r")) && await p.evaluate(() => !!P3.sel));
   const tags = await p.evaluate(() => K.sets.map(s => s.tag)); let found = 0;
@@ -84,9 +84,19 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   /* every unit opens its card with the locations of its class; a location opens in Equipment 3D */
   await p.evaluate(() => spiSpClear()); await p.waitForTimeout(1500);
   await p.click('.sp-ni[data-n="' + (await p.evaluate(() => K.sets.find(s => s.tag === "PP-148A").n)) + '"]'); await p.waitForTimeout(3500);
-  ok("library: the unit card lists the locations of its class and each opens in 3D", await p.evaluate(() => document.querySelectorAll("#p3card .sp-lr").length >= 10));
-  await p.evaluate(() => document.querySelector("#p3card .sp-lr").click()); await p.waitForTimeout(3500);
-  ok("library: a location of the class opens in Equipment 3D", !!(await p.$(".spi-eq3")));
+  ok("library: the unit card lists the locations of its class and each opens in 3D", await p.evaluate(() => document.querySelectorAll("#ex_side .sp-lr").length >= 10));
+  await p.evaluate(() => document.querySelector("#ex_side .sp-lr").click()); await p.waitForTimeout(4500);
+  ok("library: a location of the class opens in place, no page change", !!(await p.$(".ex-g3")) && (await p.evaluate(() => st.page === "spi_space")));
+  await p.evaluate(() => { const z = spiPrep(EXP.key).zones.find(q => q.lines.length); exZonePick(z.key) }); await p.waitForTimeout(800);
+  ok("explorer: a zone lists its parts", (await p.$$("#ex_side .ex-pr")).length >= 1);
+  await p.evaluate(() => document.querySelector("#ex_side .ex-pr").click()); await p.waitForTimeout(3000);
+  ok("explorer: a part opens in the panel with 3D, trail has 5 steps", !!(await p.$("#ex_part .g3box")) && (await p.$$("#ex_trail .ex-cr")).length === 5);
+  await p.evaluate(() => document.querySelector("#ex_trail .ex-cr").click()); await p.waitForTimeout(800);
+  ok("explorer: the first crumb goes back to the whole plant", await p.evaluate(() => !EXP.eq && !EXP.part && !P3.sel && !document.getElementById("ex_world").hidden));
+  await p.evaluate(() => go("spi_inv")); await p.waitForSelector(".inv-r", { timeout: 20000 }).catch(() => {}); await p.waitForTimeout(500);
+  ok("inventory: categories and a part list are shown", (await p.$$(".inv-c")).length >= 6 && (await p.$$(".inv-r")).length >= 5);
+  await p.evaluate(() => document.querySelector(".inv-r").click()); await p.waitForTimeout(3500);
+  ok("inventory: a part opens beside the list with 3D", !!(await p.$("#inv_part .g3box")));
   /* equipment set tab: every location and every material is listed and clickable */
   await p.evaluate(() => go("equipment", { set: 2, tab: "overview" })); await p.waitForTimeout(4500);
   const nm = await p.evaluate(() => SPSET[2] && SPSET[2].parts.length); await p.evaluate(() => { SPSET[2].lim = 99999; spiSetRows(2); });
@@ -96,7 +106,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("set tab: a material opens the part pop-up", !!(await p.$("#spi_pm .g3box")));
   await p.keyboard.press("Escape"); await p.waitForTimeout(300);
   await p.evaluate(() => document.querySelector("#spset_locs2 .spi-lc").click()); await p.waitForTimeout(3500);
-  ok("set tab: a functional location opens in Equipment 3D", !!(await p.$(".spi-eq3")));
+  ok("set tab: a functional location opens in the explorer", !!(await p.$(".ex-g3")));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();

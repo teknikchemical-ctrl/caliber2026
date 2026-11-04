@@ -14,7 +14,7 @@ const SPSET={};
   const c=document.getElementById("spset_cnt"+n);if(c)c.textContent=spiNum(rows.length)+" of "+spiNum(S0.parts.length)+" materials"};
  window.spiSetLocs=function(n){const S0=SPSET[n];if(!S0||!S0.locs)return;const cf=S0.lc||"all",q=(S0.lq||"").toLowerCase();
   const rows=S0.locs.filter(r=>(cf==="all"||r.eq_class===cf)&&(!q||((r.tag||"")+" "+(r.descr||"")).toLowerCase().indexOf(q)>=0)),el=document.getElementById("spset_locs"+n);if(!el)return;
-  el.innerHTML=rows.length?rows.map(r=>`<button class="spi-lc" data-f="${dz(r.funcloc)}" onclick="spiGo('spi_eq',{funcloc:this.dataset.f})"><b>${esc(r.tag||r.funcloc)}</b><span>${esc(spiName(r.descr||""))}</span>${r.eq_class?`<i>${esc(r.eq_class)}</i>`:""}${r.criticality?spiCritBadge(r.criticality):""}</button>`).join(""):spiEmpty("No location matches.")};
+  el.innerHTML=rows.length?rows.map(r=>`<button class="spi-lc" data-f="${dz(r.funcloc)}" onclick="spiGo('spi_space',{funcloc:this.dataset.f})"><b>${esc(r.tag||r.funcloc)}</b><span>${esc(spiName(r.descr||""))}</span>${r.eq_class?`<i>${esc(r.eq_class)}</i>`:""}${r.criticality?spiCritBadge(r.criticality):""}</button>`).join(""):spiEmpty("No location matches.")};
  window.spiEquipPanel=function(n){const s=S(n),id="speq"+n;
   setTimeout(async()=>{const h=document.getElementById(id);if(!h)return;
    try{const [d,l]=await Promise.all([spiApi("/api/data/equipment/"+encodeURIComponent(s.tag)),spiApi("/api/data/locations?limit=200&q="+encodeURIComponent(s.tag)).catch(()=>({rows:[],total:0}))]);
