@@ -30,3 +30,20 @@ Branch: codex/ai. Baseline merged: 25d993e. Current commit: see git log -1.
 5. Existing inbox entries are acknowledged here, including sample-CV2 golden changes and shared Forecast extension. Inbox is outside the human's file ownership list, so it was not edited. No unresolved implementation request from that inbox remains; live deployment/key steps require Claude A and the human.
 
 Remaining account usage is unavailable in this client. No main push and no pull request.
+
+## Ready to merge: brief 2, step A refresh
+- Merged main 98b1f5c and recomputed both complete AI/mock and Fin portfolio batches. All 7,481 materials completed, zero failures. Rebuilt results.sqlite.gz and checksum manifest; no old result rows were reused.
+- Manifest explicitly records sample-variance CV2, class counts (intermittent 336, lumpy 231), workbook reconciliation for 7,481 materials, and mutually exclusive B/C gross candidates IDR 14,733,770,130 (Estimate from /api/data/savings).
+- Golden evaluation: mock 43/43; fake Gemini REST 43/43; no failures. Workbook reconciliation passed using Python 3.13 with temporary dependencies. Real Gemini remains unverified.
+- Before this push: 263 AI core checks, 34 full API checks, all 14 SPI pages and legacy live suite passed. Snapshot integrity/horizon/quantile checks passed. The earlier page latency failure did not recur in this run.
+## Waiting on
+- Next: clean read-only data.js layer, shared by evidence and tools, then expanded tools and injection tests as specified in spi_codex_ai_2.md. No key requested. Remaining account usage is unavailable.
+
+## Ready to merge: brief 2, typed read-only data boundary
+- Added spi/ai/data.js and wired evidence.js and material-reading tools through it. Typed part_profile/location_profile objects, source IDs, dq_issue/profile flags, cut-off, units, explicit assumptions and missing-value display. Material stock is never summed across locations; location values are non-additive. Last usable IDR PO item amount stays an estimated unit price; missing prices stay null.
+- Completed planning proxy intervals exclude negative/zero and >365-day values, report n and pool_n, and retain the procurement-proxy label. On-hand-only inventory, assumed criticality order, zero-demand caution and insurance protection are explicit. Non Stock holdings and Max 0 are flagged and excluded from release-candidate arithmetic; no object authorises disposal.
+- Bounded lists, strict unknown-filter rejection, cache cap and copy isolation. No free SQL; evidence/tools no longer execute material SQL directly. Rules planner consumes typed quality arrays.
+- Tests reconcile all 7,481 material stocks, prices and classifications, all 43 golden values and the workbook. Both drivers pass, including an interface exposing only prepare/get/all/run and exec. Core and real-engine fixture integration and Ask guards pass. Required pre-push suites are being completed before publication.
+## Waiting on
+- Next: finish typed wrappers for all aggregate and engine endpoints, contextual assumptions in answers and database-text injection tests. Fin/A own engine release policy: data objects clearly protect Non Stock/Max 0 and never authorise disposal; keep that protection when engine recommendations are reviewed. No real Gemini key available; no key requested. Remaining account usage is unavailable.
+- Typed-boundary publication checks completed: AI core 263, full data API 34, all 14 SPI pages, legacy live suite, all-material typed/workbook tests and golden 43/43 mock plus fake Gemini REST all pass.
