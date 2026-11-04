@@ -23,7 +23,7 @@ export async function runView(db, name, args = {}) {
   const q = { ...args }; delete q.name;
   const p = VIEWS[name](db, q), id = "view:" + name + (args.material_no ? ":" + args.material_no : "");
   const limits = (p.notes || []).slice(0, 3).join(" ");
-  return { id, answer: (p.insight || p.title) + (limits ? " Limits: " + limits : ""), data: p, facts: (p.figures || []).map(f => ({ id: id + ":" + f.id, origin: "view:" + name, value: { ...f, basis: f.basis } })), evidence_ids: p.source_ids || [], assumptions: p.assumptions || [] };
+  return { id, answer: String(p.insight || p.title).split(/(?<=[.!?])\s+(?=[A-Z0-9])/).slice(0, 3).join(" "), limits, data: p, facts: (p.figures || []).map(f => ({ id: id + ":" + f.id, origin: "view:" + name, value: { ...f, basis: f.basis } })), evidence_ids: p.source_ids || [], assumptions: p.assumptions || [] };
 }
 
 // Page tab id -> view payload, so "Explain this view" on any tab is answered from the figures that tab draws.

@@ -18,8 +18,16 @@ const cases=[
  ['notification 101000000101','lookup_record',/Leak from packing/],
  ['PO 4300005214','lookup_record',/6 lines[\s\S]*CAHAYA/],
  ['supplier CAHAYA INDUSTRI','lookup_record',/525 PO lines/],
+ ['Explain this view: Purchase plan. What matters and what should we do?','get_page',/1,079 parts to order[\s\S]*IDR 44\.22 bn/,/\d{9,}/,{page:'spi_cbuy'}],
+ ['Explain this view: Notification explorer','get_page',/1,305 are still in progress/,null,{page:'spi_mnotif'}],
+ ['Explain this view: Summary','get_page',/7,481 materials[\s\S]*53 S or A parts/,null,{page:'spi_dash'}],
+ ['What does the savings planner show?','get_page',/plan releases/],
+ ['How good is the forecast?','get_page',/fills \*\*94%\*\*/],
+ ['What is in the reliability explorer?','get_page',/286 failure events/],
+ ['Explain this view: Cost-risk scenarios','get_page',/average stock value falls/,null,{page:'spi_scr'}],
+ ['Explain this view: Registers','get_page',/2,502 insurance spares/,null,{page:'spi_reg'}],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
-for(const [q,tool,ok,no] of cases){const r=await ask({db,question:q});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
- if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100)fails.push('too long '+r.answer.length);
+for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
+ if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100||(r.answer.match(/[.!?](\s|$)/g)||[]).length>7&&tool==='get_page')fails.push('too long '+r.answer.length);
  console.log((fails.length?'FAIL ':'ok   ')+q+(fails.length?' -> '+fails.join('; '):''));if(fails.length){bad++;console.log(r.answer)}}
 console.log(bad?bad+' failed':'all passed');process.exit(bad?1:0);
