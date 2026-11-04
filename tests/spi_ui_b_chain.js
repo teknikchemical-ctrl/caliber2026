@@ -32,8 +32,8 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   if (fc) { await fc.click(); await p.waitForTimeout(2500); ok("the part opens its forecast", await p.evaluate(() => st.page === "spi_forecast")); } else { await p.evaluate(() => document.getElementById("spi_pm").remove()); ok("the part panel offers the forecast", false, "no forecast button"); }
   /* C and D. sheet and zone table */
   await p.evaluate(() => spiGo("spi_eq", { funcloc: "PX_PP-148A" })); await p.waitForTimeout(3500);
-  await p.evaluate(() => document.querySelector("#spi_eqsvg [data-k].gp").dispatchEvent(new MouseEvent("click", { bubbles: true }))); await p.waitForTimeout(500);
-  ok("a click on the sheet lists the parts", /on this zone|Nozzle/.test(await text("#spi_eqp")));
+  await p.evaluate(zk => document.querySelector('#spi_eqsvg [data-k="' + zk + '"]').dispatchEvent(new MouseEvent("click", { bubbles: true })), zone); await p.waitForTimeout(500);
+  { const tx = await text("#spi_eqp"); ok("a click on the sheet lists the parts", /on this zone|Nozzle/.test(tx), tx.slice(0, 150) + " sel=" + (await p.evaluate(() => SPIEQ.sel))); }
   await p.evaluate(() => [...document.querySelectorAll(".spi-zt tr.click")].pop().click()); await p.waitForTimeout(500);
   ok("a zone table row lists the parts", /on this zone/.test(await text("#spi_eqp")));
   /* E. assembly: motor in 3D, child page, back to the parent (fresh page: no zone focus from the steps above) */
@@ -53,6 +53,18 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   /* G. part library */
   await p.evaluate(() => go("spi_parts")); await p.waitForTimeout(1500); await p.evaluate(() => spiPartType(0)); await p.waitForTimeout(2500);
   await p.evaluate(() => document.querySelector("#spi_ptype button[data-d][data-m]").click()); await p.waitForTimeout(2200); ok("part library: type to part to 3D", !!(await p.$("#spi_pm .g3box")));
+  /* H. find a part visually: search, 3D, where used, show in 3D on the equipment */
+  await p.evaluate(() => go("spi_find")); await p.waitForTimeout(2500);
+  await p.evaluate(() => { document.getElementById("spi_fq").value = "bearing 6316"; spiFndRun(true); }); await p.waitForTimeout(2500);
+  ok("find: parts are listed with a 3D thumbnail", !!(await p.$(".spi-fc .spi-fth svg")));
+  await p.evaluate(() => document.querySelector(".spi-fc .spi-fa button").click()); await p.waitForTimeout(3000);
+  ok("find: the part opens with its 3D model and where it is used", !!(await p.$("#spi_pm .g3box")) && !!(await p.$("#spi_pm .spi-wu")));
+  await p.evaluate(() => document.querySelector("#spi_pm .spi-wu").click()); await p.waitForTimeout(5500);
+  ok("find: Show in 3D lands on the equipment with the part marked", await p.evaluate(() => !!SPIEQ.sel && !!document.querySelector(".spi-hit")), "sel=" + (await p.evaluate(() => SPIEQ.sel)));
+  await p.evaluate(() => go("spi_find")); await p.waitForTimeout(1500); await p.evaluate(() => { spiFndMode("eq"); }); await p.waitForTimeout(2500);
+  await p.evaluate(() => { document.getElementById("spi_fq").value = "PRV"; spiFndRun(true); }); await p.waitForTimeout(2500);
+  await p.evaluate(() => [...document.querySelectorAll(".spi-fc .spi-fa button")].find(b => /Open in 3D/.test(b.textContent)).click()); await p.waitForTimeout(3500);
+  ok("find: an equipment result opens in 3D", !!(await p.$(".spi-eq3")));
   ok("no script errors", errs.length === 0, errs.slice(0, 3).join(" | "));
   await b.close(); srv.kill(); const bad = res.filter(r => !r[1]).length; console.log(bad ? bad + " step(s) failed" : "all click chains passed"); process.exit(bad ? 1 : 0);
 })();
