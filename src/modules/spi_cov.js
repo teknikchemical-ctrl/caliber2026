@@ -12,7 +12,7 @@ const SPCOV=[
  ["Output: Overstock Risk","Largest stock above Max with the value above Max.","spi_f_dec","decision_board"],
  ["Output: Reorder Recommendation","Parts to reorder with quantity and arrival month.","spi_f_dec","registers"],
  ["Output: Slow-Moving Alert","Non-moving and slow-moving stock, insurance spares excluded.","spi_f_dec","decision_board"],
- ["Output: Dynamic Inventory Parameters","Current, workbook and dynamic Min, Max, ROP, safety stock per part and portfolio.","spi_f_par","parameters_shift"],
+ ["Output: Dynamic Inventory Parameters","Current, workbook and dynamic Min, Max, reorder point and safety stock per part and portfolio.","spi_f_par","parameters_shift"],
  ["Output: Cost-Risk Optimization Scenarios","Budget frontier and the scenario simulator (stock, demand, lead time, service level).","spi_sim",null],
  ["Business impact","Success metrics, benefits in IDR with assumptions, sensitivity, cash plan.","spi_c_score","business_scorecard"],
  ["Maintenance and shutdown readiness","Turnaround parts gap, open work against zero-stock parts.","spi_m_ta","turnaround_readiness"],
