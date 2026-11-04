@@ -13,7 +13,7 @@ export function schemaErrors(value,schema,path='$',errors=[]){
  if(value&&typeof value==='object'&&!Array.isArray(value)){for(const k of schema.required||[])if(!Object.hasOwn(value,k))errors.push(path+'.'+k+': required');for(const [k,v]of Object.entries(value)){if(schema.additionalProperties===false&&!Object.hasOwn(schema.properties||{},k))errors.push(path+'.'+k+': unknown field');if(schema.properties?.[k])schemaErrors(v,schema.properties[k],path+'.'+k,errors)}}
  return errors;
 }
-const numbers=text=>String(text).match(/-?\d+(?:\.\d+)?/g)||[];
+const numbers=text=>(String(text).match(/-?\d+(?:,\d{3})*(?:\.\d+)?/g)||[]).map(n=>n.replaceAll(',',''));
 export function unsupportedNumbers(text,pack){const allowed=new Set();const walk=v=>{if(typeof v==='number')allowed.add(Number(v));else if(typeof v==='string')numbers(v).forEach(n=>allowed.add(Number(n)));else if(v&&typeof v==='object')Object.values(v).forEach(walk)};pack.facts.forEach(f=>walk(f.value));return numbers(text).filter(n=>!allowed.has(Number(n)))}
 export function validatePlan(plan,pack,{ai=false}={}){
  const errors=schemaErrors(plan,planSchema);if(errors.length)return {ok:false,errors};

@@ -1,0 +1,1254 @@
+{
+  "generated_at": "2026-11-04T04:32:39.218Z",
+  "engine_version": "spi-engine-1.1",
+  "data_cutoff": "2026-09-30",
+  "history_months": 17,
+  "baseline": {
+    "parts": 7481,
+    "priced": 1229,
+    "stock_value_idr": 616617267812,
+    "static_excess_idr": 546420437310,
+    "consumed_parts": 1930,
+    "single_event_parts": 1220
+  },
+  "opportunity": {
+    "low_risk_candidates_idr": 14733770130,
+    "low_risk_parts": 72,
+    "critical_review_candidates_idr": 117879258941,
+    "critical_review_parts": 207,
+    "insurance_stock_kept_idr": 398717822756,
+    "excluded_double_count_idr": 1258628365,
+    "candidates": [
+      {
+        "material_no": 4300060535,
+        "descr": "POSITIONER,VALVE,DWG.978-8170,FOR LCV-10",
+        "crit_max": "C",
+        "qty": 128,
+        "value_idr": 4266046208,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300041641,
+        "descr": "POSITIONER,VALVE,DWG.595-9766,FOR FCV-97",
+        "crit_max": "C",
+        "qty": 48,
+        "value_idr": 2525652000,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300035187,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.274-8443,FOR ",
+        "crit_max": "C",
+        "qty": 29,
+        "value_idr": 1397254684,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300071911,
+        "descr": "THERMOWELL,DWG.860-7559,FOR TEL-1476-15",
+        "crit_max": "B",
+        "qty": 69,
+        "value_idr": 805599288,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100043903,
+        "descr": "TRIM SET,CONTROL VALVE,TYPE LZ113,MONEL",
+        "crit_max": "C",
+        "qty": 12,
+        "value_idr": 545980872,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100037989,
+        "descr": "VALVE,GLOBE,1-1/2IN,150#,A216WCB,RF",
+        "crit_max": "C",
+        "qty": 121,
+        "value_idr": 533655254,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100055093,
+        "descr": "SWITCH,LIMIT,TYPE QS260,GRAPHITE",
+        "crit_max": "B",
+        "qty": 90,
+        "value_idr": 515836350,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100056408,
+        "descr": "TRANSMITTER,PRESS,TYPE FO290,SS304",
+        "crit_max": "B",
+        "qty": 9,
+        "value_idr": 467145621,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100031340,
+        "descr": "TEE,3IN,SCH80,A105,SW",
+        "crit_max": "B",
+        "qty": 311,
+        "value_idr": 411933806,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300063674,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.377-3855,FOR ",
+        "crit_max": "B",
+        "qty": 5,
+        "value_idr": 388387745,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300073931,
+        "descr": "POSITIONER,VALVE,DWG.833-5663,FOR TCV-14",
+        "crit_max": "B",
+        "qty": 7,
+        "value_idr": 314927067,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100056542,
+        "descr": "TRANSMITTER,PRESS,MODEL MC417,NBR",
+        "crit_max": "B",
+        "qty": 6,
+        "value_idr": 253259724,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100002246,
+        "descr": "BEARING,ROLLER,CYL,1ROW,7217BDB",
+        "crit_max": "C",
+        "qty": 53,
+        "value_idr": 250504182,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300039438,
+        "descr": "SEAT RING,VALVE,DWG.810-9979,FOR FCV-150",
+        "crit_max": "C",
+        "qty": 5,
+        "value_idr": 236305825,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100054282,
+        "descr": "SWITCH,LIMIT,MODEL GE636,MONEL",
+        "crit_max": "C",
+        "qty": 100,
+        "value_idr": 220183400,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300021089,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.946-5861,FOR ",
+        "crit_max": "C",
+        "qty": 5,
+        "value_idr": 215098215,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300049297,
+        "descr": "RING,WEAR,DWG.969-4928,FOR PP-1758A",
+        "crit_max": "C",
+        "qty": 12,
+        "value_idr": 166579692,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300063051,
+        "descr": "POSITIONER,VALVE,DWG.578-3598,FOR TCV-13",
+        "crit_max": "C",
+        "qty": 4,
+        "value_idr": 146207108,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300063598,
+        "descr": "IMPELLER,DWG.742-3894,FOR PP-474A",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 132296393,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300057046,
+        "descr": "POSITIONER,VALVE,DWG.789-7783,FOR TCV-12",
+        "crit_max": "C",
+        "qty": 2,
+        "value_idr": 115493746,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100043468,
+        "descr": "TRIM SET,CONTROL VALVE,SIZE QH233,GRAPHI",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 106034270,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100032929,
+        "descr": "FLANGE,WN,6IN,300#,SS316,RF",
+        "crit_max": "B",
+        "qty": 30,
+        "value_idr": 84338820,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100057598,
+        "descr": "TRANSMITTER,DIFF.PRESS,0~10000MMH2O,HART",
+        "crit_max": "C",
+        "qty": 1,
+        "value_idr": 66328612,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100060681,
+        "descr": "TRANSMITTER,TEMP,TYPE SN564,INCOLOY",
+        "crit_max": "B",
+        "qty": 3,
+        "value_idr": 63491223,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300010076,
+        "descr": "TRIM SET,CONTROL VALVE,DWG.251-1444,FOR ",
+        "crit_max": "C",
+        "qty": 2,
+        "value_idr": 58840730,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100005648,
+        "descr": "SEAL,MECHANICAL,SIZE UU499,NBR",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 57460414,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200007259,
+        "descr": "FAN,COOLING MOTOR,SIZE DE861,NBR",
+        "crit_max": "B",
+        "qty": 59,
+        "value_idr": 52383681,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300067693,
+        "descr": "POSITIONER,VALVE,DWG.379-1328,FOR LCV-16",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 41803508,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300074394,
+        "descr": "SEAT RING,VALVE,DWG.469-8754,FOR LCV-146",
+        "crit_max": "C",
+        "qty": 5,
+        "value_idr": 38047715,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100048477,
+        "descr": "DIAPHRAGM,ACTUATOR,TYPE ZR602,A182F11",
+        "crit_max": "C",
+        "qty": 3,
+        "value_idr": 35523660,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100031262,
+        "descr": "TEE,10IN,3000#,A234WPB,SW",
+        "crit_max": "C",
+        "qty": 51,
+        "value_idr": 28880841,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100034824,
+        "descr": "VALVE,GATE,10IN,300#,A105,RF",
+        "crit_max": "C",
+        "qty": 3,
+        "value_idr": 28032792,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300054961,
+        "descr": "THERMOWELL,DWG.885-6188,FOR BF-105-BRN15",
+        "crit_max": "C",
+        "qty": 5,
+        "value_idr": 25691530,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4300073868,
+        "descr": "COUPLING,DWG.939-2872,FOR PP-467A",
+        "crit_max": "B",
+        "qty": 3,
+        "value_idr": 17732568,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100101926,
+        "descr": "ANTIRUST,SPRAY TYPE,400ML/CAN,TYPE-B",
+        "crit_max": "C",
+        "qty": 197,
+        "value_idr": 16596265,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4200010291,
+        "descr": "FAN,COOLING MOTOR,DWG.121-7042,FOR PP-14",
+        "crit_max": "C",
+        "qty": 6,
+        "value_idr": 16523298,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100052805,
+        "descr": "SOLENOID VALVE,SIZE FG705,GRAPHITE",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 12564642,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300060332,
+        "descr": "SEAT RING,VALVE,DWG.704-8652,FOR TCV-514",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 10550540,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100034063,
+        "descr": "FLANGE,BLIND,4IN,150#,SS316,RF",
+        "crit_max": "B",
+        "qty": 3,
+        "value_idr": 6076875,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100101639,
+        "descr": "ANTIRUST,SPRAY TYPE,500ML/CAN,TYPE-A",
+        "crit_max": "C",
+        "qty": 114,
+        "value_idr": 5211852,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100091942,
+        "descr": "GREASE,COMPLEX,NLGI 2,0.4KG",
+        "crit_max": "C",
+        "qty": 46,
+        "value_idr": 4607912,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100028077,
+        "descr": "PIPE,1/2IN,SCH80,P11,SMLS,6M LG",
+        "crit_max": "B",
+        "qty": 7,
+        "value_idr": 4543826,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100034258,
+        "descr": "FLANGE,SO,1IN,600#,SS316,RF",
+        "crit_max": "B",
+        "qty": 29,
+        "value_idr": 4488881,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300039104,
+        "descr": "TRAY VALVE,DWG.167-6339,FOR CL-890",
+        "crit_max": "B",
+        "qty": 18,
+        "value_idr": 4374522,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200004765,
+        "descr": "LAMP,LED,36W,220VAC,FLOOD",
+        "crit_max": "B",
+        "qty": 5,
+        "value_idr": 4290095,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100065331,
+        "descr": "GAUGE,PRESSURE,0-10KG/CM2,6IN DIAL",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 4151704,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100031379,
+        "descr": "TEE,6IN,SCH80,A234WPB,BW",
+        "crit_max": "B",
+        "qty": 18,
+        "value_idr": 3832128,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4300036717,
+        "descr": "RING,WEAR,DWG.377-5729,FOR PP-1157",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 3294699,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100064593,
+        "descr": "GAUGE,PRESSURE,0-16KG/CM2,4IN DIAL",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 2436628,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100030223,
+        "descr": "ELBOW,90DEG,1-1/2IN,SCH40,A234WPB,BW",
+        "crit_max": "C",
+        "qty": 9,
+        "value_idr": 2408787,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100108057,
+        "descr": "OIL,LUBRICANT,ISO VG 220,MINERAL,209L",
+        "crit_max": "B",
+        "qty": 22,
+        "value_idr": 1782968,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100038706,
+        "descr": "VALVE,NEEDLE,1/4IN NPT,6000PSI,SS316",
+        "crit_max": "C",
+        "qty": 3,
+        "value_idr": 1760325,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100029835,
+        "descr": "ELBOW,90DEG,10IN,SCH80,A234WPB,SW",
+        "crit_max": "C",
+        "qty": 11,
+        "value_idr": 1619145,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100030406,
+        "descr": "ELBOW,45DEG,10IN,SCH40,A234WPB,BW",
+        "crit_max": "C",
+        "qty": 42,
+        "value_idr": 1311618,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200006508,
+        "descr": "FAN,COOLING MOTOR,TYPE MT764,NBR",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 1277346,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200006341,
+        "descr": "LAMP,LED,18W,24VDC,T8",
+        "crit_max": "B",
+        "qty": 3,
+        "value_idr": 1137234,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200001644,
+        "descr": "GLAND,CABLE,TYPE LM902,NBR",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 962834,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100001810,
+        "descr": "BEARING,ROLLER,CYL,1ROW,7212BDB",
+        "crit_max": "B",
+        "qty": 2,
+        "value_idr": 765774,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200003035,
+        "descr": "TERMINAL BLOCK,SIZE AK895,NBR",
+        "crit_max": "C",
+        "qty": 25,
+        "value_idr": 624675,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100102065,
+        "descr": "ANTIRUST,SPRAY TYPE,350ML/CAN,TYPE-A",
+        "crit_max": "C",
+        "qty": 15,
+        "value_idr": 624210,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4200000384,
+        "descr": "TERMINAL,LUG,FORK,2X4MM,CRIMP",
+        "crit_max": "B",
+        "qty": 93,
+        "value_idr": 571578,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100093668,
+        "descr": "TUBE PLUG,EXCHANGER,TYPE HB648,A182F11",
+        "crit_max": "B",
+        "qty": 1,
+        "value_idr": 566188,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200008235,
+        "descr": "CABLE,INSTRUMENT,4PR X 0.75MM2,ARMOURED",
+        "crit_max": "C",
+        "qty": 9,
+        "value_idr": 384885,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100026344,
+        "descr": "STUDBOLT,7/8INX95MM,B7/2H",
+        "crit_max": "B",
+        "qty": 10,
+        "value_idr": 269420,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100094430,
+        "descr": "TUBE PLUG,EXCHANGER,MODEL FM276,MONEL",
+        "crit_max": "C",
+        "qty": 1,
+        "value_idr": 223352,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100101692,
+        "descr": "ANTIRUST,SPRAY TYPE,500ML/CAN,TYPE-B",
+        "crit_max": "C",
+        "qty": 4,
+        "value_idr": 222004,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200004430,
+        "descr": "TERMINAL BLOCK,TYPE LO541,VITON",
+        "crit_max": "C",
+        "qty": 1,
+        "value_idr": 170521,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4200008403,
+        "descr": "CABLE,INSTRUMENT,1PR X 1.5MM2,ARMOURED",
+        "crit_max": "C",
+        "qty": 3,
+        "value_idr": 169920,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100020415,
+        "descr": "O-RING,NBR,198MM ID,3.5MM CS",
+        "crit_max": "B",
+        "qty": 9,
+        "value_idr": 153621,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4100019942,
+        "descr": "O-RING,VITON,258MM ID,3.5MM CS",
+        "crit_max": "C",
+        "qty": 4,
+        "value_idr": 146020,
+        "source": "excess above set Max"
+      },
+      {
+        "material_no": 4100103691,
+        "descr": "TAPE,PTFE,19MMX10M",
+        "crit_max": "C",
+        "qty": 4,
+        "value_idr": 105240,
+        "source": "non-moving review"
+      },
+      {
+        "material_no": 4200003604,
+        "descr": "TERMINAL BLOCK,MODEL SJ486,SS304",
+        "crit_max": "C",
+        "qty": 1,
+        "value_idr": 31054,
+        "source": "excess above set Max"
+      }
+    ],
+    "notes": [
+      "Estimate: priced materials only, stock counted once per material.",
+      "B/C excess and non-moving candidates are unioned by taking the larger eligible quantity for each material, never adding it twice.",
+      "S/A non-moving insurance and OEM Max-zero reserves are excluded before any release cohort is formed.",
+      "Critical active-stock excess is a separate engineering-review cohort, not approved release."
+    ]
+  },
+  "top10_static_excess_share": 0.7214956428987599,
+  "top10_static_excess": [
+    {
+      "material_no": 4300039461,
+      "excess_value_idr": 163276712768
+    },
+    {
+      "material_no": 4300003237,
+      "excess_value_idr": 91189110672
+    },
+    {
+      "material_no": 4100055430,
+      "excess_value_idr": 32387362280
+    },
+    {
+      "material_no": 4300042365,
+      "excess_value_idr": 19448083629
+    },
+    {
+      "material_no": 4100000182,
+      "excess_value_idr": 18649663388
+    },
+    {
+      "material_no": 4100084505,
+      "excess_value_idr": 17776352430
+    },
+    {
+      "material_no": 4300070474,
+      "excess_value_idr": 16853173052
+    },
+    {
+      "material_no": 4300060991,
+      "excess_value_idr": 12364260752
+    },
+    {
+      "material_no": 4300000850,
+      "excess_value_idr": 11898208568
+    },
+    {
+      "material_no": 4300032770,
+      "excess_value_idr": 10397037171
+    }
+  ],
+  "portfolio": {
+    "baseline": {
+      "parts": 7481,
+      "priced": 1229,
+      "stock_value_idr": 616617267812,
+      "carrying_cost_idr_yr": 135655798918.63997,
+      "expected_stockouts_yr": 3391.330561428297,
+      "exposure_idr": 4104598329462.9243,
+      "service_level": 0.9329564584447266,
+      "target_stock_value_idr": 294492103150,
+      "ordering_cost_idr_yr": 29744414812.543003,
+      "annual_exposure_idr": 19562145416065.6,
+      "parts_meeting_service": 6173,
+      "service_target_basis": "Criticality policy by part",
+      "total_expected_cost_idr_yr": 19727545629796.785,
+      "settings": {
+        "stock_multiplier": 1,
+        "demand_multiplier": 1,
+        "lead_time_multiplier": 1,
+        "service_level": 0.95
+      },
+      "notes": [
+        "Estimate: scaled empirical lead-time demand, not a new sampling of lead-time uncertainty.",
+        "Stockout cycles per year assumes independent lead-time cycles; not observed annual failures.",
+        "Exposure sums part-level scores; shared equipment and correlated losses can overlap. Do not claim this sum as plant downtime loss.",
+        "Changing the service target changes target stock; existing-stock risk changes only when stock or demand is changed.",
+        "Held insurance reserves are not reduced below one; zero stock is not silently replenished by the baseline scenario."
+      ]
+    },
+    "dynamic": {
+      "parts": 7481,
+      "priced": 1229,
+      "stock_value_idr": 731397578517.1439,
+      "carrying_cost_idr_yr": 160907467273.77158,
+      "expected_stockouts_yr": 74.28250723142028,
+      "exposure_idr": 31174271866.386795,
+      "service_level": 0.9986045377456222,
+      "target_stock_value_idr": 294492103150,
+      "ordering_cost_idr_yr": 29744414812.543003,
+      "annual_exposure_idr": 186556955048.46048,
+      "parts_meeting_service": 7472,
+      "service_target_basis": "Criticality policy by part",
+      "total_expected_cost_idr_yr": 377208837134.775,
+      "settings": {
+        "stock_multiplier": 1,
+        "demand_multiplier": 1,
+        "lead_time_multiplier": 1,
+        "service_level": 0.95
+      },
+      "notes": [
+        "Estimate: scaled empirical lead-time demand, not a new sampling of lead-time uncertainty.",
+        "Stockout cycles per year assumes independent lead-time cycles; not observed annual failures.",
+        "Exposure sums part-level scores; shared equipment and correlated losses can overlap. Do not claim this sum as plant downtime loss.",
+        "Changing the service target changes target stock; existing-stock risk changes only when stock or demand is changed.",
+        "Held insurance reserves are not reduced below one; zero stock is not silently replenished by the baseline scenario."
+      ]
+    },
+    "working_capital_release_idr": 139003133759.8561,
+    "replenishment_investment_idr": 253783444465,
+    "net_working_capital_release_idr": -114780310705.14392,
+    "risk_change_idr": -4073424057596.5376,
+    "unpriced_parts": 6252
+  },
+  "actions": {
+    "REORDER": 1229,
+    "REDUCE": 642,
+    "MAINTAIN": 63,
+    "MONITOR": 456,
+    "KEEP_INSURANCE": 4747,
+    "REVIEW_OBSOLETE": 344
+  },
+  "backtest_by_class": {
+    "smooth": {
+      "parts": 27,
+      "candidate_error": 0.5004227242790251,
+      "baseline_error": 0.5011318990389805,
+      "deployed_error": 0.5004227242790251,
+      "candidate_wins": 4,
+      "pinball_loss": 0.16636560583487703
+    },
+    "erratic": {
+      "parts": 116,
+      "candidate_error": 0.7456714912351758,
+      "baseline_error": 0.7599776884956871,
+      "deployed_error": 0.7456714912351758,
+      "candidate_wins": 11,
+      "pinball_loss": 0.23655094019952244
+    },
+    "lumpy": {
+      "parts": 155,
+      "candidate_error": 1.0441242476062396,
+      "baseline_error": 1.0481990818710516,
+      "deployed_error": 1.0441242476062396,
+      "candidate_wins": 22,
+      "pinball_loss": 0.2817122706605008
+    },
+    "intermittent": {
+      "parts": 157,
+      "candidate_error": 1.67127060148126,
+      "baseline_error": 1.6791416342077168,
+      "deployed_error": 1.67127060148126,
+      "candidate_wins": 13,
+      "pinball_loss": 0.4474472101657239
+    }
+  },
+  "replay": {
+    "static": {
+      "filled": 574734,
+      "demand": 1797135,
+      "shortage": 1222401,
+      "held": 237099.70588235313,
+      "months_stockout": 2189,
+      "quantity_fill_rate": 0.319805690724403
+    },
+    "dynamic": {
+      "filled": 1694637,
+      "demand": 1797135,
+      "shortage": 102498,
+      "held": 1319653.2941176458,
+      "months_stockout": 264,
+      "quantity_fill_rate": 0.9429658873707317
+    }
+  },
+  "replay_limitations": "Estimate, not achieved service: current stock snapshot is a common initial condition; constant lead time is estimated on complete history; dynamic parameters fitted on full history. Monthly lost-sales replay has no observed receipts; do not claim a causal or out-of-sample service improvement.",
+  "campaign": {
+    "cutoff": "2026-09-30",
+    "assumption": {
+      "campaign_index": 1.6,
+      "rule": "campaign month = distinct issue orders at least 1.6 times the median month; future load index = planned items divided by the median of months 4 to 12 of the horizon"
+    },
+    "history": [
+      {
+        "month": "2025-05",
+        "orders": 236,
+        "issues": 668,
+        "qty": 60907,
+        "index": 0.97,
+        "campaign": false
+      },
+      {
+        "month": "2025-06",
+        "orders": 199,
+        "issues": 596,
+        "qty": 81261,
+        "index": 0.82,
+        "campaign": false
+      },
+      {
+        "month": "2025-07",
+        "orders": 234,
+        "issues": 948,
+        "qty": 109404,
+        "index": 0.96,
+        "campaign": false
+      },
+      {
+        "month": "2025-08",
+        "orders": 322,
+        "issues": 1388,
+        "qty": 174829,
+        "index": 1.32,
+        "campaign": false
+      },
+      {
+        "month": "2025-09",
+        "orders": 304,
+        "issues": 1043,
+        "qty": 143784,
+        "index": 1.25,
+        "campaign": false
+      },
+      {
+        "month": "2025-10",
+        "orders": 276,
+        "issues": 891,
+        "qty": 81851,
+        "index": 1.13,
+        "campaign": false
+      },
+      {
+        "month": "2025-11",
+        "orders": 337,
+        "issues": 1860,
+        "qty": 173796,
+        "index": 1.38,
+        "campaign": false
+      },
+      {
+        "month": "2025-12",
+        "orders": 684,
+        "issues": 2580,
+        "qty": 226414,
+        "index": 2.8,
+        "campaign": true
+      },
+      {
+        "month": "2026-01",
+        "orders": 644,
+        "issues": 2184,
+        "qty": 259110,
+        "index": 2.64,
+        "campaign": true
+      },
+      {
+        "month": "2026-02",
+        "orders": 263,
+        "issues": 843,
+        "qty": 85252,
+        "index": 1.08,
+        "campaign": false
+      },
+      {
+        "month": "2026-03",
+        "orders": 140,
+        "issues": 440,
+        "qty": 31558,
+        "index": 0.57,
+        "campaign": false
+      },
+      {
+        "month": "2026-04",
+        "orders": 229,
+        "issues": 660,
+        "qty": 63623,
+        "index": 0.94,
+        "campaign": false
+      },
+      {
+        "month": "2026-05",
+        "orders": 168,
+        "issues": 535,
+        "qty": 31631,
+        "index": 0.69,
+        "campaign": false
+      },
+      {
+        "month": "2026-06",
+        "orders": 213,
+        "issues": 824,
+        "qty": 66533,
+        "index": 0.87,
+        "campaign": false
+      },
+      {
+        "month": "2026-07",
+        "orders": 244,
+        "issues": 753,
+        "qty": 79365,
+        "index": 1,
+        "campaign": false
+      },
+      {
+        "month": "2026-08",
+        "orders": 176,
+        "issues": 568,
+        "qty": 45960,
+        "index": 0.72,
+        "campaign": false
+      },
+      {
+        "month": "2026-09",
+        "orders": 246,
+        "issues": 737,
+        "qty": 81857,
+        "index": 1.01,
+        "campaign": false
+      }
+    ],
+    "campaign_months": [
+      "2025-12",
+      "2026-01"
+    ],
+    "median_orders_per_month": 244,
+    "overall_uplift": 2.8,
+    "uplift_by_item_type": [
+      {
+        "item_type": "GASKET",
+        "campaign_issues": 328,
+        "normal_issues": 902,
+        "uplift": 2.73
+      },
+      {
+        "item_type": "BEARING",
+        "campaign_issues": 338,
+        "normal_issues": 867,
+        "uplift": 2.92
+      },
+      {
+        "item_type": "STUDBOLT",
+        "campaign_issues": 319,
+        "normal_issues": 838,
+        "uplift": 2.86
+      },
+      {
+        "item_type": "O-RING",
+        "campaign_issues": 244,
+        "normal_issues": 614,
+        "uplift": 2.98
+      },
+      {
+        "item_type": "VALVE",
+        "campaign_issues": 247,
+        "normal_issues": 609,
+        "uplift": 3.04
+      },
+      {
+        "item_type": "PIPE",
+        "campaign_issues": 198,
+        "normal_issues": 582,
+        "uplift": 2.55
+      },
+      {
+        "item_type": "OIL",
+        "campaign_issues": 184,
+        "normal_issues": 523,
+        "uplift": 2.64
+      },
+      {
+        "item_type": "FLANGE",
+        "campaign_issues": 181,
+        "normal_issues": 512,
+        "uplift": 2.65
+      },
+      {
+        "item_type": "TERMINAL",
+        "campaign_issues": 195,
+        "normal_issues": 498,
+        "uplift": 2.94
+      },
+      {
+        "item_type": "FILTER ELEMENT",
+        "campaign_issues": 182,
+        "normal_issues": 498,
+        "uplift": 2.74
+      },
+      {
+        "item_type": "TEE",
+        "campaign_issues": 180,
+        "normal_issues": 483,
+        "uplift": 2.8
+      },
+      {
+        "item_type": "ELBOW",
+        "campaign_issues": 171,
+        "normal_issues": 484,
+        "uplift": 2.65
+      },
+      {
+        "item_type": "GREASE",
+        "campaign_issues": 169,
+        "normal_issues": 471,
+        "uplift": 2.69
+      },
+      {
+        "item_type": "CASTABLE",
+        "campaign_issues": 143,
+        "normal_issues": 494,
+        "uplift": 2.17
+      },
+      {
+        "item_type": "CERAMIC FIBER",
+        "campaign_issues": 169,
+        "normal_issues": 467,
+        "uplift": 2.71
+      },
+      {
+        "item_type": "FIREBRICK",
+        "campaign_issues": 157,
+        "normal_issues": 474,
+        "uplift": 2.48
+      },
+      {
+        "item_type": "ANTIRUST",
+        "campaign_issues": 159,
+        "normal_issues": 407,
+        "uplift": 2.93
+      },
+      {
+        "item_type": "SCREW",
+        "campaign_issues": 130,
+        "normal_issues": 429,
+        "uplift": 2.27
+      },
+      {
+        "item_type": "LAMP",
+        "campaign_issues": 142,
+        "normal_issues": 397,
+        "uplift": 2.68
+      },
+      {
+        "item_type": "TAPE",
+        "campaign_issues": 154,
+        "normal_issues": 377,
+        "uplift": 3.06
+      },
+      {
+        "item_type": "TRANSMITTER",
+        "campaign_issues": 81,
+        "normal_issues": 209,
+        "uplift": 2.91
+      },
+      {
+        "item_type": "PACKING SET",
+        "campaign_issues": 83,
+        "normal_issues": 148,
+        "uplift": 4.21
+      },
+      {
+        "item_type": "TRIM SET",
+        "campaign_issues": 61,
+        "normal_issues": 160,
+        "uplift": 2.86
+      },
+      {
+        "item_type": "POSITIONER",
+        "campaign_issues": 38,
+        "normal_issues": 116,
+        "uplift": 2.46
+      },
+      {
+        "item_type": "DIAPHRAGM",
+        "campaign_issues": 45,
+        "normal_issues": 85,
+        "uplift": 3.97
+      },
+      {
+        "item_type": "SEAT RING",
+        "campaign_issues": 21,
+        "normal_issues": 105,
+        "uplift": 1.5
+      },
+      {
+        "item_type": "SEAL",
+        "campaign_issues": 42,
+        "normal_issues": 82,
+        "uplift": 3.84
+      },
+      {
+        "item_type": "GLAND",
+        "campaign_issues": 36,
+        "normal_issues": 84,
+        "uplift": 3.21
+      },
+      {
+        "item_type": "CONNECTOR",
+        "campaign_issues": 32,
+        "normal_issues": 77,
+        "uplift": 3.12
+      },
+      {
+        "item_type": "SWITCH",
+        "campaign_issues": 27,
+        "normal_issues": 59,
+        "uplift": 3.43
+      },
+      {
+        "item_type": "NOZZLE",
+        "campaign_issues": 26,
+        "normal_issues": 53,
+        "uplift": 3.68
+      },
+      {
+        "item_type": "COUPLING",
+        "campaign_issues": 26,
+        "normal_issues": 52,
+        "uplift": 3.75
+      },
+      {
+        "item_type": "IMPELLER",
+        "campaign_issues": 26,
+        "normal_issues": 52,
+        "uplift": 3.75
+      },
+      {
+        "item_type": "SPRING",
+        "campaign_issues": 26,
+        "normal_issues": 45,
+        "uplift": 4.33
+      },
+      {
+        "item_type": "TUBE PLUG",
+        "campaign_issues": 23,
+        "normal_issues": 45,
+        "uplift": 3.83
+      },
+      {
+        "item_type": "DISC",
+        "campaign_issues": 17,
+        "normal_issues": 50,
+        "uplift": 2.55
+      },
+      {
+        "item_type": "THERMOCOUPLE",
+        "campaign_issues": 24,
+        "normal_issues": 40,
+        "uplift": 4.5
+      },
+      {
+        "item_type": "THERMOWELL",
+        "campaign_issues": 19,
+        "normal_issues": 45,
+        "uplift": 3.17
+      }
+    ],
+    "outlook": [
+      {
+        "month": "2026-10",
+        "items": 1123,
+        "critical_items": 531,
+        "index": 3.62,
+        "high_load": true
+      },
+      {
+        "month": "2026-11",
+        "items": 527,
+        "critical_items": 250,
+        "index": 1.7,
+        "high_load": true
+      },
+      {
+        "month": "2026-12",
+        "items": 694,
+        "critical_items": 319,
+        "index": 2.24,
+        "high_load": true
+      },
+      {
+        "month": "2027-01",
+        "items": 463,
+        "critical_items": 209,
+        "index": 1.49,
+        "high_load": false
+      },
+      {
+        "month": "2027-02",
+        "items": 375,
+        "critical_items": 181,
+        "index": 1.21,
+        "high_load": false
+      },
+      {
+        "month": "2027-03",
+        "items": 424,
+        "critical_items": 186,
+        "index": 1.37,
+        "high_load": false
+      },
+      {
+        "month": "2027-04",
+        "items": 297,
+        "critical_items": 130,
+        "index": 0.96,
+        "high_load": false
+      },
+      {
+        "month": "2027-05",
+        "items": 288,
+        "critical_items": 137,
+        "index": 0.93,
+        "high_load": false
+      },
+      {
+        "month": "2027-06",
+        "items": 310,
+        "critical_items": 145,
+        "index": 1,
+        "high_load": false
+      },
+      {
+        "month": "2027-07",
+        "items": 311,
+        "critical_items": 143,
+        "index": 1,
+        "high_load": false
+      },
+      {
+        "month": "2027-08",
+        "items": 309,
+        "critical_items": 121,
+        "index": 1,
+        "high_load": false
+      },
+      {
+        "month": "2027-09",
+        "items": 277,
+        "critical_items": 116,
+        "index": 0.89,
+        "high_load": false
+      }
+    ],
+    "outlook_baseline_items_per_month": 310,
+    "outlook_peak": {
+      "month": "2026-10",
+      "items": 1123,
+      "critical_items": 531,
+      "index": 3.62,
+      "high_load": true
+    },
+    "reading": "Issue activity shows 2 campaign month(s) in 17: 2025-12, 2026-01. In those months issues ran 2.8 times the normal month across every item type. The maintenance plan puts 1123 planned items in 2026-10 against a run rate of about 310 per month later in the horizon (Estimate: next due dates are calculated from cycle starts)."
+  },
+  "notes": [
+    "All amounts are Estimates on priced parts only.",
+    "Working capital release is a gross avoidable-replenishment ceiling, not cash immediately realised by selling existing stock.",
+    "Current stock is a snapshot. No automatic disposal is authorised. OEM parts with Max 0 are insurance candidates."
+  ]
+}
