@@ -77,3 +77,6 @@ Open item for A: nav entry and start page (see docs/TASKS.md).
 - Hub tabs are changed from `spi_zone_exp.js` (mutates `SPI_HUBS`): Inventory = Stock, Find, Locations and equipment, Part types, Registers, Documents and log. `spi_health` is no longer in the menu.
 - Where used from any part panel now goes to the explorer with the part selected (`spiGo('spi_space',{funcloc,fmat})`).
 - Tests: `node tests/spi_ui_b_chain.js` (40 steps incl. explorer route and inventory).
+
+## Maintenance, Forecasting and Simulation, Costs rebuilt as tools (owner request)
+All views of these three tabs are interactive tools (inputs left, results right), data from spi.sqlite through `server/ws/*.mjs`, state readable and runnable by the AI (`spiWsSnapshot`, `spiWsRun`). Full list and model notes: `docs/spi/WS_TOOLS.md`. Hub tabs are set in `src/modules/spi_zone_ws.js`. Tests: `node tests/spi_ui_b_chain.js` (54 steps).
