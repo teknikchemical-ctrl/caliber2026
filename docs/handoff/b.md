@@ -7,7 +7,13 @@
 
 Keep this file current. Update it at every push, in under 15 lines. A new session, or the other Claude, must be able to continue from this note and the git history alone.
 
-**Updated:** 2026-11-03   **Branch:** claude/funny-edison-pis09w   **Last commit:** see git log
+**Updated:** 2026-11-04   **Branch:** claude/funny-edison-pis09w   **Last commit:** see git log
+
+## Round 5 (2026-11-04, plan docs/spi/PLAN_B_ROUND5.md)
+- Shared kit `src/modules/spi_zone_zkit.js`: search dropdown, draggable and zoomable timeline, top ribbon, recommended or my-inputs toggle, AI box hosts (`kbAi` calls A's spiAiBox), waterfall, bars, text cleaner, tour hidden.
+- New pages: Status (`spi_status`, A's /api/data/status), Summary tiles (`spi_summ`), Purchase pathway (`spi_golden`) and Golden path (`spi_fgold`) on B's /api/ws/golden plus A's Monte Carlo; part card (`spi_zone_pcard.js`); maintenance timeline with work pack; impact waterfall; supplier lead-time ranges.
+- Coverage of the 20 case points: docs/spi/COVERAGE_B.md. Tests: tests/spi_ui_b_chain.js and spi_ui_b_handlers.js green.
+- Open: item 1 equipment sets (waiting on A's sets-review), toggle on the remaining tools, A's /api/data/events on the planner and maintenance timelines.
 
 ## Done (works, pushed to claude/funny-edison-pis09w)
 - **B5 drawings and 3D for all 8 equipment sets, with stock overlay** (design and how to check: `docs/spi/DRAWINGS_BRIEF.md`). Classes: steam turbine (API 612, 614), cracking furnace (API 560), centrifugal pump (API 610 OH2, API 682), shell and tube exchanger (TEMA, API 660), control valve (ISA-75, IEC 60534), flanges ASME B16.5. Files: `cases/spi/geo/g3m.js` (zones, nozzle schedule, 5 model builders), `cases/spi/geo/gad.js` (2D sheet = front elevation and plan projected from the same primitives, balloons, nozzle tags, dimensions, notes), `cases/spi/geo/p3.js` (3D plant layout and scales), `src/modules/spi_overlay.js` (stock status, legend, zone table and zone card), hooks in `src/modules/g3d.js`, CSS in `src/modules/style3d.css`.
