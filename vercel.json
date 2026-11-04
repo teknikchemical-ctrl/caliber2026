@@ -4,7 +4,7 @@
   "outputDirectory": "dist",
   "functions": {
     "api/**/*.mjs": {
-      "includeFiles": "spi/**/*.{sqlite,sql,json}",
+      "includeFiles": "{server,spi}/**",
       "maxDuration": 60
     }
   }

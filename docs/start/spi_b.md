@@ -2,7 +2,7 @@ You are Claude B on the repository teknikchemical-ctrl/caliber2026. The competit
 
 SETUP
 1. git fetch origin && git checkout claude/funny-edison-pis09w && git merge origin/main. Never push to main; Claude A merges you.
-2. Read: docs/spi/agents/B.md (updated header and the page specification in items 2 to 9), docs/spi/EQUIPMENT_SETS.md, docs/spi/STANDARDS.md, docs/spi/ARCHITECTURE.md, docs/spi/DATA.md, docs/inbox/claude-b.md, then the code: src/modules/spi_core.js, spi_dash.js, spi_equip.js, api/data/equipment/[tag].mjs, cases/spi/plant.json.
+2. Read: docs/spi/agents/B.md (updated header and the page specification in items 2 to 9), docs/spi/EQUIPMENT_SETS.md, docs/spi/STANDARDS.md, docs/spi/ARCHITECTURE.md, docs/spi/DATA.md, docs/inbox/claude-b.md, then the code: src/modules/spi_core.js, spi_dash.js, spi_equip.js, server/data/equipment/[tag].mjs, cases/spi/plant.json.
 3. Run: export CHROMIUM=/opt/pw-browsers/chromium; python3 build.py spi; node tests/spi_pages.js full; node tools/spi_dev.mjs 8765 full (the app with the real API at http://localhost:8765).
 
 YOUR WORK, IN THIS ORDER
