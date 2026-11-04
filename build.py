@@ -135,6 +135,8 @@ if SPI:  # spare part navigation group, routing and start page
     P('const NAVG=[["Operate",','const SPIPAGES='+json.dumps(PG)+';\nconst NAVG=[["Spare parts",SPIPAGES.map(r=>[r[0],r[2]])],["Operate",')
     P('app.innerHTML=p==="dashboard"?','app.innerHTML=p.startsWith("spi_")?spiRoute(p):p==="dashboard"?')
     P('let st={page:"dashboard",','let st={page:"spi_dash",')
+    h=h.replace('All eight P&IDs are laid out as on the plot plan and linked by their process lines.','All equipment sets are shown in a schematic layout generated from the data.')
+    h=h.replace('slot("Plot Plan",DOC[s.pp.document_id]),','').replace(',slot("Interlock Logic (SEQ)",DOC["IL-"+n])','')
     P('Each set = P&ID + GA drawing + datasheet + plot plan + interlock logic + OPLs + maintenance history, for one main equipment item','Each set = schematic P&ID, equipment drawing and 3D model, datasheet, spare parts list and maintenance notifications, for one main equipment item')
     P('<span class="tag">🧩 ${cnt(K.opl,o=>o.set===s.n)} lessons</span>','')
     h=h.replace('Ask about procedures, interlocks, equipment details, locations or maintenance history.','Ask about spare parts, stock, equipment details or maintenance history.').replace('plot plans, interlock documents, OPLs, instrument data and ','spare part records, datasheets and ')
