@@ -69,15 +69,15 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   /* I. spatial library: opens in 3D, search flies to the matching set */
   await p.evaluate(() => go("spi_space")); await p.waitForTimeout(3000);
   ok("library: the 3D space with every set is shown", !!(await p.$("#p3 canvas")) && (await p.$$(".sp-ni")).length === (await p.evaluate(() => p3Units().length)) && (await p.evaluate(() => new Set(p3Units().map(u => u.tpl ? u.cls : spiSpCls(u.n))).size === p3Units().length)));
-  await p.fill("#sp_q", "PP-411"); await p.waitForTimeout(2500);
+  await p.fill("#kbs_ex_q input", "PP-411"); await p.waitForTimeout(2500);
   ok("library: search diverts to the matching set", await p.evaluate(() => P3.sel === P3.rep[K.sets.find(s => s.tag === "PP-411A").n] && SPSP.act[P3.sel] === K.sets.find(s => s.tag === "PP-411A").n && !!document.querySelector("#ex_side button")));
-  await p.fill("#sp_q", "bearing"); await p.waitForTimeout(2500);
-  ok("library: a part search lists the sets that hold it", !!(await p.$("#sp_res .sp-r")) && await p.evaluate(() => !!P3.sel));
+  await p.fill("#kbs_ex_q input", "bearing"); await p.waitForTimeout(2500);
+  ok("library: a part search lists the sets that hold it", !!(await p.waitForSelector("#kbs_ex_q .kb-o",{timeout:8000}).catch(()=>null)) && await p.evaluate(() => !!P3.sel));
   const tags = await p.evaluate(() => K.sets.map(s => s.tag)); let found = 0;
-  for (const t of tags) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(700); if (await p.evaluate(t => { const n = K.sets.find(s => s.tag === t).n; return P3.sel === P3.rep[n] && SPSP.act[P3.sel] === n }, t)) found++; }
+  for (const t of tags) { await p.evaluate(() => spiSpClear()); await p.fill("#kbs_ex_q input", t); await p.waitForTimeout(700); if (await p.evaluate(t => { const n = K.sets.find(s => s.tag === t).n; return P3.sel === P3.rep[n] && SPSP.act[P3.sel] === n }, t)) found++; }
   ok("library: every equipment set is found by its tag and opens in its block, no double blocks (" + found + " of " + tags.length + ")", found === tags.length);
   const tpl = await p.evaluate(() => P3.tpl.map(u => u.tag)); let tf = 0;
-  for (const t of tpl) { await p.evaluate(() => spiSpClear()); await p.fill("#sp_q", t); await p.waitForTimeout(500); if (await p.evaluate(t => !!P3.sel && p3Units().find(u => u.n === P3.sel).tag === t, t)) tf++; }
+  for (const t of tpl) { await p.evaluate(() => spiSpClear()); await p.fill("#kbs_ex_q input", t); await p.waitForTimeout(500); if (await p.evaluate(t => !!P3.sel && p3Units().find(u => u.n === P3.sel).tag === t, t)) tf++; }
   ok("library: every class template is in the space and found by search (" + tf + " of " + tpl.length + ")", tpl.length >= 15 && tf === tpl.length);
   await p.evaluate(() => { P3.orbit = false; spiSpClear(); }); await p.waitForTimeout(2600);
   ok("library: the whole plant view shows every unit label inside the stage", await p.evaluate(() => { const r = document.querySelector(".p3stage").getBoundingClientRect(); return p3Units().every(s => { const e = P3.labs[s.n].getBoundingClientRect(); return e.width > 0 && e.x >= r.x && e.right <= r.right && e.y >= r.y && e.bottom <= r.bottom }) }));
@@ -151,8 +151,8 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   ok("link map: a part is drawn with the equipment that use it", (await p.$$("#wso_lk .lk-n")).length > 10);
   await p.evaluate(() => lkGo("loc", "PX_PP-148A")); await p.waitForTimeout(2500);
   ok("link map: an equipment is drawn with its parts and the equipment that share them", await p.evaluate(() => SPIWS.views.links.outputs.mode === "location" && SPIWS.views.links.outputs.peers.length > 0));
-  await p.evaluate(() => go("spi_space")); await p.waitForTimeout(2500); await p.fill("#sp_q", "BF-105"); await p.waitForTimeout(2500);
-  await p.evaluate(() => [...document.querySelectorAll("#sp_res .sp-r")].find(x => /BF-105/.test(x.textContent)).click()); await p.waitForFunction(() => EXP.eq && document.querySelector("#ex_eco .ip-risk"), null, { timeout: 30000 }).catch(() => {});
+  await p.evaluate(() => go("spi_space")); await p.waitForTimeout(2500); await p.fill("#kbs_ex_q input", "BF-105"); await p.waitForTimeout(2500);
+  await p.evaluate(() => [...document.querySelectorAll("#kbs_ex_q .kb-o")].find(x => /BF-105/.test(x.textContent)).dispatchEvent(new MouseEvent("mousedown", { bubbles: true }))); await p.waitForFunction(() => EXP.eq && document.querySelector("#ex_eco .ip-risk"), null, { timeout: 30000 }).catch(() => {});
   ok("explorer: a location found by search opens in 3D with its economics", await p.evaluate(() => EXP.eq && !!document.querySelector("#ex_eco .ip-risk")));
   ok("overview has only the explorer and the summary", await p.evaluate(() => SPI_HUBS.find(h => h.id === "spi_h_ov").tabs.map(t => t[0]).join() === "spi_space,spi_dash"));
   /* explorer: the 2D drawing and the 3D model follow the same zone */

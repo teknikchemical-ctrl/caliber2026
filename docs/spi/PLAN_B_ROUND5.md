@@ -1,0 +1,26 @@
+# Claude B plan, round 5 (for owner approval)
+
+Base: main 16761dd merged into `claude/funny-edison-pis09w`. Status of Claude A's dependencies today: `/api/data/history` and `spi_tl.js` exist; `/api/data/sets-review`, `/api/data/status`, `/api/data/events`, `/api/data/golden` and `src/modules/spi_ai_box.js` do not exist yet. Every B feature below is built against the A endpoint named by the owner; until it ships, B reads the same figures from its own `server/ws/*` (advice, timeline, series, costrisk) through one adapter (`spiData(name, q)`), so the switch is one line per endpoint.
+
+## Data finding that shapes item 1
+Per functional location the BoM is small in every class (largest location: KC 40 parts, PP 14, PCV 12, CL 11, FCV 11, HE 10, TCV 10, VD 9, PRV 9, LINE 8, TIT 8, SDV 7, TEL 6). A single location cannot show many parts. Proposal: a set = main equipment plus its sub-items (PP-148A with PP-148A-M motor and PP-148A-CSS), and per class the location with the most BoM lines, notifications and planned tasks, picked from A's sets-review. Expect 15 to 40 parts per set, not hundreds.
+
+## Order of work (each step: tests, push, note in docs/TASKS.md)
+| # | Item | What B builds |
+|---|---|---|
+| 1 | Shared components (items 3, 4, 7, 9, 11, 12) | `spi_ui_kit_b.js`: (a) search box with a dropdown of matches while typing (parts, equipment, class, supplier, location), keyboard and click; (b) timeline: canvas over SVG, drag to pan, wheel and pinch to zoom, brush strip at the bottom, layers (issues, notifications, planned tasks, PO raised, receipts, recommended orders, campaign months, forecast p10/p50/p90), every marker clickable to a detail card; (c) top input ribbon (grouped, collapsible) replacing the left panel in every tool; (d) criticality filter chips and S/A/B/C colours used by every chart; (e) "Show the recommended projection / My inputs" toggle; (f) `spiAiBox` call after every run; (g) text cleaner for ERP descriptions (no dangling "for", no codes as words) and input phrasing ("Demand at 200% of history"). |
+| 2 | Plant tour | Remove the tour pop-up and its button for case spi (`help.js` hook; ask A if the file is A's). |
+| 3 | Equipment sets (item 1) | Add sets for KC, VD, CL, PRV, SDV, control valves (LCV, PCV, TCV), TEL/TIT, LINE from sets-review; relink PP-148A, PP-411A, HE-605, FCV-1905D to richer locations of the same class. Needs A to write the sets into the pack and `equipment_set`; B updates blocks, 3D templates (already drawn for every class), 2D sheets, zones and the explorer. |
+| 4 | Overview (item 2) | New "Status" subtab from `/api/data/status`: do now, safe, shortages, overstock, critical exposure, each with counts, value, criticality split and a click-through. Summary rebuilt as compact tiles and small charts, one per case bullet, no question wording. |
+| 5 | Landing timelines (items 4, 5, 6) | Inventory: golden purchase path on the timeline (which parts, when, how much, cost reduction) with a work-order list per recommended purchase. Maintenance: plan through time with history per part and equipment, work-pack calculator merged into the timeline (select a window, the kit appears below; separate tool removed). Forecasting and Simulation: golden path first, inputs (service by criticality, demand factor, lead-time factor, budget, carrying rate, campaign repeat) re-run the model, Monte Carlo fan p10/p50/p90 and stockout probability. Costs: impact charts, waterfall and bar of the parts that reduce each impact most. Every one with the recommended/my-inputs toggle. |
+| 6 | Inventory planner and suppliers (item 8) | Planner: current against optimized per part, per equipment and per class, split by criticality. Suppliers: lead-time distribution per supplier (box with p50, p90), on-time rate against criticality exposure (scatter, bubble = S and A parts), list of critical parts depending on slow suppliers. |
+| 7 | Part card (item 10) | One tidy card: stock against Min/Max bar, 17-month history with forecast band, lead time, where used (small link map), order advice; 3D and the drawing sheet behind a tab. |
+| 8 | Coverage (item 13) | `docs/spi/COVERAGE_B.md`: each of the 11 stock and 9 demand bullets with the feature and chart that answers it for any part, equipment or class; checked against the screens. |
+| 9 | Tests | Chain test kept green; new tests: dropdown appears while typing and selecting a match opens the item; timeline drag moves the range and wheel zooms; recommended toggle changes figures; AI box present after each run; handler compile test. |
+
+## Needs from Claude A (written in docs/TASKS.md on approval)
+`/api/data/sets-review`, `/api/data/status`, `/api/data/events` (per part, equipment, class, plant: issues, notifications, planned tasks, PO raised, receipts with dates), `/api/data/golden` (recommended purchases with date, quantity, value, cost reduction; Monte Carlo fan and stockout probability for given inputs), `src/modules/spi_ai_box.js`, the new sets written into the case pack, and whether `help.js` (tour) is A's file.
+
+## Risks
+- Scope is large: 6 to 9 hours of work. If time runs short, the order above is the cut line (shared components and landing timelines first).
+- The golden path and Monte Carlo figures are A's; B shows what A returns and labels Estimate.
