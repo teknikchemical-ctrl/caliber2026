@@ -7,7 +7,7 @@ CREATE TABLE ai_run(                     -- one row per AI reasoning run (batch 
   question TEXT, scope_json TEXT, status TEXT, prompt_hash TEXT, tokens_in INTEGER, tokens_out INTEGER, trace_json TEXT
 );
 CREATE TABLE forecast_input(             -- the ledger: every driver that moves a forecast, with its source. AI proposals land here as source='ai'.
-  input_id TEXT PRIMARY KEY, run_id TEXT, material_no INTEGER, scope TEXT,       -- scope: 'part' | 'family' | 'funcloc' | 'plant'
+  input_id TEXT PRIMARY KEY, run_id TEXT, material_no INTEGER, scope TEXT, target TEXT,       -- scope: 'part' | 'family' | 'funcloc' | 'plant'
   driver TEXT CHECK(driver IN('pm_due','turnaround','failure_rate','lead_time','demand_uplift','demand_cut','one_off','obsolescence','price','criticality_override')),
   effect TEXT CHECK(effect IN('add_qty','multiply','set_lead_days','set_service_level','set_zero_after')), value REAL, unit TEXT,
   period_start TEXT, period_end TEXT, source TEXT CHECK(source IN('data','rule','ai','user')), confidence REAL, rationale TEXT, evidence_json TEXT,
