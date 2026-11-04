@@ -24,18 +24,19 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   /* B. real click on a zone in 3D */
   const zone = await p.evaluate(() => { const P = spiPrep(SPIEQ.key); const z = P.zones.find(z => z.key && z.id !== "oth"); return z && z.key; });
   const hit = await clickKey(".spi-eq3", zone); ok("a zone is found and clicked in 3D", hit);
-  const pan = await text("#spi_eqp"); ok("3D click lists the parts of the zone", /on this zone/.test(pan) && /Stock/.test(pan), pan.slice(0, 120));
+  await p.waitForTimeout(800); const nrows = await p.evaluate(() => document.querySelectorAll("#spi_inlist .spi-inr").length); ok("3D click opens a pop-up listing the parts of the zone", nrows > 0 && !!(await p.$("#spi_pm .spi-inl")), "rows=" + nrows);
   /* part 3D from the panel */
-  await p.evaluate(() => document.querySelector("#spi_eqp .spi-pr button[data-d]").click()); await p.waitForTimeout(2500);
-  ok("a part opens its 3D model and sheet", !!(await p.$("#spi_pm .g3box")) && !!(await p.$("#spi_pm .spi-psvg")));
+  await p.waitForTimeout(1800);
+  ok("the pop-up shows the selected part: 3D model, sheet and data", !!(await p.$("#spi_pm #spi_ipane .g3box")) && !!(await p.$("#spi_pm .spi-psvg")) && !!(await p.$("#spi_pm .spi-inkpis")));
+  const n2 = await p.evaluate(() => document.querySelectorAll("#spi_inlist .spi-inr").length); if (n2 > 1) { await p.evaluate(() => document.querySelectorAll("#spi_inlist .spi-inr")[1].click()); await p.waitForTimeout(1800); ok("choosing another part in the list updates the pop-up", await p.evaluate(() => SPIINS.sel === 1)); }
   const fc = await p.$("#spi_pm button[onclick*=spi_forecast]");
   if (fc) { await fc.click(); await p.waitForTimeout(2500); ok("the part opens its forecast", await p.evaluate(() => st.page === "spi_forecast")); } else { await p.evaluate(() => document.getElementById("spi_pm").remove()); ok("the part panel offers the forecast", false, "no forecast button"); }
   /* C and D. sheet and zone table */
   await p.evaluate(() => spiGo("spi_eq", { funcloc: "PX_PP-148A" })); await p.waitForTimeout(3500);
   await p.evaluate(zk => document.querySelector('#spi_eqsvg [data-k="' + zk + '"]').dispatchEvent(new MouseEvent("click", { bubbles: true })), zone); await p.waitForTimeout(500);
-  { const tx = await text("#spi_eqp"); ok("a click on the sheet lists the parts", /on this zone|Nozzle/.test(tx), tx.slice(0, 150) + " sel=" + (await p.evaluate(() => SPIEQ.sel))); }
+  { const tx = await text("#spi_eqp"); ok("a click on the sheet opens the pop-up", !!(await p.$("#spi_pm .spi-inl")), tx.slice(0, 100)); }
   await p.evaluate(() => [...document.querySelectorAll(".spi-zt tr.click")].pop().click()); await p.waitForTimeout(500);
-  ok("a zone table row lists the parts", /on this zone/.test(await text("#spi_eqp")));
+  ok("a zone table row opens the pop-up", !!(await p.$("#spi_pm .spi-inl")));
   /* E. assembly: motor in 3D, child page, back to the parent (fresh page: no zone focus from the steps above) */
   await p.evaluate(() => spiGo("spi_eq", { funcloc: "PX_PP-148A" })); await p.waitForTimeout(4500);
   const kidsOk = await p.evaluate(() => !!(SPIEQ.kids && SPIEQ.kids.motor)); ok("sub-items of the pump are found", kidsOk);
@@ -48,8 +49,8 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   /* F. equipment set page: sheet click and part 3D */
   await p.evaluate(() => go("equipment", { set: 5, tab: "ga" })); await p.waitForTimeout(3000);
   await p.evaluate(() => document.querySelector("#gsvg [data-k].gp").dispatchEvent(new MouseEvent("click", { bubbles: true }))); await p.waitForTimeout(600);
-  ok("set page: sheet click shows the zone card", /on this zone/.test(await text("#gp")));
-  await p.evaluate(() => document.querySelector("#gp .spi-pr button[data-d]").click()); await p.waitForTimeout(2200); ok("set page: part 3D opens", !!(await p.$("#spi_pm .g3box"))); await p.evaluate(() => document.getElementById("spi_pm").remove());
+  ok("set page: sheet click opens the pop-up", !!(await p.$("#spi_pm .spi-inl")));
+  await p.waitForTimeout(1800); ok("set page: the pop-up has the part 3D", !!(await p.$("#spi_pm #spi_ipane .g3box"))); await p.evaluate(() => document.getElementById("spi_pm").remove());
   /* G. part library */
   await p.evaluate(() => go("spi_parts")); await p.waitForTimeout(1500); await p.evaluate(() => spiPartType(0)); await p.waitForTimeout(2500);
   await p.evaluate(() => document.querySelector("#spi_ptype button[data-d][data-m]").click()); await p.waitForTimeout(2200); ok("part library: type to part to 3D", !!(await p.$("#spi_pm .g3box")));

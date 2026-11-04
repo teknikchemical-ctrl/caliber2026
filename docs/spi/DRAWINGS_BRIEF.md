@@ -95,3 +95,6 @@ Rule: nothing is shown that the six files do not contain. Finding that shaped th
 Not built because the data cannot support it: material and service compatibility (service is not in the data), rating checks against design conditions (no pressure or temperature), shelf life (no receipt dates), a leak analysis by failure mode (no endpoint over the notification text; A could add one).
 
 **Needs from Claude A:** nav entries `["spi_find","Find"]`, `["spi_prot","Protective devices"]`, `["spi_eq","Equipment 3D"]`, `["spi_parts","Part library"]` in `spi/pages.json` (all four work without; links to them exist from the Find page). A duplicate CSS class name between `style3d.css` and `style_spi.css` is flagged by `tests/static.js`: please prefix any new class in `style_spi.css` with `spi-` plus the page name; B renamed its own.
+
+## Part inspector pop-up
+Every click on a part or zone (3D, 2D sheet, zone table, search result) opens one pop-up with a part list and all data for the selected part: 3D, parameters, stock, Min and Max, issue history, where used, purchasing, family, forecast link. Other agents that need to open a part call `spiPartOpen(descr, materialNo)`.

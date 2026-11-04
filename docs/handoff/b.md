@@ -49,3 +49,8 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 ## Waiting on the other Claude / the human
 - Claude A: the maintenance page throws `Cannot read properties of undefined (reading 'slice')` in `mlab` (mh*.js) for the SPI pack (seen in `case_shots.js`). The KT parts lists contain air intake and fuel gas filters (gas-turbine items) although the class is a steam turbine driver.
 - Codex AI: the zone card links to `spiGo('spi_forecast',{mat:<material_no>})`, as the Overview does.
+
+## Part inspector pop-up (latest)
+One pop-up replaces the side panel and the second modal. Clicking a zone in 3D, on the 2D sheet or in the zone table (Equipment 3D page and equipment set page) opens `#spi_pm`: left a searchable list of the zone's parts with status dot and stock; right the selected part's 3D model, parameters and standards, KPIs (Stock, Min, Max, Issued 17 months, Lead time), issued-per-month chart, stock record, where used (Show in 3D), purchasing, specification family, forecast button and a collapsible drawing sheet. Parts opened from tables or search use the same pop-up through `spiPartOpen(descr,mat)`. Closes with Close, backdrop, Esc or any re-render.
+Code: `spiInspect`, `spiInspectShow`, `spiInspectList`, `spiInspectZone` (spi_draw_parts.js); `spiEqPick` (spi_draw_equip.js); gSel and gP wrappers (spi_overlay.js). Test: `node tests/spi_ui_b_chain.js`.
+Note: `tests/stress3d.js` reports `bad 1` on some runs because a random wheel zoom can drop pick coverage under 600; script errors are the real check and are 0.

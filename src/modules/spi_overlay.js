@@ -42,4 +42,6 @@ function spiStockPaint(n){document.querySelectorAll('.spi-stock[data-set="'+n+'"
  const P=spiPrep(n),D=SPIST.d[n];if(P&&D&&D.zones)P.zones.forEach(z=>{if(!z.key)return;const q=D.zones[z.id],c=SPI_SC[q.worst];document.querySelectorAll('.spi-ga [data-k="'+z.key+'"]').forEach(e=>{if(q.worst==="none"){e.removeAttribute("data-stock");e.style.removeProperty("--sc")}else{e.setAttribute("data-stock",q.worst);e.style.setProperty("--sc",c.c)}})});
  if(typeof G3!=="undefined"&&G3.inst)Object.values(G3.inst).forEach(I=>{I.dirty=true})}
 /* the selection panel of the equipment page: zone card first */
-{const _gP=gP;gP=function(){const k=G.sel,z=k&&spiZoneCard(G.n,k,0);return(z||"")+_gP()}}
+{const _gSel=gSel;gSel=function(k){const was=G.sel;_gSel(k);if(G.sel&&G.sel===k&&typeof spiInspectZone==="function"&&spiInspectZone(G.n,k)){}else if(!G.sel){const m=document.getElementById("spi_pm");if(m&&was)m.remove()}}}
+/* The component side panel only knows nozzles and BoM numbers. A zone or sub-item key (for example "@motor") has neither, so show the inspector hint instead of failing. */
+{const _gP=gP;gP=function(){const k=G.sel,d=GA[G.n];if(k&&d&&!d.nz.find(q=>q.m===k)&&!gBom(G.n,k))return `<h3>Component details</h3><p class="muted" style="line-height:1.6">The details of this selection are in the pop-up.</p>`;return _gP()}}
