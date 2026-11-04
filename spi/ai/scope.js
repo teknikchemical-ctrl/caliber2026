@@ -114,6 +114,7 @@ export function describePart(db,{material_no,code}={}){let mats=material_no?[{ma
   p.n_issues?'Demand: '+fmt(p.n_issues)+' issue'+(p.n_issues>1?'s':'')+' ('+fmt(p.total_qty)+' '+unit+') in '+p.months_active+' of 17 months, last in '+p.last_issue+', pattern '+String(p.demand_class).replace('_',' ')+'.':'No issues recorded since 2025-05, so the forecast is a stocking decision, not a model.',
   nl?'Installed on '+fmt(nl)+' location'+(nl>1?'s':'')+': '+locs.map(l=>l.tag).join(', ')+(nl>3?' and others':'')+'.':'Not linked to any equipment BoM.',
   p.lt_median!=null?'Lead time proxy median '+Math.round(p.lt_median)+' days ('+p.lt_n+' PO line'+(p.lt_n>1?'s':'')+').':'No PO history, so the lead time is a class default (Assumption).',
+  (()=>{try{const rs=db.prepare('SELECT expected_qty q,p_issue p FROM ml_forecast WHERE material_no=?').all(no),f=rs.length?{q:rs.reduce((a,r)=>a+r.q,0),pa:1-rs.reduce((a,r)=>a*(1-r.p),1)}:null;return f?'The learned model expects about '+fmt(Math.round(f.q))+' '+unit+' in the next 12 months ('+(f.pa>0.995?'at least one issue is almost certain':Math.round(f.pa*100)+'% chance of at least one issue')+').':'The learned model expects no issue in the next 12 months.'}catch{return ''}})(),
   price>1e8?'Unit price '+money(price)+' is the last PO line amount; check it is not a lot price before acting on the value.':''];
  return {id:'part:'+no,material:m,profile:p,locations:locs,answer:parts.filter(Boolean).join(' ')}}
 // ---- document numbers and suppliers: notification, order, PR, PO, supplier ----

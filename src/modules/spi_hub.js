@@ -18,6 +18,7 @@ function spiHubTab(hub,id){SPIHUB.tab[hub]=id;st.page=hub;render()}
 const SPI_ALIAS={spi_forecast:"spi_iplan",spi_f_part:"spi_iplan",spi_reco:"spi_cbuy",spi_f_dec:"spi_cbuy",spi_opt:"spi_iplan",spi_f_par:"spi_iplan",spi_outlook:"spi_mplan",spi_f_port:"spi_mplan",spi_m_ta:"spi_mkit",spi_savings:"spi_csave",spi_c_sav:"spi_csave",spi_c_cash:"spi_cbuy",spi_health:"spi_inv"};/* removed views: links to them open the Forecasting and Simulation hub */
 function spiHubFor(p){return SPI_HUBS.find(h=>h.tabs.some(t=>t[0]===p))}
 SPI_HUBS.forEach(h=>spiRegister(h.id,h.label,async host=>{
+ if(h.id==="spi_h_fc"&&!h.tabs.some(t=>t[0]==="spi_val"))h.tabs.splice(Math.max(0,h.tabs.findIndex(t=>t[0]==="spi_ask")),0,["spi_val","Model validation"]);
  const avail=h.tabs.filter(t=>SPI.pages[t[0]]),cur=avail.find(t=>t[0]===SPIHUB.tab[h.id])||avail[0];
  document.querySelectorAll("aside .nav").forEach(n=>n.classList.toggle("active",n.dataset.page===h.id));
  host.innerHTML=`<div class="spi-hubbar"><div class="spi-hubtabs" role="tablist">${avail.map(t=>`<button role="tab" class="${t[0]===cur[0]?"on":""}" onclick="spiHubTab('${h.id}','${t[0]}')">${esc(t[1])}</button>`).join("")}</div>${!['spi_ask','spi_find'].includes(cur[0])?`<button class="spi-explain" onclick="spiExplain('${cur[0]}','${esc(cur[1]).replace(/'/g,"")}')">Explain this view</button>`:""}</div><div class="spi-hubbody" id="spihb"><p class="spi-sub">Loading</p></div>`;

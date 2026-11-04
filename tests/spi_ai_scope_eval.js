@@ -44,6 +44,10 @@ const cases=[
  ['Which suppliers are the slowest?','get_page',/median lead time is \*\*42 days\*\*[\s\S]*slowest large supplier/],
  ['Explain this view: Impact reduction','get_page',/\*\*[0-9,]+ parts\*\* now/,null,{page:'spi_cimp'}],
  ['Explain this view: Suppliers and lead time','get_page',/119 suppliers/,null,{page:'spi_sup'}],
+ ['How good is the machine learning model?','ml_summary',/AUC of \*\*0\.\d+\*\*/],
+ ['What is the learned projection for 4100000129?','ml_part',/learned model expects about \*\*\d+ EA\*\*/],
+ ['What flaws does the model find?','ml_flags',/critical parts hold less stock/],
+ ['Which parts have a Max that is too low?','ml_flags',/Max far below/,/\d\.\d{2,}/],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
  if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100||(r.answer.match(/[.!?](\s|$)/g)||[]).length>7&&tool==='get_page')fails.push('too long '+r.answer.length);
