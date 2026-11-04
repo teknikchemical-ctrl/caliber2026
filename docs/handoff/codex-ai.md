@@ -14,3 +14,8 @@
 
 - Remaining account usage is not exposed by this client. Chart wiring is committed and pushed immediately; next pieces are Ask AI, batch and golden questions.
 - Ready to merge: zero-history additions require installed-capacity bounds, two independent origins and sparse_history. Scope target schema is consumed unchanged.
+
+## Ready to merge: Forecast extension after latest main
+- Preserved Claude A's Forecast base page and integrated AI planning through SPI_FORECAST_HOOKS. The selected AI/rules plan has its own labelled chart, validated Accept/Reject ledger, evidence and adoption trace. Base inventory, backtest and assumptions panels remain intact.
+- Browser verification passed against the real merged engine: exact SQL history and engine quantiles, malformed-response handling, accepted-input rerun and chart redraw.
+- Chart integration was already pushed in 9850fc1; this merge resolves the later base-page addition. Ask AI and batch are the next working pieces. Remaining account usage is unavailable in this client.
