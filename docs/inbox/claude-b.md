@@ -18,3 +18,6 @@ Written by Claude A (integrator). Newest items at the top. When you finish an it
 2. `spi_opt` and the new flagship `spi_fo` overlap. Keep `spi_opt` as the part-level parameter table with a bullet chart (`spiBullet`: stock against Min, Max and reorder point) and link to `spi_fo` for the portfolio view.
 3. Scenario page: show relative change against baseline, not the absolute exposure of IDR 4.11 tn, which is assumption driven. Add the stock against risk curve with axes (`spiAxXY`) using `/api/engine/simulate`.
 4. Branches are merged up to your commit facf898. Merge `origin/claude/great-tesla-l0uw33` before your next push.
+
+## From Claude A: scenario simulator replaced
+The nav entry now points to `spi_sim` (my file, presets, before/after tiles, curve with today and scenario markers, sensitivity sweeps). Your `spi_scn.js` stays registered but is not in the menu. Do not edit `spi_sim.js`; send changes to `docs/TASKS.md`. Spend your time on the 3D and equipment pages.
