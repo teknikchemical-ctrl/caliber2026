@@ -7,7 +7,7 @@ spiRegister("spi_dash","Overview",async host=>{
  const crits=["S","A","B","C","none"],cn=c=>c==="none"?"Unknown":c,stk=["normal","insurance","excess_crit","excess_true","non_moving","slow","nonstock_stock"];
  const ser=stk.map(k=>({name:SPI_STAT[k][0],tone:SPI_STAT[k][1],values:crits.map(c=>{const r=o.stock_by_status.find(x=>x.crit===c&&x.cat===k);return r?r.stock_value/1e9:0})}));
  const chart=spiAxBars({title:"Stock value by criticality and status",labels:crits.map(cn),series:ser,stack:true,yfmt:v=>Math.round(v),ylabel:"Stock value (IDR bn, Estimate)",xlabel:"Equipment criticality (S highest)",h:320,w:1100,ml:60,maxbar:110});
- host.innerHTML=spiHead("Spare part overview",`<b>${spiIdr(ex)}</b> of the <b>${spiIdr(sv)}</b> priced stock (${spiPct(ex,sv)}) is above Max (incl. Non Stock items), and <b>${top10}%</b> of that sits in 10 parts. <b>${spiNum(d.zero_stock_critical_with_demand)}</b> critical parts that were used are at zero stock.`,`<span class="spi-sub">Data to ${esc(m.data_cutoff)} | ${esc(m.history_months)} months | IDR, Estimate</span>`)+
+ host.innerHTML=spiHead("Spare part overview","",`<span class="spi-sub">Data to ${esc(m.data_cutoff)} | ${esc(m.history_months)} months | IDR, Estimate</span>`)+
  `<div class="spi-tiles">${spiTile({label:"Spare parts in baseline",value:spiNum(p.parts),delta:spiNum(p.with_demand)+" ever issued ("+spiPct(p.with_demand,p.parts)+")"})}
  ${spiTile({label:"Stock value",value:spiIdr(sv),delta:"priced parts only",info:"Price is the last purchase order item amount, read as a unit price. Estimate."})}
  ${spiTile({label:"Stock above Max",value:spiIdr(ex),tone:"bad",delta:"set Max "+spiIdr(sp.with_max)+" | no Max "+spiIdr(sp.nonstock_no_max),js:"spiGo('spi_savings')"})}

@@ -56,6 +56,9 @@ const cases=[
  ['How can the Company dynamically optimize inventory levels to balance cost, availability, and operational risk?','key_question',/new Min and Max[\s\S]*net saving/],
  ['Planned maintenance activities','case_question',/best monthly correlation/],
  ['Preventive maintenance schedules','case_question',/preventive plan has/],
+ ['Show the timeline for 4100005111','timeline',/learned model expects \*\*\d+ SET\*\*/],
+ ['History and forecast for PP-1323B','timeline',/PP-1323B[\s\S]*learned model expects/],
+ ['Show the plant timeline','timeline',/whole plant[\s\S]*if it repeats/],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
  if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100||(r.answer.match(/[.!?](\s|$)/g)||[]).length>7&&tool==='get_page')fails.push('too long '+r.answer.length);

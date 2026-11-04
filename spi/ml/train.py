@@ -154,12 +154,14 @@ for name, m in segs.items():
     if m.sum() < 5: continue
     evals.append((name, int(m.sum()), mae(pred, m), mae(naive, m), mae(sbaf, m), tot(pred, m), tot(naive, m), tot(sbaf, m)))
 
+# calibration: the hurdle model under-predicts totals on held-out months; scale the projection by actual / predicted on them (clipped)
+calib = float(np.clip(act[issued].sum() / max(pred[issued].sum(), 1e-9), 0.7, 1.5))
 # --- final model on all months, projection for the next 12 months
 wc, ws, sig2, rq, nrow, npos = fit(range(6, T), T - 1)
 proj = []
 for h in range(1, 13):
     X = feats(T, h); pr = logit_pred(wc, X); mu = ridge_pred(ws, X)
-    proj.append((pr, pr * np.exp(mu + sig2 / 2), np.exp(mu + rq[0]), np.exp(mu + rq[1])))
+    proj.append((pr, calib * pr * np.exp(mu + sig2 / 2), calib * np.exp(mu + rq[0]), calib * np.exp(mu + rq[1])))
 
 coef = sorted(zip(DNAMES, wc[0][1:].tolist()), key=lambda x: -abs(x[1]))  # standardised coefficients
 con.executescript("""
@@ -172,7 +174,7 @@ meta = {"method": "hurdle model: penalised logistic regression for occurrence (s
         "trained_rows": nrow, "rows_with_issue": npos, "features": len(DNAMES), "history": MONTHS[0] + " to " + MONTHS[-1],
         "holdout": MONTHS[t0] + " to " + MONTHS[-1], "brier_model": round(brier, 4), "brier_base_rate": round(brier0, 4),
         "top10_capture": round(capture, 3), "auc_model": round(auc_model, 3), "occurrence_drivers": [[n, round(v, 3)] for n, v in coef[:8]],
-        "campaign_months_ahead": [ALL[i] for i in range(T, len(ALL)) if camp[i]]}
+        "campaign_months_ahead": [ALL[i] for i in range(T, len(ALL)) if camp[i]], "calibration_factor": round(calib, 3)}
 con.executemany("insert into ml_model values (?,?)", [(k, json.dumps(v)) for k, v in meta.items()])
 con.executemany("insert into ml_eval values (?,?,?,?,?,?,?,?)", evals)
 rows = []
@@ -208,4 +210,4 @@ try:
         con.execute("update data_dictionary set rows=(select count(*) from " + t + ") where table_name=? and column_name=''", (t,))
 except sqlite3.OperationalError: pass
 con.commit(); con.execute("vacuum"); con.close()
-print(json.dumps({k: meta[k] for k in ("trained_rows", "brier_model", "brier_base_rate", "top10_capture", "auc_model", "occurrence_drivers")}), "| eval:", [(e[0], round(e[2], 3), round(e[3], 3), round(e[4], 3)) for e in evals], "| forecast rows", len(rows), "| flags", len(flags))
+print(json.dumps({k: meta[k] for k in ("trained_rows", "brier_model", "brier_base_rate", "top10_capture", "auc_model", "calibration_factor")}), "| eval:", [(e[0], round(e[2], 3), round(e[3], 3), round(e[4], 3)) for e in evals], "| forecast rows", len(rows), "| flags", len(flags))

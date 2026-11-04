@@ -1,0 +1,16 @@
+// Timeline for the assistant (owner: Claude A): history and prediction for a part, equipment, class or the plant, from /api/data/history.
+const N=v=>Number(v).toLocaleString('en-US',{maximumFractionDigits:0});
+async function call(args){const ep=(await import('../../server/data/history.mjs')).default;return new Promise((resolve,reject)=>{let status=200;const res={setHeader(){},get statusCode(){return status},set statusCode(x){status=x},end(t){try{const v=JSON.parse(t);status>=400?reject(new Error(v.error||'endpoint failed')):resolve(v)}catch(e){reject(e)}}};Promise.resolve(ep({method:'GET',url:'/api/data/history?'+new URLSearchParams(args),query:args,headers:{}},res)).catch(reject)})}
+const CLS={pump:'PP',pumps:'PP','heat exchanger':'HE','heat exchangers':'HE',compressor:'KC',compressors:'KC',turbine:'KT',turbines:'KT',furnace:'BF',furnaces:'BF',vessel:'VD',drum:'VD',column:'CL','relief valve':'PRV','shutdown valve':'SDV'};
+export async function timeline(db,a={}){let d;try{d=await call(a)}catch(e){return {id:'timeline:none',answer:'Not in baseline data: '+e.message}}
+ const t=d.totals,u=d.scope.kind==='part'?(d.scope.unit||'units'):'units',who=d.scope.kind==='part'?'['+d.scope.material_no+'] '+String(d.label).split(',').slice(0,2).map(x=>x.trim()).join(', ').toLowerCase():d.scope.kind==='plant'?'the whole plant':d.label;
+ const h=d.history,peakI=h.qty.indexOf(Math.max(...h.qty)),trend=t.learned_12m>t.history_12m*1.1?'more than':t.learned_12m<t.history_12m*0.9?'less than':'about the same as';
+ const s1=`For ${who}, ${N(t.history_12m)} ${u} were issued in the last 12 months, with the busiest month in ${h.months[peakI]} (${N(h.qty[peakI])}).`;
+ const s2=`The learned model expects **${N(t.learned_12m)} ${u}** in the next 12 months, ${trend} last year${t.engine_12m?', and the engine forecast is '+N(t.engine_12m):''}.`;
+ const s3=`Last year included the December and January shutdown campaign and the plan shows none ahead; if it repeats, expect about ${N(t.scenario_12m)} (Assumption).`;
+ const s4=d.scope.kind==='part'&&d.prediction.stock?(()=>{const k=d.prediction.stock.findIndex(x=>x<=(d.min_qty||0));return k<0?`Stock plus open orders stays above Min for the whole year.`:`Without a new order, stock plus open orders falls to Min or below in ${d.prediction.months[k]}.`})():'';
+ return {id:'timeline:'+(d.scope.material_no||d.scope.tag||d.scope.eq_class||'plant'),scope:d.scope,totals:t,page:'spi_tl',label:'Timeline',answer:[s1,s2,s3,s4].filter(Boolean).join(' ')}}
+export function timelineRoute(q,resolved={}){const t=q.toLowerCase();if(/maintenance timeline|^explain this/.test(t))return null;if(!/timeline|history and (forecast|prediction|projection)|(forecast|prediction|projection) (for|of) .*(next|coming) (year|12 months)|over time|trend and forecast|past and future/.test(t))return null;
+ const mat=Number((q.match(/\b\d{10}\b/)||[])[0])||resolved.material_no;if(mat)return ['timeline',{mat:String(mat)}];
+ const tag=(q.toUpperCase().match(/\b[A-Z]{1,5}-\d+[A-Z]?\b/)||[])[0]||(resolved.funcloc||'').replace(/^PX_/,'');if(tag)return ['timeline',{tag}];
+ for(const [w,c] of Object.entries(CLS))if(t.includes(w))return ['timeline',{cls:c}];return ['timeline',{all:'1'}]}
