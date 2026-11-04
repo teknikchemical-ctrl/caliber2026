@@ -28,3 +28,9 @@
 ## Waiting on
 - Claude A: merge and deploy; run npm run test:quick. Human: set the key securely in Vercel, redeploy and verify /api/ai/health. No real key is available here, and the environment proxy does not permit this Vercel host.
 - Next: deterministic resumable batch and results persistence. Remaining account usage is unavailable in this client.
+
+## Ready to merge: resumable offline batch
+- Added spi/ai/batch.js. Deterministic material order, AI for demand/S/A eligibility when a key is configured, rules for the remaining portfolio. Namespaced identities fingerprint baseline data, code and provider settings. Each part transaction writes ai_run, forecast_plan, forecast_input (including scope target), forecast, inventory_param and recommendation through the existing engine output. Other writers' rows are preserved.
+- Tests cover all contract tables, idempotent resume, source-data invalidation, preserved foreign rows, transaction rollback, failed-run retry and incomplete-result repair. Gemini token usage is logged; unreliable accounting is marked incomplete.
+## Waiting on
+- Next working piece: run the complete mock portfolio and publish its generated results artifact. Real-key M3/M5 runs and live Vercel health still require the human's securely configured environment. Remaining account usage is unavailable.
