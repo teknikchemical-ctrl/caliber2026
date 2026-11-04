@@ -102,3 +102,21 @@ Verification: `AI_PROVIDER=mock node tests/spi_ai.js` checks the reasoning core;
 Open Vercel, select the SPI project, then Settings > Environment Variables. Add `AI_PROVIDER` with value `gemini`, `AI_API_KEY` with Sensitive enabled, and `AI_MODEL` with value `gemini-flash-latest`. Select the Production and Preview environments used by the deployment URL. Save, then open Deployments, select the deployment menu and choose Redeploy. Open `/api/ai/health` on the resulting URL and inspect `ok`, provider, model, key presence, last error and deployed commit. Never paste the key into chat. If this model fails, share the error and attempt results so an available model can be chosen.
 
 All SPI AI handlers live under `server/ai/` and are dispatched through the single `api/router.mjs` function. Public URLs remain `/api/ai/health`, `/api/ai/plan` and `/api/ai/ask`. Do not create additional functions under `api/`.
+
+### Ask the AI in SPI
+
+Open Ask the AI and ask an inventory question or include a material number. Sources and tool steps show which baseline records were read. Mock mode uses rules and SQL without contacting a model. Gemini may read additional bounded tools and propose forecast adjustments. Proposals appear with Accept and Reject. Accept validates the adjustment again, reruns the engine and updates the selected forecast chart. A provider failure uses the available database answer and explains the reason in the tool steps. A connection failure is shown in plain words.
+
+Baseline cautions: procurement lead time is a proxy from PR date to PO delivery date. Criticality order S, A, B, C is assumed. Inventory position is on-hand only. Monetary values are Estimates. Synthetic baseline records do not establish future events.
+
+### Offline batch results
+
+Run `AI_PROVIDER=mock node spi/ai/batch.js` from the repository root to create or resume `spi/db/results.sqlite`. The baseline database remains read-only. Every material is processed in material-number order; parts with demand or S/A criticality use the configured provider, and the remaining portfolio uses rules. If a key is present securely in the process environment, omit `AI_PROVIDER=mock` to use Gemini for eligible parts. Never put the key in a command, source file or chat. `SPI_BATCH_LIMIT` limits a trial run; `--eligible-only` processes only the eligible set. The same command resumes completed parts. Changed baseline data, code or provider settings start a separate batch identity.
+
+Each part is committed atomically with its reasoning, proposed inputs, selected plan, forecast, inventory and recommendation. Other batches and portfolio rows are retained. Progress includes input and output tokens. Failed provider calls may have unknown token usage, which is labelled incomplete. No monetary API cost is inferred. Run with the human's securely configured key at M3 and M5; mock results do not verify Gemini availability.
+
+### Published mock snapshot and deployment
+
+The combined AI and Codex Fin snapshot is published as `spi/ai/results.sqlite.gz` because the full SQLite file exceeds GitHub's single-file limit. Claude A must run `node spi/ai/restore_results.js` before Vercel packages the function. It verifies the baseline and file checksums, then creates `spi/db/results.sqlite`. An existing different results file is protected; preserve or merge it before restoring. `spi/ai/results_manifest.json` records the source, counts and mock-only status. This snapshot covers all 7,481 baseline materials and does not verify real Gemini.
+
+The health response includes `one_word_result: "READY"` only after a valid model response (or the explicitly labelled mock response). Check this field with the responding model and deployed commit, rather than treating key presence as a successful AI connection.
