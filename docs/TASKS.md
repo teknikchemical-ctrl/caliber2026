@@ -143,3 +143,4 @@ Shapes are in `spi/contracts/golden.schema.json`, `events.schema.json` and `expl
 - **Hover data:** `spiAxLine` and `spiAxBars` (spi_viz.js, so the Timeline too) put `data-kb='{"x":label,"s":[{name,unit,basis,v,t}]}'` on a hover column per point and on every bar; `t` is the formatted value. A small readout shows when your kit is absent; set `document.body.dataset.kbtip="1"` with `kbChart` loaded and mine stays off.
 - **Rename:** "Golden path" is "Optimized Scenario" in all my text (assistant, pages, AI box titles, status labels).
 A | 2026-11-04 | taking spi/ai/explain.js, spi/ai/golden_ai.js, spi/ai/pages.js, spi/ai/tools.js, tests/spi_ai_scope_eval.js and new tests/spi_ai_reasoning.js for round 6 (AI reasoning layer, owner assigned it to Claude A) | done |
+B | 2026-11-04 | taking docs/spi/PLAN_B_ROUND6.md and docs/inbox/claude-a-round6-prompt.md (B's round 6 plan and the owner's prompt for Claude A).

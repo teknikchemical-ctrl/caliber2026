@@ -174,7 +174,7 @@ const res = [], ok = (n, c, d) => { res.push([n, !!c]); console.log((c ? "ok   "
   await p.evaluate(() => { const m = document.querySelector("#gd_tl .kb-m"); if (m) m.dispatchEvent(new MouseEvent("click", { bubbles: true })) }); await p.waitForTimeout(300);
   ok("timeline: a marker opens its details", await p.evaluate(() => { const P = document.querySelector("#gd_tl .kb-pop"); return !!P && !P.hidden }));
   await p.evaluate(() => { GD.mine.demand = 1.5; gdMine() }); await p.waitForTimeout(3500);
-  ok("golden path: my inputs re-run the model and differ from the recommended run", await p.evaluate(() => GD.view === "mine" && GD.d.mine && GD.d.mine.outputs.totals.value_idr !== GD.d.rec.outputs.totals.value_idr));
+  ok("optimized scenario: my inputs re-run the model and differ from the recommended run", await p.evaluate(() => GD.view === "mine" && GD.d.mine && GD.d.mine.outputs.totals.value_idr !== GD.d.rec.outputs.totals.value_idr));
   ok("AI box host is filled after a run", await p.evaluate(() => !!document.querySelector("#wsai_gd") && document.querySelector("#wsai_gd").innerHTML.length > 0));
   await p.evaluate(() => go("spi_status")); await p.waitForSelector(".st-c", { timeout: 20000 }).catch(() => {});
   ok("status: five groups are shown", (await p.$$(".st-c")).length === 5);
