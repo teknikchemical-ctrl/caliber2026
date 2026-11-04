@@ -9,6 +9,10 @@ Keep this file current. Update it at every push, in under 15 lines. A new sessio
 
 **Updated:** 2026-11-04   **Branch:** claude/funny-edison-pis09w   **Last commit:** see git log
 
+## Round 7 (2026-11-04, plan docs/spi/PLAN_B_ROUND7.md, owner approved)
+- History and source data tab first in four hubs (`spi_zone_src.js`, `/api/ws/source`): every date field on linked timelines, case views, breakdowns, completeness, quality flags, raw rows. Figures register `/api/ws/metrics` with drawer and glossary. PR PO counted once (view `pol`), unit price reading everywhere, cycles normalised. Optimized Scenario on A's engine with AI projection accuracy and impacts. Sign-in skipped. Findings: docs/spi/DATA_FINDINGS.md.
+- Open: A's golden orders limit 400; equipment sets for new classes (A's sets-review).
+
 ## Round 6 (2026-11-04, plan docs/spi/PLAN_B_ROUND6.md, owner approved, light theme)
 - Hover readout on every chart (`spi_zone_hover.js`), timeline range buttons, linked panels, events-in-window list; Optimized Scenario (renamed golden path) and Maintenance timeline in the terminal layout; figures strip on Costs; explorer blocks all connected (`server/ws/connect.mjs`), side panel no longer clips.
 - Open: terminal layout for Overview Status and Forecasting issues panel, single model once A extends /api/data/golden.
