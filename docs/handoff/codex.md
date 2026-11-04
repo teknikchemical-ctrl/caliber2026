@@ -17,3 +17,9 @@ Updated 2026-11-04 WIB. Branch codex/finance. Published prototype checkpoint 647
 - Regenerated the full rules batch and both impact snapshots after the sample-variance correction in main 5a2898b. No generated JSON edited by hand.
 - Required checks: 40 engine checks, 10 API checks and 34 full-data checks passed; baseline check passed.
 - Waiting on: none for this checkpoint. W1 comparison, E3/E4 and E5 are next, in that order. Deck remains deferred. Remaining account usage is not exposed.
+
+## Ready to merge: W1 three-way comparison
+- Regeneration published as aeeb055. New pure spi/engine/compare.js exports workbookPolicy, policyReplay, comparePart and comparePolicies, also exported from index.js. New POST /api/engine/compare contract is documented atop server/engine/compare.mjs. B can build the comparison page against it now.
+- Summary covers all filtered parts; rows paginate (limit <=100). in_sample fits all 17 months; holdout fits first 13 and tests last 4. Per-part rows include parameters and monthly stock, demand, shortages, orders and receipts. Aggregate stock value, stockout part-months, order counts and both service metrics included.
+- Workbook defaults/formulas and <= trigger reproduced; no future demand/family/PO/campaign information enters holdout parameters. Common lead 60 days is an explicit controlled Assumption. Identical snapshot initial stock and on-hand-only ordering limit interpretation; no observed savings or historical stockout claim.
+- Validation: new hand-calculation, pipeline and holdout leakage checks; full 7,481-part run; required baseline/core/API/full-data checks. Waiting on: B comparison UI. E3/E4 and E5 remain next. Deck deferred; remaining usage not exposed.
