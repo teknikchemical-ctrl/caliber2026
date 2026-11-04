@@ -371,3 +371,4 @@ svg[data-kbh]{cursor:crosshair}
 .kb-scn-i{display:flex;gap:6px}.kb-scn-i input{flex:1;min-width:0;padding:8px 10px;border:1px solid #c9d4e3;border-radius:8px;font:inherit;font-size:14px}.kb-scn-i button{white-space:nowrap}
 .kb-scn-r{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:6px;font-size:12px}.kb-scn-ok i{font-style:normal;display:inline-block;background:#e7f3ea;color:#1e6b34;border-radius:6px;padding:1px 6px;margin:0 4px 2px 0}.kb-scn-no{color:#8a5a10}.kb-scn-r small{color:#6b7a90}
 .ws-rib.hide .kb-scn{display:none}
+.kb-lanel{font-size:9.5px}
