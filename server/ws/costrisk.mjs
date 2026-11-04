@@ -5,6 +5,7 @@
 //   service {S,A,B,C} target service levels (mode service), scale {S,A,B,C} multipliers of the current Min and Max (mode scale),
 //   assumptions {carrying_rate, order_cost_idr, emergency_premium, downtime_idr_h {S,A,B,C}, hours_per_stockout {S,A,B,C}, lead_default, lead_delay_days, demand_factor}, budget_idr (optional cap on average stock value), curve=1 to add the cost curve.
 import { openDb, json, guard, body, list, fig, pay } from "./_lib.mjs";
+import { ECON } from "../_lib/econ.mjs";
 const M17 = 17, MD = 30.4375;
 const phi = (z) => Math.exp(-z * z / 2) / Math.sqrt(2 * Math.PI);
 const Phi = (z) => { const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = phi(z), p = d * t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429)))); return z >= 0 ? 1 - p : p; };
@@ -38,8 +39,8 @@ export function sum(parts, pol, A) { const t = { parts: parts.length, priced: 0,
   return t; }
 export default guard(async (req, res) => {
   const i = await body(req), db = openDb(), sc = typeof i.scope === "string" ? JSON.parse(i.scope || "{}") : (i.scope || {}), A0 = typeof i.assumptions === "string" ? JSON.parse(i.assumptions) : (i.assumptions || {});
-  const A = { carrying_rate: 0.22, order_cost_idr: 750000, emergency_premium: 0.35, lead_default: 60, lead_delay_days: 0, demand_factor: 1, downtime_idr_h: { S: 4200000, A: 1250000, B: 330000, C: 42000 }, hours_per_stockout: { S: 72, A: 48, B: 24, C: 12 }, downtime_share: { S: 0.5, A: 0.25, B: 0.1, C: 0.02 }, ...A0 };
-  const pol = { mode: i.mode || "service", service: { S: 0.98, A: 0.95, B: 0.9, C: 0.85, ...(typeof i.service === "string" ? JSON.parse(i.service) : i.service || {}) }, scale: { S: 1, A: 1, B: 1, C: 1, ...(typeof i.scale === "string" ? JSON.parse(i.scale) : i.scale || {}) } };
+  const A = { carrying_rate: ECON.carrying_rate, order_cost_idr: ECON.order_cost_idr, emergency_premium: ECON.emergency_premium, lead_default: ECON.lead_default, lead_delay_days: 0, demand_factor: 1, downtime_idr_h: { ...ECON.downtime_idr_h }, hours_per_stockout: { ...ECON.hours_per_stockout }, downtime_share: { ...ECON.downtime_share }, ...A0 };
+  const pol = { mode: i.mode || "service", service: { ...ECON.service, ...(typeof i.service === "string" ? JSON.parse(i.service) : i.service || {}) }, scale: { S: 1, A: 1, B: 1, C: 1, ...(typeof i.scale === "string" ? JSON.parse(i.scale) : i.scale || {}) } };
   const parts = portfolioParts(db, sc), cur = sum(parts, { mode: "current" }, A), sel = sum(parts, pol, A);
   let curve = null; if (String(i.curve) !== "0") { curve = [0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.93, 0.95, 0.97, 0.98, 0.99, 0.995].map((s) => { const r = sum(parts, { mode: "service", service: { S: s, A: s, B: s, C: s } }, A); return { service: s, value: r.value, hold: r.hold + r.order, shortCost: r.shortCost, total: r.total, events: r.events }; }); }
   const top = parts.map((p) => { const a = evalPart(p, { mode: "current" }, A), b = evalPart(p, pol, A); return { material_no: p.material_no, descr: p.descr, crit: p.crit, price: p.price, cur_min: p.min_qty, cur_max: p.max_qty, new_min: b.rop, new_max: b.max, d_value: b.value - a.value, d_short: b.shortCost - a.shortCost, d_total: b.total - a.total }; })

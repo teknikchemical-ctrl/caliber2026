@@ -10,7 +10,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 role="${1:?role: a, b, codex or any}"
 git fetch -q origin 2>/dev/null || echo "(could not fetch: results may be out of date)"
-B3D='^(src/modules/(g3d|g3r|g3neck|plant3d|hse3d|sim3d|auto3d)\.js|src/modules/style3d\.css|cases/[^/]+/geo/(g3m|p3|h3)\.js|tools/g3[a-z]*\.js|tests/stress3d\.js|cases/spi/geo/.*|src/modules/spi_(draw|zone|overlay|reco|health|opt|scn)[a-z0-9_]*\.js|tests/spi_ui_b[a-z0-9_]*\.js|docs/spi/DRAWINGS_BRIEF\.md|docs/spi/shots/b[^/]*/.*)$'
+B3D='^(src/modules/(g3d|g3r|g3neck|plant3d|hse3d|sim3d|auto3d)\.js|src/modules/style3d\.css|cases/[^/]+/geo/(g3m|p3|h3)\.js|tools/g3[a-z]*\.js|tests/stress3d\.js|cases/spi/geo/.*|src/modules/spi_(draw|zone|overlay|reco|health|opt|scn)[a-z0-9_]*\.js|tests/spi_ui_b[a-z0-9_]*\.js|docs/spi/DRAWINGS_BRIEF\.md|docs/spi/shots/b[^/]*/.*|server/ws/.*|docs/spi/WS_TOOLS\.md)$'
 CODEX='^((deck|finance|manual)/.*|src/modules/(fin\.js|style_fin\.css)|cases/[^/]+/(fin|eval_extra_fin)\.json|docs/handoff/codex\.md|tests/fin_[a-z0-9_]+\.js|tools/record_demo\.js|spi/engine/.*|server/engine/.*|src/modules/spi_impact\.js|docs/spi/shots/.*|tests/spi_ui_fin[a-z0-9_]*\.js|tests/spi_engine[a-z0-9_]*\.js|docs/spi/(FORECASTING|BUSINESS_CASE)\.md)$'
 AIF='^(netlify/functions/[a-z_0-9]+\.mjs|src/modules/(ai|ai2|sync|intent|facts)\.js|tests/live\.js|docs/(AI_ASSISTANT|AI_PROVIDER_CONTRACT|BACKEND_API)\.md|docs/handoff/codex-ai\.md|spi/ai/.*|server/ai/.*|src/modules/spi_(forecast|ask)\.js|tests/spi_ui_ai[a-z0-9_]*\.js|tests/spi_ai[a-z0-9_]*\.js|docs/spi/AI_REASONING\.md)$'
 base=$(git merge-base HEAD origin/main)

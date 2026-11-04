@@ -188,7 +188,7 @@ for i, r in enumerate(parts):
     lt_m = (lt or 60) / 30.4; ltd = y12[i] / 12 * lt_m
     if mx is not None and mn is not None and mn > mx > 0: flags.append((mat, "min_above_max", "error", f"Min {mn:,.0f} is above Max {mx:,.0f}", mn - mx))
     if mrp == "Stock Item" and (mx or 0) == 0 and y12[i] >= 2: flags.append((mat, "no_max_with_demand", "warn", f"no Max set although the model expects {y12[i]:,.0f} a year", y12[i]))
-    if cr >= 3 and (stock or 0) < ltd and y12[i] >= 1: flags.append((mat, "critical_below_lead_demand", "warn", f"stock {stock:,.0f} against {ltd:,.0f} expected during the lead time", ltd - (stock or 0)))
+    if cr >= 3 and (stock or 0) < ltd and y12[i] >= 1: flags.append((mat, "critical_below_lead_demand", "warn", f"stock {stock:,.0f} against {ltd:,.0f} expected during the lead time", (ltd - (stock or 0)) * (price or 0)))
     if (stock or 0) > 0 and y12[i] > 0 and stock > 10 * max(y12[i], 1) and (stock - (mx or 0)) > 0 and price: flags.append((mat, "stock_far_above_learned_need", "info", f"stock covers about {stock / max(y12[i], 1e-9):,.0f} years of learned demand", (stock - y12[i]) * price))
     if mx and y12[i] > 3 * mx and y12[i] >= 6: flags.append((mat, "max_below_learned_demand", "warn", f"Max {mx:,.0f} against {y12[i]:,.0f} a year expected", y12[i] - mx))
 con.executemany("insert or replace into ml_flag values (?,?,?,?,?)", flags)
@@ -200,7 +200,7 @@ dd = [("ml_model", "", "Learned demand model: method, training size, validation 
       ("ml_forecast", "", "Learned 12-month projection per part and month (Estimate)", None),
       ("ml_forecast", "p_issue", "Chance the part is issued in the month", None), ("ml_forecast", "expected_qty", "Expected quantity in the month", None),
       ("ml_forecast", "qty_if_issued_low", "Quantity if issued, low case (10%)", None), ("ml_forecast", "qty_if_issued_high", "Quantity if issued, high case (90%)", None),
-      ("ml_flag", "", "Flaws found by comparing the learned demand with today's Min, Max and stock", None)]
+      ("ml_flag", "", "Flaws found by comparing the learned demand with today's Min, Max and stock", None), ("ml_flag", "value", "Size of the flaw: IDR to cover the gap for critical parts and for excess stock, units otherwise", None)]
 try:
     con.execute("delete from data_dictionary where table_name like 'ml_%'")
     con.executemany("insert or replace into data_dictionary values (?,?,?,?)", dd)

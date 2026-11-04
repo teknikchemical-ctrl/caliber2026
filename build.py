@@ -146,6 +146,9 @@ if SPI:  # spare part navigation group, routing and start page
         except Exception: _sha=''
     import datetime
     P('window.NW=n=>','window.SPI_MODE=true;window.SPI_STAMP={sha:"%s",time:"%s"};window.NW=n=>'%(_sha[:7] or 'local',datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')))
+    _ec=json.load(open(os.path.join(ROOT,'spi','contracts','econ_assumptions.json')));_ev=lambda k:_ec[k]['value']
+    _spa={'downtime_idr_h':{k:v/24 for k,v in _ev('downtime_idr_day').items()},'hours_per_stockout':_ev('hours_per_stockout'),'downtime_share':_ev('downtime_share'),'emergency_premium':_ev('emergency_premium'),'carrying_rate':_ev('carrying_rate'),'lead_default':_ev('lead_default_days'),'service':_ev('service'),'order_cost_idr':_ev('order_cost_idr')}
+    P('window.SPI_MODE=true;','window.SPI_MODE=true;window.SPI_ECON_DEF=%s;'%json.dumps(_spa,separators=(',',':')))
     P('All ${NW(K.sets.length)} units as laid out on the plot plan, joined by their process, gas, water, nitrogen and steam lines. Drag to look around. Select a unit to fly to it and see its figures, then open its equipment set from the card.','All ${NW(K.sets.length)} equipment sets in a schematic site layout generated from the data. Drag to look around. Select a unit to fly to it, then open its equipment set from the card.')
 
 # ---------- 4. theme + cleanup ----------

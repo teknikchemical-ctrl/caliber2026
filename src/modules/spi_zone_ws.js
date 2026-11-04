@@ -9,9 +9,9 @@ function spiWsSet(id,o){SPIWS.views[id]=Object.assign(SPIWS.views[id]||{},o,{upd
 function spiWsSnapshot(){return JSON.parse(JSON.stringify({assumptions:SPA,views:SPIWS.views}))}
 /* for the AI: run a tool with inputs (the tool must be on screen or registered) */
 async function spiWsRun(id,inputs){const f=SPIWS.run[id];if(!f)throw new Error("No tool named "+id);return f(inputs||{})}
-const SPA_DEF={downtime_idr_h:{S:4200000,A:1250000,B:330000,C:42000},hours_per_stockout:{S:72,A:48,B:24,C:12},downtime_share:{S:0.5,A:0.25,B:0.1,C:0.02},emergency_premium:0.35,carrying_rate:0.22,lead_default:60,service:{S:0.98,A:0.95,B:0.9,C:0.85},order_cost_idr:750000};
-const SPA=(()=>{try{const s=JSON.parse(localStorage.getItem("spa")||"null");if(s)return Object.assign(JSON.parse(JSON.stringify(SPA_DEF)),s)}catch(e){}return JSON.parse(JSON.stringify(SPA_DEF))})();
-function spiSpaSave(){try{localStorage.setItem("spa",JSON.stringify(SPA))}catch(e){}}
+const SPA_DEF=(typeof window!=="undefined"&&window.SPI_ECON_DEF)?JSON.parse(JSON.stringify(window.SPI_ECON_DEF)):{downtime_idr_h:{S:4200000,A:1250000,B:330000,C:42000},hours_per_stockout:{S:72,A:48,B:24,C:12},downtime_share:{S:0.5,A:0.25,B:0.1,C:0.02},emergency_premium:0.35,carrying_rate:0.22,lead_default:60,service:{S:0.98,A:0.95,B:0.9,C:0.85},order_cost_idr:750000};
+const SPA=(()=>{try{const s=JSON.parse(localStorage.getItem("spa2")||"null");if(s)return Object.assign(JSON.parse(JSON.stringify(SPA_DEF)),s)}catch(e){}return JSON.parse(JSON.stringify(SPA_DEF))})();
+function spiSpaSave(){try{localStorage.setItem("spa2",JSON.stringify(SPA))}catch(e){}}
 function spiSpaReset(){Object.assign(SPA,JSON.parse(JSON.stringify(SPA_DEF)));spiSpaSave()}
 /* ---------- helpers ---------- */
 const wsE=s=>esc(s==null?"":String(s));

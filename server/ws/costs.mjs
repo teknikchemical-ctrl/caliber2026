@@ -4,15 +4,16 @@
 // Shortage: expected yearly cost of stockouts under today's Min and Max (same model as /api/ws/costrisk).
 // Inputs: scope {crit, type, dclass, q}, rates {capital, storage, obsolescence}, assumptions as in costrisk.
 import { openDb, json, guard, body, fig, pay } from "./_lib.mjs";
+import { ECON } from "../_lib/econ.mjs";
 import { portfolioParts, evalPart } from "./costrisk.mjs";
 const P = (v) => (typeof v === "string" ? (() => { try { return JSON.parse(v); } catch { return {}; } })() : v || {});
 export default guard(async (req, res) => {
   const i = await body(req), db = openDb(), sc = P(i.scope), rt = { capital: 0.1, storage: 0.07, obsolescence: 0.05, ...P(i.rates) }, rate = rt.capital + rt.storage + rt.obsolescence;
-  const A = { carrying_rate: rate, order_cost_idr: 750000, emergency_premium: 0.35, lead_default: 60, lead_delay_days: 0, demand_factor: 1, downtime_idr_h: { S: 4200000, A: 1250000, B: 330000, C: 42000 }, hours_per_stockout: { S: 72, A: 48, B: 24, C: 12 }, downtime_share: { S: 0.5, A: 0.25, B: 0.1, C: 0.02 }, ...P(i.assumptions) };
+  const A = { carrying_rate: rate, order_cost_idr: ECON.order_cost_idr, emergency_premium: ECON.emergency_premium, lead_default: ECON.lead_default, lead_delay_days: 0, demand_factor: 1, downtime_idr_h: { ...ECON.downtime_idr_h }, hours_per_stockout: { ...ECON.hours_per_stockout }, downtime_share: { ...ECON.downtime_share }, ...P(i.assumptions) };
   const parts = portfolioParts(db, sc), extra = Object.fromEntries(db.prepare("select material_no, months_active from part_profile").all().map((r) => [r.material_no, r.months_active]));
   const cats = { excess: { k: "excess", label: "Above Max", value: 0, parts: 0 }, idle: { k: "idle", label: "No issue in 17 months", value: 0, parts: 0 }, slow: { k: "slow", label: "Issued in one or two months", value: 0, parts: 0 }, policy: { k: "policy", label: "Within policy", value: 0, parts: 0 } };
   const crit = {}, rows = []; let stockV = 0, priced = 0, shortT = 0, evT = 0;
-  parts.forEach((p) => { if (!p.price) return; priced++; const v = (p.stock || 0) * p.price, ex = p.max_qty > 0 && p.stock > p.max_qty ? (p.stock - p.max_qty) * p.price : 0, ma = extra[p.material_no] || 0; stockV += v;
+  parts.forEach((p) => { if (!p.price) { const r0 = evalPart(p, { mode: "current" }, A); shortT += r0.shortCost; evT += r0.events; const c0 = crit[p.crit] = crit[p.crit] || { k: p.crit, value: 0, hold: 0, short: 0, events: 0 }; c0.short += r0.shortCost; c0.events += r0.events; return; } /* downtime does not depend on price: unpriced parts count in the shortage cost */ priced++; const v = (p.stock || 0) * p.price, ex = p.max_qty > 0 && p.stock > p.max_qty ? (p.stock - p.max_qty) * p.price : 0, ma = extra[p.material_no] || 0; stockV += v;
     let rest = v; if (ex > 0) { cats.excess.value += ex; cats.excess.parts++; rest -= ex; } if (rest > 0) { const k = !(p.total_qty > 0) ? "idle" : ma <= 2 ? "slow" : "policy"; cats[k].value += rest; if (!(ex > 0)) cats[k].parts++; }
     const r = evalPart(p, { mode: "current" }, A); shortT += r.shortCost; evT += r.events; const c = crit[p.crit] = crit[p.crit] || { k: p.crit, value: 0, hold: 0, short: 0, events: 0 }; c.value += v; c.hold += v * rate; c.short += r.shortCost; c.events += r.events;
     rows.push({ material_no: p.material_no, descr: p.descr, crit: p.crit, stock: p.stock, value: v, hold: v * rate, short: r.shortCost, events: r.events }); });

@@ -1,0 +1,12 @@
+{
+ "_note": "One set of economic assumptions for every tab, endpoint, engine run and assistant answer (owner: Claude A, agreed sources below). Change a value here only; tests/spi_econ_consistency.js checks that every copy matches.",
+ "carrying_rate": {"value": 0.22, "unit": "share of stock value per year", "basis": "Assumption", "source": "Engine policy and Codex Fin finance model: capital, storage, insurance and obsolescence"},
+ "cash_holding_rate": {"value": 0.04, "unit": "share of stock value per year", "basis": "Assumption", "source": "Codex Fin: avoidable storage, handling and insurance cash only"},
+ "order_cost_idr": {"value": 250000, "unit": "IDR per order", "basis": "Assumption", "source": "Engine policy; no ordering cost in the baseline data"},
+ "emergency_premium": {"value": 0, "unit": "share of unit price", "basis": "Data", "source": "PO lines show the same relative unit price in every lead-time band and purchase type, so no rush premium is supported"},
+ "lead_default_days": {"value": 60, "unit": "days", "basis": "Assumption", "source": "Used only for parts with no purchase history"},
+ "service": {"value": {"S": 0.99, "A": 0.975, "B": 0.95, "C": 0.90}, "unit": "chance of no stockout per cycle", "basis": "Policy", "source": "Engine policy, shown on Model validation"},
+ "downtime_idr_day": {"value": {"S": 100000000, "A": 30000000, "B": 5000000, "C": 1000000}, "unit": "IDR per day of equipment down", "basis": "Assumption", "source": "Engine policy and Codex Fin; a policy consequence, not a measured margin"},
+ "hours_per_stockout": {"value": {"S": 72, "A": 48, "B": 24, "C": 12}, "unit": "hours of downtime when a stockout stops the equipment", "basis": "Assumption", "source": "Claude B tools"},
+ "downtime_share": {"value": {"S": 0.5, "A": 0.25, "B": 0.1, "C": 0.02}, "unit": "share of stockouts that stop the equipment", "basis": "Assumption", "source": "Claude B tools; spares, workarounds and redundancy cover the rest"}
+}

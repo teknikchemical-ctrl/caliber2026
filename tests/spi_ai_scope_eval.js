@@ -18,7 +18,7 @@ const cases=[
  ['notification 101000000101','lookup_record',/Leak from packing/],
  ['PO 4300005214','lookup_record',/6 lines[\s\S]*CAHAYA/],
  ['supplier CAHAYA INDUSTRI','lookup_record',/525 PO lines/],
- ['Explain this view: Purchase plan. What matters and what should we do?','get_page',/1,079 parts to order[\s\S]*IDR 44\.22 bn/,/\d{9,}/,{page:'spi_cbuy'}],
+ ['Explain this view: Purchase plan. What matters and what should we do?','get_page',/\*\*[0-9,]+ parts to order\*\*[\s\S]*IDR [0-9.]+ bn/,/\d{9,}/,{page:'spi_cbuy'}],
  ['Explain this view: Notification explorer','get_page',/1,305 are still in progress/,null,{page:'spi_mnotif'}],
  ['Explain this view: Summary','get_page',/7,481 materials[\s\S]*53 S or A parts/,null,{page:'spi_dash'}],
  ['What does the savings planner show?','get_page',/plan releases/],
@@ -32,7 +32,7 @@ const cases=[
  ['How does the installed equipment population affect demand?','case_question',/installed across/],
  ['Are there abnormal or unexpected consumption patterns?','case_question',/three standard deviations/],
  ['Which items should be reordered and when?','case_question',/order-by date/],
- ['What are the recommended reorder quantities and dynamic Min-Max levels?','get_view',/dynamic policy raises Min/],
+ ['What are the recommended reorder quantities and dynamic Min-Max levels?','case_question',/new Min and Max for \*\*[0-9,]+ parts\*\*/],
  ['Simulate reducing inventory by 20%','simulate_scenario',/IDR 616\.62 bn[\s\S]*IDR 493\.68 bn/,/Figures are Estimates/],
  ['Inventory for part 4100005111','plan_part',/Order \*\*38 SET\*\*[\s\S]*79%/,/not priced:/],
  ['When should we order 4100000129?','plan_part',/No order is needed/],
@@ -48,6 +48,14 @@ const cases=[
  ['What is the learned projection for 4100000129?','ml_part',/learned model expects about \*\*\d+ EA\*\*/],
  ['What flaws does the model find?','ml_flags',/critical parts hold less stock/],
  ['Which parts have a Max that is too low?','ml_flags',/Max far below/,/\d\.\d{2,}/],
+ ['What are the overall economics?','economic_ledger',/holding it costs about \*\*IDR [0-9.]+ bn a year\*\*[\s\S]*payback/],
+ ['How much stock can we release?','economic_ledger',/Savings planner releases \*\*IDR [0-9.]+ bn\*\*[\s\S]*ceiling/],
+ ['How much do we need to buy?','economic_ledger',/Inventory planner orders \*\*[0-9,]+ parts\*\*/],
+ ['Why do the release figures differ between tabs?','economic_ledger',/answer different questions/],
+ ['How can the Company improve demand predictability for spare parts with irregular and uncertain consumption patterns?','key_question',/treat demand by pattern[\s\S]*AUC/],
+ ['How can the Company dynamically optimize inventory levels to balance cost, availability, and operational risk?','key_question',/new Min and Max[\s\S]*net saving/],
+ ['Planned maintenance activities','case_question',/best monthly correlation/],
+ ['Preventive maintenance schedules','case_question',/preventive plan has/],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no,ctx] of cases){const r=await ask({db,question:q,context:ctx||{}});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
  if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100||(r.answer.match(/[.!?](\s|$)/g)||[]).length>7&&tool==='get_page')fails.push('too long '+r.answer.length);

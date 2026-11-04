@@ -3,12 +3,13 @@
 // Reorder month = months until stock on hand plus open orders falls to the reorder point at the mean monthly demand; order quantity = order-up-to level minus that position.
 // Order-by date = reorder month minus the lead time. When a budget is set, lines are funded by criticality (S first) and date; the rest is deferred.
 import { openDb, json, guard, body, num, fig, pay, months, addMonths, CUTOFF } from "./_lib.mjs";
+import { ECON } from "../_lib/econ.mjs";
 import { portfolioParts, evalPart } from "./costrisk.mjs";
 const P = (v) => (typeof v === "string" ? (() => { try { return JSON.parse(v); } catch { return {}; } })() : v || {});
 export default guard(async (req, res) => {
   const i = await body(req), db = openDb(), sc = P(i.scope), H = num(i.horizon, 6, 1, 24), budget = Number(i.budget_month_idr) || null;
-  const A = { carrying_rate: num(i.carrying_rate, 0.22, 0, 1), order_cost_idr: num(i.order_cost_idr, 750000, 0, 1e9), emergency_premium: 0.35, lead_default: num(i.lead_default, 60, 1, 720), lead_delay_days: 0, demand_factor: 1, downtime_idr_h: {}, hours_per_stockout: {}, downtime_share: {} };
-  const pol = { mode: i.policy === "current" ? "current" : "service", service: { S: 0.98, A: 0.95, B: 0.9, C: 0.85, ...P(i.service) } };
+  const A = { carrying_rate: num(i.carrying_rate, ECON.carrying_rate, 0, 1), order_cost_idr: num(i.order_cost_idr, ECON.order_cost_idr, 0, 1e9), emergency_premium: ECON.emergency_premium, lead_default: num(i.lead_default, ECON.lead_default, 1, 720), lead_delay_days: 0, demand_factor: 1, downtime_idr_h: {}, hours_per_stockout: {}, downtime_share: {} };
+  const pol = { mode: i.policy === "current" ? "current" : "service", service: { ...ECON.service, ...P(i.service) } };
   const onOrder = Object.fromEntries(db.prepare("select material_no, sum(qty) q from po_line where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q]));
   const from = addMonths(CUTOFF.slice(0, 7), 1), MM = months(from, H), lines = [];
   portfolioParts(db, sc).forEach((p) => { const mu = (p.total_qty || 0) / 17; if (!(mu > 0)) return; const r = evalPart(p, pol, A); if (!(r.max > 0)) return; const pos = (p.stock || 0) + (onOrder[p.material_no] || 0);

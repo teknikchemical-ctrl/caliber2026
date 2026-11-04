@@ -3,11 +3,12 @@
 // Inputs: scope {crit, type, q}, take {excess, idle, slow, nonstock: true|false}, realise {excess, idle, slow, nonstock: share 0..1}, recovery (share of book value recovered on disposal), exclude_sa (keep S and A parts),
 //         keep_months (months of demand kept on hand for slow movers), months (phasing period), carrying_rate.
 import { openDb, json, guard, body, num, fig, pay, months, addMonths, CUTOFF } from "./_lib.mjs";
+import { ECON } from "../_lib/econ.mjs";
 import { portfolioParts } from "./costrisk.mjs";
 const P = (v) => (typeof v === "string" ? (() => { try { return JSON.parse(v); } catch { return {}; } })() : v || {});
 export default guard(async (req, res) => {
   const i = await body(req), db = openDb(), sc = P(i.scope), take = { excess: true, idle: true, slow: false, nonstock: true, ...P(i.take) }, rl = { excess: 0.6, idle: 0.4, slow: 0.3, nonstock: 0.5, ...P(i.realise) };
-  const rec = num(i.recovery, 0.3, 0, 1), exSA = String(i.exclude_sa) !== "0", keepM = num(i.keep_months, 6, 0, 36), M = num(i.months, 12, 3, 36), cr = num(i.carrying_rate, 0.22, 0, 1);
+  const rec = num(i.recovery, 0.3, 0, 1), exSA = String(i.exclude_sa) !== "0", keepM = num(i.keep_months, 6, 0, 36), M = num(i.months, 12, 3, 36), cr = num(i.carrying_rate, ECON.carrying_rate, 0, 1);
   const extra = Object.fromEntries(db.prepare("select p.material_no, p.months_active, t.mrp_type from part_profile p join material t using(material_no)").all().map((r) => [r.material_no, r]));
   const L = { excess: "Above Max", idle: "No issue in 17 months", slow: "Issued in one or two months", nonstock: "Non Stock items holding stock" }, cat = {}, rows = [];
   Object.keys(L).forEach((k) => (cat[k] = { k, label: L[k], gross: 0, kept_sa: 0, candidate: 0, realisable: 0, parts: 0 }));

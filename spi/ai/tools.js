@@ -8,6 +8,8 @@ import {VIEW_NAMES,runView} from './views_route.js';
 import {SCOPE_TOOLS,runScope} from './scope.js';
 import {describeDatabase,queryRecords} from './dbread.js';
 import {mlSummary,mlPart,mlFlags} from './ml.js';
+import {economicLedger} from './ledger.js';
+import {keyQuestion} from './keyq.js';
 import {PAGE_IDS,readPage,TOPICS,readTopic,planPart,CASE_IDS,caseQuestion} from './pages.js';
 const id={type:'integer',minimum:1},str={type:'string',maxLength:100},filters={q:str,crit:str,class:str,system:str,limit:{type:'integer',minimum:1,maximum:20}};
 const schemas={inventory_metric:{metric:{enum:metricNames},material_no:id,criticality:{enum:['S','A','B','C']},demand_class:str,tag:str},search_parts:{text:str,tag:str,family:str,class:str,criticality:str},get_part_profile:{material_no:id},get_demand_series:{material_no:id,months:{type:'integer',minimum:1,maximum:24}},get_equipment_context:{tag:str},get_pm_schedule:{tag:str,from:str,to:str},get_procurement:{material_no:id},get_inventory_position:filters,run_forecast:{material_no:id},run_optimise:{limit:{type:'integer',minimum:1,maximum:20}},simulate_scenario:{stock_multiplier:{type:'number',minimum:0,maximum:3},service_level:{type:'number',minimum:.8,maximum:.999},lead_time_multiplier:{type:'number',minimum:.25,maximum:3}},explain_recommendation:{material_no:id},search_locations:filters,get_location:{funcloc:str},get_maintenance_summary:{},get_projection:{by:{enum:['all','crit','item_type']}},get_savings:{},get_stock_health:{},get_campaigns:{},get_engine_report:{},get_procurement_findings:{}};
@@ -18,7 +20,7 @@ schemas.inventory_list={kind:{enum:inventoryKinds},equipment:str,material_no:id,
 const required={inventory_list:['kind'],inventory_metric:['metric'],get_part_profile:['material_no'],get_demand_series:['material_no'],get_equipment_context:['tag'],get_pm_schedule:['tag'],get_procurement:['material_no'],run_forecast:['material_no'],explain_recommendation:['material_no'],get_location:['funcloc']};
 Object.assign(schemas,SCOPE_TOOLS);required.activity_on_date=['date'];required.find_entities=['text'];
 schemas.get_page={page:{enum:PAGE_IDS}};required.get_page=['page'];schemas.brief_topic={topic:{enum:Object.keys(TOPICS).filter(k=>TOPICS[k][1])}};required.brief_topic=['topic'];schemas.plan_part={material_no:id};required.plan_part=['material_no'];schemas.case_question={q:{enum:CASE_IDS}};required.case_question=['q'];
-schemas.describe_database={};schemas.ml_summary={};schemas.ml_part={material_no:id};required.ml_part=['material_no'];schemas.ml_flags={kind:{enum:['critical_below_lead_demand','max_below_learned_demand','stock_far_above_learned_need','no_max_with_demand','min_above_max']}};schemas.query_records={table:{type:'string',maxLength:40},filters:{type:'object'},sort:{type:'string',maxLength:40},desc:{type:'boolean'},limit:{type:'integer',minimum:1,maximum:20},count_only:{type:'boolean'}};required.query_records=['table'];
+schemas.describe_database={};schemas.ml_summary={};schemas.key_question={q:{enum:['kq1','kq2']}};required.key_question=['q'];schemas.economic_ledger={topic:{enum:['overview','release','purchase','differences']}};schemas.ml_part={material_no:id};required.ml_part=['material_no'];schemas.ml_flags={kind:{enum:['critical_below_lead_demand','max_below_learned_demand','stock_far_above_learned_need','no_max_with_demand','min_above_max']}};schemas.query_records={table:{type:'string',maxLength:40},filters:{type:'object'},sort:{type:'string',maxLength:40},desc:{type:'boolean'},limit:{type:'integer',minimum:1,maximum:20},count_only:{type:'boolean'}};required.query_records=['table'];
 schemas.get_view={name:{enum:VIEW_NAMES},material_no:id};required.get_view=['name'];
 export const toolDefinitions=Object.entries(schemas).map(([name,properties])=>({name,description:name.replaceAll('_',' ')+' from the baseline database or deterministic engine; no SQL arguments accepted',parameters:{type:'object',properties,required:required[name]||[],additionalProperties:false}})).concat(financeToolDefinitions);
 const endpoints={search_locations:()=>import('../../server/data/locations.mjs'),get_location:()=>import('../../server/data/location.mjs'),get_maintenance_summary:()=>import('../../server/data/maintenance.mjs'),get_projection:()=>import('../../server/data/projection.mjs'),get_savings:()=>import('../../server/data/savings.mjs'),get_stock_health:()=>import('../../server/data/stock-health.mjs'),get_campaigns:()=>import('../../server/data/campaigns.mjs'),get_inventory_position:()=>import('../../server/data/parts.mjs'),get_equipment_context:()=>import('../../server/data/equipment/[tag].mjs'),run_optimise:()=>import('../../server/engine/optimise.mjs'),simulate_scenario:()=>import('../../server/engine/simulate.mjs')};
@@ -39,6 +41,8 @@ export function createTools(db,{signal,inputs_accepted=[],adapter}={}){const cle
  if(SCOPE_TOOLS[name])return runScope(db,name,args);
  if(name==='describe_database')return describeDatabase(db);
  if(name==='ml_summary')return mlSummary(db);
+ if(name==='economic_ledger')return economicLedger(db,args);
+ if(name==='key_question')return keyQuestion(db,args);
  if(name==='ml_part')return mlPart(db,args);
  if(name==='ml_flags')return mlFlags(db,args);
  if(name==='query_records')return queryRecords(db,args);

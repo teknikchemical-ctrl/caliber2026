@@ -2,12 +2,13 @@
 // Without q: the list of questions with their inputs and the tool that goes deeper. With q=<id>: the answer, as {figures, chart, rows, notes} inside the usual ws payload.
 // Question group "demand" answers key question 1 (demand predictability), group "stock" answers key question 2 (dynamic optimisation), group "data" describes the six baseline files.
 import { openDb, json, fail, guard, body, num, list, fig, pay, CUTOFF, months, median, quant } from "./_lib.mjs";
+import { ECON } from "../_lib/econ.mjs";
 import { portfolioParts, evalPart, sum } from "./costrisk.mjs";
 import { advise } from "./advice.mjs";
 import { occurrences } from "./plan.mjs";
 const P = (v) => (typeof v === "string" ? (() => { try { return JSON.parse(v); } catch { return {}; } })() : v || {});
 const M17 = months("2025-05", 17);
-const DEF = () => ({ carrying_rate: 0.22, order_cost_idr: 750000, emergency_premium: 0.35, lead_default: 60, lead_delay_days: 0, demand_factor: 1, downtime_idr_h: { S: 4200000, A: 1250000, B: 330000, C: 42000 }, hours_per_stockout: { S: 72, A: 48, B: 24, C: 12 }, downtime_share: { S: 0.5, A: 0.25, B: 0.1, C: 0.02 } });
+const DEF = () => ({ carrying_rate: ECON.carrying_rate, order_cost_idr: ECON.order_cost_idr, emergency_premium: ECON.emergency_premium, lead_default: ECON.lead_default, lead_delay_days: 0, demand_factor: 1, downtime_idr_h: { ...ECON.downtime_idr_h }, hours_per_stockout: { ...ECON.hours_per_stockout }, downtime_share: { ...ECON.downtime_share } });
 export const QUESTIONS = [
   { id: "d_history", group: "demand", text: "Historical spare part consumption and usage patterns", tool: "spi_inv", inputs: ["adi", "cv2"] },
   { id: "d_failure", group: "demand", text: "Equipment failure frequency and failure history", tool: "spi_mrel", inputs: ["priority"] },
@@ -140,7 +141,7 @@ export default guard(async (req, res) => {
   const i = await body(req), db = openDb();
   if (!i.q) return json(res, 200, pay("ws.questions", {}, { questions: QUESTIONS }, [], ["spi/db/spi.sqlite"], ["Call with q=<id> for one answer."]));
   const Q = QUESTIONS.find((x) => x.id === i.q); if (!Q || !H[i.q]) return fail(res, 404, "Unknown question.");
-  const A = { ...DEF(), ...P(i.assumptions) }, o = { horizon: num(i.horizon, 12, 1, 24), cover: 0, lead: "median", service: { S: 0.98, A: 0.95, B: 0.9, C: 0.85, ...P(i.service) } };
+  const A = { ...DEF(), ...P(i.assumptions) }, o = { horizon: num(i.horizon, 12, 1, 24), cover: 0, lead: "median", service: { ...ECON.service, ...P(i.service) } };
   const r = H[i.q](db, i, A, o);
   json(res, 200, pay("ws.questions." + i.q, { ...i, assumptions: A }, { question: Q, chart: r.chart, rows: r.rows, ...Object.fromEntries(Object.entries(r).filter(([k]) => !["figures", "chart", "rows", "notes"].includes(k))) }, r.figures, ["spi/db/spi.sqlite"], r.notes));
 });

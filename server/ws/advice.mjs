@@ -5,6 +5,7 @@
 // Decision rule (same for every part): reorder point = demand over the lead time + z x spread over the lead time; order-up-to = reorder point + cover months of demand.
 //   Position (stock + open orders) at or below the reorder point: order now. Position reaches the reorder point inside the horizon: order by (date the position reaches it minus the lead time). Otherwise no order in the horizon.
 import { openDb, json, fail, guard, body, num, list, fig, pay, CUTOFF } from "./_lib.mjs";
+import { ECON } from "../_lib/econ.mjs";
 import { evalPart, portfolioParts } from "./costrisk.mjs";
 const P = (v) => (typeof v === "string" ? (() => { try { return JSON.parse(v); } catch { return {}; } })() : v || {}), MD = 30.4375;
 const phi = (z) => Math.exp(-z * z / 2) / Math.sqrt(2 * Math.PI);
@@ -18,7 +19,7 @@ export function impacts(e, p, A) { const c = p.crit || "C", price = p.price || 0
 export function advise(p, o, A) {
   const f = A.demand_factor || 1, mu = p.mu_override != null ? p.mu_override : (p.total_qty || 0) / 17 * f, sd = p.sd_override != null ? p.sd_override : Math.sqrt(Math.max(0, (p.sq || 0) / 17 - ((p.total_qty || 0) / 17) ** 2)) * f, crit = p.crit || "C";
   if (p.mu_override != null) { p = { ...p, total_qty: mu * 17 / f, sq: (sd * sd / (f * f) + (mu / f) ** 2) * 17 }; }
-  const leadD = (o.lead === "p90" ? (p.lt_p90 || p.lt_median) : Number(o.lead) > 0 ? Number(o.lead) : p.lt_median) || A.lead_default, L = leadD / MD, muL = mu * L, sdL = sd * Math.sqrt(L), svc = (o.service || {})[crit] ?? { S: 0.98, A: 0.95, B: 0.9, C: 0.85 }[crit], z = zOf(svc);
+  const leadD = (o.lead === "p90" ? (p.lt_p90 || p.lt_median) : Number(o.lead) > 0 ? Number(o.lead) : p.lt_median) || A.lead_default, L = leadD / MD, muL = mu * L, sdL = sd * Math.sqrt(L), svc = (o.service || {})[crit] ?? ECON.service[crit], z = zOf(svc);
   const price = p.price || 0, D = mu * 12, eoq = price && D > 0 ? Math.sqrt(2 * D * A.order_cost_idr / (price * A.carrying_rate)) : mu, pos = (p.stock || 0) + (p.on_order || 0), H = o.horizon, cur = evalPart(p, { mode: "current" }, A);
   /* search: order size (months of demand) and service level at or above the target; today's Min and Max is a candidate too, so the recommendation never costs more than today */
   let best = null; if (mu > 0) { const covers = o.cover > 0 ? [o.cover] : [1, 2, 3, 4, 6, 9, 12, 18, 24], svcs = [svc, 0.99, 0.995, 0.999].filter((x, k, a) => x >= svc && a.indexOf(x) === k);
@@ -43,7 +44,7 @@ export function advise(p, o, A) {
 }
 export default guard(async (req, res) => {
   const i = await body(req), db = openDb(), H = num(i.horizon, 12, 1, 36), cover = num(i.cover, 0, 0, 36);
-  const A = { carrying_rate: 0.22, order_cost_idr: 750000, emergency_premium: 0.35, lead_default: 60, lead_delay_days: 0, demand_factor: num(i.demand_factor, 1, 0.1, 5), downtime_idr_h: { S: 4200000, A: 1250000, B: 330000, C: 42000 }, hours_per_stockout: { S: 72, A: 48, B: 24, C: 12 }, downtime_share: { S: 0.5, A: 0.25, B: 0.1, C: 0.02 }, ...P(i.assumptions) };
+  const A = { carrying_rate: ECON.carrying_rate, order_cost_idr: ECON.order_cost_idr, emergency_premium: ECON.emergency_premium, lead_default: ECON.lead_default, lead_delay_days: 0, demand_factor: num(i.demand_factor, 1, 0.1, 5), downtime_idr_h: { ...ECON.downtime_idr_h }, hours_per_stockout: { ...ECON.hours_per_stockout }, downtime_share: { ...ECON.downtime_share }, ...P(i.assumptions) };
   A.demand_factor = num(i.demand_factor, A.demand_factor || 1, 0.1, 5);
   let mats = list(i.mats).map(Number).filter(Boolean), scope = null, all = String(i.all) === "1";
   if (i.mat) mats = [Number(i.mat)];
@@ -53,7 +54,7 @@ export default guard(async (req, res) => {
   const rows = []; if (all) { const on = Object.fromEntries(db.prepare("select material_no, sum(qty) q from po_line where po_delivery > ? group by 1").all(CUTOFF).map((r) => [r.material_no, r.q])); portfolioParts(db, { crit: i.crit, type: i.type ? [String(i.type).toUpperCase()] : [], q: i.q }).forEach((p) => rows.push({ ...p, on_order: on[p.material_no] || 0 })); } else for (let k = 0; k < mats.length; k += 500) { const ch = mats.slice(k, k + 500); rows.push(...db.prepare(`select p.material_no, t.descr, t.unit, t.mrp_type, t.item_type, coalesce(p.crit_max,'C') crit, p.demand_class, p.stock, p.min_qty, p.max_qty, p.unit_price_idr price, p.lt_median, p.lt_p90, p.supplier_count, p.total_qty, p.n_issues,
     (select coalesce(sum(qty*qty),0) from demand_month d where d.material_no = p.material_no) sq, (select coalesce(sum(qty),0) from po_line o where o.material_no = p.material_no and o.po_delivery > ?) on_order
     from part_profile p join material t using(material_no) where p.material_no in (${ch.map(() => "?").join(",")})`).all(CUTOFF, ...ch)); }
-  const o = { cap: String(i.cap) === "1", release_idle: String(i.release_idle) === "1", apply: list(i.apply).map((x) => x.toUpperCase()), horizon: H, cover, lead: i.lead || "median", service: { S: 0.98, A: 0.95, B: 0.9, C: 0.85, ...P(i.service) } };
+  const o = { cap: String(i.cap) === "1", release_idle: String(i.release_idle) === "1", apply: list(i.apply).map((x) => x.toUpperCase()), horizon: H, cover, lead: i.lead || "median", service: { ...ECON.service, ...P(i.service) } };
   if (i.mu != null && i.mu !== "" && rows.length === 1) { rows[0].mu_override = Number(i.mu); rows[0].sd_override = Number(i.sd) || 0; }
   let out = rows.map((p) => advise(p, o, A)), rank = { order_now: 0, order_by: 1, to_order: 2, no_order: 3, hold_no_use: 4, none: 5 };
   const SORT = { saving: (a, b) => b.saving_per_year - a.saving_per_year, value: (a, b) => (b.order_value || 0) - (a.order_value || 0), risk: (a, b) => b.risk.stockout_in_lead_time - a.risk.stockout_in_lead_time || b.risk.downtime_cost_per_stockout - a.risk.downtime_cost_per_stockout, date: (a, b) => String(a.order_by || "9").localeCompare(String(b.order_by || "9")), excess: (a, b) => b.risk.excess_value - a.risk.excess_value,
