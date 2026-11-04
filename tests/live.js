@@ -246,7 +246,7 @@ let LAST=null;const fake=http.createServer((rq,rs)=>{let b="";rq.on("data",d=>b+
  await bc.close();sc.kill();
  /* entering the AI key from Settings */
  const sk=proc(8915,{AI_PROVIDER:"",AI_API_KEY:"",GEMINI_API_KEY:"",AI_BASE_URL:"http://localhost:8977/v1beta",ADMIN_CODE:"adm",AI_RATE_PER_MIN:"60"});await up(8915);
- const kc=await b.newContext({viewport:{width:1280,height:900}}),K=await kc.newPage();K.on("pageerror",e=>errs.push(e.message));await K.goto("http://localhost:8915/",{waitUntil:"commit"});await K.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await K.waitForTimeout(1800);
+ const kc=await b.newContext({viewport:{width:1280,height:900}}),K=await kc.newPage();K.on("pageerror",e=>errs.push(e.message));await K.goto("http://localhost:8915/",{waitUntil:"commit"});await K.waitForFunction(()=>typeof SYNC!=="undefined"&&typeof setOpen==="function",null,{timeout:60000});await K.waitForFunction(()=>SYNC.state==="online"&&SYNC.ai&&typeof SYNC.canSetKey==="boolean",null,{timeout:15000});
  ok(await K.evaluate(()=>SYNC.state==="online"&&!SYNC.ai.configured&&AI.conn.state==="local"),"site without a key starts in search-only mode");
  await K.evaluate(()=>{ACC.admin="adm";accSave();setOpen()});await K.waitForTimeout(300);
  ok(await K.evaluate(()=>document.querySelector("#setbody").innerText.includes("Connect the AI")),"Settings offers to connect the AI");
