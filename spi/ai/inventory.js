@@ -32,15 +32,16 @@ export function inventoryList(db,{kind,equipment,material_no,limit=10}={}){
   definition={critical_zero:'S/A Stock Item materials at zero on-hand stock with issues in at least two historical months.',excess:CATS.excess.def,slow_dead:CATS.slow.def+' '+CATS.non_moving.def+' Non-moving is not proof of obsolescence; insurance reserves stay.',insurance:CATS.insurance.def}[kind];
  }
  const total=rows.length,shown=rows.slice(0,kind==='top_reorder_lead'?1:limit),label=equipment||material_no||'all materials';
- const describe=r=>{const base='Material '+r.material_no+' ('+r.descr+'): stock '+n(r.stock)+' '+r.unit;
+ const idr=v=>v==null?'price Not in baseline data':Math.abs(v)>=1e9?'IDR '+(v/1e9).toFixed(2)+' bn':Math.abs(v)>=1e6?'IDR '+(v/1e6).toFixed(1)+' mn':'IDR '+n(v);
+ const describe=r=>{const base='['+r.material_no+'] '+r.descr+': stock '+n(r.stock)+' '+r.unit;
   if(kind==='top_reorder_lead')return base+'; planning lead time '+n(r.planning_lead_days)+' days (proxy); '+r.lead_basis+'.';
-  if(kind==='excess')return base+'; Max '+n(r.max_qty)+'; excess '+n(r.excess_qty)+' '+r.unit+'; priced excess IDR '+n(r.static_excess_value_idr)+' (Estimate).';
-  if(kind==='campaign')return base+'; estimated campaign demand '+n(r.expected_demand)+' '+r.unit+'; gap '+n(r.gap_qty)+' '+r.unit+'; priced gap IDR '+n(r.gap_value_idr)+' (Estimate).';
-  if(kind==='release')return base+'; gross review candidate IDR '+n(r.release_candidate_idr)+' (Estimate), '+r.category+'.';
+  if(kind==='excess')return base+'; Max '+n(r.max_qty)+'; excess '+n(r.excess_qty)+' '+r.unit+'; excess value '+idr(r.static_excess_value_idr)+' (Estimate)';
+  if(kind==='campaign')return base+'; estimated campaign demand '+n(r.expected_demand)+' '+r.unit+'; gap '+n(r.gap_qty)+' '+r.unit+'; gap value '+idr(r.gap_value_idr)+' (Estimate)';
+  if(kind==='release')return base+'; review candidate '+idr(r.release_candidate_idr)+' (Estimate), '+r.category;
   if(['critical_risk','reorder'].includes(kind))return base+'; reorder point '+n(r.reorder_point)+'; proposed order '+n(r.order_qty)+' '+r.unit+'; modelled stockout probability '+n(r.stockout_risk*100)+'%.';
-  return base+'; criticality '+r.crit_max+'; '+(kind==='slow_dead'?r.movement_status+'; ':'')+'stock value IDR '+n(r.stock_value_idr)+' (Estimate).';
+  return base+'; criticality '+r.crit_max+'; '+(kind==='slow_dead'?r.movement_status+'; ':'')+'stock value '+idr(r.stock_value_idr)+' (Estimate)';
  };
- const answer=total+' matching materials in '+label+'. Showing '+shown.length+'.\n'+definition+'\n'+(shown.length?shown.map(describe).join('\n'):'No materials match this rule in the selected scope.')+'\nZero observed demand is not zero need. No automatic disposal or purchase approval is implied.';
+ const answer='**'+n(total)+' matching materials** in '+label+'. '+definition+(shown.length?'\n'+shown.slice(0,5).map(r=>'- '+describe(r)).join('\n')+(total>5?'\n('+Math.min(total,shown.length)+' listed in the evidence; open Inventory > Registers for the full list.)':''):'\nNo materials match this rule in the selected scope.')+'\nStock is on-hand only. No disposal or purchase is implied.';
  return {id:'inventory:'+kind,...clean.stamp({kind,scope,total,shown:shown.length,truncated:total>shown.length,definition,rows:shown.map(r=>Object.fromEntries(['material_no','descr','unit','stock','mrp_type','crit_max','min_qty','max_qty','excess_qty','static_excess_value_idr','order_qty','reorder_point','stockout_risk','action','planning_lead_days','lead_basis','movement_status','stock_value_idr','release_candidate_idr','category','expected_demand','gap_qty','gap_value_idr','insurance_spare','dq_flags','evidence_ids'].filter(k=>r[k]!==undefined).map(k=>[k,r[k]]))),answer},['inventory:'+kind],{count:'materials',stock:'material base units',money:'IDR (Estimate)'})};
 }
 

@@ -54,14 +54,14 @@ export function describeScope(db,{cls,text,funcloc,focus}={}){
   if(focus==='maintenance'){const items=db.prepare('SELECT descr,cycle_text,next_due FROM maint_item WHERE funcloc=? ORDER BY next_due LIMIT 6').all(f.funcloc),ns=db.prepare('SELECT notif_date,descr,priority,status FROM notification WHERE funcloc=? ORDER BY notif_date DESC LIMIT 3').all(f.funcloc);
    const answer='**'+f.tag+'** ('+f.descr+'): '+(items.length?'**'+items.length+' planned maintenance item'+(items.length>1?'s':'')+'**: '+items.slice(0,4).map(i=>i.descr+' ('+String(i.cycle_text).toLowerCase()+', next due '+i.next_due+')').join('; ')+'.':'no planned maintenance items in the data.')+(ns.length?' Latest notifications: '+ns.map(n=>n.notif_date+' '+n.descr+' ('+String(n.status).toLowerCase()+')').join('; ')+'.':' No notifications recorded.');
    return {id,equipment:f,planned:items,notifications:ns,answer}}
-  const parts=partsFor(db,[f.funcloc]);
+  const parts=partsFor(db,[f.funcloc]),nb=db.prepare('SELECT count(DISTINCT material_no) n FROM bom WHERE funcloc=?').get(f.funcloc).n;
   const n=db.prepare('SELECT count(*) n FROM notification WHERE funcloc=?').get(f.funcloc).n,pm=db.prepare('SELECT count(*) n FROM maint_item WHERE funcloc=?').get(f.funcloc).n,iss=db.prepare('SELECT count(*) n,coalesce(sum(qty),0) q FROM movement WHERE funcloc=?').get(f.funcloc);
   let answer;
-  if(parts.length)answer='**'+f.tag+'** ('+f.descr+', class '+f.eq_class+') has **'+parts.length+(parts.length>=6?'+':'')+' installed spare parts** in its bill of materials. Top by issue history: '+parts.slice(0,3).map(partLine).join('; ')+'. It has '+n+' notifications, '+pm+' planned maintenance items and '+iss.n+' recorded issues.';
+  if(parts.length)answer='**'+f.tag+'** ('+f.descr+', class '+f.eq_class+') has **'+fmt(nb)+' spare parts** in its bill of materials. Top by issue history: '+parts.slice(0,3).map(partLine).join('; ')+'. It has '+n+' notifications, '+pm+' planned maintenance items and '+iss.n+' recorded issues.';
   else{const peers=db.prepare("SELECT funcloc FROM funcloc WHERE eq_class=? AND has_bom=1 AND funcloc<>? ORDER BY tag LIMIT 40").all(f.eq_class,f.funcloc).map(x=>x.funcloc);const pp=partsFor(db,peers,4);
    answer='**'+f.tag+'** ('+f.descr+') has **no bill of materials** in the data, so no spare part is linked to it. Its activity: '+n+' notifications, '+pm+' planned items, '+iss.n+' recorded issues. '+(pp.length?'Parts used on other '+f.eq_class+' equipment that do have a BoM, for reference: '+pp.slice(0,3).map(partLine).join('; ')+'. These are class-level analogues, not a confirmed fit.':'No comparable equipment with a BoM was found.')+' Add its BoM through the Documents and log page to enable forecasting.';
    return {id,equipment:f,parts:[],analogues:pp,counts:{notifications:n,planned:pm,issues:iss.n},answer,empty:true}}
-  return {id,equipment:f,parts,counts:{notifications:n,planned:pm,issues:iss.n},answer}}
+  return {id,equipment:f,parts,bom_parts:nb,counts:{notifications:n,planned:pm,issues:iss.n},answer}}
  const ws=r.words;let locs=[],label;
  if(classes.length&&!ws.length){const ci=classInfo(db,classes[0]);if(!ci)return {id:'scope:none',answer:'Not in baseline data: class '+classes[0]+'.'};
   const ids=db.prepare('SELECT funcloc FROM funcloc WHERE eq_class=? AND has_bom=1').all(classes[0]).map(x=>x.funcloc);const tot=db.prepare('SELECT count(DISTINCT b.material_no) parts,coalesce(sum(m.stock*m.last_unit_price_idr),0) val FROM bom b JOIN material m USING(material_no) JOIN funcloc f USING(funcloc) WHERE f.eq_class=?').get(classes[0]);
@@ -83,13 +83,53 @@ export function activityOnDate(db,{date}={}){if(!/^20\d\d-\d\d-\d\d$/.test(date|
  if(!mv.n&&!nt.n&&!pr.n&&!dl.n)return {id:'activity:'+date,answer:'No recorded activity on '+date+' (data runs 2025-05 to 2026-09).'};
  const answer='On **'+date+'**: **'+fmt(mv.n)+' material issues** ('+fmt(mv.mats)+' distinct materials), **'+nt.n+' notifications**'+(nt.hi?' ('+nt.hi+' high priority)':'')+', '+(pr.n?'**'+pr.n+' purchase requisition lines** raised'+(dl.n?' and ':''):'')+(dl.n?'**'+dl.n+' PO deliveries** due':'')+'.'+(top.length?' Largest issues: '+top.map(t=>'['+t.material_no+'] '+t.descr+' ('+fmt(t.q)+')').join('; ')+'.':'')+(locs.length?' Busiest equipment: '+locs.map(l=>l.tag+' '+l.descr).join('; ')+'.':'');
  return {id:'activity:'+date,date,issues:mv.n,notifications:nt.n,pr_lines:pr.n,po_deliveries:dl.n,top_materials:top,answer}}
-export const SCOPE_TOOLS={find_entities:{text:{type:'string',maxLength:200}},describe_scope:{focus:{enum:['parts','maintenance']},cls:{type:'string',maxLength:12},text:{type:'string',maxLength:200},funcloc:{type:'string',maxLength:80}},activity_on_date:{date:{type:'string',maxLength:10}}};
-export function runScope(db,name,a){return name==='find_entities'?findEntities(db,a):name==='describe_scope'?describeScope(db,a):activityOnDate(db,a)}
+export const SCOPE_TOOLS={lookup_record:{id:{type:'integer',minimum:1},supplier:{type:'string',maxLength:80}},describe_part:{material_no:{type:'integer',minimum:1},code:{type:'string',maxLength:40}},find_entities:{text:{type:'string',maxLength:200}},describe_scope:{focus:{enum:['parts','maintenance']},cls:{type:'string',maxLength:12},text:{type:'string',maxLength:200},funcloc:{type:'string',maxLength:80}},activity_on_date:{date:{type:'string',maxLength:10}}};
+export function runScope(db,name,a){return name==='lookup_record'?lookupRecord(db,a):name==='describe_part'?describePart(db,a):name==='find_entities'?findEntities(db,a):name==='describe_scope'?describeScope(db,a):activityOnDate(db,a)}
 // Deterministic planner used in rules mode (and as the first call in Gemini mode).
 export function scopeRoute(db,q,resolved={}){
  const r=resolveEntities(db,q);
+ {const known=t=>db.prepare('SELECT 1 FROM funcloc WHERE tag=? OR funcloc=? LIMIT 1').get(t,'PX_'+t);for(const t of codeTokens(q)){if(known(t))continue;if(findByCode(db,t).length)return ['describe_part',{code:t}]}}
+ {const d=(q.match(/\b\d{10,12}\b/)||[])[0];if(d&&!db.prepare('SELECT 1 FROM material WHERE material_no=?').get(Number(d))&&(/^\d{12}$/.test(d)||db.prepare('SELECT 1 FROM po_line WHERE po_no=? OR pr_no=? LIMIT 1').get(Number(d),Number(d))))return ['lookup_record',{id:Number(d)}]}
+ {const m=q.match(/\bsupplier\s+(?:called\s+|named\s+)?([A-Za-z][A-Za-z .&]{2,40})/i)||q.match(/^\s*(?:who is|tell me about)\s+([A-Za-z .&]{3,40}\b(?:PT|TBK|CV))\b/i);if(m&&!/\b(lead|which|most|best|count|how)\b/i.test(m[1]))return ['lookup_record',{supplier:m[1].trim().replace(/\s+(pt|tbk)$/i,'')}]}
+ const mat=(q.match(/\b\d{10}\b/)||[])[0];if(mat&&/^\s*(?:part code|material|part|code)?\s*\d{10}\s*(?:what is it|\?)?\s*$|what is|what's|describe|tell me about|which part|info/i.test(q)&&!/forecast|reorder|history|trend|why|risk|recommend|next|stock|\bmin\b|\bmax\b|price|value|lead|cost|demand|consum|safety/i.test(q))return ['describe_part',{material_no:Number(mat)}];
  if(r.date&&/happen|activity|event|issue|notif|order|record|everything|what|how many/i.test(q))return ['activity_on_date',{date:r.date}];
  if(/\b(min|max|forecast|reorder|safety|lead time|recommend|cost|saving|scenario|what if)\b/i.test(q))return null;
  if(resolved.funcloc&&!resolved.material_no&&r.tag){if(/vibration|measure|inspect|notif|\bpm\b|maintenance|schedule|due|task|failure|breakdown/i.test(q))return ['describe_scope',{funcloc:resolved.funcloc,focus:'maintenance'}];if(q.trim().split(/\s+/).length<=6||/part|spare|bom|bill|install|use|have|fit/i.test(q))return ['describe_scope',{funcloc:resolved.funcloc,focus:'parts'}]}
  if(!r.tag&&!r.material_no&&(r.classes.length||r.words.length)&&q.trim().split(/\s+/).length<=8&&!/\b(zero|below|excess|slow|dead|obsolete|insurance|critical|campaign|turnaround|shutdown|procure|supplier|spend|stockout|overstock|budget|cash|health)\b/i.test(q))return ['describe_scope',{text:q.slice(0,200)}];
  return null}
+
+// ---- part card and code search (model, type, drawing numbers inside the description) ----
+const money=v=>v==null?'Not in baseline data':Math.abs(v)>=1e9?'IDR '+(v/1e9).toFixed(2)+' bn':Math.abs(v)>=1e6?'IDR '+(v/1e6).toFixed(1)+' mn':'IDR '+fmt(v);
+export function codeTokens(q){return [...new Set((q.toUpperCase().match(/\b(?=[A-Z0-9.\-]*\d)(?=[A-Z0-9.\-]*[A-Z])[A-Z0-9][A-Z0-9.\-]{2,}[A-Z0-9]\b/g)||[]).filter(t=>!/^\d{10}$/.test(t)&&!/^20\d\d-/.test(t)))]}
+export function findByCode(db,code){const c=String(code).toUpperCase().replace(/[^A-Z0-9.\-]/g,'');if(c.length<3)return [];
+ return db.prepare("SELECT material_no,descr FROM material WHERE upper(descr) LIKE ? OR upper(coalesce(dwg_no,'')) LIKE ? OR upper(coalesce(for_tag,''))=? ORDER BY material_no LIMIT 8").all('%'+c+'%','%'+c+'%',c)}
+export function describePart(db,{material_no,code}={}){let mats=material_no?[{material_no}]:findByCode(db,code||'');
+ if(!mats.length)return {id:'part:none',answer:'Not in baseline data: no material has "'+code+'" in its description or drawing number.'};
+ if(mats.length>1)return {id:'part:code:'+code,matches:mats,answer:'**'+mats.length+(mats.length>=8?'+':'')+' materials** contain "'+code+'": '+mats.slice(0,5).map(m=>'['+m.material_no+'] '+m.descr).join('; ')+'. Ask about one part number for its card.'};
+ const no=mats[0].material_no,m=db.prepare('SELECT * FROM material WHERE material_no=?').get(no);if(!m)return {id:'part:none',answer:'Not in baseline data: material '+no+'.'};
+ const p=db.prepare('SELECT * FROM part_profile WHERE material_no=?').get(no)||{},locs=db.prepare("SELECT DISTINCT coalesce(f.tag,replace(f.funcloc,'PX_','')) tag FROM part_equipment e JOIN funcloc f USING(funcloc) WHERE e.material_no=? ORDER BY 1 LIMIT 3").all(no),nl=db.prepare('SELECT count(DISTINCT funcloc) n FROM part_equipment WHERE material_no=?').get(no).n;
+ const price=m.last_unit_price_idr,above=m.max_qty!=null&&m.stock>m.max_qty?m.stock-m.max_qty:0,unit=m.unit||'EA';
+ const parts=['**['+no+'] '+m.descr+'** ('+(m.item_type||'item').toLowerCase()+', '+(m.mrp_type||'type not set')+(p.crit_max?', criticality '+p.crit_max:'')+').',
+  'Stock **'+fmt(m.stock)+' '+unit+'** against Min '+(m.min_qty??'not set')+' and Max '+(m.max_qty??'not set')+(above?' ('+fmt(above)+' above Max, about **'+money(above*(price||0))+'** at the last PO price, Estimate)':'')+'.',
+  p.n_issues?'Demand: '+fmt(p.n_issues)+' issue'+(p.n_issues>1?'s':'')+' ('+fmt(p.total_qty)+' '+unit+') in '+p.months_active+' of 17 months, last in '+p.last_issue+', pattern '+String(p.demand_class).replace('_',' ')+'.':'No issues recorded since 2025-05, so the forecast is a stocking decision, not a model.',
+  nl?'Installed on '+fmt(nl)+' location'+(nl>1?'s':'')+': '+locs.map(l=>l.tag).join(', ')+(nl>3?' and others':'')+'.':'Not linked to any equipment BoM.',
+  p.lt_median!=null?'Lead time proxy median '+Math.round(p.lt_median)+' days ('+p.lt_n+' PO line'+(p.lt_n>1?'s':'')+').':'No PO history, so the lead time is a class default (Assumption).',
+  price>1e8?'Unit price '+money(price)+' is the last PO line amount; check it is not a lot price before acting on the value.':''];
+ return {id:'part:'+no,material:m,profile:p,locations:locs,answer:parts.filter(Boolean).join(' ')}}
+// ---- document numbers and suppliers: notification, order, PR, PO, supplier ----
+export function lookupRecord(db,{id,supplier}={}){
+ if(supplier){const s=db.prepare("SELECT supplier,supplier_code,count(*) n,count(DISTINCT material_no) mats,min(pr_date) a,max(pr_date) b FROM po_line WHERE upper(supplier) LIKE ? GROUP BY 1,2 ORDER BY n DESC LIMIT 3").all('%'+String(supplier).toUpperCase()+'%');
+  if(!s.length)return {id:'record:none',answer:'Not in baseline data: no supplier name contains "'+supplier+'".'};const t=s[0];
+  const lt=db.prepare('SELECT lead_days FROM po_line WHERE supplier_code=? AND lead_days IS NOT NULL ORDER BY lead_days').all(t.supplier_code).map(x=>x.lead_days),med=lt.length?lt[Math.floor(lt.length/2)]:null;
+  const top=db.prepare('SELECT p.material_no,m.descr,count(*) n FROM po_line p JOIN material m USING(material_no) WHERE supplier_code=? GROUP BY 1 ORDER BY n DESC LIMIT 3').all(t.supplier_code);
+  return {id:'record:supplier:'+t.supplier_code,suppliers:s,answer:'**'+t.supplier+'** (code '+t.supplier_code+'): **'+fmt(t.n)+' PO lines** for '+fmt(t.mats)+' materials between '+t.a+' and '+t.b+(med!=null?', median lead time proxy **'+med+' days**':'')+'. Most bought: '+top.map(x=>'['+x.material_no+'] '+x.descr+' ('+x.n+')').join('; ')+'.'+(s.length>1?' Other matches: '+s.slice(1).map(x=>x.supplier).join('; ')+'.':'')}}
+ const n=Number(id);if(!Number.isSafeInteger(n))return {id:'record:none',answer:'Give a notification, order, PR or PO number.'};
+ const nt=db.prepare('SELECT * FROM notification WHERE notif_no=? OR order_no=? ORDER BY notif_date').all(n,n);
+ if(nt.length){const x=nt[0],iss=db.prepare('SELECT count(*) c,count(DISTINCT material_no) m FROM movement WHERE order_no=?').get(x.order_no);const tag=String(x.funcloc||'').replace(/^PX_/,'');
+  return {id:'record:notif:'+n,notifications:nt.slice(0,5),answer:(x.notif_no===n?'Notification **'+n+'**':'Order **'+n+'**')+' ('+x.type+', priority '+x.priority+'): "'+x.descr+'" on **'+tag+'**, raised '+x.notif_date+', '+String(x.status).toLowerCase()+(x.completed_on?' on '+x.completed_on:'')+'. '+(iss.c?'Order '+x.order_no+' drew '+fmt(iss.c)+' material issues ('+fmt(iss.m)+' materials).':'No material issue is booked to order '+x.order_no+'.')+(nt.length>1?' The order has '+nt.length+' notifications.':'')}}
+ const mv=db.prepare('SELECT count(*) c,count(DISTINCT material_no) m,min(posting_date) a,max(posting_date) b,max(funcloc) f FROM movement WHERE order_no=?').get(n);
+ if(mv.c)return {id:'record:order:'+n,answer:'Order **'+n+'** drew **'+fmt(mv.c)+' material issues** ('+fmt(mv.m)+' materials) between '+mv.a+' and '+mv.b+(mv.f?' on '+String(mv.f).replace(/^PX_/,''):'')+'. No notification in the data names this order.'};
+ const po=db.prepare('SELECT p.*,m.descr FROM po_line p LEFT JOIN material m USING(material_no) WHERE po_no=? OR pr_no=? ORDER BY po_item').all(n,n);
+ if(po.length){const x=po[0],kind=x.po_no===n?'PO':'PR';
+  return {id:'record:'+kind.toLowerCase()+':'+n,lines:po.slice(0,10),answer:kind+' **'+n+'**: **'+po.length+' line'+(po.length>1?'s':'')+'**, supplier '+(x.supplier||'not assigned')+', PR date '+x.pr_date+(x.po_delivery?', PO delivery '+x.po_delivery:'')+(x.lead_days!=null?' (lead time proxy '+x.lead_days+' days)':'')+'. Items: '+po.slice(0,3).map(l=>'['+l.material_no+'] '+(l.descr||'')+' x '+fmt(l.qty)+' '+(l.uom||'')).join('; ')+'.'}}
+ return {id:'record:none',answer:'Not in baseline data: '+n+' is not a notification, order, PR or PO number.'}}

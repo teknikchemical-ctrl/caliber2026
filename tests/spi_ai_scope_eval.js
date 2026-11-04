@@ -10,6 +10,14 @@ const cases=[
  ['What happened on 2026-09-30','activity_on_date',/99 material issues/],
  ['PP-1323B vibration measurement','describe_scope',/Vibration measurement \(monthly, next due 2026-10-01\)/,/chart/],
  ['compressor','describe_scope',/class KC/],
+ ['model dy707 what is it','describe_part',/4100055430[\s\S]*DY707/,/4300003237/],
+ ['TYPE FO338 what is it','describe_part',/4100048715[\s\S]*FO338/,/no BoM/i],
+ ['Part code 4300003237 what is it','describe_part',/BLADE,ROTOR[\s\S]*IDR 91\.19 bn/,/460551064|Figures are Estimates/],
+ ['What are the largest excess stock items?','inventory_list',/1,376 matching materials[\s\S]*IDR 163\.28 bn/,/163,276,712,768|Figures are Estimates/],
+ ['what is KT-624A','describe_scope',/208 spare parts/,/6\+/],
+ ['notification 101000000101','lookup_record',/Leak from packing/],
+ ['PO 4300005214','lookup_record',/6 lines[\s\S]*CAHAYA/],
+ ['supplier CAHAYA INDUSTRI','lookup_record',/525 PO lines/],
  ['What happened on 3 Jan 2020','activity_on_date',/No recorded activity/]];
 for(const [q,tool,ok,no] of cases){const r=await ask({db,question:q});const t=r.trace.find(x=>x.step==='tool')?.name,fails=[];
  if(t!==tool)fails.push('tool '+t);if(!ok.test(r.answer))fails.push('missing pattern');if(no&&no.test(r.answer))fails.push('forbidden pattern');if(r.answer.length>1100)fails.push('too long '+r.answer.length);
